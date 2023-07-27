@@ -21,10 +21,10 @@
 #define LUA_VERSION_NUM		503
 #define LUA_VERSION_RELEASE	"6"
 
-#define LUA_VERSION	"LUX based on Lua " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR " and LJS"
-#define LUA_RELEASE	LUA_VERSION "." LUA_VERSION_RELEASE
-#define LUA_COPYRIGHT	LUA_RELEASE "  Copyright (C) 1994-2018 Lua.org, PUC-Rio"
-#define LUA_AUTHORS	"R. Ierusalimschy, L. H. de Figueiredo, W. Celes, Domingo Alvarez Duarte"
+#define LUA_VERSION	"luax based on Lua " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR " and ljs"
+#define LUA_RELEASE	LUA_VERSION "."
+#define LUA_COPYRIGHT	LUA_VERSION
+#define LUA_AUTHORS	""
 
 
 /* mark for precompiled code ('<esc>Lua') */

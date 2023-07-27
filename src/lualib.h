@@ -41,6 +41,9 @@ LUAMOD_API int (luaopen_bit32) (lua_State *L);
 #define LUA_MATHLIBNAME	"math"
 LUAMOD_API int (luaopen_math) (lua_State *L);
 
+#define LUA_COLORLIBNAME	"color"
+LUAMOD_API int (luaopen_color) (lua_State *L);
+
 #define LUA_DBLIBNAME	"debug"
 LUAMOD_API int (luaopen_debug) (lua_State *L);
 

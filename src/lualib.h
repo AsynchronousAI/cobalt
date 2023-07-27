@@ -50,6 +50,9 @@ LUAMOD_API int (luaopen_2D) (lua_State *L);
 #define LUA_3DLIBNAME	"Vec3"
 LUAMOD_API int (luaopen_3D) (lua_State *L);
 
+// #define LUA_INSTANCELIBNAME	"CoreInstance"
+// LUAMOD_API int (luaopen_instance) (lua_State *L);
+
 #define LUA_DBLIBNAME	"debug"
 LUAMOD_API int (luaopen_debug) (lua_State *L);
 

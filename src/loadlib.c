@@ -626,7 +626,6 @@ static int ll_require (lua_State *L) {
 ** 'module' function
 ** =======================================================
 */
-#if defined(LUA_COMPAT_MODULE)
 
 /*
 ** changes the environment variable of calling function
@@ -671,6 +670,7 @@ static void modinit (lua_State *L, const char *modname) {
 
 
 static int ll_module (lua_State *L) {
+  printf("\'module\' will provide unexpected results! Switch to \'import\'/\'require\' instead.\n");
   const char *modname = luaL_checkstring(L, 1);
   int lastarg = lua_gettop(L);  /* last parameter */
   luaL_pushmodule(L, modname, 1);  /* get/create module table */
@@ -700,7 +700,7 @@ static int ll_seeall (lua_State *L) {
   return 0;
 }
 
-#endif
+
 /* }====================================================== */
 
 
@@ -708,9 +708,7 @@ static int ll_seeall (lua_State *L) {
 static const luaL_Reg pk_funcs[] = {
   {"loadlib", ll_loadlib},
   {"searchpath", ll_searchpath},
-#if defined(LUA_COMPAT_MODULE)
   {"seeall", ll_seeall},
-#endif
   /* placeholders */
   {"preload", NULL},
   {"cpath", NULL},
@@ -722,10 +720,9 @@ static const luaL_Reg pk_funcs[] = {
 
 
 static const luaL_Reg ll_funcs[] = {
-#if defined(LUA_COMPAT_MODULE)
   {"module", ll_module},
-#endif
   {"require", ll_require},
+  {"import", ll_require},
   {NULL, NULL}
 };
 
@@ -742,10 +739,9 @@ static void createsearcherstable (lua_State *L) {
     lua_pushcclosure(L, searchers[i], 1);
     lua_rawseti(L, -2, i+LUA_INDEX_BASE);
   }
-#if defined(LUA_COMPAT_LOADERS)
+
   lua_pushvalue(L, -1);  /* make a copy of 'searchers' table */
   lua_setfield(L, -3, "loaders");  /* put it in field 'loaders' */
-#endif
   lua_setfield(L, -2, "searchers");  /* put it in field 'searchers' */
 }
 

@@ -16,7 +16,7 @@
 #include "lualib.h"
 
 
-#if defined(LUA_COMPAT_BITLIB)		/* { */
+		/* { */
 
 
 #define pushunsigned(L,n)	lua_pushinteger(L, (lua_Integer)(n))
@@ -223,11 +223,3 @@ LUAMOD_API int luaopen_bit32 (lua_State *L) {
 }
 
 
-#else					/* }{ */
-
-
-LUAMOD_API int luaopen_bit32 (lua_State *L) {
-  return luaL_error(L, "library 'bit32' has been deprecated");
-}
-
-#endif					/* } */

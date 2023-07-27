@@ -200,7 +200,7 @@ typedef struct luaL_Stream {
 
 
 /* compatibility with old module system */
-#if defined(LUA_COMPAT_MODULE)
+
 
 LUALIB_API void (luaL_pushmodule) (lua_State *L, const char *modname,
                                    int sizehint);
@@ -208,8 +208,6 @@ LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
                                 const luaL_Reg *l, int nup);
 
 #define luaL_register(L,n,l)	(luaL_openlib(L,(n),(l),0))
-
-#endif
 
 
 /*
@@ -242,7 +240,7 @@ LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
 ** Compatibility with deprecated conversions
 ** =============================================================
 */
-#if defined(LUA_COMPAT_APIINTCASTS)
+
 
 #define luaL_checkunsigned(L,a)	((lua_Unsigned)luaL_checkinteger(L,a))
 #define luaL_optunsigned(L,a,d)	\
@@ -254,7 +252,6 @@ LUALIB_API void (luaL_openlib) (lua_State *L, const char *libname,
 #define luaL_checklong(L,n)	((long)luaL_checkinteger(L, (n)))
 #define luaL_optlong(L,n,d)	((long)luaL_optinteger(L, (n), (d)))
 
-#endif
 /* }============================================================ */
 
 

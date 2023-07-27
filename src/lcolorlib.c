@@ -9,6 +9,8 @@
 
 
 #include <stdlib.h>
+#include <math.h>
+#include <string.h>
 
 #include "lua.h"
 
@@ -24,12 +26,20 @@ typedef struct {
 
 
 
-static int color_hsv (lua_State *L) {
-  int h = luaL_checknumber(L, 1);
-  int s = luaL_checknumber(L, 2);
-  int v = luaL_checknumber(L, 3);
-  lua_pushnumber(L, -1);
-  return 1;
+static int color_index(lua_State *L) {
+  Color* color = (Color*)lua_touserdata(L, 1);
+  const char* key = luaL_checkstring(L, 2);
+  if (strcmp(key, "R") == 0) {
+    lua_pushinteger(L, color->r);
+    return 1;
+  } else if (strcmp(key, "G") == 0) {
+    lua_pushinteger(L, color->g);
+    return 1;
+  } else if (strcmp(key, "B") == 0) {
+    lua_pushinteger(L, color->b);
+    return 1;
+  }
+  return 0;
 }
 
 static void push_color(lua_State *L, int r, int g, int b) {
@@ -37,7 +47,10 @@ static void push_color(lua_State *L, int r, int g, int b) {
   color->r = r;
   color->g = g;
   color->b = b;
-  luaL_getmetatable(L, "color");
+  if (luaL_newmetatable(L, "color")) {
+    lua_pushcfunction(L, color_index);
+    lua_setfield(L, -2, "__index");
+  }
   lua_setmetatable(L, -2);
 }
 
@@ -54,6 +67,30 @@ static int color_rgb (lua_State *L) {
   int r = luaL_checknumber(L, 1);
   int g = luaL_checknumber(L, 2);
   int b = luaL_checknumber(L, 3);
+  push_color(L, r, g, b);
+  return 1;
+}
+
+static int color_hsv (lua_State *L) {
+  int h = luaL_checknumber(L, 1);
+  int s = luaL_checknumber(L, 2);
+  int v = luaL_checknumber(L, 3);
+  
+  int r, g, b;
+  int i = floor(h * 6);
+  int f = h * 6 - i;
+  int p = v * (1 - s);
+  int q = v * (1 - f * s);
+  int t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0: r = v, g = t, b = p; break;
+    case 1: r = q, g = v, b = p; break;
+    case 2: r = p, g = v, b = t; break;
+    case 3: r = p, g = q, b = v; break;
+    case 4: r = t, g = p, b = v; break;
+    case 5: r = v, g = p, b = q; break;
+  }
+
   push_color(L, r, g, b);
   return 1;
 }
@@ -99,9 +136,6 @@ static int color_fromhex (lua_State *L) {
   push_color(L, r, g, b);
   return 1;
 }
-
-
-
 
 
 

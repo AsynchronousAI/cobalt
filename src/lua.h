@@ -380,13 +380,13 @@ LUA_API void      (lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 ** compatibility macros for unsigned conversions
 ** ===============================================================
 */
-#if defined(LUA_COMPAT_APIINTCASTS)
+
 
 #define lua_pushunsigned(L,n)	lua_pushinteger(L, (lua_Integer)(n))
 #define lua_tounsignedx(L,i,is)	((lua_Unsigned)lua_tointegerx(L,i,is))
 #define lua_tounsigned(L,i)	lua_tounsignedx(L,(i),NULL)
 
-#endif
+
 /* }============================================================== */
 
 /*

@@ -51,7 +51,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_COLORLIBNAME, luaopen_color},
   {LUA_2DLIBNAME, luaopen_2D},
   {LUA_3DLIBNAME, luaopen_3D},
-  //{LUA_TRANSFORMNAME, luaopen_transform},
+  {LUA_TRANSFORMNAME, luaopen_transform},
   {LUA_UTF8LIBNAME, luaopen_utf8},
   {LUA_DBLIBNAME, luaopen_debug},
   {LUA_BITLIBNAME, luaopen_bit32},

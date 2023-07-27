@@ -12,8 +12,12 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-#include "l3dlib.c"
 
+typedef struct {
+  int x;
+  int y;
+  int z;
+} Vec3;
 
 typedef struct {
     int x; // position x
@@ -30,12 +34,7 @@ typedef struct {
     int pz; // pivot z
 } Transform;
 
-default_transform = {
-  0, 0, 0,
-  0, 0, 0,
-  1, 1, 1,
-  0, 0, 0
-};
+int default_transform[12] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 0 ,0 ,0};
 
 static int transform_index(lua_State *L) {
   Transform* transform = (Transform*)lua_touserdata(L, 1);

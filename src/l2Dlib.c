@@ -25,10 +25,10 @@ typedef struct {
 static int vec2_index(lua_State *L) {
   Vec2* vec2 = (Vec2*)lua_touserdata(L, 1);
   const char* key = luaL_checkstring(L, 2);
-  if (strcmp(key, "x") == 0) {
+  if (strcmp(key, "X") == 0) {
     lua_pushnumber(L, vec2->x);
     return 1;
-  } else if (strcmp(key, "y") == 0) {
+  } else if (strcmp(key, "Y") == 0) {
     lua_pushnumber(L, vec2->y);
     return 1;
   }
@@ -80,17 +80,13 @@ static int vec2_new(lua_State *L) {
 
 static const luaL_Reg vec2lib[] = {
     {"new", vec2_new},
-    {"__add", vec2_add},
-    {"__sub", vec2_sub},
-    {"__mul", vec2_mul},
-    {"__div", vec2_div},
-  {NULL, NULL}
+    {"add", vec2_add},
+    {"sub", vec2_sub},
+    {"mul", vec2_mul},
+    {"div", vec2_div},
+    {NULL, NULL}
 };
 
-static const luaL_Reg vec2meta[] = {
-  {"__index", vec2_index},
-  {NULL, NULL}
-};
 
 
 LUAMOD_API int luaopen_2D (lua_State *L) {

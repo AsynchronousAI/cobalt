@@ -50,6 +50,9 @@ LUAMOD_API int (luaopen_2D) (lua_State *L);
 #define LUA_3DLIBNAME	"Vector3"
 LUAMOD_API int (luaopen_3D) (lua_State *L);
 
+#define LUA_MANUALMEMNAME	"memory"
+LUAMOD_API int (luaopen_memory) (lua_State *L);
+
 #define LUA_TRANSFORMNAME	"Transform"
 LUAMOD_API int (luaopen_transform) (lua_State *L);
 

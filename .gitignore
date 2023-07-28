@@ -2,4 +2,5 @@
 /.argon.project.json
 *.o
 *.a
-/lua-5.1.5
+/__pycache__/
+*.pyc

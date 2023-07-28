@@ -1,6 +1,6 @@
 import sys
-from src import lundump
-from src import lparser
+from src.lasm import lundump
+from src.lasm import lparser
 
 lc = lundump.LuaUndump()
 print(sys.argv[1])

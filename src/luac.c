@@ -27,6 +27,7 @@ static void PrintFunction(const Proto* f, int full);
 
 #define PROGNAME	"luaxc"		/* default program name */
 #define OUTPUT		PROGNAME ".luabyte"	/* default output file */
+#define ASMOUTPUT PROGNAME ".lasm"
 
 static int listing=0;			/* list bytecodes? */
 static int dumping=1;			/* dump bytecodes? */

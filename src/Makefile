@@ -34,7 +34,7 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	ltm.o lundump.o lvm.o lzio.o
 LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o lcolorlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o l2Dlib.o l3Dlib.o \
-	l3transform.o lcinterface.o
+	l3transform.o lcinterface.o lmanualmemory.o
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
 
 LUA_T=	luax
@@ -142,6 +142,7 @@ lcode.o: lcode.c lprefix.h lua.h luaconf.h lcode.h llex.h lobject.h \
 lcorolib.o: lcorolib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 lctype.o: lctype.c lprefix.h lctype.h lua.h luaconf.h llimits.h
 ldblib.o: ldblib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
+lmanualmemory.o: lmanualmemory.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 ldebug.o: ldebug.c lprefix.h lua.h luaconf.h lapi.h llimits.h lstate.h \
  lobject.h ltm.h lzio.h lmem.h lcode.h llex.h lopcodes.h lparser.h \
  ldebug.h ldo.h lfunc.h lstring.h lgc.h ltable.h lvm.h

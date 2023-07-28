@@ -1,3 +1,19 @@
 if (true) {
     print("hi")
 }
+
+function formatTransform(transform) {
+    return "Transform: " .. transform.x .. ", " .. transform.y .. ", " .. (transform.z || "nil")
+}
+
+function formatVector3(vector) {
+    return "Vector3: " .. vector.X .. ", ".. vector.Y .. ", " .. vector.Z
+}
+
+newTransform = Transform.new(0,0,0,0)
+newVec = Vector3.new(0,0,0)
+transformFromVec = Transform.new(newVec)
+
+print(formatTransform(newTransform))
+print(formatVector3(newVec))
+print(formatTransform(transformFromVec))

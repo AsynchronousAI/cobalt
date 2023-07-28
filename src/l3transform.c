@@ -39,11 +39,41 @@ int default_transform[12] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 0 ,0 ,0};
 static int transform_index(lua_State *L) {
   Transform* transform = (Transform*)lua_touserdata(L, 1);
   const char* key = luaL_checkstring(L, 2);
-  if (strcmp(key, "x") == 0) {
+  if (strcmp(key, "X") == 0) {
     lua_pushnumber(L, transform->x);
     return 1;
-  } else if (strcmp(key, "y") == 0) {
+  } else if (strcmp(key, "Y") == 0) {
     lua_pushnumber(L, transform->y);
+    return 1;
+  } else if (strcmp(key, "Z") == 0) {
+    lua_pushnumber(L, transform->z);
+    return 1;
+  } else if (strcmp(key, "OX") == 0) {
+    lua_pushnumber(L, transform->ox);
+    return 1;
+  } else if (strcmp(key, "OY") == 0) {
+    lua_pushnumber(L, transform->oy);
+    return 1;
+  } else if (strcmp(key, "OZ") == 0) {
+    lua_pushnumber(L, transform->oz);
+    return 1;
+  } else if (strcmp(key, "SX") == 0) {
+    lua_pushnumber(L, transform->sx);
+    return 1;
+  } else if (strcmp(key, "SY") == 0) {
+    lua_pushnumber(L, transform->sy);
+    return 1;
+  } else if (strcmp(key, "SZ") == 0) {
+    lua_pushnumber(L, transform->sz);
+    return 1;
+  } else if (strcmp(key, "PX") == 0) {
+    lua_pushnumber(L, transform->px);
+    return 1;
+  } else if (strcmp(key, "PY") == 0) {
+    lua_pushnumber(L, transform->py);
+    return 1;
+  } else if (strcmp(key, "PZ") == 0) {
+    lua_pushnumber(L, transform->pz);
     return 1;
   }
   return 0;
@@ -51,18 +81,18 @@ static int transform_index(lua_State *L) {
 
 static int push_transform(lua_State *L, int x, int y, int z, int ox, int oy, int oz, int sx, int sy, int sz, int px, int py, int pz) {
   Transform* transform = (Transform*)lua_newuserdata(L, sizeof(Transform));
-  transform->x = x || default_transform[0];
-  transform->y = y || default_transform[1];
-  transform->z = z || default_transform[2];
-  transform->ox = ox || default_transform[3];
-  transform->oy = oy || default_transform[4];
-  transform->oz = oz || default_transform[5];
-  transform->sx = sx || default_transform[6];
-  transform->sy = sy || default_transform[7];
-  transform->sz = sz || default_transform[8];
-  transform->px = px || default_transform[9];
-  transform->py = py || default_transform[10];
-  transform->pz = pz || default_transform[11];
+  transform->x = x ?: default_transform[0];
+  transform->y = y ?: default_transform[1];
+  transform->z = z ?: default_transform[2];
+  transform->ox = ox ?: default_transform[3];
+  transform->oy = oy ?: default_transform[4];
+  transform->oz = oz ?: default_transform[5];
+  transform->sx = sx ?: default_transform[6];
+  transform->sy = sy ?: default_transform[7];
+  transform->sz = sz ?: default_transform[8];
+  transform->px = px ?: default_transform[9];
+  transform->py = py ?: default_transform[10];
+  transform->pz = pz ?: default_transform[11];
 
   if (luaL_newmetatable(L, "transform")) {
     lua_pushcfunction(L, transform_index);

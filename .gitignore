@@ -1,2 +1,4 @@
 /.DS_Store
 /.argon.project.json
+*.o
+*.a

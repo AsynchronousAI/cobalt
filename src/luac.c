@@ -25,8 +25,8 @@
 static void PrintFunction(const Proto* f, int full);
 #define luaU_print	PrintFunction
 
-#define PROGNAME	"ljsc"		/* default program name */
-#define OUTPUT		PROGNAME ".out"	/* default output file */
+#define PROGNAME	"luaxc"		/* default program name */
+#define OUTPUT		PROGNAME ".luabyte"	/* default output file */
 
 static int listing=0;			/* list bytecodes? */
 static int dumping=1;			/* dump bytecodes? */

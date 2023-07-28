@@ -2,9 +2,6 @@
 Like ffi for LuaJIT, but can be interpreted and bytecoded.
 */
 
-/*
-    [DISABLED]
-*/
 #define lcinterface_c
 #define LUA_LIB
 

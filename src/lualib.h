@@ -53,8 +53,8 @@ LUAMOD_API int (luaopen_3D) (lua_State *L);
 #define LUA_TRANSFORMNAME	"Transform"
 LUAMOD_API int (luaopen_transform) (lua_State *L);
 
-#define LUA_MEMLIBNAME	"memory"
-LUAMOD_API int (luaopen_memory) (lua_State *L);
+#define LUA_FFLIBNAME	"ffi"
+LUAMOD_API int (luaopen_lcinterface) (lua_State *L);
 
 #define LUA_DBLIBNAME	"debug"
 LUAMOD_API int (luaopen_debug) (lua_State *L);

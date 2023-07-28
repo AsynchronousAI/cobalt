@@ -44,6 +44,7 @@ static int push_vec2(lua_State *L, float x, float y) {
     lua_setfield(L, -2, "__index");
   }
   lua_setmetatable(L, -2);
+  return 1;
 }
 
 

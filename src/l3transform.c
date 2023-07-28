@@ -95,6 +95,7 @@ static int push_transform(lua_State *L, int x, int y, int z, int ox, int oy, int
     lua_setfield(L, -2, "__index");
   }
   lua_setmetatable(L, -2);
+  return 1;
 }
 
 static int transform_new(lua_State *L){

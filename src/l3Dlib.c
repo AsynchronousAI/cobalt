@@ -43,6 +43,7 @@ static int push_vec3(lua_State *L, float x, float y, float z) {
     lua_setfield(L, -2, "__index");
   }
   lua_setmetatable(L, -2);
+  return 1;
 }
 
 static int vec3_add(lua_State *L) {

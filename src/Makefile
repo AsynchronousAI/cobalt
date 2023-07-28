@@ -98,7 +98,7 @@ bsd:
 c89:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_C89" CC="gcc -std=c89"
 	@echo ''
-	@echo '*** C89 does not guarantee 64-bit integers for Lua.'
+	@echo '*** C89 does not guarantee 64-bit integers for Luax.'
 	@echo ''
 
 

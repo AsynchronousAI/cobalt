@@ -13,13 +13,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-
-
-typedef struct {
-  float x;
-  float y;
-  float z;
-} Vec3;
+#include "vec3class.h"
 
 
 

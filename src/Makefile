@@ -162,8 +162,8 @@ llex.o: llex.c lprefix.h lua.h luaconf.h lctype.h llimits.h ldebug.h \
 lmathlib.o: lmathlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 lcolorlib.o: lcolorlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 l2Dlib.o: l2Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-l3Dlib.o: l3Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-l3transform.o: l3transform.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
+l3Dlib.o: l3Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
+l3transform.o: l3transform.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
 lmem.o: lmem.c lprefix.h lua.h luaconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h
 loadlib.o: loadlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h

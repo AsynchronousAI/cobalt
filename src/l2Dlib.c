@@ -77,6 +77,27 @@ static int vec2_new(lua_State *L) {
   push_vec2(L, x, y);
   return 1;
 }
+static int vec2_fromOffsetScale(lua_State *L) {
+  float x = luaL_checknumber(L, 1);
+  float y = luaL_checknumber(L, 2);
+  float ox = luaL_checknumber(L, 3);
+  float oy = luaL_checknumber(L, 4);
+
+  int screenx, screeny;
+
+  screenx = luaL_checknumber(L, 5);
+  screeny = luaL_checknumber(L, 6);
+
+  x = x * screenx;
+  y = y * screeny;
+  x += ox;
+  y += oy;
+  x = (x / screenx) * 2 - 1;
+  y = (y / screeny) * 2 - 1;
+
+  push_vec2(L, x, y);
+  return 1;
+}
 
 static const luaL_Reg vec2lib[] = {
     {"new", vec2_new},
@@ -84,6 +105,7 @@ static const luaL_Reg vec2lib[] = {
     {"sub", vec2_sub},
     {"mul", vec2_mul},
     {"div", vec2_div},
+    {"fromScreen", vec2_fromOffsetScale},
     {NULL, NULL}
 };
 

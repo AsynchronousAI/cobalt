@@ -12,12 +12,8 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#include "vec3class.h"
 
-typedef struct {
-  int x;
-  int y;
-  int z;
-} Vec3;
 
 typedef struct {
     int x; // position x

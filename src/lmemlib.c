@@ -1,8 +1,18 @@
+/*
+NOTE:
+
+This is a very core library, and shouldnt be played around with. This is not meant for the user
+but we still leave it open for the user to use if they want to. We will not document this library
+and playing around can leave crashes, memory leaks, and other issues. This is a very dangerous
+library to play around with. You have been warned.
+*/
+
 #define lmemlib_c
 #define LUA_LIB
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -75,8 +85,47 @@ static int set_hex_memory_address(lua_State* L) {
   void* address = (void*)strtol(address_str, NULL, 16);
   size_t size;
   const char* data = luaL_checklstring(L, 2, &size);
-  write_memory(address, (void*)data, size);
+  void* buffer = malloc(size);
+  memcpy(buffer, data, size);
+  write_memory(address, buffer, size);
+  delete_memory(buffer);
   return 0;
+}
+static int permission_check(lua_State* L) {
+  const char* address_str = luaL_checkstring(L, 1);
+  void* address = (void*)strtol(address_str, NULL, 16);
+  size_t size = luaL_checkinteger(L, 2);
+  int prot = PROT_READ | PROT_WRITE;
+  if (mprotect(address, size, prot) == 0) {
+    lua_pushboolean(L, 1);
+  } else {
+    lua_pushboolean(L, 0);
+  }
+  prot = PROT_NONE;
+  mprotect(address, size, prot);
+  return 1;
+}
+static int allocate_hex_memory_address(lua_State* L) {
+  size_t size = luaL_checkinteger(L, 1);
+  void* address = malloc(size);
+  char buffer[32];
+  sprintf(buffer, "%p", address);
+  lua_pushstring(L, buffer);
+  return 1;
+}
+static int isfree_hex_memory_address(lua_State* L) {
+  const char* address_str = luaL_checkstring(L, 1);
+  void* address = (void*)strtol(address_str, NULL, 16);
+  size_t size = luaL_checkinteger(L, 2);
+  int prot = PROT_READ | PROT_WRITE;
+  if (mprotect(address, size, prot) == 0) {
+    lua_pushboolean(L, 1);
+  } else {
+    lua_pushboolean(L, 0);
+  }
+  prot = PROT_NONE;
+  mprotect(address, size, prot);
+  return 1;
 }
 
 static const luaL_Reg memlib[] = {
@@ -84,6 +133,10 @@ static const luaL_Reg memlib[] = {
   {"fetch", fetch_hex_memory_address},
   {"free", free_hex_memory_address},
   {"set", set_hex_memory_address},
+  {"perm", permission_check},
+  {"alloc", allocate_hex_memory_address},
+  {"isfree", isfree_hex_memory_address},
+  
   {NULL, NULL}
 };
 

@@ -1,3 +1,5 @@
+ffi = import("ffi")
+
 if (true) {
     print("hi")
 }

@@ -173,7 +173,7 @@
 #define LUA_EXEC_DIR            "!"
 
 #ifdef LUA_LJS
-  #define LUA_SCRIPT_EXT ".ljs"
+  #define LUA_SCRIPT_EXT ".luax"
 #else
   #define LUA_SCRIPT_EXT ".lua"
 #endif // LUA_LJS

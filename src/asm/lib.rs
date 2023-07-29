@@ -1,7 +1,7 @@
 #![feature(ptr_sub_ptr, lazy_cell, box_patterns)]
 
 use std::{borrow::Cow, rc::Rc};
-
+pub use nom_supreme::error::ErrorKind;
 #[allow(unused_imports)]
 use nom::{
     branch::alt,
@@ -27,7 +27,15 @@ use nom_supreme::{error::*, ParserExt};
 use serde::{Deserialize, Serialize};
 use serde_bytes::ByteBuf;
 
+pub mod lua51;
+pub mod lua52;
 pub mod lua53;
+pub mod lua54;
+pub mod luajit;
+pub mod luau;
+pub mod utils;
+
+pub type ErrorTree<I> = nom_supreme::ErrorTree<I, ErrorKind>;
 
 pub type IResult<I, O, E = ErrorTree<I>> = Result<(I, O), nom::Err<E>>;
 
@@ -441,7 +449,11 @@ pub fn lua_bytecode(input: &[u8]) -> IResult<&[u8], LuaBytecode, ErrorTree<&[u8]
     let (input, header) = alt((lua_header, luajit::lj_header))(input)?;
     log::trace!("header: {header:?}");
     let (input, main_chunk) = match header.lua_version {
+        LUA51 => lua51::lua_chunk(&header).parse(input)?,
+        LUA52 => lua52::lua_chunk(&header).parse(input)?,
         LUA53 => lua53::lua_chunk(&header).parse(input)?,
+        LUA54 => lua54::lua_chunk(&header).parse(input)?,
+        LUAJ1 | LUAJ2 => luajit::lj_chunk(&header).parse(input)?,
         _ => context("unsupported lua version", fail)(input)?,
     };
     Ok((input, LuaBytecode { header, main_chunk }))
@@ -467,4 +479,9 @@ impl LuaBytecode {
     }
 }
 
+pub const LUA51: u8 = 0x51;
+pub const LUA52: u8 = 0x52;
 pub const LUA53: u8 = 0x53;
+pub const LUA54: u8 = 0x54;
+pub const LUAJ1: u8 = 0x11;
+pub const LUAJ2: u8 = 0x12;

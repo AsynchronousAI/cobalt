@@ -11,7 +11,7 @@ function test2()
     print("test2")
 end
 zz = z
-load("print(zz)")()
+loadstring("print(zz)")()
 test()
 test2()
 for i = 1, 10 do
@@ -38,4 +38,9 @@ elseif true then
     print("elseif")
 else
     print("else")
+end
+x = 10
+y = 20
+x,y=y,x
+for _ = #x, 1 do
 end

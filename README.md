@@ -1,16 +1,22 @@
 # luax
 ## What is it?
 Luax is an ultrafast and lightweight programming language based on Lua. Used for making ultra high performance applications and games.
-## Why not just use Lua?
-- Way better syntax
-- Color, Vec2, Vec3, Transform libraries
-- Memory access
-- Assembly-like compiler
-- Borrowownership memory management (luasm only, not for luac or lua)
-- Improved GC
+## Features
+- Built in libraries for graphics, audio, and more
+- Ultrafast
+- Way better syntax 
+- Easy to learn
+- Portable (Written in C and Rust)
+- Embeddable
+- Built in Lexer
+- Interpreter
+- Bytecode compiler
+- Bytecode interpreter
+- Assembly compiler
 ## Building
 - `cd src; make`
 ## Credits
 - Lua
 - Ljs
+- selene
 

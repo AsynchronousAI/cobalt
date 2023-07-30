@@ -1,13 +1,23 @@
-# Makefile for building Lua
+# Makefile for building Luax
 # See ../doc/readme.html for installation and customization instructions.
 
-# == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
+# == REQUIRED SETTINGS ========================================================
 
-# Your platform. See PLATS for possible values.
-PLAT= macosx
+#################################################
+# Your platform. See PLATS for possible values. #
+#-----------------------------------------------#
+PLAT= macosx                            #
+#################################################
+
+
+# == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
+ENDIAN= # If endian can not be autodetected you will be required to set it manually.
+# You can also set it to "BIG_ENDIAN" or "LITTLE_ENDIAN" to override the autodetection.
 
 CC= gcc -std=gnu99
-CFLAGS= -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
+CXX = g++ -std=c++14
+CFLAGS= -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS) -FFI_$(ENDIAN)
+CXXFLAGS = -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCXXFLAGS) $(MYCXXFLAGS)
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
 
@@ -16,25 +26,29 @@ RANLIB= ranlib
 RM= rm -f
 
 SYSCFLAGS=
+SYSCXXFLAGS=
 SYSLDFLAGS=
 SYSLIBS=
 
 MYCFLAGS=
+MYCXXFLAGS=
 MYLDFLAGS=
 MYLIBS=
 MYOBJS=
 
 # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
 
+
+
 PLATS= aix bsd c89 freebsd generic linux macosx mingw posix solaris
 
 LUA_A=	liblua.a
 CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
-	ltm.o lundump.o lvm.o lzio.o
+	ltm.o lundump.o lvm.o lzio.o 
 LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o lcolorlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o l2Dlib.o l3Dlib.o \
-	l3transform.o lcinterface.o
+	l3transform.o lcinterface.o lcffi.o
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
 
 LUA_T=	luax
@@ -164,9 +178,7 @@ lcolorlib.o: lcolorlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 l2Dlib.o: l2Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 l3Dlib.o: l3Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
 l3transform.o: l3transform.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
-lcinterface.o: lcinterface.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h main.cc \
-  parser.cc parser.hh platform.hh util.cc util.hh lua.cc lua.hh \
-  lib.cc lib.hh libffi.hh ffilib.cc ffi.hh ffi.hh ast.cc ast.hh 
+lcinterface.o: lcinterface.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h 
 lmem.o: lmem.c lprefix.h lua.h luaconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h
 loadlib.o: loadlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
@@ -175,6 +187,7 @@ lobject.o: lobject.c lprefix.h lua.h luaconf.h lctype.h llimits.h \
  lvm.h
 lopcodes.o: lopcodes.c lprefix.h lopcodes.h llimits.h lua.h luaconf.h
 loslib.o: loslib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
+lcffi.o: lcffi.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h 
 lparser.o: lparser.c lprefix.h lua.h luaconf.h lcode.h llex.h lobject.h \
  llimits.h lzio.h lmem.h lopcodes.h lparser.h ldebug.h lstate.h ltm.h \
  ldo.h lfunc.h lstring.h lgc.h ltable.h

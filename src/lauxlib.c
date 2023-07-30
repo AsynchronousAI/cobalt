@@ -27,6 +27,10 @@
 #include "lauxlib.h"
 
 
+#include <stdio.h>
+#include <stdarg.h>
+
+
 /*
 ** {======================================================
 ** Traceback
@@ -829,6 +833,24 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
         break;
       case LUA_TNIL:
         lua_pushliteral(L, "null");
+        break;
+      case LUA_TTABLE:
+        lua_pushliteral(L, "[");
+        lua_pushnil(L);  // push the first key
+        int first = 1;
+        while (lua_next(L, idx) != 0) {
+          if (!first) {
+            lua_pushliteral(L, ", ");
+          }
+          first = 0;
+          luaL_tolstring(L, -2, NULL);  // convert the key to a string
+          lua_pushliteral(L, ": ");
+          luaL_tolstring(L, -2, NULL);  // convert the value to a string
+          lua_concat(L, 3);  // concatenate the key, value, and separator
+          lua_pop(L, 1);  // remove the value
+        }
+        lua_pushliteral(L, "]");
+        lua_concat(L, lua_gettop(L) - idx);
         break;
       default: {
         int tt = luaL_getmetafield(L, idx, "__name");  /* try name */

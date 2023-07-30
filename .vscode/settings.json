@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "lauxlib.h": "c"
+        "lauxlib.h": "c",
+        "lua.hh": "c",
+        "cstddef": "cpp"
     }
 }

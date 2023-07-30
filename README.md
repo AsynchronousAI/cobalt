@@ -15,8 +15,11 @@ and made to make applications and games.
 - Interpreter
 - Bytecode compiler
 - Bytecode interpreter
+- Vector3 and Vector2 class
+- Transform class
 - Assembly compiler
 - Faster and more random number generator
+- wait/swait (seconds), mwait (milliseconds, 1/1000 of a second), and uwait (microseconds, 1/1000000 of a second) functions with amazing accuracy
 - Slicing like in Python (<string>.slice(<start>, <end>, <step>))
 - Syntax like C and C++
 - Class support (<name>: <class> = <value>)

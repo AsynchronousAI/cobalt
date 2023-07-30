@@ -12,7 +12,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include <sys/mman.h>
-void* read_memory(void* address, size_t size) {
+void* read_memory2(void* address, size_t size) {
   FILE* fp = tmpfile();
   fwrite(address, size, 1, fp);
   rewind(fp);
@@ -22,7 +22,7 @@ void* read_memory(void* address, size_t size) {
   return buffer;
 }
 
-void write_memory(void* address, void* data, size_t size) {
+void write_memory2(void* address, void* data, size_t size) {
   FILE* fp = tmpfile();
   fwrite(data, size, 1, fp);
   rewind(fp);
@@ -30,7 +30,7 @@ void write_memory(void* address, void* data, size_t size) {
   fclose(fp);
 }
 
-void delete_memory(void* address) {
+void delete_memory2(void* address) {
   free(address);
 }
 
@@ -77,16 +77,16 @@ static int fetch_hex_memory_address(lua_State* L) {
   const char* address_str = luaL_checkstring(L, 1);
   void* address = (void*)strtol(address_str, NULL, 16);
   size_t size = luaL_checkinteger(L, 2);
-  void* data = read_memory(address, size);
+  void* data = read_memory2(address, size);
   lua_pushlstring(L, (const char*)data, size);
-  delete_memory(data);
+  delete_memory2(data);
   return 1;
 }
 
 static int free_hex_memory_address(lua_State* L) {
   const char* address_str = luaL_checkstring(L, 1);
   void* address = (void*)strtol(address_str, NULL, 16);
-  delete_memory(address);
+  delete_memory2(address);
   return 0;
 }
 
@@ -97,8 +97,8 @@ static int set_hex_memory_address(lua_State* L) {
   const char* data = luaL_checklstring(L, 2, &size);
   void* buffer = malloc(size);
   memcpy(buffer, data, size);
-  write_memory(address, buffer, size);
-  delete_memory(buffer);
+  write_memory2(address, buffer, size);
+  delete_memory2(buffer);
   return 0;
 }
 static int permission_check(lua_State* L) {
@@ -172,7 +172,7 @@ static const struct luaL_Reg lcinterface_lib[] = {
   //{NULL, NULL}
 };
 
-LUALIB_API int luaopen_lcinterface(lua_State* L) {
+LUALIB_API int luaopen_cffi(lua_State* L) {
   luaL_newlib(L, lcinterface_lib);
   return 1;
 }

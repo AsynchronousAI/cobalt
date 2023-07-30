@@ -21,6 +21,81 @@
 #include "lualib.h"
 #include <unistd.h>
 
+
+#include <stdio.h>
+#include <stdarg.h>
+
+enum {
+  COLOR_BLACK = 30,
+  COLOR_RED,
+  COLOR_GREEN,
+  COLOR_YELLOW,
+  COLOR_BLUE,
+  COLOR_MAGENTA,
+  COLOR_CYAN,
+  COLOR_WHITE
+};
+
+enum {
+  STYLE_BOLD = 1,
+  STYLE_UNDERLINE = 4,
+  STYLE_REVERSE = 7,
+  STYLE_CONCEALED = 8
+};
+
+const char *color(const char *text, int color, const char **styles, int num_styles) {
+  static char buf[1024];
+  char *p = buf;
+  const char *style;
+  int i;
+
+  p += sprintf(p, "\033[");
+  for (i = 0; i < num_styles; i++) {
+    style = styles[i];
+    if (style == "bold") {
+      p += sprintf(p, "1;");
+    } else if (style == "underline") {
+      p += sprintf(p, "4;");
+    } else if (style == "reverse") {
+      p += sprintf(p, "7;");
+    } else if (style == "concealed") {
+      p += sprintf(p, "8;");
+    }
+  }
+  p += sprintf(p, "%dm%s\033[0m", color, text);
+  return buf;
+}
+
+const char *red(const char *text, const char **styles, int num_styles) {
+  return color(text, COLOR_RED, styles, num_styles);
+}
+
+const char *green(const char *text, const char **styles, int num_styles) {
+  return color(text, COLOR_GREEN, styles, num_styles);
+}
+
+const char *yellow(const char *text, const char **styles, int num_styles) {
+  return color(text, COLOR_YELLOW, styles, num_styles);
+}
+
+const char *blue(const char *text, const char **styles, int num_styles) {
+  return color(text, COLOR_BLUE, styles, num_styles);
+}
+
+const char *magenta(const char *text, const char **styles, int num_styles) {
+  return color(text, COLOR_MAGENTA, styles, num_styles);
+}
+
+const char *cyan(const char *text, const char **styles, int num_styles) {
+  return color(text, COLOR_CYAN, styles, num_styles);
+}
+
+const char *white(const char *text, const char **styles, int num_styles) {
+  return color(text, COLOR_WHITE, styles, num_styles);
+}
+
+
+
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
   int i;
@@ -39,6 +114,50 @@ static int luaB_print (lua_State *L) {
     lua_pop(L, 1);  /* pop result */
   }
   lua_writeline();
+  return 0;
+}
+
+static int luaB_warn (lua_State *L) {
+  int n = lua_gettop(L);  /* number of arguments */
+  int i;
+  lua_getglobal(L, "tostring");
+  lua_getglobal(L, "print");
+  for (i=1; i<=n; i++) {
+    const char *s;
+    size_t l;
+    lua_pushvalue(L, -2);  /* function to be called */
+    lua_pushvalue(L, i);   /* value to print */
+    lua_call(L, 1, 1);
+    lua_pushstring(L, yellow("warning: ", (const char *[]){"bold"}, 1));
+    lua_insert(L, -2);
+    lua_concat(L, 2);
+    s = lua_tolstring(L, -1, &l);  /* get result */
+    if (s == NULL)
+      return luaL_error(L, "'tostring' must return a string to 'warn'");
+    lua_call(L, 1, 0);
+  }
+  return 0;
+}
+
+static int luaB_info (lua_State *L) {
+  int n = lua_gettop(L);  /* number of arguments */
+  int i;
+  lua_getglobal(L, "tostring");
+  lua_getglobal(L, "print");
+  for (i=1; i<=n; i++) {
+    const char *s;
+    size_t l;
+    lua_pushvalue(L, -2);  /* function to be called */
+    lua_pushvalue(L, i);   /* value to print */
+    lua_call(L, 1, 1);
+    lua_pushstring(L, blue("info: ", (const char *[]){"bold"}, 1));
+    lua_insert(L, -2);
+    lua_concat(L, 2);
+    s = lua_tolstring(L, -1, &l);  /* get result */
+    if (s == NULL)
+      return luaL_error(L, "'tostring' must return a string to 'info'");
+    lua_call(L, 1, 0);
+  }
   return 0;
 }
 
@@ -482,6 +601,8 @@ static const luaL_Reg base_funcs[] = {
   {"pairs", luaB_pairs},
   {"pcall", luaB_pcall},
   {"print", luaB_print},
+  {"warn", luaB_warn},
+  {"info", luaB_info},
   {"rawequal", luaB_rawequal},
   {"rawlen", luaB_rawlen},
   {"rawget", luaB_rawget},

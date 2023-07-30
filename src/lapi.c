@@ -28,9 +28,6 @@
 #include "ltm.h"
 #include "lundump.h"
 #include "lvm.h"
-
-
-
 const char lua_ident[] =
   "$LuaVersion: " LUA_COPYRIGHT " $"
   "$LuaAuthors: " LUA_AUTHORS " $";
@@ -1112,6 +1109,7 @@ LUA_API int lua_gc (lua_State *L, int what, int data) {
 
 
 LUA_API int lua_error (lua_State *L) {
+  lua_pushstring(L, "\033[1;31merror: \033[0m");
   lua_lock(L);
   api_checknelems(L, 1);
   luaG_errormsg(L);

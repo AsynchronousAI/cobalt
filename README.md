@@ -1,6 +1,9 @@
 # luax
 ## What is it?
-Luax is an ultrafast and lightweight programming language based on Lua. Used for making ultra high performance applications and games.
+Luax is an simplified version of C and C++ based on Lua. It is written in C and is portable. It is also embeddable, interpreted, bytecoded, and assembly compiled. It comes with a load of libraries for USB 
+control, FFI, audio, etc. Luax's focus is to be a portable language that works everywhere while being simple
+and made to make applications and games.
+
 ## Features
 - Built in libraries for graphics, audio, and more
 - Ultrafast
@@ -18,6 +21,8 @@ Luax is an ultrafast and lightweight programming language based on Lua. Used for
 - Syntax like C and C++
 - Class support (<name>: <class> = <value>)
 - Easy way to get system variables (sys)
+- FFI (Foreign Function Interface)
+- USB support
 ## Building
 - `cd src; make`
 ## Credits

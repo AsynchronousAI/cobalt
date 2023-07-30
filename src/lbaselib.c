@@ -19,6 +19,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#include <unistd.h>
 
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
@@ -448,6 +449,24 @@ static int luaB_tostring (lua_State *L) {
   return 1;
 }
 
+static int luaB_wait(lua_State *L) {
+  float seconds = luaL_optnumber(L, 1, 1);
+  usleep(seconds * 1000000);
+  return 0;
+}
+
+static int luaB_mwait(lua_State *L) {
+  float ms = luaL_optnumber(L, 1, 1);
+  usleep(ms * 1000);
+  return 0;
+}
+
+static int luaB_uwait(lua_State *L) {
+  float m = luaL_optnumber(L, 1, 1);
+  usleep(m);
+  return 0;
+}
+
 
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
@@ -473,6 +492,11 @@ static const luaL_Reg base_funcs[] = {
   {"tostring", luaB_tostring},
   {"type", luaB_type},
   {"xpcall", luaB_xpcall},
+  {"wait", luaB_wait},
+  /*subwait*/
+  {"swait", luaB_wait},
+  {"mwait", luaB_mwait},
+  {"uwait", luaB_uwait},
   /* placeholders */
   {"_G", NULL},
   {"_VERSION", NULL},

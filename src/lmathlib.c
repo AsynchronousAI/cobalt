@@ -17,24 +17,58 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#include <stdint.h>
+#include <time.h>
 
+#if !defined(LUA_USE_POSIX)
+#define L_RANDMAX	2147483647	/* (2^31 - 1), following POSIX */
+#else
+#define L_RANDMAX	RAND_MAX
+#endif
+
+static uint64_t s[2];
+
+void init_rand(uint64_t seed) {
+    s[0] = seed;
+    s[1] = seed ^ 0xdeadbeef;
+}
+
+uint64_t rand64(void) {
+    uint64_t s1 = s[0];
+    const uint64_t s0 = s[1];
+    s[0] = s0;
+    s1 ^= s1 << 23;
+    s[1] = s1 ^ s0 ^ (s1 >> 18) ^ (s0 >> 5);
+    return s[1] + s0;
+}
+
+int xorrand(void) {
+    uint32_t r;
+    do {
+        r = (uint32_t)rand64();
+    } while (r == 0 || r == 0x80000000);
+    return abs((int)(r % (L_RANDMAX - 1)) + 1);
+}
 
 #undef PI
 #define PI	(l_mathop(3.141592653589793238462643383279502884))
 
+#define l_rand() xorrand()//mt19937_rand()
+#define l_srand(x) init_rand(x)//mt19937_init(x)
 
-#if !defined(l_rand)		/* { */
+/*
+#if !defined(l_rand)		/\* { *\/
 #if defined(LUA_USE_POSIX)
 #define l_rand()	random()
 #define l_srand(x)	srandom(x)
-#define L_RANDMAX	2147483647	/* (2^31 - 1), following POSIX */
+#define L_RANDMAX	2147483647	/\* (2^31 - 1), following POSIX *\/
 #else
 #define l_rand()	rand()
 #define l_srand(x)	srand(x)
 #define L_RANDMAX	RAND_MAX
 #endif
-#endif				/* } */
-
+#endif				/\* } *\/
+*/
 
 static int math_abs (lua_State *L) {
   if (lua_isinteger(L, 1)) {
@@ -269,7 +303,10 @@ static int math_max (lua_State *L) {
 ** all bits from 'l_rand' can be represented, and that 'RANDMAX + 1.0'
 ** will keep full precision (ensuring that 'r' is always less than 1.0.)
 */
-static int math_random (lua_State *L) {
+static int math_random (lua_State *L, int check) {
+  if (s[0] == 0) {
+    init_rand((unsigned int)time(NULL));
+  }
   lua_Integer low, up;
   double r = (double)l_rand() * (1.0 / ((double)L_RANDMAX + 1.0));
   switch (lua_gettop(L)) {  /* check number of arguments */
@@ -361,8 +398,30 @@ static int math_log10 (lua_State *L) {
   return 1;
 }
 
+static int math_rand(lua_State *L) {
+  if (s[0] == 0) {
+    init_rand((unsigned int)time(NULL));
+  }
+  u_int32_t val = l_rand();
+  if (val == 0) {
+    // srand to the clock time then try again
+    l_srand((unsigned int)time(NULL));
+    (void)l_rand(); /* discard first value to avoid undesirable correlations */
+    return math_rand(L);
+  }
+  if (lua_isinteger(L, 1)) {
+    u_int32_t max = lua_tointeger(L, 1);
+    val = val % max;
+  }
+  lua_pushinteger(L, val);
+  return 1;
+}
 
-
+static int math_crand(lua_State *L) {
+  // use built in rand for this
+  lua_pushinteger(L, rand());
+  return 1;
+}
 static const luaL_Reg mathlib[] = {
   {"abs",   math_abs},
   {"acos",  math_acos},
@@ -382,7 +441,9 @@ static const luaL_Reg mathlib[] = {
   {"modf",   math_modf},
   {"rad",   math_rad},
   {"random",     math_random},
-  {"randomseed", math_randomseed},
+  {"srandom", math_randomseed},
+  {"rand", math_rand},
+  {"crand", math_crand},
   {"sin",   math_sin},
   {"sqrt",  math_sqrt},
   {"tan",   math_tan},

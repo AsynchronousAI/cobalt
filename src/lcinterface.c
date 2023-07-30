@@ -12,7 +12,6 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include <sys/mman.h>
-
 void* read_memory(void* address, size_t size) {
   FILE* fp = tmpfile();
   fwrite(address, size, 1, fp);
@@ -157,6 +156,13 @@ static int isfree_hex_memory_address(lua_State* L) {
   mprotect(address, size, prot);
   return 1;
 }
+// FFI for C
+// cdef ex: cdef("int printf(const char* format, ...);")
+// cload ex: cload("printf")
+// crun ex: ccall("printf", "Hello World!")
+// cfree ex: cfree("printf") (Unloads the library)
+
+// this doesnt use 
 
 static const struct luaL_Reg lcinterface_lib[] = {
   //{"pointer", {
@@ -167,7 +173,11 @@ static const struct luaL_Reg lcinterface_lib[] = {
     {"perm", permission_check},
     {"alloc", allocate_hex_memory_address},
     {"isfree", isfree_hex_memory_address},
-    
+  //}},
+  //{"ffi", {
+    //{"cdef", cdef},
+    //{"cload", cload},
+    //{"crun", crun},
     {NULL, NULL}
   //}}, 
   //{NULL, NULL}

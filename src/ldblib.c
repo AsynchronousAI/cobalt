@@ -20,6 +20,7 @@
 #include "lualib.h"
 
 
+
 /*
 ** The hook table at registry[&HOOKKEY] maps threads to their current
 ** hook function. (We only need the unique address of 'HOOKKEY'.)
@@ -427,6 +428,20 @@ static int db_traceback (lua_State *L) {
   return 1;
 }
 
+static int db_gethookmask (lua_State *L) {
+  int arg;
+  lua_State *L1 = getthread(L, &arg);
+  lua_pushstring(L, unmakemask(lua_gethookmask(L1), lua_newuserdata(L, 5)));
+  return 1;
+}
+
+static int db_gethookcount (lua_State *L) {
+  int arg;
+  lua_State *L1 = getthread(L, &arg);
+  lua_pushinteger(L, lua_gethookcount(L1));
+  return 1;
+}
+
 
 static const luaL_Reg dblib[] = {
   {"debug", db_debug},
@@ -445,6 +460,8 @@ static const luaL_Reg dblib[] = {
   {"setmetatable", db_setmetatable},
   {"setupvalue", db_setupvalue},
   {"traceback", db_traceback},
+  {"gethookmask", db_gethookmask},
+  {"gethookcount", db_gethookcount},
   {NULL, NULL}
 };
 

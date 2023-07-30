@@ -42,5 +42,5 @@ end
 x = 10
 y = 20
 x,y=y,x
-for _ = #x, 1 do
+for _ = #x, 1, -1 do
 end

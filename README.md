@@ -6,13 +6,18 @@ Luax is an ultrafast and lightweight programming language based on Lua. Used for
 - Ultrafast
 - Way better syntax 
 - Easy to learn
-- Portable (Written in C and Rust)
+- Portable (Written in C)
 - Embeddable
 - Built in Lexer
 - Interpreter
 - Bytecode compiler
 - Bytecode interpreter
 - Assembly compiler
+- Faster and more random number generator
+- Slicing like in Python (<string>.slice(<start>, <end>, <step>))
+- Syntax like C and C++
+- Class support (<name>: <class> = <value>)
+- Easy way to get system variables (sys)
 ## Building
 - `cd src; make`
 ## Credits

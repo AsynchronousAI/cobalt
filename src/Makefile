@@ -9,14 +9,9 @@
 PLAT= macosx                            #
 #################################################
 
-
-# == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
-ENDIAN= # If endian can not be autodetected you will be required to set it manually.
-# You can also set it to "BIG_ENDIAN" or "LITTLE_ENDIAN" to override the autodetection.
-
 CC= gcc -std=gnu99
 CXX = g++ -std=c++14
-CFLAGS= -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS) -FFI_$(ENDIAN)
+CFLAGS= -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
 CXXFLAGS = -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCXXFLAGS) $(MYCXXFLAGS)
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
@@ -48,7 +43,7 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	ltm.o lundump.o lvm.o lzio.o 
 LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o lcolorlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o l2Dlib.o l3Dlib.o \
-	l3transform.o lcinterface.o lcffi.o
+	l3transform.o lcinterface.o #ffi.o
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
 
 LUA_T=	luax
@@ -187,7 +182,10 @@ lobject.o: lobject.c lprefix.h lua.h luaconf.h lctype.h llimits.h \
  lvm.h
 lopcodes.o: lopcodes.c lprefix.h lopcodes.h llimits.h lua.h luaconf.h
 loslib.o: loslib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-lcffi.o: lcffi.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h 
+#ffi.o: ffi.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h \
+# ffi.h call_arm.h call_x64.h call_x64win.h call_x86.h \
+# dynasm/dasm_arm.h dynasm/dasm_x86.h dynasm/dasm_ppc.h \
+# dynasm/dasm_proto.h
 lparser.o: lparser.c lprefix.h lua.h luaconf.h lcode.h llex.h lobject.h \
  llimits.h lzio.h lmem.h lopcodes.h lparser.h ldebug.h lstate.h ltm.h \
  ldo.h lfunc.h lstring.h lgc.h ltable.h

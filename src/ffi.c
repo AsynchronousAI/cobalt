@@ -10,6 +10,20 @@
 #include <math.h>
 #include <inttypes.h>
 
+#define ffi_c
+#define LUA_LIB
+
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include <dlfcn.h>
+
+#include "lua.h"
+
+#include "lauxlib.h"
+#include "lualib.h"
+#include <sys/mman.h>
+
 /* Set to 1 to get extra debugging on print */
 #define DEBUG_TOSTRING 0
 
@@ -3469,7 +3483,7 @@ static void setup_mt(lua_State* L, const luaL_Reg* mt, int upvals)
     luaL_setfuncs(L, mt, upvals);
 }
 
-int luaopen_ffi(lua_State* L)
+LUALIB_API int luaopen_ffi(lua_State* L)
 {
     lua_settop(L, 0);
 
@@ -3550,3 +3564,4 @@ int luaopen_ffi(lua_State* L)
     lua_setfield(L, -2, "type"); /* ffi.type */
     return 1;
 }
+

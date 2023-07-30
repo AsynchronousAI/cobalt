@@ -63,6 +63,10 @@ static int get_hex_memory_address(lua_State* L) {
     case LUA_TTHREAD:
       address = lua_topointer(L, 1);
       break;
+    case LUA_TNONE:
+      // return 0x0;
+      address = NULL;
+      break;
     default:
       luaL_error(L, "Invalid Lua value type");
       break;
@@ -169,7 +173,7 @@ static const struct luaL_Reg lcinterface_lib[] = {
     {"alloc", allocate_hex_memory_address},
     {"isfree", isfree_hex_memory_address},
   //}},
-  //{NULL, NULL}
+  {NULL, NULL}
 };
 
 LUALIB_API int luaopen_lcinterface(lua_State* L) {

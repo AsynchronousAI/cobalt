@@ -156,11 +156,36 @@ static int isfree_hex_memory_address(lua_State* L) {
   mprotect(address, size, prot);
   return 1;
 }
-// FFI for C
-// cdef ex: cdef("int printf(const char* format, ...);")
-// cload ex: cload("printf")
-// crun ex: ccall("printf", "Hello World!")
-// cfree ex: cfree("printf") (Unloads the library)
+// C in Lua
+static int cdef(lua_State* L) {
+  const char* cdef_str = luaL_checkstring(L, 1);
+  luaL_loadstring(L, cdef_str);
+  lua_call(L, 0, 0);
+  return 0;
+}
+static int cload(lua_State* L) {
+  const char* cload_str = luaL_checkstring(L, 1);
+  void* handle = dlopen(cload_str, RTLD_LAZY);
+  if (!handle) {
+    lua_pushnil(L);
+    lua_pushstring(L, dlerror());
+    return 2;
+  }
+  lua_pushlightuserdata(L, handle);
+  return 1;
+}
+static int crun(lua_State* L) {
+  void* handle = lua_touserdata(L, 1);
+  const char* crun_str = luaL_checkstring(L, 2);
+  void* func = dlsym(handle, crun_str);
+  if (!func) {
+    lua_pushnil(L);
+    lua_pushstring(L, dlerror());
+    return 2;
+  }
+  lua_pushlightuserdata(L, func);
+  return 1;
+}
 
 // this doesnt use 
 
@@ -175,9 +200,9 @@ static const struct luaL_Reg lcinterface_lib[] = {
     {"isfree", isfree_hex_memory_address},
   //}},
   //{"ffi", {
-    //{"cdef", cdef},
-    //{"cload", cload},
-    //{"crun", crun},
+    {"cdef", cdef},
+    {"cload", cload},
+    {"crun", crun},
     {NULL, NULL}
   //}}, 
   //{NULL, NULL}

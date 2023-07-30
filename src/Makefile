@@ -114,7 +114,7 @@ macosx:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_MACOSX" SYSLIBS="-lreadline"
 
 mingw:
-	$(MAKE) "LUA_A=lua53.dll" "LUA_T=luax.exe" \
+	$(MAKE) "LUA_A=luax.dll" "LUA_T=luax.exe" \
 	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
 	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" luax.exe
 	$(MAKE) "LUAC_T=luaxc.exe" luaxc.exe
@@ -164,7 +164,9 @@ lcolorlib.o: lcolorlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 l2Dlib.o: l2Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
 l3Dlib.o: l3Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
 l3transform.o: l3transform.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
-lcinterface.o: lcinterface.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
+lcinterface.o: lcinterface.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h main.cc \
+  parser.cc parser.hh platform.hh util.cc util.hh lua.cc lua.hh \
+  lib.cc lib.hh libffi.hh ffilib.cc ffi.hh ffi.hh ast.cc ast.hh 
 lmem.o: lmem.c lprefix.h lua.h luaconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h
 loadlib.o: loadlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h

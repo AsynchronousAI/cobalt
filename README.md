@@ -1,6 +1,6 @@
 # luax
 ## What is it?
-Luax is an simplified version of C and C++ based on Lua. It is written in C and is portable. It is also embeddable, interpreted, bytecoded, and assembly compiled. It comes with a load of libraries for USB 
+Luax is an simplified version of C and C++ based on Lua. It is written in C and C++ and is made to bw portable. It is also embeddable, interpreted, bytecoded, and assembly compiled. It comes with a load of libraries for USB 
 control, FFI, audio, etc. Luax's focus is to be a portable language that works everywhere while being simple
 and made to make applications and games.
 

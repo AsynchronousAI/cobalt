@@ -7,6 +7,7 @@
 import sys
 import os
 import subprocess
+import time
 
 #########################
 # FUNCTIONS
@@ -111,11 +112,17 @@ except IndexError:
 # Prepare the makefile
 print("\n\n\n")
 MAKEFILEPATH = os.path.join(os.path.dirname(__file__), "Makefile")
+POSTMAKEFILEPATH = os.path.join(os.path.dirname(__file__), "PostMakefile")
 with open(MAKEFILEPATH, "r") as makefile:
+    makefiledata = makefile.read()
+    makefiledata = makefiledata.replace("<--platform-->", arg2)
+with open(POSTMAKEFILEPATH, "r") as makefile:
     makefiledata = makefile.read()
     makefiledata = makefiledata.replace("<--platform-->", arg2)
 print("Configuring...")
 with open(MAKEFILEPATH, "w") as makefile:
+    makefile.write(makefiledata)
+with open(POSTMAKEFILEPATH, "w") as makefile:
     makefile.write(makefiledata)
     
 # Begin building
@@ -132,36 +139,17 @@ print("Configuring Luax Prebuild...")
 # Luax is a dependency for Luax FFI/USB library and that is a dependency for Luax
 # So we have a chicken and egg problem
 
+# Just wait like 1 second so it can render
 
-
-# 1- Disable ffi.so and usb.so in the makefile
-global originalmakefile
-with open(MAKEFILEPATH, "r") as makefile:
-    makefiledata = makefile.read()
-    originalmakefile = makefiledata
-    
-    makefiledata = makefiledata.replace("ffi.so", "")
-    makefiledata = makefiledata.replace("usb.so", "")
-    
-    makefiledata = makefiledata.replace("linit.c", "rinit.c")
-    makefiledata = makefiledata.replace("lualib.h", "rlua_lib.h")
-    
-    makefile.close()
-# 2- Write the makefile
-with open(MAKEFILEPATH, "w") as makefile:
-    makefile.write(makefiledata)
-    makefile.close()
-
-
+time.sleep(1)
 
 ### PREBUILD
 print("Prebuilding Luax...")
+
+# Run make
 exitcode = os.system("make")
 if exitcode != 0:
     print("Prebuild failed!")
-    #with open(MAKEFILEPATH, "w") as makefile:
-    #    makefile.write(originalmakefile)
-    #    makefile.close()
     sys.exit(1)
 
 ### WAIT UNTIL PREBUILD IS DONE
@@ -182,9 +170,6 @@ os.system("cd usb")
 exitcode = os.system("make")
 if exitcode != 0:
     print("USB Build failed!")
-    with open(MAKEFILEPATH, "w") as makefile:
-        makefile.write(originalmakefile)
-        makefile.close()
     sys.exit(1)
     
 ### MAIN
@@ -194,22 +179,32 @@ while True:
         break
     else:
         continue
-# Restore the makefile
-with open(MAKEFILEPATH, "w") as makefile:
-    makefile.write(originalmakefile)
-    makefile.close()
 
 
 # Go back to the main directory
 os.system("cd ..")
 print("\n\n")
+# Delete /luax and /luaxc, they are prebuild
+os.system("rm luax")
+os.system("rm luaxc")
+
+# Move the contents of PostMakefile to Makefile
+os.system("mv Makefile PostMakefile")
+os.system("mv PostMakefile Makefile")
 print("Building Luax...")
+time.sleep(1)
 exitcode = os.system("make")
 if exitcode != 0:
     print("Luax Build failed!")
     sys.exit(1)
+while True:
+    if os.path.exists("luax") and os.path.exists("luaxc"):
+        break
+    else:
+        continue
 print("Build succeeded!")
-
+os.system("mv Makefile PostMakefile")
+os.system("mv PostMakefile Makefile")
 # Install
 print("\n\n\n")
 print("Please specify what extension would be used.")

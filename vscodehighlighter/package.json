@@ -1,0 +1,49 @@
+{
+	"name": "Luax-highlighting",
+	"displayName": "Luax Syntax Highlighting",
+	"description": "Official Luax syntax highlighting for Visual Studio Code",
+	"categories": [
+		"Languages"
+	],
+	"version": "1.1.1",
+	"publisher": "AsynchronousAI",
+	"author": {
+		"name": "AsynchronousAI"
+	},
+	"icon": "icon.png",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/AsynchronousAI/luax.git"
+	},
+	"engines": {
+		"vscode": "*"
+	},
+	"contributes": {
+		"languages": [
+			{
+				"id": "luax",
+				"extensions": [
+					".luax",
+					".luaxcheckrc"
+				],
+				"aliases": [
+					"Luax",
+					"luax"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "luax",
+				"scopeName": "source.luax",
+				"path": "./syntaxes/luax.json"
+			}
+		]
+	},
+	"__metadata": {
+		"id": "a9c7a85b-1f93-6aef-a358-7669d60498c7",
+		"publisherDisplayName": "AsynchronousAI",
+		"publisherId": "a9c7a85b-1f93-6aef-a358-7669d60498c7"
+	}
+}

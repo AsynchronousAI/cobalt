@@ -5,27 +5,15 @@ control, FFI, audio, etc. Luax's focus is to be a portable language that works e
 and made to make applications and games.
 
 ## Features
-- Built in libraries for graphics, audio, and more
-- Ultrafast
-- Way better syntax 
-- Easy to learn
-- Portable (Written in C)
+- Ultrafast and presice 
+- FFI
 - Embeddable
-- Built in Lexer
-- Interpreter
-- Bytecode compiler
-- Bytecode interpreter
-- Vector3 and Vector2 class
-- Transform class
-- Assembly compiler
-- Faster and more random number generator
-- wait/swait (seconds), mwait (milliseconds, 1/1000 of a second), and uwait (microseconds, 1/1000000 of a second) functions with amazing accuracy
-- Slicing like in Python (<string>.slice(<start>, <end>, <step>))
-- Syntax like C and C++
-- Class support (<name>: <class> = <value>)
-- Easy way to get system variables (sys)
-- FFI (Foreign Function Interface)
-- USB support
+- Audio control
+- Easy to use
+- USB control
+- C-like syntax
+- Interpreted, Bytecoded, and Standalone executables
+- Read [examples](/Examples.md) for more
 ## Building
 ### Requirements
 - Python 3

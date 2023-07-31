@@ -7,3 +7,4 @@
 /luaffifb
 *.a
 *.so
+/node_modules

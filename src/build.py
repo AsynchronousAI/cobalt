@@ -154,6 +154,7 @@ with open("linit.c", "r") as linit:
             linitdata.remove(line)  
 with open("linit.c", "w") as linit:
     linit.write("".join(linitdata))
+    linit.close()
 
 with open("lualib.h", "r") as liblua:
     libluadata = liblua.readlines()
@@ -163,6 +164,7 @@ with open("lualib.h", "r") as liblua:
             libluadata.remove(line)
 with open("lualib.h", "w") as liblua:
     liblua.write("".join(libluadata))
+    liblua.close()
 
 
 ### PREBUILD
@@ -203,13 +205,15 @@ while True:
 with open(MAKEFILEPATH, "w") as makefile:
     makefile.write(originalmakefile)
 # Restore linit.c and liblua.c
-
+print("!!!"*100, originallinit, originalliblua, "!!!"*100)
 with open("linit.c", "w") as linit:
     linit.write(originallinit)
     print(originallinit)
+    linit.close()
 with open("lualib.h", "w") as liblua:
     liblua.write(originalliblua)
     print(originalliblua)
+    liblua.close()
 
 # Go back to the main directory
 os.system("cd ..")

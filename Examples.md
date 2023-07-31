@@ -123,7 +123,9 @@ uwait(1) // Waits 1 microsecond (1/1000000 of a second)
 
 // These are very accurate and will not drift like Lua's wait function
 // Do not do:
-uwait(1000000) // This DOES NOT improve performance, it just makes it slower and unreadable
+uwait(1000000) // This DOES NOT improve performance, it just makes it unreadable
+
+/*swait/wait, mwait, uwait are interchangable because internally they all get waited by the microsecond*/
 
 // Do:
 swait(1) // Better!

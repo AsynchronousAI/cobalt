@@ -127,14 +127,14 @@ print("Configuring Luax Prebuild...")
 # Luax is a dependency for Luax FFI/USB library and that is a dependency for Luax
 # So we have a chicken and egg problem
 
-ORIGINALMAKEFILE = ""
-ORIGINALLINIT = ""
-ORIGINALLIBLUA = ""
+originalmakefile = ""
+originallinit = ""
+originalliblua = ""
 
 # 1- Disable ffi.so and usb.so in the makefile
 with open(MAKEFILEPATH, "r") as makefile:
     makefiledata = makefile.read()
-    ORIGINALMAKEFILE = makefiledata
+    originalmakefile = makefiledata
     
     makefiledata = makefiledata.replace("ffi.so", "")
     makefiledata = makefiledata.replace("usb.so", "")
@@ -148,7 +148,7 @@ global libluadata
 
 with open("linit.c", "r") as linit: 
     linitdata = linit.readlines()
-    ORIGINALLINIT = linit.read()
+    originallinit = linit.read()
     for line in linitdata:
         if "//SAFEDELETE" in line:
             linitdata.remove(line)  
@@ -157,14 +157,14 @@ with open("linit.c", "w") as linit:
 
 with open("lualib.h", "r") as liblua:
     libluadata = liblua.readlines()
-    ORIGINALLIBLUA = liblua.read()
+    originalliblua = liblua.read()
     for line in libluadata:
         if "//SAFEDELETE" in line:
             libluadata.remove(line)
 with open("lualib.h", "w") as liblua:
     liblua.write("".join(libluadata))
 
-print(ORIGINALLIBLUA, ORIGINALLINIT)
+
 ### PREBUILD
 print("Prebuilding Luax...")
 exitcode = os.system("make")
@@ -201,12 +201,16 @@ while True:
         continue
 # Restore the makefile
 with open(MAKEFILEPATH, "w") as makefile:
-    makefile.write(ORIGINALMAKEFILE)
+    makefile.write(originalmakefile)
 # Restore linit.c and liblua.c
+
 with open("linit.c", "w") as linit:
-    linit.write(ORIGINALLINIT)
+    linit.write(originallinit)
+    print(originallinit)
 with open("lualib.h", "w") as liblua:
-    liblua.write(ORIGINALLIBLUA)
+    liblua.write(originalliblua)
+    print(originalliblua)
+
 # Go back to the main directory
 os.system("cd ..")
 print("\n\n")

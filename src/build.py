@@ -130,40 +130,23 @@ print("Configuring Luax Prebuild...")
 
 
 # 1- Disable ffi.so and usb.so in the makefile
-
+global originalmakefile
 with open(MAKEFILEPATH, "r") as makefile:
     makefiledata = makefile.read()
     originalmakefile = makefiledata
     
     makefiledata = makefiledata.replace("ffi.so", "")
     makefiledata = makefiledata.replace("usb.so", "")
+    
+    makefiledata = makefiledata.replace("linit.c", "rinit.c")
+    makefiledata = makefiledata.replace("lualib.h", "rlualib.h")
+    
+    makefile.close()
 # 2- Write the makefile
 with open(MAKEFILEPATH, "w") as makefile:
     makefile.write(makefiledata)
-# 3- Remove ffi and usb fro linit.c and liblua.c
-# How you will do this is that you will loop through all lines and if the line includes //SAFEDELETE then you will delete the line
+    makefile.close()
 
-
-with open("linit.c", "r") as linit: 
-    linitdata = linit.readlines()
-    
-    originallinit = linit.read()
-    for line in linitdata:
-        if "//SAFEDELETE" in line:
-            linitdata.remove(line)  
-with open("linit.c", "w") as linit:
-    linit.write("".join(linitdata))
-    linit.close()
-
-with open("lualib.h", "r") as liblua:
-    libluadata = liblua.readlines()
-    originalliblua = liblua.read()
-    for line in libluadata:
-        if "//SAFEDELETE" in line:
-            libluadata.remove(line)
-with open("lualib.h", "w") as liblua:
-    liblua.write("".join(libluadata))
-    liblua.close()
 
 
 ### PREBUILD
@@ -203,17 +186,7 @@ while True:
 # Restore the makefile
 with open(MAKEFILEPATH, "w") as makefile:
     makefile.write(originalmakefile)
-# Restore linit.c and liblua.c
-print("!!!"*100, originallinit, originalliblua, "!!!"*100)
-
-with open("linit.c", "w") as linit:
-    linit.write(originallinit)
-    print(originallinit)
-    linit.close()
-with open("lualib.h", "w") as liblua:
-    liblua.write(originalliblua)
-    print(originalliblua)
-    liblua.close()
+    makefile.close()
 
 
 # Go back to the main directory

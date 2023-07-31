@@ -17,7 +17,7 @@
   // - Vram usage percentage
   // - is iGPU?
 
-/// Used in debug.info() and io
+/// Used in device.info() and io
 
 // Path: src/system.c
 // @AsynchronousAI - 2023

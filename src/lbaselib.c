@@ -630,6 +630,8 @@ static int luaB_slice(lua_State *L) {
 
   return 1;
 }
+
+
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"slice", luaB_slice},

@@ -127,11 +127,10 @@ print("Configuring Luax Prebuild...")
 # Luax is a dependency for Luax FFI/USB library and that is a dependency for Luax
 # So we have a chicken and egg problem
 
-originalmakefile = ""
-originallinit = ""
-originalliblua = ""
+
 
 # 1- Disable ffi.so and usb.so in the makefile
+
 with open(MAKEFILEPATH, "r") as makefile:
     makefiledata = makefile.read()
     originalmakefile = makefiledata
@@ -143,11 +142,11 @@ with open(MAKEFILEPATH, "w") as makefile:
     makefile.write(makefiledata)
 # 3- Remove ffi and usb fro linit.c and liblua.c
 # How you will do this is that you will loop through all lines and if the line includes //SAFEDELETE then you will delete the line
-global linitdata
-global libluadata
+
 
 with open("linit.c", "r") as linit: 
     linitdata = linit.readlines()
+    
     originallinit = linit.read()
     for line in linitdata:
         if "//SAFEDELETE" in line:
@@ -206,6 +205,7 @@ with open(MAKEFILEPATH, "w") as makefile:
     makefile.write(originalmakefile)
 # Restore linit.c and liblua.c
 print("!!!"*100, originallinit, originalliblua, "!!!"*100)
+
 with open("linit.c", "w") as linit:
     linit.write(originallinit)
     print(originallinit)
@@ -214,6 +214,7 @@ with open("lualib.h", "w") as liblua:
     liblua.write(originalliblua)
     print(originalliblua)
     liblua.close()
+
 
 # Go back to the main directory
 os.system("cd ..")

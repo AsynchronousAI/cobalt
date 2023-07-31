@@ -520,6 +520,7 @@ static const char *funcnamefromcode (lua_State *L, CallInfo *ci,
       tm = cast(TMS, offset + cast_int(TM_ADD));  /* ORDER TM */
       break;
     }
+    case OP_EXIST: tm = TM_LEN; break;
     case OP_UNM: tm = TM_UNM; break;
     case OP_BNOT: tm = TM_BNOT; break;
     case OP_LEN: tm = TM_LEN; break;

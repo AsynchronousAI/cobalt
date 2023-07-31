@@ -35,7 +35,11 @@ and made to make applications and games.
 ### Building
 - `git clone https://github.com/AsynchronousAI/luax`
 - `cd luax`
-- `python3 build.py` for an interactive setup. We do not reccomend using Makefile because there are over 5 of them and are implemented in the build.py script.
+- `python3 build.py` for an interactive setup. 
+### Other options
+- `python3 build.py help` for help
+- `python3 build.py clean` to clean the build
+You must use build.py to build as it modifys the souce code to work with your requirements and avoids conflicts since this has multiple MakeFiles. 
 ### End result
 - `luax` executable in the `dist` folder
 - `luaxc` executable in the `dist` folder

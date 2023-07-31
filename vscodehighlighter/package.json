@@ -1,11 +1,11 @@
 {
-	"name": "Luax-highlighting",
+	"name": "luax-highlighting",
 	"displayName": "Luax Syntax Highlighting",
 	"description": "Official Luax syntax highlighting for Visual Studio Code",
 	"categories": [
-		"Languages"
+		"Programming Languages"
 	],
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"publisher": "AsynchronousAI",
 	"author": {
 		"name": "AsynchronousAI"

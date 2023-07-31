@@ -1,1 +1,6 @@
-function lol(){}
+function add(a, b){
+    return a + b;
+}
+var start = os.clock()
+swait(add(10, 10))
+print("10 seconds finished, elasped: ", os.clock() - start)

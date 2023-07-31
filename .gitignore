@@ -4,3 +4,4 @@
 *.a
 /__pycache__/
 *.pyc
+/luaffifb

@@ -13,7 +13,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-#include "vec3class.h"
+#include "classes.h"
 
 
 

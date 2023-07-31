@@ -835,22 +835,47 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
         lua_pushliteral(L, "null");
         break;
       case LUA_TTABLE:
-        lua_pushliteral(L, "[");
-        lua_pushnil(L);  // push the first key
+        lua_pushliteral(L, "");
         int first = 1;
-        while (lua_next(L, idx) != 0) {
-          if (!first) {
-            lua_pushliteral(L, ", ");
+        int tt = luaL_getmetafield(L, idx, "__name");  /* try name */
+        const char *kind = (tt == LUA_TSTRING) ? lua_tostring(L, -1) :
+                                                luaL_typename(L, idx);
+        int len = luaL_len(L, idx);
+        lua_pushfstring(L, "(%s: %p) length: %d", kind, lua_topointer(L, idx), len);
+        if (len == 0){
+          lua_pushfstring(L, "(%s: %p)  table is empty or restricted", kind, lua_topointer(L, idx));
+        }
+        /*
+        lua_pushliteral(L, "[");
+        luaL_checktype(L, idx, LUA_TTABLE);
+        int len = luaL_len(L, idx);
+        for (int i = 1; i <= len; i++) {
+          lua_rawgeti(L, idx, i);
+          if (!lua_isnil(L, -1)) {
+            first = 0;
+            lua_pushfstring(L, "%d ", i);
+            luaL_tolstring(L, -2, NULL);
+            lua_concat(L, 3); 
           }
-          first = 0;
-          luaL_tolstring(L, -2, NULL);  // convert the key to a string
+          lua_pop(L, 1); 
+        }
+        // Check if the last value is nil
+        lua_rawgeti(L, idx, len + 1);
+        if (lua_isnil(L, -1)) {
+          lua_pop(L, 1);
+          lua_pushliteral(L, "]");
+        } else {
+          lua_pushliteral(L, ", ");
+          lua_pushfstring(L, "%d", len + 1);
           lua_pushliteral(L, ": ");
           luaL_tolstring(L, -2, NULL);  // convert the value to a string
           lua_concat(L, 3);  // concatenate the key, value, and separator
-          lua_pop(L, 1);  // remove the value
+          lua_pushliteral(L, "]");
+          lua_concat(L, 2);
         }
-        lua_pushliteral(L, "]");
+        
         lua_concat(L, lua_gettop(L) - idx);
+        */
         break;
       default: {
         int tt = luaL_getmetafield(L, idx, "__name");  /* try name */

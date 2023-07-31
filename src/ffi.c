@@ -6,10 +6,6 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
-#include "ffi.h"
-#include <math.h>
-#include <inttypes.h>
-
 #define ffi_c
 #define LUA_LIB
 
@@ -23,6 +19,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include <sys/mman.h>
+#include "ffi.h"
+#include <math.h>
+#include <inttypes.h>
 
 /* Set to 1 to get extra debugging on print */
 #define DEBUG_TOSTRING 0

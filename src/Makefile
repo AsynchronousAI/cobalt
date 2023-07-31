@@ -169,10 +169,10 @@ llex.o: llex.c lprefix.h lua.h luaconf.h lctype.h llimits.h ldebug.h \
  lstate.h lobject.h ltm.h lzio.h lmem.h ldo.h lgc.h llex.h lparser.h \
  lstring.h ltable.h
 lmathlib.o: lmathlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-lcolorlib.o: lcolorlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-l2Dlib.o: l2Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-l3Dlib.o: l3Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
-l3transform.o: l3transform.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h vec3class.h
+lcolorlib.o: lcolorlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h classes.h
+l2Dlib.o: l2Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h classes.h
+l3Dlib.o: l3Dlib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h classes.h
+l3transform.o: l3transform.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h classes.h
 lcinterface.o: lcinterface.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h 
 lmem.o: lmem.c lprefix.h lua.h luaconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h
@@ -182,10 +182,10 @@ lobject.o: lobject.c lprefix.h lua.h luaconf.h lctype.h llimits.h \
  lvm.h
 lopcodes.o: lopcodes.c lprefix.h lopcodes.h llimits.h lua.h luaconf.h
 loslib.o: loslib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-#ffi.o: ffi.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h \
-# ffi.h call_arm.h call_x64.h call_x64win.h call_x86.h \
-# dynasm/dasm_arm.h dynasm/dasm_x86.h dynasm/dasm_ppc.h \
-# dynasm/dasm_proto.h
+ffi.o: ffi.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h \
+ ffi.h call_arm.h call_x64.h call_x64win.h call_x86.h \
+ dynasm/dasm_arm.h dynasm/dasm_x86.h dynasm/dasm_ppc.h \
+ dynasm/dasm_proto.h
 lparser.o: lparser.c lprefix.h lua.h luaconf.h lcode.h llex.h lobject.h \
  llimits.h lzio.h lmem.h lopcodes.h lparser.h ldebug.h lstate.h ltm.h \
  ldo.h lfunc.h lstring.h lgc.h ltable.h

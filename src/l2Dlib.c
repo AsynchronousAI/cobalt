@@ -15,11 +15,7 @@
 #include "lualib.h"
 
 
-typedef struct {
-  float x;
-  float y;
-} Vec2;
-
+#include "classes.h"
 
 
 static int vec2_index(lua_State *L) {

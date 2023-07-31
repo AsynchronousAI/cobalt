@@ -16,13 +16,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-
-
-typedef struct {
-  int r;
-  int g;
-  int b;
-} Color;
+#include "classes.h"
 
 
 

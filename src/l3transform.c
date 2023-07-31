@@ -12,23 +12,9 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-#include "vec3class.h"
+#include "classes.h"
 
 
-typedef struct {
-    int x; // position x
-    int y; // position y
-    int z; // position z
-    int ox; // orientation x
-    int oy; // orientation y
-    int oz; // orientation z
-    int sx; // scale x
-    int sy; // scale y
-    int sz; // scale z
-    int px; // pivot x
-    int py; // pivot y
-    int pz; // pivot z
-} Transform;
 
 int default_transform[12] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 0 ,0 ,0};
 

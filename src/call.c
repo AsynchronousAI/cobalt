@@ -7,6 +7,11 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 #include "ffi.h"
+#include "lua.h"
+
+#include "lauxlib.h"
+#include "lualib.h"
+#include "lprefix.h"
 
 static cfunction compile(Dst_DECL, lua_State* L, cfunction func, int ref);
 

@@ -19,19 +19,11 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef __cplusplus
-extern "C" {
-# include "lua.h"
-# include "lauxlib.h"
-# include "lualib.h"
-}
-# define EXTERN_C extern "C"
-#else
-# include "lua.h"
-# include "lauxlib.h"
-# include "lualib.h"
-# define EXTERN_C extern
-#endif
+#include "lua.h"
+
+#include "lauxlib.h"
+#include "lualib.h"
+#include "lprefix.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -65,7 +57,7 @@ struct jit;
 # define EXPORT
 #endif
 
-EXTERN_C EXPORT int luaopen_ffi(lua_State* L);
+EXPORT int luaopen_ffi(lua_State* L);
 
 static int lua_absindex2(lua_State* L, int idx) {
     return (LUA_REGISTRYINDEX <= idx && idx < 0)

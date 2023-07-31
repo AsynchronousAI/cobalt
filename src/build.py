@@ -1,7 +1,8 @@
 """Handles building luax by downloading dependencies, configuring, and compiling, and installing."""
 import sys
 import os
-
+import subprocess
+#########################
 # Prepare
 os.chdir(os.path.dirname(__file__))
 
@@ -15,6 +16,10 @@ try:
     elif arg2 == "clean":
         print("Cleaning")
         os.system("make clean")
+        # delete ffi.so
+        if os.path.exists("ffi.so"):
+            os.system("rm ffi.so")
+        
         sys.exit(0)
     elif arg2 == "-h":
         print("Usage: python3 build.py <platform> (or clean to clean up build files)")
@@ -38,7 +43,15 @@ with open(MAKEFILEPATH, "w") as makefile:
     
 # Begin building
 print("\n\n\n")
-print("Building...")
+print("Building Luax USB library...")
+os.system("cd usb")
+exitcode = os.system("make")
+if exitcode != 0:
+    print("Build failed!")
+    sys.exit(1)
+os.system("cd ..")
+print("\n\n")
+print("Building Luax...")
 exitcode = os.system("make")
 if exitcode != 0:
     print("Build failed!")
@@ -63,14 +76,17 @@ print("\n\n\n")
 print("More options:")
 print("\n")
 print("1- Read install data")
-print("2- Clean up build files")
+print("2- Clean uneeded up build files")
 print("3- Build again for another platform")
 print("4- Move dist/luax" + res + " and dist/luaxc" + res + " to your PATH/$PATH")
 print("5- Exit")
 inp = input("What do you want to do? (1, 2, 3, etc.): ")
 
 if inp == "1":
+    print("\n\n\nLUAX")
     os.system("make echo")
+    print("\n\n\nLUAX USB LIB")
+    os.system("cd usb && make echo")
 elif inp == "2":
     os.system("python3 build.py clean")
 elif inp == "3":

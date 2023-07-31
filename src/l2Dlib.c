@@ -2,7 +2,6 @@
 #define l2Dlib_c
 #define LUA_LIB
 
-#include "lprefix.h"
 
 
 #include <stdlib.h>
@@ -10,7 +9,7 @@
 #include <string.h>
 
 #include "lua.h"
-
+#include "lprefix.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

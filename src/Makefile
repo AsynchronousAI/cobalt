@@ -9,7 +9,6 @@
 PLAT= macosx                            #
 #################################################
 
-# ffi.c should be compiled to a .so file
 
 CC= gcc -std=gnu99
 CXX = g++ -std=c++14
@@ -45,9 +44,8 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	ltm.o lundump.o lvm.o lzio.o 
 LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o lcolorlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o l2Dlib.o l3Dlib.o \
-	l3transform.o lcinterface.o ffi.o
+	l3transform.o lcinterface.o #ffi.so
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
-
 LUA_T=	luax
 LUA_O=	lua.o
 
@@ -55,6 +53,7 @@ LUAC_T=	luaxc
 LUAC_O=	luac.o
 
 ALL_O= $(BASE_O) $(LUA_O) $(LUAC_O)
+ALL_SO= $(LIB_SO)
 ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T)
 ALL_A= $(LUA_A)
 
@@ -67,6 +66,7 @@ o:	$(ALL_O)
 
 a:	$(ALL_A)
 
+
 $(LUA_A): $(BASE_O)
 	$(AR) $@ $(BASE_O)
 	$(RANLIB) $@
@@ -78,7 +78,7 @@ $(LUAC_T): $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
 
 clean:
-	$(RM) $(ALL_T) $(ALL_O)
+	$(RM) $(ALL_T) $(ALL_O) $(ALL_SO)
 
 depend:
 	@$(CC) $(CFLAGS) -MM l*.c
@@ -184,10 +184,6 @@ lobject.o: lobject.c lprefix.h lua.h luaconf.h lctype.h llimits.h \
  lvm.h
 lopcodes.o: lopcodes.c lprefix.h lopcodes.h llimits.h lua.h luaconf.h
 loslib.o: loslib.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h
-ffi.o: ffi.c lprefix.h lua.h luaconf.h lauxlib.h lualib.h \
- ffi.h call_arm.h call_x64.h call_x64win.h call_x86.h \
- dynasm/dasm_arm.h dynasm/dasm_x86.h dynasm/dasm_ppc.h \
- dynasm/dasm_proto.h
 lparser.o: lparser.c lprefix.h lua.h luaconf.h lcode.h llex.h lobject.h \
  llimits.h lzio.h lmem.h lopcodes.h lparser.h ldebug.h lstate.h ltm.h \
  ldo.h lfunc.h lstring.h lgc.h ltable.h

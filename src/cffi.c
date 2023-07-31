@@ -6,7 +6,11 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
-#define ffi_c
+
+// Provides an API for ffi.h
+
+#define CFFI_C
+
 #define LUA_LIB
 
 #include <stdlib.h>
@@ -18,6 +22,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#include "lprefix.h"
 #include <sys/mman.h>
 #include "ffi.h"
 #include <math.h>
@@ -3482,7 +3487,7 @@ static void setup_mt(lua_State* L, const luaL_Reg* mt, int upvals)
     luaL_setfuncs(L, mt, upvals);
 }
 
-LUALIB_API int luaopen_ffi(lua_State* L)
+LUAMOD_API int luaopen_cffi(lua_State* L)
 {
     lua_settop(L, 0);
 
@@ -3563,4 +3568,5 @@ LUALIB_API int luaopen_ffi(lua_State* L)
     lua_setfield(L, -2, "type"); /* ffi.type */
     return 1;
 }
+
 

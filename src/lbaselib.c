@@ -586,9 +586,53 @@ static int luaB_uwait(lua_State *L) {
   return 0;
 }
 
+static int luaB_slice(lua_State *L) {
+  int nargs = lua_gettop(L);
+  luaL_argcheck(L, nargs >= 2, 2, "expected at least 2 arguments");
 
+  int start = luaL_checkinteger(L, 1);
+  int stop = luaL_checkinteger(L, 2);
+  int step = 1;
+
+  if (nargs >= 3) {
+    step = luaL_checkinteger(L, 3);
+    luaL_argcheck(L, step != 0, 3, "step cannot be zero");
+  }
+
+  luaL_checktype(L, -1, LUA_TTABLE);
+  int len = lua_rawlen(L, -1);
+
+  if (start < 0) {
+    start = len + start + 1;
+  }
+
+  if (stop < 0) {
+    stop = len + stop + 1;
+  }
+
+  luaL_argcheck(L, start >= 1 && start <= len, 1, "start index out of range");
+  luaL_argcheck(L, stop >= 1 && stop <= len, 2, "stop index out of range");
+
+  if (step > 0) {
+    luaL_argcheck(L, start <= stop, 2, "stop index must be greater than start index");
+  } else {
+    luaL_argcheck(L, start >= stop, 2, "stop index must be less than start index");
+  }
+
+  lua_newtable(L);
+  int j = 1;
+
+  for (int i = start; step > 0 ? i <= stop : i >= stop; i += step) {
+    lua_rawgeti(L, -2, i);
+    lua_rawseti(L, -2, j);
+    j++;
+  }
+
+  return 1;
+}
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
+  {"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
   {"error", luaB_error},

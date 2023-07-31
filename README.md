@@ -27,14 +27,28 @@ and made to make applications and games.
 - FFI (Foreign Function Interface)
 - USB support
 ## Building
+### Requirements
+- Python 3
+- CMake
+- A C/C++ compiler (Preferably GCC or Clang)
+- Git
+### Building
 - `git clone https://github.com/AsynchronousAI/luax`
 - `cd luax`
-- `python3 build.py` for an interactive setup
-
+- `python3 build.py` for an interactive setup. We do not reccomend using Makefile because there are over 5 of them and are implemented in the build.py script.
+### End result
+- `luax` executable in the `dist` folder
+- `luaxc` executable in the `dist` folder
+- `luaxasm` executable in the `dist` folder
+- If you chose to move them to the PATH/$PATH they will be there instead of the dist folder
 ## Credits
 - Lua
 - Ljs
 - selene
 - libffifb
 - moonusb
-
+## TODO:
+- Redo FFI so it can be included
+- Implement USB
+- Fix slice
+- Fix memory

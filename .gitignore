@@ -5,3 +5,5 @@
 /__pycache__/
 *.pyc
 /luaffifb
+*.a
+*.so

@@ -27,9 +27,14 @@ and made to make applications and games.
 - FFI (Foreign Function Interface)
 - USB support
 ## Building
-- `cd src; make`
+- `git clone https://github.com/AsynchronousAI/luax`
+- `cd luax`
+- `python3 build.py` for an interactive setup
+
 ## Credits
 - Lua
 - Ljs
 - selene
+- libffifb
+- moonusb
 

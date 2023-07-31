@@ -9,6 +9,8 @@
 PLAT= macosx                            #
 #################################################
 
+# ffi.c should be compiled to a .so file
+
 CC= gcc -std=gnu99
 CXX = g++ -std=c++14
 CFLAGS= -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
@@ -43,7 +45,7 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	ltm.o lundump.o lvm.o lzio.o 
 LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o lcolorlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o l2Dlib.o l3Dlib.o \
-	l3transform.o lcinterface.o #ffi.o
+	l3transform.o lcinterface.o ffi.o
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
 
 LUA_T=	luax

@@ -3,7 +3,7 @@
 	"fileTypes": [
 		"luax"
 	],
-	"firstLineMatch": "\\A#!.*?\\blua(\\d+(\\.\\d+)?)?\\b|\\A--\\s+-\\*-\\s*lua\\s*-\\*-",
+	"firstLineMatch": "\\A#!.*?\\blua(\\d+(\\.\\d+)?)?\\b|\\A//\\s+-\\*-\\s*lua\\s*-\\*-",
 	"keyEquivalent": "^~L",
 	"name": "Luax",
 	"scopeName": "source.luax",
@@ -100,7 +100,7 @@
 		},
 		"line-comment": {
 			"name": "comment.line.double-dash.lua",
-			"match": "(--)(?!(\\[=*\\[|\\]=*\\])).*$\n?",
+			"match": "(//)(?!(\\[=*\\[|\\]=*\\])).*$\n?",
 			"captures": {
 				"1": {
 					"name": "punctuation.definition.comment.lua"
@@ -109,19 +109,19 @@
 		},
 		"block-comment": {
 			"name": "comment.block.lua",
-			"begin": "--\\[(=*)\\[",
+			"begin": "\\/\\*",
 			"beginCaptures": {
-				"0": {
-					"name": "punctuation.definition.comment.lua"
-				}
+			  "0": {
+				"name": "punctuation.definition.comment.lua"
+			  }
 			},
-			"end": "\\]\\1\\]",
+			"end": "\\*\\/",
 			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.comment.lua"
-				}
+			  "0": {
+				"name": "punctuation.definition.comment.lua"
+			  }
 			}
-		},
+		  },
 		"constant": {
 			"name": "constant.language.lua",
 			"match": "\\b(nil|true|false|_G|_VERSION|\\.\\.\\.)\\b"
@@ -195,7 +195,7 @@
 					"name": "keyword.control.lua"
 				}
 			},
-			"end": "\\bend\\b",
+			"end": "\\b}\\b",
 			"endCaptures": {
 				"0": {
 					"name": "keyword.control.lua"
@@ -215,7 +215,7 @@
 					"name": "keyword.control.lua"
 				}
 			},
-			"end": "\\bend\\b",
+			"end": "\\b}\\b",
 			"endCaptures": {
 				"0": {
 					"name": "keyword.control.lua"
@@ -235,7 +235,7 @@
 					"name": "keyword.control.lua"
 				}
 			},
-			"end": "\\bend\\b",
+			"end": "\\b}\\b",
 			"endCaptures": {
 				"0": {
 					"name": "keyword.control.lua"
@@ -277,12 +277,12 @@
 		},
 		"keyword": {
 			"name": "keyword.control.lua",
-			"match": "\\b(break|do|else|for|if|elseif|return|then|repeat|while|until|end|local|in)\\b"
+			"match": "\\b(break|else|for|if|elseif|return|then|repeat|while|until|var|in)\\b"
 		},
 		"table-function": {
 			"name": "meta.function.lua",
 			"begin": "(?=\\bfunction\\s+[_[:alpha:]][_[:alnum:]]*(?:\\.[_[:alpha:]][_[:alnum:]]*)*(?:\\.(?:[_[:alpha:]][_[:alnum:]]*)|:(?:[_[:alpha:]][_[:alnum:]]*)))",
-			"end": "\\bend\\b",
+			"end": "\\b}\\b",
 			"endCaptures": {
 				"0": {
 					"name": "keyword.control.function-end.lua"
@@ -330,7 +330,7 @@
 		"function": {
 			"name": "meta.function.lua",
 			"begin": "(?=\\b(?:local\\s+)?function\\s+[_[:alpha:]][_[:alnum:]]*)",
-			"end": "\\bend\\b",
+			"end": "\\}\\b",
 			"endCaptures": {
 				"0": {
 					"name": "keyword.control.function-end.lua"
@@ -374,7 +374,7 @@
 		"anonymous-function": {
 			"name": "meta.function.anonymous.lua",
 			"begin": "(?=\\bfunction(?!\\s+[_[:alpha:]][_[:alnum:]]*))",
-			"end": "\\bend\\b",
+			"end": "\\b}\\b",
 			"endCaptures": {
 				"0": {
 					"name": "keyword.control.function-end.lua"
@@ -440,7 +440,7 @@
 			]
 		},
 		"support-function-call": {
-			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\\s*[\\({]",
+			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|import|wait|swait|mwait|uwait|slice|load)\\s*[\\({]",
 			"beginCaptures": {
 				"1": {
 					"name": "meta.function-call.lua support.function"
@@ -454,7 +454,7 @@
 			]
 		},
 		"support-string-function-call": {
-			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\\s*(?=[\\'\"]|\\[\\[)",
+			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|import|wait|swait|mwait|uwait|slice|load)\\s*(?=[\\'\"]|\\[\\[)",
 			"beginCaptures": {
 				"1": {
 					"name": "meta.function-call.lua support.function"

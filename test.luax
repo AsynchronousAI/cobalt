@@ -1,21 +1,30 @@
-ffi = import("ffi")
+// SYNTAX HIGHLIGHTER TEST!!!!
+/*
+    I am a multiline comment
+*/
+// I am a single line comment`
 
-if (true) {
-    print("hi")
+function newFunction() // oh yeah auto function completion, even in comments :skull: :skull: :skull:
+{
+    print("Hello World!")
+    for (i = 1,10){
+        print(i)
+    }
+    if (a) {
+        print("a")
+    } else if (b) {
+        print("b")
+    } else {
+        print("c")
+    }
+
+    n.b->()
+    n::b()
+
+    ////////////////////////////////////////
+    
+
 }
 
-function formatTransform(transform) {
-    return "Transform: " .. transform.x .. ", " .. transform.y .. ", " .. (transform.z || "nil")
-}
+newFunction()
 
-function formatVector3(vector) {
-    return "Vector3: " .. vector.X .. ", ".. vector.Y .. ", " .. vector.Z
-}
-
-newTransform = Transform.new(0,0,0,0)
-newVec = Vector3.new(0,0,0)
-transformFromVec = Transform.new(newVec)
-
-print(formatTransform(newTransform))
-print(formatVector3(newVec))
-print(formatTransform(transformFromVec))

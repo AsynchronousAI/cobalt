@@ -1,4 +1,9 @@
 """Handles building luax by downloading dependencies, configuring, and compiling, and installing."""
+
+# @AsynchronousAI - 2023
+
+
+
 import sys
 import os
 import subprocess
@@ -139,7 +144,7 @@ with open(MAKEFILEPATH, "r") as makefile:
     makefiledata = makefiledata.replace("usb.so", "")
     
     makefiledata = makefiledata.replace("linit.c", "rinit.c")
-    makefiledata = makefiledata.replace("lualib.h", "rlualib.h")
+    makefiledata = makefiledata.replace("lualib.h", "rlua_lib.h")
     
     makefile.close()
 # 2- Write the makefile
@@ -153,7 +158,10 @@ with open(MAKEFILEPATH, "w") as makefile:
 print("Prebuilding Luax...")
 exitcode = os.system("make")
 if exitcode != 0:
-    print("Build failed!")
+    print("Prebuild failed!")
+    #with open(MAKEFILEPATH, "w") as makefile:
+    #    makefile.write(originalmakefile)
+    #    makefile.close()
     sys.exit(1)
 
 ### WAIT UNTIL PREBUILD IS DONE
@@ -173,7 +181,10 @@ print("Building Luax USB library...")
 os.system("cd usb")
 exitcode = os.system("make")
 if exitcode != 0:
-    print("Build failed!")
+    print("USB Build failed!")
+    with open(MAKEFILEPATH, "w") as makefile:
+        makefile.write(originalmakefile)
+        makefile.close()
     sys.exit(1)
     
 ### MAIN
@@ -195,7 +206,7 @@ print("\n\n")
 print("Building Luax...")
 exitcode = os.system("make")
 if exitcode != 0:
-    print("Build failed!")
+    print("Luax Build failed!")
     sys.exit(1)
 print("Build succeeded!")
 

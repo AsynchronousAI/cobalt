@@ -37,7 +37,7 @@
 
 
 /*
-** these libs are loaded by lua.c and are readily available to any Lua
+** these libs are loaded by lua.c and are readily available to any Luax
 ** program
 */
 static const luaL_Reg loadedlibs[] = {

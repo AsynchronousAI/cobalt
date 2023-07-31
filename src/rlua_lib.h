@@ -1,10 +1,10 @@
 /*
-** $Id: lualib.h,v 1.45.1.1 2017/04/19 17:20:42 roberto Exp $
-** Lua standard libraries
+** $Id: rlualib.h,v 1.45.1.1 2023/07/31 01:06:35 AsynchronousAI 
+** Internal luax standard libraries
 ** See Copyright Notice in lua.h
 */
 
-// rinit.c is the safe build version of linit.c that is dumbed down for internal use only.
+// rlua_lib.c is the safe build version of linit.c that is dumbed down for internal use only.
 
 #ifndef lualib_h
 #define lualib_h

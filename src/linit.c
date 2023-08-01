@@ -54,6 +54,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_TRANSFORMNAME, luaopen_transform},
   {LUA_CORENAME, luaopen_lcinterface},
   {LUA_UTF8LIBNAME, luaopen_utf8},
+  {LUA_DEVICENAME, luaopen_device},
   {LUA_DBLIBNAME, luaopen_debug},
   {LUA_BITLIBNAME, luaopen_bit32},
   {NULL, NULL}

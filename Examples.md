@@ -1,21 +1,22 @@
 # luax/examples
 Very useful examples to give you an idea of how to use luax.
 
-All these examples are in pure luax with no external libraries or modules.
+All these examples are in pure luax with no external libraries or modules, and will work out of the box.
 ## Get system OS
 ```js
 device.os // Returns the OS name, ex: OSX
 ```
 ## Get device specs
 ```js
-device.info("memory") // Returns device memory, for example 16gb
-device.info("cpu") // Returns device cpu, for example Intel Core i7
-device.info("memoryusage") // Returns memory usage, for example 50%
-device.info("cpuusage") // Returns cpu usage, for example 50%
-device.info("gpu") // Returns gpu, for example Intel Iris Graphics 6100
-device.info("gpuusage") // Returns gpu usage, for example 50%
-/***************************************************************************/
-device.info().memory // Works just like device.info("memory") but is slower and better for getting a large amount of device information
+
+var deviceinfo = device.info() // Returns a table with all the info
+
+deviceinfo.sysname // Returns the system name, ex: Darwin
+deviceinfo.nodename // Returns the node name, ex: MacBook-Pro.local
+deviceinfo.generalos // Returns "windows" or "unix". Some features on windows are not supported
+deviceinfo.release // Returns the release, ex: 20.6.0
+deviceinfo.version // Returns the version, ex: Darwin Kernel Version 20.6.0: Mon Aug 30 06:12:21 PDT 2021; root:xnu-7195.141.6~3/RELEASE_X86_64
+deviceinfo.machine // Returns the machine, ex: x86_64
 ```
 ## Count to 10
 ```js
@@ -42,34 +43,30 @@ ffi.C.printf("Hello %s!\n", "world")
 ffi.os // Returns the OS name, ex: OSX
 ffi.arch // Returns the architecture, ex: x86_64
 ```
-## USB
-> **Note:** This requires the USB library to be installed. See [here](https://github.com/luax/usb) for more information.
-```js
-var usb = device.usb
-var ctx = usb.init()
-var devices = ctx:get_device_list()
-
-for (i, dev in ipairs(devices)) {
-   var descr = dev->get_device_descriptor()
-   var devhandle = dev->open()
-   print(string.format("USB %s - bus:%d port:%d %.4x:%.4x %s %s (%s)",
-      descr.usb_version, dev->get_bus_number(), dev->get_port_number(),
-      descr.vendor_id, descr.product_id,
-      devhandle->get_string_descriptor(descr.manufacturer_index) || "???",
-      devhandle->get_string_descriptor(descr.product_index) || "???",
-      descr.class))
-   devhandle:close()
-   dev:free()
-}
-```
 
 ## Memory
 ```js
-core.alloc(1024) // Allocates 1024 bytes of memory
-core.get({}) // 0x0, gets the address of the object
-core.set({}, "0x0") // Sets the address of the object to 0x0
-core.free(core.get({})) // Frees the memory of the object
-core.fetch("0x0") // Fetches the object at 0x0
+// Allocate a block of memory
+var address = core.memory.alloc(1024)
+
+// Write data to the block of memory
+core.memory.set(address, 1024, "Hello, world!")
+
+// Read data from the block of memory
+var data = core.memory.get(address, 1024)
+print(data) // prints "Hello, world!", but may also print garbage data
+print(data->sub(0, 12)) // print "Hello, world!" (the first 12 bytes) with no garbage data
+
+// Free the block of memory
+core.memory.free(address)
+
+/***************************************************************************/
+/* WARNING: Do not try the next line it will crash your program with a     /
+"Segmentation fault: 11" error                                           */
+core.memory.get(address, 1024)                                          //
+/* since the memory is already freed, it is locked and cannot be        /
+accessed leading to a crash */                                        //
+/*********************************************************************/
 ```
 
 ## Color

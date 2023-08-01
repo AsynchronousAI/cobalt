@@ -38,9 +38,9 @@ You must use build.py to build as it modifys the souce code to work with your re
 - Ljs
 - selene
 - libffifb
-- moonusb
 ## TODO:
-- Redo FFI so it can be included
-- Implement USB
-- Fix slice
-- Fix memory
+- FFI
+- Add selene
+- device
+- fix require
+- add loop over tables insted of needing to use ipairs

@@ -1,0 +1,102 @@
+{
+    "name": "luax-vscode",
+    "displayName": "luax",
+    "description": "A blazing-fast modern Lua linter written in Rust",
+    "version": "1.5.0",
+    "publisher": "AsynchronousAI",
+    "repository": "https://github.com/luaxlang/luax",
+    "engines": {
+        "vscode": "^1.63.0"
+    },
+    "categories": [
+        "Linters"
+    ],
+    "activationEvents": [
+        "onLanguage:lua",
+        "workspaceContains:luax.toml",
+        "onCommand:luax.reinstall"
+    ],
+    "main": "./out/extension.js",
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile",
+        "test": "node ./out/test/runTest.js"
+    },
+    "contributes": {
+        "commands": [
+            {
+                "command": "luax.reinstall",
+                "title": "Reinstall luax",
+                "category": "luax"
+            }
+        ],
+        "configuration": {
+            "title": "luax",
+            "properties": {
+                "luax.luaxPath": {
+                    "title": "Path",
+                    "type": [
+                        "string",
+                        null
+                    ],
+                    "default": null,
+                    "description": "Specifies the path of luax. If not specified, luax will automatically download from the GitHub releases.",
+                    "scope": "machine-overridable"
+                },
+                "luax.run": {
+                    "title": "Run",
+                    "type": "string",
+                    "default": "onType",
+                    "enum": [
+                        "onSave",
+                        "onType",
+                        "onNewLine",
+                        "onIdle"
+                    ],
+                    "enumDescriptions": [
+                        "Run the linter on file save.",
+                        "Run the linter as you type.",
+                        "Run the linter when a new line is added or removed.",
+                        "Run the linter after the configured \"Idle Delay\"."
+                    ],
+                    "description": "Controls when the linter is ran."
+                },
+                "luax.idleDelay": {
+                    "title": "Idle Delay",
+                    "type": "number",
+                    "default": 500,
+                    "markdownDescription": "Controls the delay in ms after which the file is linted. Only applies when `#luax.run#` is set to `onIdle`."
+                }
+            }
+        }
+    },
+    "devDependencies": {
+        "@types/glob": "^7.1.1",
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^12.12.37",
+        "@types/request": "^2.48.4",
+        "@types/request-promise-native": "^1.0.17",
+        "@types/semver": "^7.3.13",
+        "@types/unzipper": "^0.10.3",
+        "@types/vscode": "^1.54.0",
+        "@typescript-eslint/eslint-plugin": "^4.27.0",
+        "eslint": "^7.29.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^3.4.0",
+        "glob": "^7.1.5",
+        "mocha": "^10.2.0",
+        "prettier": "2.8.4",
+        "tslint": "^5.20.0",
+        "typescript": "^4.9.5",
+        "vscode-test": "^1.3.0"
+    },
+    "dependencies": {
+        "fs-write-stream-atomic": "^1.0.10",
+        "request": "^2.88.2",
+        "request-promise-native": "^1.0.8",
+        "semver": "^7.3.8",
+        "unzipper": "^0.10.11"
+    }
+}

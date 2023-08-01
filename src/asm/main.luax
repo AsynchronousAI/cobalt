@@ -1,0 +1,45 @@
+     ///////////////////////////////////////////////////////////////////////////
+    // luaxasm, a Luax assembler                                             ///
+   /// (c) 2023 - AsynchronousAI                                            ///
+  ///                                                                      ///
+ /// Yes this is written in the same language it is assembling.           ///
+////////////////////////////////////////////////////////////////////////////
+
+// Utilities
+function file_exists(name){
+    var f=io.open(name,"r")
+    if f~=nil {io.close(f) return true}else{return false}
+}
+
+// Functions
+function help(){
+    print([[Usage: luax asm [options] <file>
+    Options:
+      -h, --help            show this help message and exit
+      -o FILE, --output=FILE
+                            output file]])
+}
+
+function compile(input, output){
+    // Check if input is a file or folder
+    inpclass = fs.stat(input)
+}
+
+// Main interface
+if (args[1] == "-h" || args[1] == null){
+    help()
+}elseif(args[1] == "-o"){
+    if (args[2] == null){
+        error("no output file")
+        help()
+    }else{
+        output = args[2]
+        if (args[3] == null){
+            error("no input file")
+            help()
+        }else{
+            input = args[3]
+            compile(input, output)
+        }
+    }
+}

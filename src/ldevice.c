@@ -1,6 +1,7 @@
 /*
 ** Standard Device library for luax
 */
+// (c) 2023, AsynchronousAI 
 
 #define ldevice_c
 #define LUA_LIB

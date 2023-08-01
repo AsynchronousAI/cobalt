@@ -10,7 +10,6 @@ and made to make applications and games.
 - Embeddable
 - Audio control
 - Easy to use
-- USB control
 - C-like syntax
 - Interpreted, Bytecoded, and Standalone executables
 - Read [examples](/Examples.md) for more

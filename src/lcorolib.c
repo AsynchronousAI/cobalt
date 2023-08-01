@@ -153,7 +153,7 @@ static const luaL_Reg co_funcs[] = {
   {"resume", luaB_coresume},
   {"running", luaB_corunning},
   {"status", luaB_costatus},
-  {"wrap", luaB_cowrap},
+  {"new", luaB_cowrap},
   {"yield", luaB_yield},
   {"isyieldable", luaB_yieldable},
   {NULL, NULL}

@@ -144,3 +144,30 @@ for (i = 1, 60) {
 // Do:
 swait(60) // Better!
 ```
+## Parrallel
+```js
+// Parrallel is a function that runs a function in a new thread
+// It is very useful for running multiple things at once
+
+var thread = parrallel.new(function() {
+    while (true) {
+        print("Hello, World!")
+        swait(1)
+    }
+})
+
+// - luaxlang 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
+swait(10) // Wait 10 seconds so the thread can finish
+thread->pause() // Stop the thread
+thread->resume() // Resume the thread
+thread->kill() // Kill the thread
+
+
+// Or maybe we could 
+var thread2 = thread->clone() // Clone the thread
+thread->kill() // Kill the thread
+// Since the thread has been cloned even though we killed the thread it will still run
+thread2->kill() // Kill the thread
+// Now we should no longer see "Hello, World!" being printed
+
+```

@@ -17,7 +17,7 @@
 
 LUAMOD_API int (luaopen_base) (lua_State *L);
 
-#define LUA_COLIBNAME	"coroutine"
+#define LUA_COLIBNAME	"parallel"
 LUAMOD_API int (luaopen_coroutine) (lua_State *L);
 
 #define LUA_TABLIBNAME	"table"

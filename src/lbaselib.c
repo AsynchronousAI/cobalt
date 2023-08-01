@@ -567,24 +567,36 @@ static int luaB_tostring (lua_State *L) {
   luaL_tolstring(L, 1, NULL);
   return 1;
 }
+static int luaB_uwait(lua_State *L) {
+  float m = luaL_optnumber(L, 1, 1);
+  usleep(m);
+  // returns a function that waits m without needing any arguments
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_pushnumber(L, m);
+  lua_pushcclosure(L, luaB_uwait, 1);
+  return 1;
+}
 
 static int luaB_wait(lua_State *L) {
   float seconds = luaL_optnumber(L, 1, 1);
   usleep(seconds * 1000000);
-  return 0;
+  // returns a function that waits m without needing any arguments
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_pushnumber(L, seconds * 1000000);
+  lua_pushcclosure(L, luaB_uwait, 1);
+  return 1;
 }
 
 static int luaB_mwait(lua_State *L) {
   float ms = luaL_optnumber(L, 1, 1);
   usleep(ms * 1000);
-  return 0;
+  // returns a function that waits m without needing any arguments
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_pushnumber(L, ms * 1000);
+  lua_pushcclosure(L, luaB_uwait, 1);
+  return 1;
 }
 
-static int luaB_uwait(lua_State *L) {
-  float m = luaL_optnumber(L, 1, 1);
-  usleep(m);
-  return 0;
-}
 
 static int luaB_slice(lua_State *L) {
   int nargs = lua_gettop(L);

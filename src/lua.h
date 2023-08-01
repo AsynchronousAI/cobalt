@@ -16,12 +16,12 @@
 #include "luaconf.h"
 
 
-#define LUA_VERSION_MAJOR	"5"
-#define LUA_VERSION_MINOR	"4"
-#define LUA_VERSION_NUM		503
-#define LUA_VERSION_RELEASE	"6"
+#define LUA_VERSION_MAJOR	"1"
+#define LUA_VERSION_MINOR	"0"
+#define LUA_VERSION_NUM		100
+#define LUA_VERSION_RELEASE	"0"
 
-#define LUA_VERSION	"luax based on Lua " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR " and ljs"
+#define LUA_VERSION	"Luax " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR "." LUA_VERSION_RELEASE " based on Lua 5.3 and LJS"
 #define LUA_RELEASE	LUA_VERSION "."
 #define LUA_COPYRIGHT	LUA_VERSION
 #define LUA_AUTHORS	""

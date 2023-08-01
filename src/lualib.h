@@ -56,9 +56,6 @@ LUAMOD_API int (luaopen_transform) (lua_State *L);
 #define LUA_CORENAME	"core"
 LUAMOD_API int (luaopen_lcinterface) (lua_State *L);
 
-#define LUA_LCFFINAME	"ffi" //SAFEDELETE
-LUAMOD_API int (luaopen_ffi) (lua_State *L); //SAFEDELETE
-
 #define LUA_DBLIBNAME	"debug"
 LUAMOD_API int (luaopen_debug) (lua_State *L);
 

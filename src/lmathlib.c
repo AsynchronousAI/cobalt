@@ -303,7 +303,7 @@ static int math_max (lua_State *L) {
 ** all bits from 'l_rand' can be represented, and that 'RANDMAX + 1.0'
 ** will keep full precision (ensuring that 'r' is always less than 1.0.)
 */
-static int math_random (lua_State *L, int check) {
+static int math_random (lua_State *L) {
   if (s[0] == 0) {
     init_rand((unsigned int)time(NULL));
   }

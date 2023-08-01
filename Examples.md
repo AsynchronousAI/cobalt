@@ -4,7 +4,18 @@ Very useful examples to give you an idea of how to use luax.
 All these examples are in pure luax with no external libraries or modules.
 ## Get system OS
 ```js
-ffi.os // Returns the OS name, ex: OSX
+device.os // Returns the OS name, ex: OSX
+```
+## Get device specs
+```js
+device.info("memory") // Returns device memory, for example 16gb
+device.info("cpu") // Returns device cpu, for example Intel Core i7
+device.info("memoryusage") // Returns memory usage, for example 50%
+device.info("cpuusage") // Returns cpu usage, for example 50%
+device.info("gpu") // Returns gpu, for example Intel Iris Graphics 6100
+device.info("gpuusage") // Returns gpu usage, for example 50%
+/***************************************************************************/
+device.info().memory // Works just like device.info("memory") but is slower and better for getting a large amount of device information
 ```
 ## Count to 10
 ```js
@@ -21,8 +32,18 @@ print("Hello, World!")
 var a = "Hello, World!"
 print(a)
 ```
+## FFI
+```js
+import "ffi"
 
+ffi.cdef("int printf(const char *format, ...);")
+ffi.C.printf("Hello %s!\n", "world")
+
+ffi.os // Returns the OS name, ex: OSX
+ffi.arch // Returns the architecture, ex: x86_64
+```
 ## USB
+> **Note:** This requires the USB library to be installed. See [here](https://github.com/luax/usb) for more information.
 ```js
 var usb = device.usb
 var ctx = usb.init()
@@ -49,13 +70,6 @@ core.get({}) // 0x0, gets the address of the object
 core.set({}, "0x0") // Sets the address of the object to 0x0
 core.free(core.get({})) // Frees the memory of the object
 core.fetch("0x0") // Fetches the object at 0x0
-```
-
-## FFI
-Like LuaJIT's FFI.
-```js
-ffi.cdef("int printf(const char *format, ...);")
-ffi.C.printf("Hello %s!\n", "world") //-> Hello world!, Return value: 13
 ```
 
 ## Color
@@ -97,20 +111,6 @@ t.x = 1 // X axis is now 1
 var t2 = Transform.new(Vector3.new(10,10,10), Vector3.new(11,11,11), Vector3.new(12,12,12), Vector3.new(13,13,13)) // -> <transform object> 
 // t2 will be located at 10,10,10, rotated at 11,11,11, scaled at 12,12,12, and pivoted at 13,13,13
 t2.py // -> 13
-```
-
-## Audio
-```js
-var a = Audio.new("path/to/file.wav") // -> <audio object>
-a->play() // Plays the audio
-a->pause() // Pauses the audio
-a->stop() // Stops the audio
-
-a.Volume = 1 // Sets the volume to 1
-a.Loop = true
-
-a.Position = Vector3.new(1, 2, 3) // Sets the position of the audio to 1, 2, 3
-// If the user has 3d audio enabled the audio will be heard as if it was being played from 1, 2, 3
 ```
 
 ## Wait

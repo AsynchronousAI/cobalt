@@ -1,6 +1,6 @@
-function add(a, b){
-    return a + b;
+// Test the FFI
+var ffi = require("ffi")
+
+for (i, v in pairs(ffi)) {
+    print(i, v )
 }
-var start = os.clock()
-swait(add(10, 10))
-print("10 seconds finished, elasped: ", os.clock() - start)

@@ -2,9 +2,17 @@
 Very useful examples to give you an idea of how to use luax.
 
 All these examples are in pure luax with no external libraries or modules, and will work out of the box.
-## Get system OS
+
+These items are in no particular order.
+
+## Get system specs
+You could use the built in library `device` to get the system specs for all platforms, it provides a abstraction layer for all platforms.
+
 ```js
-device.os // Returns the OS name, ex: OSX
+device.info().generalos // Returns "windows" or "unix". Some features on windows are not supported
+device.info().sysname // Returns the system name, ex: Darwin. If this is being run on windows it will only return "Windows"
+device.os // Like sysname
+device.info().nodename // Returns the node name, ex: MacBook-Pro
 ```
 ## Get device specs
 ```js

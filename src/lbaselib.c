@@ -644,11 +644,38 @@ static int luaB_slice(lua_State *L) {
 }
 
 
+static int luaB_inputf(lua_State *L) {
+  const char *prompt = luaL_optstring(L, 1, " ");
+  const char *fmt = luaL_optstring(L, 2, "*l");
+  int nargs = lua_gettop(L);
+  luaL_argcheck(L, nargs <= 2, 2, "expected at most 2 arguments");
+  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
+
+  printf("%s", prompt);
+  char buf[1024];
+  fgets(buf, sizeof(buf), stdin);
+  buf[strlen(buf) - 1] = '\0';
+
+  if (strcmp(fmt, "*n") == 0) {
+    lua_pushnumber(L, atof(buf));
+  } else if (strcmp(fmt, "*a") == 0) {
+    lua_pushstring(L, buf);
+  } else if (strcmp(fmt, "*l") == 0) {
+    lua_pushstring(L, buf);
+  } else {
+    return luaL_error(L, "invalid format");
+  }
+
+  return 1;
+}
+
+
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
+  {"inputf", luaB_inputf},
   {"error", luaB_error},
   {"getmetatable", luaB_getmetatable},
   {"ipairs", luaB_ipairs},
@@ -657,7 +684,7 @@ static const luaL_Reg base_funcs[] = {
   {"loadstring", luaB_load},
   {"next", luaB_next},
   {"pairs", luaB_pairs},
-  {"pcall", luaB_pcall},
+  {"try", luaB_pcall},
   {"print", luaB_print},
   {"warn", luaB_warn},
   {"info", luaB_info},
@@ -670,7 +697,8 @@ static const luaL_Reg base_funcs[] = {
   {"tonumber", luaB_tonumber},
   {"tostring", luaB_tostring},
   {"type", luaB_type},
-  {"xpcall", luaB_xpcall},
+  {"xtry", luaB_xpcall},
+  
   {"wait", luaB_wait},
   /*subwait*/
   {"swait", luaB_wait},
@@ -691,7 +719,7 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "_G");
   /* set global _VERSION */
-  lua_pushliteral(L, LUA_VERSION);
+  lua_pushliteral(L, "Luax 1.0.0");
   lua_setfield(L, -2, "_VERSION");
   return 1;
 }

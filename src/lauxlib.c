@@ -133,7 +133,7 @@ LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1,
   int last = lastlevel(L1);
   int n1 = (last - level > LEVELS1 + LEVELS2) ? LEVELS1 : -1;
   if (msg)
-    lua_pushfstring(L, "%s\n", msg);
+    lua_pushfstring(L, "\033[1;31m%s\033[0m\n", msg);
   luaL_checkstack(L, 10, NULL);
   lua_pushliteral(L, "stack traceback:");
   while (lua_getstack(L1, level++, &ar)) {

@@ -527,11 +527,21 @@ static int loadfunc (lua_State *L, const char *filename, const char *modname) {
 }
 
 
-static int searcher_C (lua_State *L) {
+static int searcher_C (lua_State *L) { // ERROR HERE
   const char *name = luaL_checkstring(L, 1);
   const char *filename = findfile(L, name, "cpath", LUA_CSUBSEP);
-  if (filename == NULL) return 1;  /* module not found in this path */
-  return checkload(L, (loadfunc(L, filename, name) == 0), filename);
+  if (filename == NULL) {
+    lua_pushnil(L);
+    lua_pushfstring(L, "module '%s' not found in path '%s'", name, "cpath");
+    return 2;
+  }
+  int load_result = loadfunc(L, filename, name);
+  if (load_result != 0) {
+    lua_pushnil(L);
+    lua_pushfstring(L, "error loading module '%s' from file '%s': %s", name, filename, lua_tostring(L, -1));
+    return 2;
+  }
+  return 1;
 }
 
 
@@ -575,13 +585,20 @@ static void findloader (lua_State *L, const char *name) {
     luaL_error(L, "'package.searchers' must be a table");
   /*  iterate over available searchers to find a loader */
   for (i = LUA_INDEX_BASE; ; i++) {
+    
+    // make sure that the item is not NULL
+    if (i == 5) {  /* no more searchers? */
+      lua_pop(L, 1);  /* remove nil */
+      luaL_pushresult(&msg);  /* create error message */
+      luaL_error(L, "module '%s' not found:%s", name, lua_tostring(L, -1));
+    }
     if (lua_rawgeti(L, 3, i) == LUA_TNIL) {  /* no more searchers? */
       lua_pop(L, 1);  /* remove nil */
       luaL_pushresult(&msg);  /* create error message */
       luaL_error(L, "module '%s' not found:%s", name, lua_tostring(L, -1));
     }
     lua_pushstring(L, name);
-    lua_call(L, 1, 2);  /* call it */
+    lua_call(L, 1, 2);  /* call it */ // Error here, as > package.searchers[3]("ffi")
     if (lua_isfunction(L, -2))  /* did it find a loader? */
       return;  /* module loader found */
     else if (lua_isstring(L, -2)) {  /* searcher returned error message? */
@@ -595,15 +612,13 @@ static void findloader (lua_State *L, const char *name) {
 
 
 static int ll_require (lua_State *L) { // This is the same require function as the Lua 5.4.2, which is a bit different from the Lua 5.3.5 version.
-   luaL_traceback(L, L, NULL, 0);
-    const char *traceback = lua_tostring(L, -1);
-    printf("Error: %s\n", traceback);
   const char *name = luaL_checkstring(L, 1);
   lua_settop(L, 1);  /* LOADED table will be at index 2 */
   lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
   lua_getfield(L, 2, name);  /* LOADED[name] */
-  if (lua_toboolean(L, -1))  /* is it there? */
+  if (lua_toboolean(L, -1)){  /* is it there? */
     return 1;  /* package is already loaded */
+  }
   /* else must load package */
   lua_pop(L, 1);  /* remove 'getfield' result */
   findloader(L, name);
@@ -613,10 +628,12 @@ static int ll_require (lua_State *L) { // This is the same require function as t
   /* stack: ...; loader data; loader function; mod. name; loader data */
   lua_call(L, 2, 1);  /* run loader to load module */
   /* stack: ...; loader data; result from loader */
-  if (!lua_isnil(L, -1))  /* non-nil return? */
+  if (!lua_isnil(L, -1)){  /* non-nil return? */
     lua_setfield(L, 2, name);  /* LOADED[name] = returned value */
-  else
+  }else{
     lua_pop(L, 1);  /* pop nil */
+  }
+
   if (lua_getfield(L, 2, name) == LUA_TNIL) {   /* module set no value? */
     lua_pushboolean(L, 1);  /* use true as result */
     lua_copy(L, -1, -2);  /* replace loader result */

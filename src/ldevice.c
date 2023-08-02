@@ -70,6 +70,21 @@
     - Get RAM Size
     - Get RAM Usage
 */
+
+const char *format_memory_size(int size_kb) {
+  static const char *units[] = {"KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+  static const int num_units = sizeof(units) / sizeof(units[0]);
+  double size = (double)size_kb;
+  int unit_index = 0;
+  while (size >= 1024.0 && unit_index < num_units - 1) {
+    size /= 1024.0;
+    unit_index++;
+  }
+  static char result[32];
+  snprintf(result, sizeof(result), "%.2f %s", size, units[unit_index]);
+  return result;
+}
+
 static int get_device_info(lua_State* L) {
   int disabled = 0;
   int platform = 0;
@@ -144,7 +159,12 @@ static int get_device_info(lua_State* L) {
         lua_pushstring(L, "sysname");
         lua_pushstring(L, "Windows");
         lua_settable(L, -3);
-
+        lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+        lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
+        lua_settable(L, -3);
+        lua_pushstring(L, "scriptmemory");
+        lua_pushfstring(L, "%s", format_memory_size(lua_gc(L, LUA_GCCOUNT, 0)));
+        lua_settable(L, -3);
         return 1;
 
     return 1;
@@ -177,6 +197,12 @@ static int get_device_info(lua_State* L) {
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "unix");
     lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
+    lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemory");
+    lua_pushfstring(L, "%s", format_memory_size(lua_gc(L, LUA_GCCOUNT, 0)));
+    lua_settable(L, -3);
     return 1;
   #elif defined(__APPLE__)
    #if defined(TARGET_OS_IOS)
@@ -199,6 +225,12 @@ static int get_device_info(lua_State* L) {
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "ios");
     lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
+    lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemory");
+    lua_pushfstring(L, "%s", format_memory_size(lua_gc(L, LUA_GCCOUNT, 0)));
+    lua_settable(L, -3);
     return 1;
   #elif defined(TARGET_OS_TV)
     lua_newtable(L);
@@ -219,6 +251,12 @@ static int get_device_info(lua_State* L) {
     lua_settable(L, -3);
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "tvos");
+    lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
+    lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemory");
+    lua_pushfstring(L, "%s", format_memory_size(lua_gc(L, LUA_GCCOUNT, 0)));
     lua_settable(L, -3);
     return 1;
    #endif
@@ -241,6 +279,12 @@ static int get_device_info(lua_State* L) {
     lua_settable(L, -3);
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "Unknown");
+    lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
+    lua_settable(L, -3);
+    lua_pushstring(L, "scriptmemory");
+    lua_pushfstring(L, "%s", format_memory_size(lua_gc(L, LUA_GCCOUNT, 0)));
     lua_settable(L, -3);
     return 1;
   #endif

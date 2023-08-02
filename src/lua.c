@@ -258,7 +258,7 @@ static int dostring (lua_State *L, const char *s, const char *name) {
 */
 static int dolibrary (lua_State *L, const char *name) {
   int status;
-  lua_getglobal(L, "require");
+  lua_getglobal(L, "import");
   lua_pushstring(L, name);
   status = docall(L, 1, 1);  /* call 'require(name)' */
   if (status == LUA_OK)

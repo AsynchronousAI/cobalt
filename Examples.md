@@ -89,7 +89,18 @@ Color.hsv(50,25,23).R // -> 255 (Red)
 All color objects have 3 values, R, G, B. No matter how they are created internally they will be RGB.
 */
 ```
+## Get memory usage
+```js
+// All of the following techniques are valid
+// it is your prefrence on which one you use
 
+// device.info()
+device.info().scriptmemory // -> 117.74 MB // returns from kb to yb (crazy if you use that much memory)
+device.info().scriptmemoryint // -> 31 (as an integer) // only returns kb
+
+// collectgarbage()
+collectgarbage("count") // -> 31 (as an integer) // only returns kb
+```
 ## Vector3
 ```js
 var v = Vector3.new(1, 2, 3) // -> <vector3 object>

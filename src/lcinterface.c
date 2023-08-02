@@ -101,7 +101,6 @@ static int resize_memory(lua_State* L) {
   return 1;
 }
 
-
 static const struct luaL_Reg lcinterface_lib[] = {
   {NULL, NULL}
 };

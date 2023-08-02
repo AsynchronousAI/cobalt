@@ -1,3 +1,6 @@
 // Test the FFI
 
 print("What")
+
+x = y
+y = x

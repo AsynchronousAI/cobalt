@@ -48,5 +48,4 @@ You must use build.py to build as it modifys the souce code to work with your re
 - FFI
 - Add linter
 - fix require
-- add loop over tables insted of needing to use ipairs
 - Publish extension

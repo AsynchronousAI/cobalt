@@ -1,6 +1,3 @@
 // Test the FFI
-var ffi = require("ffi")
 
-for (i, v in pairs(ffi)) {
-    print(i, v )
-}
+print("What")

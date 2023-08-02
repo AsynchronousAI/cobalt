@@ -112,8 +112,7 @@ print("\n")
 print("1- Read install data")
 print("2- Clean uneeded up build files")
 print("3- Build again for another platform")
-print("4- Move dist/luax" + res + " and dist/luaxc" + res + " to your PATH/$PATH")
-print("5- Exit")
+print("4- Exit")
 inp = input("What do you want to do? (1, 2, 3, etc.): ")
 
 if inp == "1":
@@ -123,20 +122,6 @@ elif inp == "2":
     os.system("python3 build.py clean")
 elif inp == "3":
     os.system("python3 build.py")
-elif inp == "4":
-    # Step number one get the path for PATH
-    print("\n\n\n")
-    print("Please specify the path for PATH/$PATH.")
-    print("If you don't know what this is, please search it up.")
-    print("If you don't want to do this, please press Ctrl+C.")
-    val = input("PATH/$PATH: ")
-
-    # Step number two move the files
-    print("\n\n\n")
-    print("Moving files...")
-    os.system("mv dist/luax" + res + " " + val)
-    os.system("mv dist/luaxc" + res + " " + val)
-    print("Done!")
 else:
     print("Exiting...")
     sys.exit(0)

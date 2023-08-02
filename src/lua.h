@@ -18,7 +18,7 @@
 
 #define LUA_VERSION_MAJOR	"1"
 #define LUA_VERSION_MINOR	"0"
-#define LUA_VERSION_NUM		100
+#define LUA_VERSION_NUM		503
 #define LUA_VERSION_RELEASE	"0"
 
 #define LUA_VERSION	"Luax " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR "." LUA_VERSION_RELEASE " based on Lua 5.3 and LJS"
@@ -28,7 +28,7 @@
 
 
 /* mark for precompiled code ('<esc>Lua') */
-#define LUA_SIGNATURE	"\x1bLua"
+#define LUA_SIGNATURE	"\x1bLuax"
 
 /* option for multiple returns in 'lua_pcall' and 'lua_call' */
 #define LUA_MULTRET	(-1)

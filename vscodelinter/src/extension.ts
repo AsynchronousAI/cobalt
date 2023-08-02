@@ -95,7 +95,7 @@ export async function activate(
         }
 
         switch (document.languageId) {
-            case "lua":
+            case "luax":
                 break
             case "toml":
             case "yaml":

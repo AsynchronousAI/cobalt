@@ -277,7 +277,7 @@
 		},
 		"keyword": {
 			"name": "keyword.control.lua",
-			"match": "\\b(break|else|for|if|elseif|return|then|repeat|while|until|var|in)\\b"
+			"match": "\\b(break|else|for|if|elseif|import|return|then|repeat|while|until|var|in)\\b"
 		},
 		"table-function": {
 			"name": "meta.function.lua",
@@ -440,7 +440,7 @@
 			]
 		},
 		"support-function-call": {
-			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|import|wait|swait|mwait|uwait|slice|load|Vector3|Transform|Color|Vector2|core|ffi)\\s*[\\({]",
+			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|import|wait|swait|mwait|uwait|slice|load|Vector3|Transform|Color|Vector2|core|ffi)\\s*[\\({]",
 			"beginCaptures": {
 				"1": {
 					"name": "meta.function-call.lua support.function"
@@ -454,7 +454,7 @@
 			]
 		},
 		"support-string-function-call": {
-			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|import|wait|swait|mwait|uwait|slice|load|Vector3|Transform|Color|Vector2|core|ffi)\\s*(?=[\\'\"]|\\[\\[)",
+			"begin": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|import|wait|swait|mwait|uwait|slice|load|Vector3|Transform|Color|Vector2|core|ffi)\\s*(?=[\\'\"]|\\[\\[)",
 			"beginCaptures": {
 				"1": {
 					"name": "meta.function-call.lua support.function"
@@ -532,7 +532,7 @@
 		},
 		"support-variable": {
 			"name": "support.variable.lua",
-			"match": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|coroutine|string|table|math|io|os|package|import|wait|swait|mwait|uwait|slice|load|debug|Vector3|Transform|Color|Vector2|core|ffi)\\b"
+			"match": "\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall|coroutine|string|table|math|io|os|package|import|wait|swait|mwait|uwait|slice|load|debug|Vector3|Transform|Color|Vector2|core|ffi)\\b"
 		},
 		"variable": {
 			"name": "variable.other.lua",

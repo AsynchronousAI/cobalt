@@ -1,7 +1,7 @@
 {
     "name": "luax-vscode",
     "displayName": "luax",
-    "description": "A blazing-fast modern Lua linter written in Rust",
+    "description": "A Luax Linter for VSCode based on Selene.",
     "version": "1.5.0",
     "publisher": "AsynchronousAI",
     "repository": "https://github.com/luaxlang/luax",
@@ -12,7 +12,7 @@
         "Linters"
     ],
     "activationEvents": [
-        "onLanguage:lua",
+        "onLanguage:luax",
         "workspaceContains:luax.toml",
         "onCommand:luax.reinstall"
     ],

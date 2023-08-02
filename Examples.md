@@ -43,7 +43,7 @@ print(a)
 ```
 ## FFI
 ```js
-import "ffi"
+import("ffi")
 
 ffi.cdef("int printf(const char *format, ...);")
 ffi.C.printf("Hello %s!\n", "world")
@@ -117,7 +117,14 @@ var t2 = Transform.new(Vector3.new(10,10,10), Vector3.new(11,11,11), Vector3.new
 // t2 will be located at 10,10,10, rotated at 11,11,11, scaled at 12,12,12, and pivoted at 13,13,13
 t2.py // -> 13
 ```
-
+## File control
+Luax provides a File Control library buildin based on lfs.
+```js
+file.chdir("path") // Changes the current working directory to path
+file.mkdir("path") // Creates a directory at path
+file.rmdir("path") // Removes a directory at path
+// .. and more
+```
 ## Wait
 ```js
 wait(1) // Allias for swait

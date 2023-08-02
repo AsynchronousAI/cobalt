@@ -1,15 +1,13 @@
-     ///////////////////////////////////////////////////////////////////////////
-    // luaxasm, a Luax assembler                                             ///
+     ////////////////////////////////////////////////////////////////////////////
+    /// luaxasm, a Luax assembler                                            ///
    /// (c) 2023 - AsynchronousAI                                            ///
   ///                                                                      ///
  /// Yes this is written in the same language it is assembling.           ///
 ////////////////////////////////////////////////////////////////////////////
 
-// Utilities
-function file_exists(name){
-    var f=io.open(name,"r")
-    if f~=nil {io.close(f) return true}else{return false}
-}
+
+// in-progress
+
 
 // Functions
 function help(){
@@ -22,7 +20,7 @@ function help(){
 
 function compile(input, output){
     // Check if input is a file or folder
-    inpclass = fs.stat(input)
+    inpclass = file.exists
 }
 
 // Main interface

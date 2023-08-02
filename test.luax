@@ -2,5 +2,10 @@
 
 print("What")
 
+var x = 1
+var y = 2
+
 x = y
 y = x
+
+print("x = (#), y = (y)")

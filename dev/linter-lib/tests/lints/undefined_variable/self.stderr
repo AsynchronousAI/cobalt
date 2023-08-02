@@ -1,0 +1,6 @@
+error[undefined_variable]: `self` is not defined
+  ┌─ self.lua:8:11
+  │
+8 │     print(self)
+  │           ^^^^
+

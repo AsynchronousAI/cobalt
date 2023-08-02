@@ -1,0 +1,12 @@
+[selene]
+base = "lua51"
+
+[selene.structs.Instance.Name]
+property = true
+writable = "overridden"
+
+[selene.structs.Instance."*"]
+struct = "Instance"
+
+[script]
+struct = "Instance"

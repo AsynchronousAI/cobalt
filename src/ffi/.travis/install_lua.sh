@@ -23,6 +23,8 @@ elif [ "$LUA_VERSION" == "LUA52" ]; then
     URL="http://www.lua.org/ftp/lua-5.2.4.tar.gz"
 elif [ "$LUA_VERSION" == "LUA53" ]; then
     URL="http://www.lua.org/ftp/lua-5.3.1.tar.gz"
+elif [ "$LUA_VERSION" == "LUA54"; then
+    URL="http://www.lua.org/ftp/lua-5.4.0.tar.gz"
 else
     echo "Invalid Lua version: LUA_VERSION=$LUA_VERSION"
     exit 1

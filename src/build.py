@@ -55,7 +55,7 @@ print("Building Luax...")
 # Run make
 exitcode = os.system("make")
 if exitcode != 0:
-    print("Prebuild failed!")
+    print("Build failed!")
     sys.exit(1)
 
 ### WAIT UNTIL BUILD IS DONE
@@ -104,6 +104,15 @@ os.system("mv luaxc"+res+" ../dist/luaxc" + res)
 print("\n\n\n")
 print("Done! luax is now in dist/luax" + res + " and luaxc is in dist/luaxc" + res + ".")
 print("Move them to your PATH/$PATH to use them.")
+
+# Ask to install libraries
+print("\n\n\nLibraries are available for luax which will offer immense functionality.\nWould you like to install them? (y/n): ")
+newinput = input("Would you like to install libraries? (y/n): ")
+if newinput == "y":
+    # TODO: Install libraries
+    pass
+else:
+    pass
 
 # Extra options
 print("\n\n\n")

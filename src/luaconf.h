@@ -187,7 +187,7 @@
 ** hierarchy or if you want to install your libraries in
 ** non-conventional directories.
 */
-#define LUA_VDIR	LUA_VERSION_MAJOR "." LUA_VERSION_MINOR
+#define LUA_VDIR	"5.4" // placeholder
 #if defined(_WIN32)	/* { */
 /*
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
@@ -200,7 +200,12 @@
 		LUA_LDIR"?" LUA_SCRIPT_EXT ";"  LUA_LDIR"?\\init" LUA_SCRIPT_EXT ";" \
 		LUA_CDIR"?" LUA_SCRIPT_EXT ";"  LUA_CDIR"?\\init" LUA_SCRIPT_EXT ";" \
 		LUA_SHRDIR"?" LUA_SCRIPT_EXT ";" LUA_SHRDIR"?\\init" LUA_SCRIPT_EXT ";" \
-		".\\?" LUA_SCRIPT_EXT ";" ".\\?\\init" LUA_SCRIPT_EXT
+		".\\?" LUA_SCRIPT_EXT ";" ".\\?\\init" LUA_SCRIPT_EXT \
+		LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
+		LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" \
+		LUA_SHRDIR"?.lua;" LUA_SHRDIR"?\\init.lua;" \
+		".\\?.lua;" "./?\\init.lua"
+
 #define LUA_CPATH_DEFAULT \
 		LUA_CDIR"?.dll;" \
 		LUA_CDIR"..\\lib\\lua\\" LUA_VDIR "\\?.dll;" \
@@ -214,7 +219,10 @@
 #define LUA_PATH_DEFAULT  \
 		LUA_LDIR"?" LUA_SCRIPT_EXT ";"  LUA_LDIR"?/init" LUA_SCRIPT_EXT ";" \
 		LUA_CDIR"?" LUA_SCRIPT_EXT ";"  LUA_CDIR"?/init" LUA_SCRIPT_EXT ";" \
-		"./?" LUA_SCRIPT_EXT ";" "./?/init" LUA_SCRIPT_EXT
+		"./?" LUA_SCRIPT_EXT ";" "./?/init" LUA_SCRIPT_EXT ";" \
+		LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
+		LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" \
+		"./?.lua;" "./?/init.lua"
 #define LUA_CPATH_DEFAULT \
 		LUA_CDIR"?.so;" LUA_CDIR"loadall.so;" "./?.so"
 #endif			/* } */
@@ -263,6 +271,13 @@
 
 #endif				/* } */
 
+/*
+** LUA_IGMARK is a mark to ignore all after it when building the
+** module name (e.g., used to build the luaopen_ function name).
+** Typically, the sufix after the mark is the module version,
+** as in "mod-v1.2.so".
+*/
+#define LUA_IGMARK		"-"
 
 /* more often than not the libs go together with the core */
 #define LUALIB_API	LUA_API

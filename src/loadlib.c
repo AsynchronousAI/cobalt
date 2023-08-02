@@ -595,6 +595,9 @@ static void findloader (lua_State *L, const char *name) {
 
 
 static int ll_require (lua_State *L) { // This is the same require function as the Lua 5.4.2, which is a bit different from the Lua 5.3.5 version.
+   luaL_traceback(L, L, NULL, 0);
+    const char *traceback = lua_tostring(L, -1);
+    printf("Error: %s\n", traceback);
   const char *name = luaL_checkstring(L, 1);
   lua_settop(L, 1);  /* LOADED table will be at index 2 */
   lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
@@ -622,7 +625,6 @@ static int ll_require (lua_State *L) { // This is the same require function as t
   lua_rotate(L, -2, 1);  /* loader data <-> module result  */
   return 2;  /* return module result and loader data */
 }
-
 /* }====================================================== */
 
 

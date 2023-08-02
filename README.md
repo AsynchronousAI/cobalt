@@ -13,6 +13,7 @@ and made to make applications and games.
 - C-like syntax
 - Interpreted, Bytecoded, and Standalone executables
 - Read [examples](/Examples.md) for more
+- Supports using lua alongside luax
 ## Building
 ### Requirements
 - Python 3
@@ -37,6 +38,12 @@ You must use build.py to build as it modifys the souce code to work with your re
 - Ljs
 - selene
 - libffifb
+## Dependencies
+- Lua 5.4
+- Python (if you want to build)
+- CMake (if you want to build)
+- A C/C++ compiler (if you want to build or use the FFI)
+
 ## TODO:
 - FFI
 - Add linter

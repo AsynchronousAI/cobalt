@@ -1,8 +1,9 @@
-     ////////////////////////////////////////////////////////////////////////////
-    /// luaxasm, a Luax assembler                                            ///
-   /// (c) 2023 - AsynchronousAI                                            ///
-  ///                                                                      ///
- /// Yes this is written in the same language it is assembling.           ///
+      ////////////////////////////////////////////////////////////////////////////
+     /// luaxasm, a Luax assembler                                            ///
+    /// (c) 2023 - AsynchronousAI                                            ///
+   ///                                                                      ///
+  /// Yes this is written in the same language it is assembling.           ///
+ /// Also yes this is being compiled with luaxasm.                        ///
 ////////////////////////////////////////////////////////////////////////////
 
 
@@ -24,9 +25,13 @@ function compile(input, output){
 }
 
 // Main interface
+if (!args){
+    info("Arguments not provided")
+    args = []
+}
 if (args[1] == "-h" || args[1] == null){
     help()
-}elseif(args[1] == "-o"){
+}else if(args[1] == "-o"){
     if (args[2] == null){
         error("no output file")
         help()

@@ -1,11 +1,91 @@
-// Test the FFI
+// Fun little benchmarking script I made
+// It is not going to be performant or accurate at all
+// this is made as a test
 
-print("What")
+// This is going to be like way faster then it would have been on roblox
+// :D
+function calculate(f1, f2, arg1, arg2, mass){
+    var times = 0;
+    var total = 0;
+    var start = os.clock();
 
-var x = 1
-var y = 2
+    // Thread 1
+    while (arg1){
+        f1();
+        times++;
+        total += os.clock()-start;
 
-x = y
-y = x
+        if (times == mass){
+            break;
+        }
+    }
 
-print("x = (#), y = (y)")
+    // Thread 2
+    var times2 = 0;
+    var total2 = 0;
+    var start2 = os.clock();
+    while (arg2){
+        f2();
+        times2++;
+        total2 += os.clock()-start2;
+
+        if (times2 == mass){
+            break;
+        }
+    }
+
+    // Output
+    info("Thread 1: ")
+    print(total/times)
+
+    info("Thread 2: ")
+    print(total2/times2)
+
+    info("Total: ")
+    print((total+total2)/(times+times2))
+
+    info("Winner: ")
+    if (total/times < total2/times2){
+        print("Thread 1")
+    } else {
+        print("Thread 2")
+    }
+
+    return {
+        "winner": (total/times<total2/times2 && "thread1") || "thread2", 
+        // What the above is doing is if
+        // total/times < total2/times2 then it will get true
+        // and the && "thread1" will return thread1 since it is checking if both
+        // are not false or null. Otherwise it will return thread2.
+        "thread1": total/times,
+        "thread2": total2/times2,
+        "total":  (total+total2)/(times+times2)
+    }
+}
+
+var junk = []
+
+for (i = 1, 100){ // do bulk 10,000 calculations 100 times
+    table.insert(junk, calculate(function(){ // uwait
+
+    }, function(){ // true
+
+    }, uwait(), true, 10000)) // uwait and true are the conditions
+}
+
+// Go through junk and pick the grand winner
+print("-------------------------")
+print("Analysing results...")
+swait(3) // dramatic effect
+
+var winner = "thread1"
+var winnerTime = math.huge
+
+for (i, v in pairs(junk)){
+    if (junk[i].total < winnerTime){
+        winner = junk[i].winner
+        winnerTime = junk[i].total
+    }
+}  
+
+print("The winner is: "..winner.." with the average time of "..winnerTime.." seconds, 2nd place goes to "..((winner == "thread1" && "thread2") || "thread1").." with the average time of "..((winner == "thread1" && junk[2].total) || junk[1].total).." seconds.".." they lost by "..((winner == "thread1" && junk[2].total-winnerTime) || junk[1].total-winnerTime).." seconds.")

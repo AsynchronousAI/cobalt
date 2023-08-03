@@ -29,9 +29,9 @@ and made to make applications and games.
 - `python3 build.py clean` to clean the build
 You must use build.py to build as it modifys the souce code to work with your requirements and avoids conflicts since this has multiple MakeFiles. 
 ### End result
-- `luax` executable in the `dist` folder
-- `luaxc` executable in the `dist` folder
-- `luaxasm` executable in the `dist` folder
+- `luax` executable in the `dist` folder for interpreting
+- `luaxc` executable in the `dist` folder for compiling to bytecode
+- `luaxasm` executable in the `dist` folder for making .o files from bytecode
 - If you chose to move them to the PATH/$PATH they will be there instead of the dist folder
 ## Credits
 - Lua

@@ -308,12 +308,12 @@ LUALIB_API int luaopen_device(lua_State* L) {
         lua_pushstring(L, "tvOS");
     #elif TARGET_OS_WATCH
         lua_pushstring(L, "watchOS");
-    #elif TARGET_OS_MAC
+    #elif TARGET_OS_MAC // Note for language hackers: TARGET_OS_MAC only work when compiled using Xcode
         lua_pushstring(L, "macOS");
     #elif TARGET_OS_IPHONE
       lua_pushstring(L, "iPadOS");
     #else
-      lua_pushstring(L, "Unknown Apple OS");
+      lua_pushstring(L, "Apple OS");
     #endif
     lua_setfield(L, -2, "os");
   #elif defined(LUA_USE_POSIX) || defined(LUA_USE_DLOPEN)

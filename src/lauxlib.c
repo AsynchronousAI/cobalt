@@ -834,50 +834,25 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
       case LUA_TNIL:
         lua_pushliteral(L, "null");
         break;
-      case LUA_TTABLE:
-        lua_pushliteral(L, "");
-        //int first = 1;
-        int tt = luaL_getmetafield(L, idx, "__name");  /* try name */
-        const char *kind = (tt == LUA_TSTRING) ? lua_tostring(L, -1) :
-                                                luaL_typename(L, idx);
-        int len = luaL_len(L, idx);
-        lua_pushfstring(L, "(%s: %p) length: %d", kind, lua_topointer(L, idx), len);
-        if (len == 0){
-          lua_pushfstring(L, "(%s: %p)  table is empty or restricted", kind, lua_topointer(L, idx));
-        }
-        /*
-        lua_pushliteral(L, "[");
-        luaL_checktype(L, idx, LUA_TTABLE);
-        int len = luaL_len(L, idx);
-        for (int i = 1; i <= len; i++) {
-          lua_rawgeti(L, idx, i);
-          if (!lua_isnil(L, -1)) {
-            first = 0;
-            lua_pushfstring(L, "%d ", i);
-            luaL_tolstring(L, -2, NULL);
-            lua_concat(L, 3); 
-          }
-          lua_pop(L, 1); 
-        }
-        // Check if the last value is nil
-        lua_rawgeti(L, idx, len + 1);
-        if (lua_isnil(L, -1)) {
+      case LUA_TTABLE: {
+        char* literal = "(table)[";
+        for (int i = 1; i <= luaL_len(L, idx); i++) {
+          lua_pushinteger(L, i);
+          lua_gettable(L, idx);
+          // if the item is a string push a " before and after
+          //if (lua_isstring(L, -1)) {
+          //  strcat(literal, "\"");
+          //}
+          literal = lua_pushfstring(L, "%s%s%s", literal, luaL_tolstring(L, -1, NULL), i == luaL_len(L, idx) ? "" : ", ");
+          //if (lua_isstring(L, -1)) {
+          //  strcat(literal, "\"");
+          //}
           lua_pop(L, 1);
-          lua_pushliteral(L, "]");
-        } else {
-          lua_pushliteral(L, ", ");
-          lua_pushfstring(L, "%d", len + 1);
-          lua_pushliteral(L, ": ");
-          luaL_tolstring(L, -2, NULL);  // convert the value to a string
-          lua_concat(L, 3);  // concatenate the key, value, and separator
-          lua_pushliteral(L, "]");
-          lua_concat(L, 2);
         }
-        
-        lua_concat(L, lua_gettop(L) - idx);
-        */
+
+        lua_pushfstring(L, "%s]", literal);
         break;
-      default: {
+      }default: {
         int tt = luaL_getmetafield(L, idx, "__name");  /* try name */
         const char *kind = (tt == LUA_TSTRING) ? lua_tostring(L, -1) :
                                                  luaL_typename(L, idx);

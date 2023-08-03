@@ -669,10 +669,44 @@ static int luaB_inputf(lua_State *L) {
   return 1;
 }
 
+int isdefined(const char *name) {
+  #if defined(name)
+    return 1;
+  #else
+    return 0;
+  #endif
+}
 
+static int luaB_defined(lua_State *L) {
+    // Use FFI to check if a variable is defined
+    return 0;
+}
+
+
+static int luaB_define(lua_State *L) {
+  // Use FFI to define a variable
+  return 0;
+}
+
+static int luaB_new(lua_State *L) {
+  // Runs arg1.new(arg2, arg3, ...)
+  // So new(arg1, arg2, arg3, ...) is equivalent to arg1.new(arg2, arg3, ...)
+  int nargs = lua_gettop(L);
+  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
+  luaL_argcheck(L, lua_type(L, 1) == LUA_TTABLE, 1, "expected a table");
+
+  lua_getfield(L, 1, "new");
+  lua_insert(L, 1);
+  lua_remove(L, 1);
+  lua_call(L, nargs, 1);
+  return 1;
+}
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
-  {"slice", luaB_slice},
+  //{"define", luaB_define},
+  //{"defined", luaB_defined},
+  //{"new", luaB_new},
+  //{"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
   {"inputf", luaB_inputf},

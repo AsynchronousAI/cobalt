@@ -1,7 +1,0 @@
-globals:
-  table.clone:
-    args:
-    - type: table
-  pairs:
-    args:
-    - type: table

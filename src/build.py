@@ -119,7 +119,7 @@ print("Move them to your PATH/$PATH to use them.")
 
 # Ask to install libraries
 print("\n\n\nLibraries are available for lxx which will offer immense functionality.\nWould you like to install them? (y/n): ")
-newinput = input("Would you like to install libraries? (y/n): ")
+newinput = input("")
 if newinput == "y":
     # TODO: Install libraries
     pass

@@ -101,6 +101,29 @@ device.info().scriptmemoryint // -> 31 (as an integer) // only returns kb
 // collectgarbage()
 collectgarbage("count") // -> 31 (as an integer) // only returns kb
 ```
+## Access macros
+```js
+// Macros should only be fetched in the start of the program or be initialized in the start of the program
+// Otherwise macros may take a big performance hit
+core.macros() // Returns a table of all macros and if this is the first time accessing macros it will initialize them
+core.macros() // Since you did this again it will happen instantly since it is initialized
+
+core.macros("_WIN32") // This is a real C macro, it will return "1" if the OS is windows
+
+// For example:
+if (core.macros("_WIN32") == "1") {
+    print("You are on windows!")
+}else if(core.macros("__APPLE__") == "1") {
+    print("You are on an Apple device!")
+}else if(core.macros("__linux__") == "1") {
+    print("You are on linux!")
+}else {
+    print("You are on an unknown device!")
+}
+// All of these macros shown are real C macros that are used in the C preprocessor
+// We do not reccomend using macros for fetching the OS or Device, use device.info(), device.os, or ffi.os instead
+```
+
 ## Vector3
 ```js
 var v = Vector3.new(1, 2, 3) // -> <vector3 object>
@@ -188,4 +211,26 @@ thread->kill() // Kill the thread
 thread2->kill() // Kill the thread
 // Now we should no longer see "Hello, World!" being printed
 
+```
+
+## Signals
+```js
+// Signals are a way to communicate between threads
+// They are very useful for running multiple things at once
+signal.new("test", function(){
+    print("Hello, World!")
+}) 
+// Creates a new signal and when raised/called will print "Hello, World!"
+signal.call("test") // Calls the signal "test" and will print "Hello, World!"
+// Signals can be called from any thread
+```
+## Structs
+```js
+// Structs are a way to compress data into a single variable
+
+struct.pack("ii", 1, 2) // Packs 1 and 2 into a struct
+// -> �
+// This is a binary string, it is not readable. That is not also the real result, it is just an example
+struct.unpack("ii", "�") // Unpacks the binary string
+// -> 1, 2
 ```

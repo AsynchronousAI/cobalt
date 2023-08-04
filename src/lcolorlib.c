@@ -183,12 +183,28 @@ static int color_rgb (lua_State *L) {
   return 1;
 }
 
+static void hex_to_rgb(const char *hex, int *r, int *g, int *b) {
+    if (strlen(hex) != 6) {
+        fprintf(stderr, "Invalid hex color format: %s\n", hex);
+        exit(1);
+    }
+
+    if (sscanf(hex, "%2x%2x%2x", r, g, b) != 3) {
+        fprintf(stderr, "Invalid hex color format: %s\n", hex);
+        exit(1);
+    }
+}
+
 static int color_fromhex (lua_State *L) {
   const char *hex = luaL_checkstring(L, 1);
+  // if the hex starts with a #, remove it
+  if (hex[0] == '#') {
+    hex++;
+  }
+  
   int r, g, b;
-  sscanf(hex, "%02x%02x%02x", &r, &g, &b);
+  hex_to_rgb(hex, &r, &g, &b);
   push_color(L, r, g, b);
-  return 1;
 }
 
 

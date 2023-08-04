@@ -101,7 +101,63 @@ static int resize_memory(lua_State* L) {
   return 1;
 }
 
+// MACROS:
+static int dumpmacros(lua_State* L){
+  // Step 1: Check if GCC is installed
+  // otherwise error
+  if (system("gcc -v") != 0){
+    luaL_error(L, "GCC is not installed");
+  }
+  // Run gcc -dM -E - < /dev/null and return the output
+  FILE* fp;
+  char* line = NULL;
+  size_t len = 0;
+  ssize_t read;
+  char* output = NULL;
+  size_t output_len = 0;
+
+  fp = popen("gcc -dM -E - < /dev/null 2>/dev/null", "r");
+  if (fp == NULL) {
+    return NULL;
+  }
+
+  while ((read = getline(&line, &len, fp)) != -1) {
+    output = realloc(output, output_len + read);
+    memcpy(output + output_len, line, read);
+    output_len += read;
+  }
+
+  pclose(fp);
+  free(line);
+
+  if (output == NULL) {
+    return NULL;
+  }
+
+  output[output_len] = '\0';
+
+  // Format the output
+  // 1- Split by \n
+  // 2- Remove #define from each line
+  // 3- Make a new table and for every item in the old table add another table in the newtable with {item:split(" ")[1] = item:split(" ")[2]}
+  char* token = strtok(output, "\n");
+  lua_newtable(L);
+  int i = 1;
+  while (token != NULL) {
+    char* define = strstr(token, "#define");
+    if (define != NULL) {
+      lua_pushstring(L, define + 8);
+      lua_seti(L, -2, i);
+      i++;
+    }
+    token = strtok(NULL, "\n");
+  }
+  free(output);
+  
+  return 1;
+}
 static const struct luaL_Reg lcinterface_lib[] = {
+  {"macrosdump", dumpmacros},
   {NULL, NULL}
 };
 

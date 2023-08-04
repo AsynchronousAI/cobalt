@@ -681,50 +681,6 @@ static int luaB_inputf(lua_State *L) {
 }
 
 
-static int luaB_defined(lua_State *L) {
-    // use an ffi and return if the inputted string is defined as a macro
-    // in the C code
-
-    // get the string
-    const char *str = luaL_checkstring(L, 1);
-
-    // get the ffi
-    lua_getglobal(L, "ffi");
-
-    // error if ffi is not loaded
-    if (lua_isnil(L, -1)) {
-        return luaL_error(L, "ffi is not loaded and is required for _defined");
-    }
-
-    // get the cdef function
-    lua_getfield(L, -1, "cdef");
-
-    // error if cdef is not found
-    if (lua_isnil(L, -1)) {
-        return luaL_error(L, "ffi.cdef is not found and is required for _defined");
-    }
-
-    // call cdef with:
-    /*
-    #ifdef <str>
-    return 1;
-    #else
-    return 0;
-    #endif
-    */
-    // and retunr that data to the user
-    lua_pushfstring(L, "#ifdef %s\nreturn 1;\n#else\nreturn 0;\n#endif", str);
-    lua_call(L, 1, 1);
-
-    return 1;
-}
-
-
-static int luaB_define(lua_State *L) {
-  // Use FFI to define a variable
-  return 0;
-}
-
 static int luaB_new(lua_State *L) {
   // Runs arg1.new(arg2, arg3, ...)
   // So new(arg1, arg2, arg3, ...) is equivalent to arg1.new(arg2, arg3, ...)
@@ -781,8 +737,6 @@ static int luaB_range(lua_State *L) {
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"range", luaB_range},
-  //{"define", luaB_define},
-  //{"_defined", luaB_defined},
   //{"new", luaB_new},
   //{"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},

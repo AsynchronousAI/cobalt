@@ -79,12 +79,9 @@ accessed leading to a crash */                                        //
 
 ## Color
 ```js
-Color.rgb(255, 255, 255) // -> <color object>
-Color.fromHex("#ffffff") // -> <color object>
-Color.fromHex("#ffffff").R // -> 255
-Color.fromHex("#ffffff").G // -> 255
-Color.fromHex("#ffffff").B // -> 255
-Color.hsv(50,25,23).R // -> 255 (Red)
+Color.new(255, 255, 255) // -> <color object>
+Color.hex("#ffffff") // -> <color object>
+
 /*
 All color objects have 3 values, R, G, B. No matter how they are created internally they will be RGB.
 */

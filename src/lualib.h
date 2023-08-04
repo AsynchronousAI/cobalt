@@ -17,7 +17,7 @@
 
 LUAMOD_API int (luaopen_base) (lua_State *L);
 
-#define LUA_COLIBNAME	"parallel"
+#define LUA_COLIBNAME	"async"
 LUAMOD_API int (luaopen_coroutine) (lua_State *L);
 
 #define LUA_TABLIBNAME	"table"
@@ -76,6 +76,10 @@ LUAMOD_API int (luaopen_signal) (lua_State *L);
 
 #define LUA_FILESYSTEMNAME	"file"
 LUAMOD_API int (luaopen_lfs) (lua_State *L);
+
+#define LUA_SOCKETNAME	"msg"
+LUAMOD_API int (luaopen_chan) (lua_State *L);
+
 /* open all previous libraries */
 LUALIB_API void (luaL_openlibs) (lua_State *L);
 

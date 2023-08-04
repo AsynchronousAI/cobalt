@@ -44,7 +44,7 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	ltm.o lundump.o lvm.o lzio.o 
 LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o lcolorlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o l2Dlib.o l3Dlib.o \
-	l3transform.o lcinterface.o ldevice.o file.o lcomplex.o lstruct.o lsignal.o
+	l3transform.o lcinterface.o ldevice.o file.o lcomplex.o lstruct.o lsignal.o lchan.o
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
 LUA_T=	lxx
 LUA_O=	lua.o
@@ -183,6 +183,7 @@ file.o: file.c lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB) lfs.h
 lcinterface.o: lcinterface.c lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB) 
 lmem.o: lmem.c lprefix.h lua.h luaconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h
+lchan.o: lchan.c lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB)
 ldevice.o: ldevice.c system.h lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB)
 loadlib.o: loadlib.c lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB)
 lobject.o: lobject.c lprefix.h lua.h luaconf.h lctype.h llimits.h \

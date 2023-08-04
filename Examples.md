@@ -119,6 +119,7 @@ if (core.macros("_WIN32") == "1") {
 }
 // All of these macros shown are real C macros that are used in the C preprocessor
 // We do not reccomend using macros for fetching the OS or Device, use device.info(), device.os, or ffi.os instead
+// There are hundreds of macros and all are fully supported in lxx
 ```
 
 ## Vector3
@@ -142,11 +143,11 @@ var rv = Vector2.fromScreen(.5, 5, .5, 5, 100, 100) // -> <vector2 object>. Form
 ## Transform
 ```js
 var t = Transform.new() // -> <transform object>
-t.x = 1 // X axis is now 1
+t.X = 1 // X axis is now 1
 
 var t2 = Transform.new(Vector3.new(10,10,10), Vector3.new(11,11,11), Vector3.new(12,12,12), Vector3.new(13,13,13)) // -> <transform object> 
 // t2 will be located at 10,10,10, rotated at 11,11,11, scaled at 12,12,12, and pivoted at 13,13,13
-t2.py // -> 13
+t2.PY // -> 13 | PY means Pivot Y (Pivot Y axis)
 ```
 ## File control
 lxx provides a File Control library buildin based on lfs.

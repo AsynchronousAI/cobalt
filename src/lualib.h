@@ -68,6 +68,9 @@ LUAMOD_API int (luaopen_device) (lua_State *L);
 #define LUA_COMPLEXNAME	"complex"
 LUAMOD_API int (luaopen_complex) (lua_State *L);
 
+#define LUA_STRUCTNAME	"struct"
+LUAMOD_API int (luaopen_struct) (lua_State *L);
+
 #define LUA_FILESYSTEMNAME	"file"
 LUAMOD_API int (luaopen_lfs) (lua_State *L);
 /* open all previous libraries */

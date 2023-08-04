@@ -46,6 +46,4 @@ You must use build.py to build as it modifys the souce code to work with your re
 
 ## TODO:
 - FFI
-- Add linter
-- fix require
 - Publish extension

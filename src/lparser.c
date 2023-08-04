@@ -69,7 +69,7 @@ static void statement (LexState *ls);
 static void expr (LexState *ls, expdesc *v);
 
 static void parser_warning (LexState *ls, const char *msg) {
-  msg = luaO_pushfstring(ls->L, "warning %s", msg);
+  msg = luaO_pushfstring(ls->L, "\033[1;33mwarning!\033[0m %s", msg);
   msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);
   fprintf(stderr, "%s\n", msg);
   fflush(stderr);
@@ -84,7 +84,7 @@ static l_noret semerror (LexState *ls, const char *msg) {
 
 static l_noret error_expected (LexState *ls, int token) {
   lxx_syntaxerror(ls,
-      luaO_pushfstring(ls->L, "%s expected", lxx_token2str(ls, token)));
+      luaO_pushfstring(ls->L, "\033[1;31m%s expected\033[0m", lxx_token2str(ls, token)));
 }
 
 

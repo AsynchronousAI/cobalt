@@ -1,9 +1,9 @@
       ////////////////////////////////////////////////////////////////////////////
-     /// lxxasm, a lxx assembler                                            ///
+     /// lxxasm, a lxx assembler                                              ///
     /// (c) 2023 - AsynchronousAI                                            ///
    ///                                                                      ///
-  /// Yes this is written in the same language it is assembling.           ///
- /// Also yes this is being compiled with lxxasm.                        ///
+  /// LXX Bytecode -> Object File Compiler                                 ///
+ /// Written in LXX and Rust                                              ///
 ////////////////////////////////////////////////////////////////////////////
 
 
@@ -12,7 +12,7 @@
 
 // Functions
 function help(){
-    print([[Usage: lxx asm [options] <file>
+    print([[Usage: lxxasm [options] <file>
     Options:
       -h, --help            show this help message and exit
       -o FILE, --output=FILE

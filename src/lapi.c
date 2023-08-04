@@ -730,6 +730,30 @@ LUA_API int lua_getuservalue (lua_State *L, int idx) {
 }
 
 
+static void getiuservalue(lua_State *L, void *udata, int n, StkId res) {
+    // Pushes onto the stack the n-th user value associated with the userdata at the given index. Returns NULL if there is no such value.
+    Table *mt;
+    TValue temp;
+    setuservalue(L, udata, res);
+    if (n <= 0 || udata == NULL) return;
+    mt = lua_getuservalue(L, udata);
+    if (mt == NULL) return;
+    setivalue(&temp, n);
+    setobj2s(L, res, luaH_getint(mt, n));
+}
+
+LUA_API int lua_getiuservalue (lua_State *L, int idx, int n) {
+    // Pushes onto the stack the n-th user value associated with the full userdata at the given index and returns the type of the pushed value.
+    StkId o;
+    lua_lock(L);
+    o = index2addr(L, idx);
+    api_check(L, ttisfulluserdata(o), "full userdata expected");
+    getiuservalue(L, uvalue(o), n, L->top);
+    api_incr_top(L);
+    lua_unlock(L);
+    return ttnov(L->top - 1);
+}
+
 /*
 ** set functions (stack -> Lua)
 */

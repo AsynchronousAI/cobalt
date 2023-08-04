@@ -30,7 +30,7 @@ MYCFLAGS=
 MYlxxFLAGS=
 MYLDFLAGS=
 MYLIBS=
-MYOBJS= call.o ffi.o ctype.o parser.o
+MYOBJS=
 
 # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
 
@@ -72,7 +72,7 @@ $(LUA_A): $(BASE_O)
 	$(AR) $@ $(BASE_O)
 	$(RANLIB) $@
 
-$(LUA_T): $(LUA_O) $(LUA_A) ffi.so
+$(LUA_T): $(LUA_O) $(LUA_A)
 	$(CC) -o $@ $(LDFLAGS) $(LUA_O) $(LUA_A) $(LIBS)
 
 $(LUAC_T): $(LUAC_O) $(LUA_A)
@@ -142,11 +142,6 @@ solaris:
 
 # DO NOT DELETE
 
-ffi.o: ffi.c ffi.h lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB)
-call.o: call.c ffi.h lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB)
-ctype.o: ctype.c ffi.h lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB)
-parser.o: parser.c ffi.h lprefix.h lua.h luaconf.h lauxlib.h $(LUALIB)
-ffi.so: ffi.o call.o ctype.o parser.o
 lapi.o: lapi.c lprefix.h lua.h luaconf.h lapi.h llimits.h lstate.h \
  lobject.h ltm.h lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h \
  ltable.h lundump.h lvm.h

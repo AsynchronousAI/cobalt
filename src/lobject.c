@@ -173,7 +173,6 @@ static int isneg (const char **s) {
 }
 
 
-
 /*
 ** {==================================================================
 ** Lua's implementation for 'lua_strx2number'

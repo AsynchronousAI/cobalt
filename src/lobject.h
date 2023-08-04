@@ -44,10 +44,11 @@
 */
 
 /* Variant tags for functions */
+#define makevariant(t,v)	((t) | ((v) << 4)) /*LUA_VNIL needs this */
 #define LUA_TLCL	(LUA_TFUNCTION | (0 << 4))  /* Lua closure */
 #define LUA_TLCF	(LUA_TFUNCTION | (1 << 4))  /* light C function */
 #define LUA_TCCL	(LUA_TFUNCTION | (2 << 4))  /* C closure */
-
+#define LUA_VNIL	makevariant(LUA_TNIL, 0) /* idfk */
 
 /* Variant tags for strings */
 #define LUA_TSHRSTR	(LUA_TSTRING | (0 << 4))  /* short strings */
@@ -207,7 +208,7 @@ typedef struct lua_TValue {
 #define chgivalue(obj,x) \
   { TValue *io=(obj); lua_assert(ttisinteger(io)); val_(io).i=(x); }
 
-#define setnilvalue(obj) settt_(obj, LUA_TNIL)
+#define setnilvalue(obj) settt_(obj, LUA_VNIL)
 
 #define setfvalue(obj,x) \
   { TValue *io=(obj); val_(io).f=(x); settt_(io, LUA_TLCF); }

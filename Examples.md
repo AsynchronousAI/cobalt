@@ -79,12 +79,9 @@ accessed leading to a crash */                                        //
 
 ## Color
 ```js
-Color.rgb(255, 255, 255) // -> <color object>
-Color.fromHex("#ffffff") // -> <color object>
-Color.fromHex("#ffffff").R // -> 255
-Color.fromHex("#ffffff").G // -> 255
-Color.fromHex("#ffffff").B // -> 255
-Color.hsv(50,25,23).R // -> 255 (Red)
+Color.new(255, 255, 255) // -> <color object>
+Color.hex("#ffffff") // -> <color object>
+
 /*
 All color objects have 3 values, R, G, B. No matter how they are created internally they will be RGB.
 */
@@ -95,7 +92,7 @@ All color objects have 3 values, R, G, B. No matter how they are created interna
 // it is your prefrence on which one you use
 
 // device.info()
-device.info().scriptmemory // -> 117.74 MB // returns from kb to yb (crazy if you use that much memory)
+device.info().scriptmemory // -> 117.74 MB // formats from kb to yb (crazy if you use that much memory)
 device.info().scriptmemoryint // -> 31 (as an integer) // only returns kb
 
 // collectgarbage()
@@ -105,7 +102,7 @@ collectgarbage("count") // -> 31 (as an integer) // only returns kb
 ```js
 // Macros should only be fetched in the start of the program or be initialized in the start of the program
 // Otherwise macros may take a big performance hit
-core.macros() // Returns a table of all macros and if this is the first time accessing macros it will initialize them
+core.macros() // Returns a table of all macros; if this is the first time accessing macros, it will initialize them
 core.macros() // Since you did this again it will happen instantly since it is initialized
 
 core.macros("_WIN32") // This is a real C macro, it will return "1" if the OS is windows
@@ -122,6 +119,7 @@ if (core.macros("_WIN32") == "1") {
 }
 // All of these macros shown are real C macros that are used in the C preprocessor
 // We do not reccomend using macros for fetching the OS or Device, use device.info(), device.os, or ffi.os instead
+// There are hundreds of macros and all are fully supported in lxx
 ```
 
 ## Vector3
@@ -145,11 +143,11 @@ var rv = Vector2.fromScreen(.5, 5, .5, 5, 100, 100) // -> <vector2 object>. Form
 ## Transform
 ```js
 var t = Transform.new() // -> <transform object>
-t.x = 1 // X axis is now 1
+t.X = 1 // X axis is now 1
 
 var t2 = Transform.new(Vector3.new(10,10,10), Vector3.new(11,11,11), Vector3.new(12,12,12), Vector3.new(13,13,13)) // -> <transform object> 
 // t2 will be located at 10,10,10, rotated at 11,11,11, scaled at 12,12,12, and pivoted at 13,13,13
-t2.py // -> 13
+t2.PY // -> 13 | PY means Pivot Y (Pivot Y axis)
 ```
 ## File control
 lxx provides a File Control library buildin based on lfs.
@@ -197,7 +195,7 @@ var thread = parrallel.new(function() {
     }
 })
 
-// - lxxlang 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
+// - lxx 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
 swait(10) // Wait 10 seconds so the thread can finish
 thread->pause() // Stop the thread
 thread->resume() // Resume the thread

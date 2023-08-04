@@ -57,6 +57,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_DEVICENAME, luaopen_device},
   {LUA_DBLIBNAME, luaopen_debug},
   {LUA_FILESYSTEMNAME, luaopen_lfs},
+  {LUA_COMPLEXNAME, luaopen_complex},
   {LUA_BITLIBNAME, luaopen_bit32},
   {NULL, NULL}
 };

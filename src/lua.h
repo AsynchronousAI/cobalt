@@ -15,7 +15,6 @@
 
 #include "luaconf.h"
 
-
 #define LUA_VERSION_MAJOR	"1"
 #define LUA_VERSION_MINOR	"0"
 #define LUA_VERSION_NUM		503

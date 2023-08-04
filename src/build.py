@@ -102,8 +102,6 @@ while True:
     else:
         continue
 print("Build succeeded!")
-os.system("mv Makefile PostMakefile")
-os.system("mv PostMakefile Makefile")
 # Install
 print("\n\n\n")
 print("Please specify what extension would be used.")
@@ -120,11 +118,6 @@ print("Move them to your PATH/$PATH to use them.")
 # Ask to install libraries
 print("\n\n\nLibraries are available for lxx which will offer immense functionality.\nWould you like to install them? (y/n): ")
 newinput = input("")
-if newinput == "y":
-    # TODO: Install libraries
-    pass
-else:
-    pass
 
 # Extra options
 print("\n\n\n")

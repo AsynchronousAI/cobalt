@@ -18,6 +18,24 @@
 #include "lualib.h"
 #include "classes.h"
 
+/*
+TO BE ADDED FUNCTIONS:
+Color->to_rgb
+Color->hue_offset
+Color->complementary
+Color->neighbors
+Color->triadic
+Color->split_complementary
+Color->desaturate_to
+Color->desaturate_by
+Color->lighten_to
+Color->lighten_by
+Color->variations
+Color->tints
+Color->shades
+Color->tint
+Color->shade
+*/
 
 
 static int color_index(lua_State *L) {
@@ -48,77 +66,119 @@ static void push_color(lua_State *L, int r, int g, int b) {
   lua_setmetatable(L, -2);
 }
 
-static int hue2rgb(int p, int q, int t) {
-  if (t < 0) t += 1;
-  if (t > 1) t -= 1;
-  if (t < 1/6) return p + (q - p) * 6 * t;
-  if (t < 1/2) return q;
-  if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-  return p;
+static void hsl_to_rgb(double h, double s, double l, int* r, int* g, int* b) {
+    double c = (1 - fabs(2 * l - 1)) * s;
+    double x = c * (1 - fabs(fmod(h / 60, 2) - 1));
+    double m = l - c / 2;
+    double r1, g1, b1;
+    if (h < 60) {
+        r1 = c;
+        g1 = x;
+        b1 = 0;
+    } else if (h < 120) {
+        r1 = x;
+        g1 = c;
+        b1 = 0;
+    } else if (h < 180) {
+        r1 = 0;
+        g1 = c;
+        b1 = x;
+    } else if (h < 240) {
+        r1 = 0;
+        g1 = x;
+        b1 = c;
+    } else if (h < 300) {
+        r1 = x;
+        g1 = 0;
+        b1 = c;
+    } else {
+        r1 = c;
+        g1 = 0;
+        b1 = x;
+    }
+    *r = (int)((r1 + m) * 255);
+    *g = (int)((g1 + m) * 255);
+    *b = (int)((b1 + m) * 255);
 }
+
+static void rgb_to_hsl(int r, int g, int b, double* h, double* s, double* l) {
+    double r1 = (double)r / 255;
+    double g1 = (double)g / 255;
+    double b1 = (double)b / 255;
+    double max = r1;
+    if (g1 > max) {
+        max = g1;
+    }
+    if (b1 > max) {
+        max = b1;
+    }
+    double min = r1;
+    if (g1 < min) {
+        min = g1;
+    }
+    if (b1 < min) {
+        min = b1;
+    }
+    double c = max - min;
+    double h1;
+    if (c == 0) {
+        h1 = 0;
+    } else if (max == r1) {
+        h1 = fmod((g1 - b1) / c, 6);
+    } else if (max == g1) {
+        h1 = (b1 - r1) / c + 2;
+    } else {
+        h1 = (r1 - g1) / c + 4;
+    }
+    *h = h1 * 60;
+    *l = (max + min) / 2;
+    if (c == 0) {
+        *s = 0;
+    } else {
+        *s = c / (1 - fabs(2 * *l - 1));
+    }
+}
+
+static int color_hsl_to_rgb (lua_State *L) {
+  double h = luaL_checknumber(L, 1);
+  double s = luaL_checknumber(L, 2);
+  double l = luaL_checknumber(L, 3);
+  int r, g, b;
+  hsl_to_rgb(h, s, l, &r, &g, &b);
+  push_color(L, r, g, b);
+  return 1;
+}
+
+static int string(lua_State *L) {
+    const char *rgb_string = luaL_checkstring(L, 1);
+
+    int r, g, b;
+    if (sscanf(rgb_string, "#%02x%02x%02x", &r, &g, &b) != 3) {
+        luaL_error(L, "invalid RGB string format");
+    }
+    
+    push_color(L, r, g, b);
+
+    return 1;
+}
+
+static int color_rgb_to_hsl (lua_State *L) {
+  int r = luaL_checknumber(L, 1);
+  int g = luaL_checknumber(L, 2);
+  int b = luaL_checknumber(L, 3);
+  double h, s, l;
+  rgb_to_hsl(r, g, b, &h, &s, &l);
+  lua_pushnumber(L, h);
+  lua_pushnumber(L, s);
+  lua_pushnumber(L, l);
+  return 3;
+}
+
 
 static int color_rgb (lua_State *L) {
   int r = luaL_checknumber(L, 1);
   int g = luaL_checknumber(L, 2);
   int b = luaL_checknumber(L, 3);
-  push_color(L, r, g, b);
-  return 1;
-}
-
-static int color_hsv (lua_State *L) {
-  int h = luaL_checknumber(L, 1);
-  int s = luaL_checknumber(L, 2);
-  int v = luaL_checknumber(L, 3);
-  
-  int r, g, b;
-  int i = floor(h * 6);
-  int f = h * 6 - i;
-  int p = v * (1 - s);
-  int q = v * (1 - f * s);
-  int t = v * (1 - (1 - f) * s);
-  switch (i % 6) {
-    case 0: r = v, g = t, b = p; break;
-    case 1: r = q, g = v, b = p; break;
-    case 2: r = p, g = v, b = t; break;
-    case 3: r = p, g = q, b = v; break;
-    case 4: r = t, g = p, b = v; break;
-    case 5: r = v, g = p, b = q; break;
-  }
-
-  push_color(L, r, g, b);
-  return 1;
-}
-
-static int color_hsl (lua_State *L) {
-  int h = luaL_checknumber(L, 1);
-  int s = luaL_checknumber(L, 2);
-  int l = luaL_checknumber(L, 3);
-  
-  int r, g, b;
-  if (s == 0) {
-    r = g = b = l; // achromatic
-  } else {
-    int q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    int p = 2 * l - q;
-    r = hue2rgb(p, q, h + 1/3);
-    g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1/3);
-  }
-
-  push_color(L, r, g, b);
-  return 1;
-}
-
-static int color_cmyk (lua_State *L) {
-  int c = luaL_checknumber(L, 1);
-  int m = luaL_checknumber(L, 2);
-  int y = luaL_checknumber(L, 3);
-  int k = luaL_checknumber(L, 4);
-
-  int r = 255 * (1 - c) * (1 - k);
-  int g = 255 * (1 - m) * (1 - k);
-  int b = 255 * (1 - y) * (1 - k);
-  
   push_color(L, r, g, b);
   return 1;
 }
@@ -135,11 +195,11 @@ static int color_fromhex (lua_State *L) {
 
 
 static const luaL_Reg colorlib[] = {
-  {"hsv", color_hsv},
-  {"rgb", color_rgb},
-  {"hsl", color_hsl},
-  {"cmyk", color_cmyk},
-  {"fromHex", color_fromhex},
+  {"new", color_rgb},
+  {"hex", color_fromhex},
+  {"hsl_to_rgb", color_hsl_to_rgb},
+  {"rgb_to_hsl", color_rgb_to_hsl},
+  {"string", string},
 
   {NULL, NULL}
 };

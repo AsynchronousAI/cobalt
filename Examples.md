@@ -92,7 +92,7 @@ All color objects have 3 values, R, G, B. No matter how they are created interna
 // it is your prefrence on which one you use
 
 // device.info()
-device.info().scriptmemory // -> 117.74 MB // returns from kb to yb (crazy if you use that much memory)
+device.info().scriptmemory // -> 117.74 MB // formats from kb to yb (crazy if you use that much memory)
 device.info().scriptmemoryint // -> 31 (as an integer) // only returns kb
 
 // collectgarbage()
@@ -102,7 +102,7 @@ collectgarbage("count") // -> 31 (as an integer) // only returns kb
 ```js
 // Macros should only be fetched in the start of the program or be initialized in the start of the program
 // Otherwise macros may take a big performance hit
-core.macros() // Returns a table of all macros and if this is the first time accessing macros it will initialize them
+core.macros() // Returns a table of all macros; if this is the first time accessing macros, it will initialize them
 core.macros() // Since you did this again it will happen instantly since it is initialized
 
 core.macros("_WIN32") // This is a real C macro, it will return "1" if the OS is windows
@@ -194,7 +194,7 @@ var thread = parrallel.new(function() {
     }
 })
 
-// - lxxlang 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
+// - lxx 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
 swait(10) // Wait 10 seconds so the thread can finish
 thread->pause() // Stop the thread
 thread->resume() // Resume the thread

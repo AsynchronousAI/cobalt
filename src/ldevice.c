@@ -1,5 +1,5 @@
 /*
-** Standard Device library for luax
+** Standard Device library for lxx
 */
 // (c) 2023, AsynchronousAI 
 
@@ -159,7 +159,7 @@ static int get_device_info(lua_State* L) {
         lua_pushstring(L, "sysname");
         lua_pushstring(L, "Windows");
         lua_settable(L, -3);
-        lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+        lua_pushstring(L, "scriptmemoryint"); // How much memory is lxx using
         lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
         lua_settable(L, -3);
         lua_pushstring(L, "scriptmemory");
@@ -197,7 +197,7 @@ static int get_device_info(lua_State* L) {
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "unix");
     lua_settable(L, -3);
-    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is lxx using
     lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
     lua_settable(L, -3);
     lua_pushstring(L, "scriptmemory");
@@ -225,7 +225,7 @@ static int get_device_info(lua_State* L) {
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "ios");
     lua_settable(L, -3);
-    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is lxx using
     lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
     lua_settable(L, -3);
     lua_pushstring(L, "scriptmemory");
@@ -252,7 +252,7 @@ static int get_device_info(lua_State* L) {
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "tvos");
     lua_settable(L, -3);
-    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is lxx using
     lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
     lua_settable(L, -3);
     lua_pushstring(L, "scriptmemory");
@@ -280,7 +280,7 @@ static int get_device_info(lua_State* L) {
     lua_pushstring(L, "generalos");
     lua_pushstring(L, "Unknown");
     lua_settable(L, -3);
-    lua_pushstring(L, "scriptmemoryint"); // How much memory is luax using
+    lua_pushstring(L, "scriptmemoryint"); // How much memory is lxx using
     lua_pushnumber(L, lua_gc(L, LUA_GCCOUNT, 0));
     lua_settable(L, -3);
     lua_pushstring(L, "scriptmemory");
@@ -290,9 +290,17 @@ static int get_device_info(lua_State* L) {
   #endif
 }
 
+static int get_device_specs(lua_State* L) {
+
+  lua_newtable(L);
+  lua_pushstring(L, "CPU");
+  lua_pushstring(L, "Unavailable");//getCPUName());
+  lua_settable(L, -3);
+}
+
 static const struct luaL_Reg device_lib[] = {
   {"info", get_device_info},
-
+  {"specs", get_device_specs},
   {NULL, NULL}
 };
 

@@ -37,7 +37,7 @@ export function processDiagnostic(
 
                 const configFilename = vscode.Uri.joinPath(
                     workspace.uri,
-                    "luax.toml",
+                    "lxx.toml",
                 )
 
                 let configContents: Uint8Array

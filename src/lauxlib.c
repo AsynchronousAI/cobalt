@@ -859,7 +859,7 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
         lua_pushfstring(L, "%s: %p", kind, lua_topointer(L, idx));
         if (tt != LUA_TNIL)
           lua_remove(L, -2);  /* remove '__name' */
-        break;
+        break; 
       }
     }
   }

@@ -207,7 +207,7 @@ static void f_luaopen (lua_State *L, void *ud) {
   init_registry(L, g);
   luaS_init(L);
   luaT_init(L);
-  luaX_init(L);
+  lxx_init(L);
   g->gcrunning = 1;  /* allow gc */
   g->version = lua_version(NULL);
   luai_userstateopen(L);

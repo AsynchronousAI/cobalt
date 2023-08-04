@@ -1,5 +1,5 @@
 //import * as roblox from "./roblox"
-import * as luax from "./luax"
+import * as lxx from "./lxx"
 import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
@@ -9,7 +9,7 @@ import { lintConfig } from "./configLint"
 import { byteToCharMap } from "./byteToCharMap"
 import { Capabilities } from "./structures/capabilities"
 
-let tryluax: Promise<boolean>
+let trylxx: Promise<boolean>
 
 enum RunType {
     OnSave = "onSave",
@@ -36,18 +36,18 @@ function labelToRange(
 export async function activate(
     context: vscode.ExtensionContext,
 ): Promise<void> {
-    console.log("luax-vscode activated")
+    console.log("lxx-vscode activated")
 
     let capabilities: Capabilities = {}
 
-    tryluax = util
-        .ensureluaxExists(context.globalStorageUri)
+    trylxx = util
+        .ensurelxxExists(context.globalStorageUri)
         .then(() => {
-            luax
-                .luaxCommand(
+            lxx
+                .lxxCommand(
                     context.globalStorageUri,
                     "capabilities --display-style=json2",
-                    luax.Expectation.Stdout,
+                    lxx.Expectation.Stdout,
                 )
                 .then((output) => {
                     if (output === null) {
@@ -57,7 +57,7 @@ export async function activate(
                     capabilities = JSON.parse(output.toString())
                 })
                 .catch(() => {
-                    // luax version is too old
+                    // lxx version is too old
                     return
                 })
         })
@@ -66,36 +66,36 @@ export async function activate(
         })
         .catch((error) => {
             vscode.window.showErrorMessage(
-                `An error occurred when finding luax:\n${error}`,
+                `An error occurred when finding lxx:\n${error}`,
             )
             return false
         })
 
-    await tryluax
+    await trylxx
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("luax.reinstall", () => {
-            tryluax = util
-                .downloadluax(context.globalStorageUri)
+        vscode.commands.registerCommand("lxx.reinstall", () => {
+            trylxx = util
+                .downloadlxx(context.globalStorageUri)
                 .then(() => true)
                 .catch(() => false)
-            return tryluax
+            return trylxx
         }),
     )
 
     const diagnosticsCollection =
-        vscode.languages.createDiagnosticCollection("luax")
+        vscode.languages.createDiagnosticCollection("lxx")
     context.subscriptions.push(diagnosticsCollection)
 
     //let hasWarnedAboutRoblox = false
 
     async function lint(document: vscode.TextDocument) {
-        if (!(await tryluax)) {
+        if (!(await trylxx)) {
             return
         }
 
         switch (document.languageId) {
-            case "luax":
+            case "lxx":
                 break
             case "toml":
             case "yaml":
@@ -110,10 +110,10 @@ export async function activate(
                 return
         }
 
-        const output = await luax.luaxCommand(
+        const output = await lxx.lxxCommand(
             context.globalStorageUri,
             "--display-style=json2 --no-summary -",
-            luax.Expectation.Stderr,
+            lxx.Expectation.Stderr,
             vscode.workspace.getWorkspaceFolder(document.uri),
             document.getText(),
         )
@@ -176,7 +176,7 @@ export async function activate(
                     : vscode.DiagnosticSeverity.Warning,
             )
 
-            diagnostic.source = `luax::${data.code}`
+            diagnostic.source = `lxx::${data.code}`
 
             if (data.code === "unused_variable") {
                 diagnostic.tags = [vscode.DiagnosticTag.Unnecessary]
@@ -196,7 +196,7 @@ export async function activate(
 
             //if (
             //    vscode.workspace
-            //        .getConfiguration("luax")
+            //        .getConfiguration("lxx")
             //        .get<boolean>("warnRoblox")
             //) {
                 //if (
@@ -216,7 +216,7 @@ export async function activate(
     let lastTimeout: NodeJS.Timeout
     function listenToChange() {
         switch (
-            vscode.workspace.getConfiguration("luax").get<RunType>("run")
+            vscode.workspace.getConfiguration("lxx").get<RunType>("run")
         ) {
             case RunType.OnSave:
                 return vscode.workspace.onDidSaveTextDocument(lint)
@@ -240,7 +240,7 @@ export async function activate(
                 })
             case RunType.OnIdle: {
                 const idleDelay = vscode.workspace
-                    .getConfiguration("luax")
+                    .getConfiguration("lxx")
                     .get<number>("idleDelay") as number
 
                 return vscode.workspace.onDidChangeTextDocument((event) => {
@@ -258,8 +258,8 @@ export async function activate(
     let disposable = listenToChange()
     vscode.workspace.onDidChangeConfiguration((event) => {
         if (
-            event.affectsConfiguration("luax.run") ||
-            event.affectsConfiguration("luax.idleDelay")
+            event.affectsConfiguration("lxx.run") ||
+            event.affectsConfiguration("lxx.idleDelay")
         ) {
             disposable?.dispose()
             disposable = listenToChange()

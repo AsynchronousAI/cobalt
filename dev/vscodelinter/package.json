@@ -1,10 +1,10 @@
 {
-    "name": "luax-vscode",
-    "displayName": "luax",
-    "description": "A Luax Linter for VSCode based on Selene.",
+    "name": "lxx-vscode",
+    "displayName": "lxx",
+    "description": "A lxx Linter for VSCode based on Selene.",
     "version": "1.5.0",
     "publisher": "AsynchronousAI",
-    "repository": "https://github.com/luaxlang/luax",
+    "repository": "https://github.com/lxxlang/lxx",
     "engines": {
         "vscode": "^1.63.0"
     },
@@ -12,9 +12,9 @@
         "Linters"
     ],
     "activationEvents": [
-        "onLanguage:luax",
-        "workspaceContains:luax.toml",
-        "onCommand:luax.reinstall"
+        "onLanguage:lxx",
+        "workspaceContains:lxx.toml",
+        "onCommand:lxx.reinstall"
     ],
     "main": "./out/extension.js",
     "scripts": {
@@ -27,25 +27,25 @@
     "contributes": {
         "commands": [
             {
-                "command": "luax.reinstall",
-                "title": "Reinstall luax",
-                "category": "luax"
+                "command": "lxx.reinstall",
+                "title": "Reinstall lxx",
+                "category": "lxx"
             }
         ],
         "configuration": {
-            "title": "luax",
+            "title": "lxx",
             "properties": {
-                "luax.luaxPath": {
+                "lxx.lxxPath": {
                     "title": "Path",
                     "type": [
                         "string",
                         null
                     ],
                     "default": null,
-                    "description": "Specifies the path of luax. If not specified, luax will automatically download from the GitHub releases.",
+                    "description": "Specifies the path of lxx. If not specified, lxx will automatically download from the GitHub releases.",
                     "scope": "machine-overridable"
                 },
-                "luax.run": {
+                "lxx.run": {
                     "title": "Run",
                     "type": "string",
                     "default": "onType",
@@ -63,11 +63,11 @@
                     ],
                     "description": "Controls when the linter is ran."
                 },
-                "luax.idleDelay": {
+                "lxx.idleDelay": {
                     "title": "Idle Delay",
                     "type": "number",
                     "default": 500,
-                    "markdownDescription": "Controls the delay in ms after which the file is linted. Only applies when `#luax.run#` is set to `onIdle`."
+                    "markdownDescription": "Controls the delay in ms after which the file is linted. Only applies when `#lxx.run#` is set to `onIdle`."
                 }
             }
         }

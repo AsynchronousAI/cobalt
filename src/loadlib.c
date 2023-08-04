@@ -607,6 +607,14 @@ static void findloader (lua_State *L, const char *name) {
     }
     else
       lua_pop(L, 2);  /* remove both returns */
+    
+    // save the module contents as a global variable under the name of the second argument given or module name
+    if (lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE) != LUA_TTABLE) {
+      luaL_error(L, "'package.loaded' must be a table");
+    }
+    lua_pushvalue(L, -2);
+    lua_setfield(L, -2, name);
+    lua_pop(L, 1);
   }
 }
 

@@ -25,7 +25,7 @@
 static void PrintFunction(const Proto* f, int full);
 #define luaU_print	PrintFunction
 
-#define PROGNAME	"luaxc"		/* default program name */
+#define PROGNAME	"lxxc"		/* default program name */
 #define OUTPUT		PROGNAME ".luabyte"	/* default output file */
 #define ASMOUTPUT PROGNAME ".lasm"
 

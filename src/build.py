@@ -1,4 +1,4 @@
-"""Handles building luax by downloading dependencies, configuring, and compiling, and installing."""
+"""Handles building lxx by downloading dependencies, configuring, and compiling, and installing."""
 
 # @AsynchronousAI - 2023
 
@@ -50,17 +50,29 @@ with open(MAKEFILEPATH, "w") as makefile:
     makefile.write(makefiledata)
     
 ### BUILD
-print("Building Luax...")
+item = input("Would you like to install to dist or bin (1/2): ")
+if item == "1":
+    print("Installing to dist/")
+elif item == "2":
+    print("Installing to usr/bin/.../")
+else:
+    print("Invalid input!")
+    sys.exit(1)
+    
+print("Building lxx...")
 
 # Run make
-exitcode = os.system("make")
+if item == "2":
+    exitcode = os.system("make install")
+else:
+    exitcode = os.system("make")
 if exitcode != 0:
     print("Build failed!")
     sys.exit(1)
 
 ### WAIT UNTIL BUILD IS DONE
 while True:
-    if os.path.exists("luax") and os.path.exists("luaxc"):
+    if os.path.exists("lxx") and os.path.exists("lxxc"):
         break
     else:
         continue
@@ -70,22 +82,22 @@ while True:
 # Go back to the main directory
 os.system("cd ..")
 print("\n\n")
-# Delete /luax and /luaxc, they are prebuild
-os.system("rm luax")
-os.system("rm luaxc")
+# Delete /lxx and /lxxc, they are prebuild
+os.system("rm lxx")
+os.system("rm lxxc")
 
 # Move the contents of PostMakefile to Makefile
 
-print("Building Luax...")
+print("Building lxx...")
 with open(MAKEFILEPATH, "r") as makefile:
     makefiledata = makefile.read()
     makefiledata = makefiledata.replace("#<--so-->", "ffi.so")
 exitcode = os.system("make")
 if exitcode != 0:
-    print("Luax Build failed!")
+    print("lxx Build failed!")
     sys.exit(1)
 while True:
-    if os.path.exists("luax") and os.path.exists("luaxc"):
+    if os.path.exists("lxx") and os.path.exists("lxxc"):
         break
     else:
         continue
@@ -97,16 +109,16 @@ print("\n\n\n")
 print("Please specify what extension would be used.")
 res = input("(ex: .exe, or nothing for no extension usually on UNIX systems): ")
 os.system("mkdir ../dist")
-os.system("mv luax"+res+" ../dist/luax" + res)
-os.system("mv luaxc"+res+" ../dist/luaxc" + res)
+os.system("mv lxx"+res+" ../dist/lxx" + res)
+os.system("mv lxxc"+res+" ../dist/lxxc" + res)
         
 # Inform user
 print("\n\n\n")
-print("Done! luax is now in dist/luax" + res + " and luaxc is in dist/luaxc" + res + ".")
+print("Done! lxx is now in dist/lxx" + res + " and lxxc is in dist/lxxc" + res + ".")
 print("Move them to your PATH/$PATH to use them.")
 
 # Ask to install libraries
-print("\n\n\nLibraries are available for luax which will offer immense functionality.\nWould you like to install them? (y/n): ")
+print("\n\n\nLibraries are available for lxx which will offer immense functionality.\nWould you like to install them? (y/n): ")
 newinput = input("Would you like to install libraries? (y/n): ")
 if newinput == "y":
     # TODO: Install libraries
@@ -125,7 +137,7 @@ print("4- Exit")
 inp = input("What do you want to do? (1, 2, 3, etc.): ")
 
 if inp == "1":
-    print("\n\n\nLUAX")
+    print("\n\n\nlxx")
     os.system("make echo")
 elif inp == "2":
     os.system("python3 build.py clean")

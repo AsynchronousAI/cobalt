@@ -173,7 +173,7 @@
 #define LUA_EXEC_DIR            "!"
 
 #ifdef LUA_LJS
-  #define LUA_SCRIPT_EXT ".luax"
+  #define LUA_SCRIPT_EXT ".lxx"
 #else
   #define LUA_SCRIPT_EXT ".lua"
 #endif // LUA_LJS
@@ -187,7 +187,7 @@
 ** hierarchy or if you want to install your libraries in
 ** non-conventional directories.
 */
-#define LUA_VDIR	"5.4" // placeholder
+#define LUA_VDIR	"lxx" // emphasises lxx specific packages
 #if defined(_WIN32)	/* { */
 /*
 ** In Windows, any exclamation mark ('!') in the path is replaced by the
@@ -200,12 +200,7 @@
 		LUA_LDIR"?" LUA_SCRIPT_EXT ";"  LUA_LDIR"?\\init" LUA_SCRIPT_EXT ";" \
 		LUA_CDIR"?" LUA_SCRIPT_EXT ";"  LUA_CDIR"?\\init" LUA_SCRIPT_EXT ";" \
 		LUA_SHRDIR"?" LUA_SCRIPT_EXT ";" LUA_SHRDIR"?\\init" LUA_SCRIPT_EXT ";" \
-		".\\?" LUA_SCRIPT_EXT ";" ".\\?\\init" LUA_SCRIPT_EXT \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?\\init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?\\init.lua;" \
-		LUA_SHRDIR"?.lua;" LUA_SHRDIR"?\\init.lua;" \
-		".\\?.lua;" "./?\\init.lua"
-
+		".\\?" LUA_SCRIPT_EXT ";" ".\\?\\init" LUA_SCRIPT_EXT 
 #define LUA_CPATH_DEFAULT \
 		LUA_CDIR"?.dll;" \
 		LUA_CDIR"..\\lib\\lua\\" LUA_VDIR "\\?.dll;" \
@@ -219,10 +214,7 @@
 #define LUA_PATH_DEFAULT  \
 		LUA_LDIR"?" LUA_SCRIPT_EXT ";"  LUA_LDIR"?/init" LUA_SCRIPT_EXT ";" \
 		LUA_CDIR"?" LUA_SCRIPT_EXT ";"  LUA_CDIR"?/init" LUA_SCRIPT_EXT ";" \
-		"./?" LUA_SCRIPT_EXT ";" "./?/init" LUA_SCRIPT_EXT ";" \
-		LUA_LDIR"?.lua;"  LUA_LDIR"?/init.lua;" \
-		LUA_CDIR"?.lua;"  LUA_CDIR"?/init.lua;" \
-		"./?.lua;" "./?/init.lua"
+		"./?" LUA_SCRIPT_EXT ";" "./?/init" LUA_SCRIPT_EXT ";" 
 #define LUA_CPATH_DEFAULT \
 		LUA_CDIR"?.so;" LUA_CDIR"loadall.so;" "./?.so"
 #endif			/* } */
@@ -323,6 +315,9 @@
 ** You can define it to get all options, or change specific options
 ** to fit your specific needs.
 */
+#define LUA_COMPAT_5_1
+#define LUA_COMPAT_5_2
+
 #if defined(LUA_COMPAT_5_2)	/* { */
 
 /*

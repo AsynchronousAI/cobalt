@@ -37,7 +37,7 @@
 
 
 /* ORDER RESERVED */
-static const char *const luaX_tokens [] = {
+static const char *const lxx_tokens [] = {
     "auto", "break", "continue", "do", "else",
     "false", "__FILE__", "for", "function", "goto",
     "idiv", "if", "in", "let", "__LINE__", "local", "null",
@@ -70,25 +70,25 @@ static void save (LexState *ls, int c) {
 }
 
 
-void luaX_init (lua_State *L) {
+void lxx_init (lua_State *L) {
   int i;
   TString *e = luaS_newliteral(L, LUA_ENV);  /* create env name */
   luaC_fix(L, obj2gco(e));  /* never collect this name */
   for (i=0; i<NUM_RESERVED; i++) {
-    TString *ts = luaS_new(L, luaX_tokens[i]);
+    TString *ts = luaS_new(L, lxx_tokens[i]);
     luaC_fix(L, obj2gco(ts));  /* reserved words are never collected */
     ts->extra = cast_byte(i+1);  /* reserved word */
   }
 }
 
 
-const char *luaX_token2str (LexState *ls, int token) {
+const char *lxx_token2str (LexState *ls, int token) {
   if (token < FIRST_RESERVED) {  /* single-byte symbols? */
     lua_assert(token == cast_uchar(token));
     return luaO_pushfstring(ls->L, "'%c'", token);
   }
   else {
-    const char *s = luaX_tokens[token - FIRST_RESERVED];
+    const char *s = lxx_tokens[token - FIRST_RESERVED];
     if (token < TK_EOS)  /* fixed format (symbols and reserved words)? */
       return luaO_pushfstring(ls->L, "'%s'", s);
     else  /* names, strings, and numerals */
@@ -104,7 +104,7 @@ static const char *txtToken (LexState *ls, int token) {
       save(ls, '\0');
       return luaO_pushfstring(ls->L, "'%s'", luaZ_buffer(ls->buff));
     default:
-      return luaX_token2str(ls, token);
+      return lxx_token2str(ls, token);
   }
 }
 
@@ -117,7 +117,7 @@ static l_noret lexerror (LexState *ls, const char *msg, int token) {
 }
 
 
-l_noret luaX_syntaxerror (LexState *ls, const char *msg) {
+l_noret lxx_syntaxerror (LexState *ls, const char *msg) {
   lexerror(ls, msg, ls->t.token);
 }
 
@@ -127,7 +127,7 @@ l_noret luaX_syntaxerror (LexState *ls, const char *msg) {
 ** it will not be collected until the end of the compilation
 ** (by that time it should be anchored somewhere)
 */
-TString *luaX_newstring (LexState *ls, const char *str, size_t l) {
+TString *lxx_newstring (LexState *ls, const char *str, size_t l) {
   lua_State *L = ls->L;
   TValue *o;  /* entry for 'str' */
   TString *ts = luaS_newlstr(L, str, l);  /* create new string */
@@ -162,7 +162,7 @@ static void inclinenumber (LexState *ls) {
 }
 
 
-void luaX_setinput (lua_State *L, LexState *ls, ZIO *z, TString *source,
+void lxx_setinput (lua_State *L, LexState *ls, ZIO *z, TString *source,
                     int firstchar) {
   ls->t.token = 0;
   ls->L = L;
@@ -303,7 +303,7 @@ static void read_long_string (LexState *ls, SemInfo *seminfo, size_t sep) {
     }
   } endloop:
   if (seminfo)
-    seminfo->ts = luaX_newstring(ls, luaZ_buffer(ls->buff) + sep,
+    seminfo->ts = lxx_newstring(ls, luaZ_buffer(ls->buff) + sep,
                                      luaZ_bufflen(ls->buff) - 2 * sep);
 }
 
@@ -429,7 +429,7 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
     }
   }
   save_and_next(ls);  /* skip delimiter */
-  seminfo->ts = luaX_newstring(ls, luaZ_buffer(ls->buff) + 1,
+  seminfo->ts = lxx_newstring(ls, luaZ_buffer(ls->buff) + 1,
                                    luaZ_bufflen(ls->buff) - 2);
 }
 
@@ -613,7 +613,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
           do {
             save_and_next(ls);
           } while (lislalnum(ls->current));
-          ts = luaX_newstring(ls, luaZ_buffer(ls->buff),
+          ts = lxx_newstring(ls, luaZ_buffer(ls->buff),
                                   luaZ_bufflen(ls->buff));
           seminfo->ts = ts;
           if (isreserved(ts))  /* reserved word? */
@@ -633,7 +633,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
 }
 
 
-void luaX_next (LexState *ls) {
+void lxx_next (LexState *ls) {
   ls->lastline = ls->linenumber;
   if (ls->lookahead.token != TK_EOS) {  /* is there a look-ahead token? */
     ls->t = ls->lookahead;  /* use this one */
@@ -644,7 +644,7 @@ void luaX_next (LexState *ls) {
 }
 
 
-int luaX_lookahead (LexState *ls) {
+int lxx_lookahead (LexState *ls) {
   lua_assert(ls->lookahead.token == TK_EOS);
   ls->lookahead.token = llex(ls, &ls->lookahead.seminfo);
   return ls->lookahead.token;

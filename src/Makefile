@@ -1,4 +1,4 @@
-# Makefile for building Luax
+# Makefile for building lxx
 # See ../doc/readme.html for installation and customization instructions.
 
 # == REQUIRED SETTINGS ========================================================
@@ -11,9 +11,9 @@ PLAT= macosx                            #
 
 
 CC= gcc -std=gnu99
-CXX = g++ -std=c++14
+lxx = g++ -std=c++14
 CFLAGS= -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
-CXXFLAGS = -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSCXXFLAGS) $(MYCXXFLAGS)
+lxxFLAGS = -O2 -fPIC -Wall -Wextra -DLUA_LJS -DLUA_COMPAT_5_2 $(SYSlxxFLAGS) $(MYlxxFLAGS)
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
 
@@ -22,12 +22,12 @@ RANLIB= ranlib
 RM= rm -f
 
 SYSCFLAGS=
-SYSCXXFLAGS=
+SYSlxxFLAGS=
 SYSLDFLAGS=
 SYSLIBS=
 
 MYCFLAGS=
-MYCXXFLAGS=
+MYlxxFLAGS=
 MYLDFLAGS=
 MYLIBS=
 MYOBJS=
@@ -46,10 +46,10 @@ LIB_O=	lauxlib.o lbaselib.o lbitlib.o lcorolib.o ldblib.o liolib.o \
 	lmathlib.o lcolorlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o loadlib.o linit.o l2Dlib.o l3Dlib.o \
 	l3transform.o lcinterface.o ldevice.o file.o
 BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
-LUA_T=	luax
+LUA_T=	lxx
 LUA_O=	lua.o
 
-LUAC_T=	luaxc
+LUAC_T=	lxxc
 LUAC_O=	luac.o
 LINIT_C= linit.c
 LUALIB= lualib.h
@@ -110,7 +110,7 @@ bsd:
 c89:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_C89" CC="gcc -std=c89"
 	@echo ''
-	@echo '*** C89 does not guarantee 64-bit integers for Luax.'
+	@echo '*** C89 does not guarantee 64-bit integers for lxx.'
 	@echo ''
 
 
@@ -126,10 +126,10 @@ macosx:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_MACOSX" SYSLIBS="-lreadline"
 
 mingw:
-	$(MAKE) "LUA_A=luax.dll" "LUA_T=luax.exe" \
+	$(MAKE) "LUA_A=lxx.dll" "LUA_T=lxx.exe" \
 	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
-	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" luax.exe
-	$(MAKE) "LUAC_T=luaxc.exe" luaxc.exe
+	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lxx.exe
+	$(MAKE) "LUAC_T=lxxc.exe" lxxc.exe
 
 posix:
 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_POSIX"

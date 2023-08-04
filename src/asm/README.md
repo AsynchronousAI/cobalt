@@ -1,19 +1,19 @@
-# luax/asm
-Make standalone executable from Luax, this will return alot of C scripts and a Makefile.
+# lxx/asm
+Make standalone executable from lxx, this will return alot of C scripts and a Makefile.
 ```bash
-$ luaxasm -h
-Usage: luax asm [options] <file>
+$ lxxasm -h
+Usage: lxx asm [options] <file>
 Options:
   -h, --help            show this help message and exit
   -o FILE, --output=FILE
                         output file
 ```
 ```bash
-$ luaxasm myapp.luax -o
+$ lxxasm myapp.lxx -o
 ```
-or if you have a folder of luax files
+or if you have a folder of lxx files
 ```bash
-$ luaxasm myfolderofluax -o
+$ lxxasm myfolderoflxx -o
 ```
 
 ***

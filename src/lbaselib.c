@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include <time.h>
+
 enum {
   COLOR_BLACK = 30,
   COLOR_RED,
@@ -100,6 +102,15 @@ static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
   int i;
   lua_getglobal(L, "tostring");
+  
+  // outpus (<time>) in gray 
+  time_t t = time(NULL);
+  struct tm tm = *localtime(&t);
+  char time_str[80];
+  sprintf(time_str, "%d-%02d-%02d %02d:%02d:%02d", tm.tm_year + 1900, 
+    tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+  printf(L, white(time_str, (const char *[]){"bold"}, 1));
+
   for (i=1; i<=n; i++) {
     const char *s;
     size_t l;
@@ -669,17 +680,43 @@ static int luaB_inputf(lua_State *L) {
   return 1;
 }
 
-int isdefined(const char *name) {
-  #if defined(name)
-    return 1;
-  #else
-    return 0;
-  #endif
-}
 
 static int luaB_defined(lua_State *L) {
-    // Use FFI to check if a variable is defined
+    // use an ffi and return if the inputted string is defined as a macro
+    // in the C code
+
+    // get the string
+    const char *str = luaL_checkstring(L, 1);
+
+    // get the ffi
+    lua_getglobal(L, "ffi");
+
+    // error if ffi is not loaded
+    if (lua_isnil(L, -1)) {
+        return luaL_error(L, "ffi is not loaded and is required for _defined");
+    }
+
+    // get the cdef function
+    lua_getfield(L, -1, "cdef");
+
+    // error if cdef is not found
+    if (lua_isnil(L, -1)) {
+        return luaL_error(L, "ffi.cdef is not found and is required for _defined");
+    }
+
+    // call cdef with:
+    /*
+    #ifdef <str>
+    return 1;
+    #else
     return 0;
+    #endif
+    */
+    // and retunr that data to the user
+    lua_pushfstring(L, "#ifdef %s\nreturn 1;\n#else\nreturn 0;\n#endif", str);
+    lua_call(L, 1, 1);
+
+    return 1;
 }
 
 
@@ -701,10 +738,51 @@ static int luaB_new(lua_State *L) {
   lua_call(L, nargs, 1);
   return 1;
 }
+
+static int luaB_range(lua_State *L) {
+  // range(start, stop, step)
+  // returns a table of numbers from start to stop (inclusive) with step
+  // if step is not provided, it defaults to 1
+  int nargs = lua_gettop(L);
+  luaL_argcheck(L, nargs >= 2, 2, "expected at least 2 arguments");
+  luaL_argcheck(L, nargs <= 3, 3, "expected at most 3 arguments");
+
+  int start = luaL_checkinteger(L, 1);
+  int stop = luaL_checkinteger(L, 2);
+  int step = 1;
+
+  if (nargs >= 3) {
+    step = luaL_checkinteger(L, 3);
+    luaL_argcheck(L, step != 0, 3, "step cannot be zero");
+  }
+
+  if (start < 0) {
+    start = stop + start + 1;
+  }
+
+  if (stop < 0) {
+    stop = stop + stop + 1;
+  }
+
+  luaL_argcheck(L, start >= 1 && start <= stop, 1, "start index out of range");
+  luaL_argcheck(L, stop >= 1 && stop <= stop, 2, "stop index out of range");
+
+  lua_newtable(L);
+  int j = 1;
+
+  for (int i = start; i <= stop; i += step) {
+    lua_pushinteger(L, i);
+    lua_rawseti(L, -2, j);
+    j++;
+  }
+
+  return 1;
+}
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
+  {"range", luaB_range},
   //{"define", luaB_define},
-  //{"defined", luaB_defined},
+  //{"_defined", luaB_defined},
   //{"new", luaB_new},
   //{"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},
@@ -753,7 +831,7 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "_G");
   /* set global _VERSION */
-  lua_pushliteral(L, "Luax 1.0.0");
+  lua_pushliteral(L, "lxx 1.0.0");
   lua_setfield(L, -2, "_VERSION");
   return 1;
 }

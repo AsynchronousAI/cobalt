@@ -7,23 +7,23 @@ export enum Expectation {
     Stdout,
 }
 
-export async function luaxCommand(
+export async function lxxCommand(
     storagePath: vscode.Uri,
     command: string,
     expectation: Expectation,
     workspace?: vscode.WorkspaceFolder,
     stdin?: string,
 ): Promise<string | null> {
-    return util.getluaxPath(storagePath).then((luaxPath) => {
+    return util.getlxxPath(storagePath).then((lxxPath) => {
         return new Promise((resolve, reject) => {
-            if (luaxPath === undefined) {
-                return reject("Could not find luax.")
+            if (lxxPath === undefined) {
+                return reject("Could not find lxx.")
             }
 
             const workspaceFolders = vscode.workspace.workspaceFolders
 
             const child = childProcess.exec(
-                `"${luaxPath.fsPath}" ${command}`,
+                `"${lxxPath.fsPath}" ${command}`,
                 {
                     cwd:
                         workspace?.uri.fsPath ||

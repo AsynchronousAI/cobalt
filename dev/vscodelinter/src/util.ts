@@ -1,5 +1,5 @@
 import * as os from "os"
-import * as luax from "./luax"
+import * as lxx from "./lxx"
 import * as requestNative from "request"
 import * as request from "request-promise-native"
 import * as unzip from "unzipper"
@@ -18,16 +18,16 @@ interface GithubRelease {
     tag_name: string
 }
 
-let getLatestluaxReleasePromise: Promise<GithubRelease>
+let getLatestlxxReleasePromise: Promise<GithubRelease>
 
-export async function getLatestluaxRelease(): Promise<GithubRelease> {
-    if (getLatestluaxReleasePromise) {
-        return getLatestluaxReleasePromise
+export async function getLatestlxxRelease(): Promise<GithubRelease> {
+    if (getLatestlxxReleasePromise) {
+        return getLatestlxxReleasePromise
     }
 
     return request(GITHUB_RELEASES, {
         headers: {
-            "User-Agent": "luax-vscode",
+            "User-Agent": "lxx-vscode",
         },
     }).then((body) => {
         return JSON.parse(body) as GithubRelease
@@ -45,7 +45,7 @@ export function platformIsSupported(): boolean {
     }
 }
 
-function getluaxFilename(): string {
+function getlxxFilename(): string {
     switch (os.platform()) {
         case "win32":
             return "selene.exe"
@@ -57,7 +57,7 @@ function getluaxFilename(): string {
     }
 }
 
-function getluaxFilenamePattern(): RegExp {
+function getlxxFilenamePattern(): RegExp {
     switch (os.platform()) {
         case "win32":
             return /selene-[^-]+-windows.zip/
@@ -83,14 +83,14 @@ async function fileExists(filename: vscode.Uri): Promise<boolean> {
     }
 }
 
-export async function downloadluax(directory: vscode.Uri): Promise<void> {
-    vscode.window.showInformationMessage("Downloading Luax Extension...")
+export async function downloadlxx(directory: vscode.Uri): Promise<void> {
+    vscode.window.showInformationMessage("Downloading lxx Extension...")
 
-    const filename = getluaxFilename()
-    const filenamePattern = getluaxFilenamePattern()
-    const release = await getLatestluaxRelease().catch((error) => {
+    const filename = getlxxFilename()
+    const filenamePattern = getlxxFilenamePattern()
+    const release = await getLatestlxxRelease().catch((error) => {
         vscode.window.showErrorMessage(
-            `Couldn't look for new luax release to download.\n\n${error.toString()}`,
+            `Couldn't look for new lxx release to download.\n\n${error.toString()}`,
         )
 
         return Promise.reject(error)
@@ -108,7 +108,7 @@ export async function downloadluax(directory: vscode.Uri): Promise<void> {
             return new Promise((resolve, reject) => {
                 requestNative(asset.browser_download_url, {
                     headers: {
-                        "User-Agent": "luax-vscode",
+                        "User-Agent": "lxx-vscode",
                     },
                 })
                     .pipe(unzip.Parse())
@@ -128,52 +128,52 @@ export async function downloadluax(directory: vscode.Uri): Promise<void> {
     }
 }
 
-export async function getluaxPath(
+export async function getlxxPath(
     storagePath: vscode.Uri,
 ): Promise<vscode.Uri | undefined> {
     const settingPath = vscode.workspace
-        .getConfiguration("luax")
-        .get<string | null>("luaxPath")
+        .getConfiguration("lxx")
+        .get<string | null>("lxxPath")
     if (settingPath) {
         return vscode.Uri.file(settingPath)
     }
 
-    const downloadPath = vscode.Uri.joinPath(storagePath, getluaxFilename())
+    const downloadPath = vscode.Uri.joinPath(storagePath, getlxxFilename())
     if (await fileExists(downloadPath)) {
         return downloadPath
     }
 }
 
-export async function ensureluaxExists(
+export async function ensurelxxExists(
     storagePath: vscode.Uri,
 ): Promise<void> {
-    const path = await getluaxPath(storagePath)
+    const path = await getlxxPath(storagePath)
 
     if (path === undefined) {
         await vscode.workspace.fs.createDirectory(storagePath)
-        return downloadluax(storagePath)
+        return downloadlxx(storagePath)
     } else {
         if (!(await fileExists(path))) {
-            return Promise.reject("Path given for luax does not exist")
+            return Promise.reject("Path given for lxx does not exist")
         }
 
         const version = (
-            await luax.luaxCommand(
+            await lxx.lxxCommand(
                 storagePath,
                 "--version",
-                luax.Expectation.Stdout,
+                lxx.Expectation.Stdout,
             )
         )?.trim()
 
-        return getLatestluaxRelease()
+        return getLatestlxxRelease()
             .then((release) => {
-                if (version !== `luax ${release.tag_name}`) {
+                if (version !== `lxx ${release.tag_name}`) {
                     openUpdatePrompt(storagePath, release)
                 }
             })
             .catch((error) => {
                 vscode.window.showErrorMessage(
-                    `Couldn't look for new luax releases.\n\n${error.toString()}`,
+                    `Couldn't look for new lxx releases.\n\n${error.toString()}`,
                 )
             })
     }
@@ -182,7 +182,7 @@ export async function ensureluaxExists(
 function openUpdatePrompt(directory: vscode.Uri, release: GithubRelease) {
     vscode.window
         .showInformationMessage(
-            `There's an update available for luax: ${release.tag_name}`,
+            `There's an update available for lxx: ${release.tag_name}`,
             "Install Update",
             "Later",
             "Release Notes",
@@ -190,7 +190,7 @@ function openUpdatePrompt(directory: vscode.Uri, release: GithubRelease) {
         .then((option) => {
             switch (option) {
                 case "Install Update":
-                    downloadluax(directory).then(() =>
+                    downloadlxx(directory).then(() =>
                         vscode.window.showInformationMessage(
                             "Update succeeded.",
                         ),

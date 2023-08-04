@@ -1,3 +1,3 @@
-# Luax Syntax Highlighter
+# lxx Syntax Highlighter
 
-Official Luax Syntax Highlighter for VSCode. This is based on Lua Plus.
+Official lxx Syntax Highlighter for VSCode. This is based on Lua Plus.

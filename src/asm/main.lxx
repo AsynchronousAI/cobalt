@@ -1,9 +1,9 @@
       ////////////////////////////////////////////////////////////////////////////
-     /// luaxasm, a Luax assembler                                            ///
+     /// lxxasm, a lxx assembler                                            ///
     /// (c) 2023 - AsynchronousAI                                            ///
    ///                                                                      ///
   /// Yes this is written in the same language it is assembling.           ///
- /// Also yes this is being compiled with luaxasm.                        ///
+ /// Also yes this is being compiled with lxxasm.                        ///
 ////////////////////////////////////////////////////////////////////////////
 
 
@@ -12,7 +12,7 @@
 
 // Functions
 function help(){
-    print([[Usage: luax asm [options] <file>
+    print([[Usage: lxx asm [options] <file>
     Options:
       -h, --help            show this help message and exit
       -o FILE, --output=FILE

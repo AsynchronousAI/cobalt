@@ -1,3 +1,3 @@
-# luax/vscodelinter
+# lxx/vscodelinter
 
-A modified version of [selene](https://kampfkarren.github.io/selene/) for luax.
+A modified version of [selene](https://kampfkarren.github.io/selene/) for lxx.

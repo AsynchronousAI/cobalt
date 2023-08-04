@@ -27,7 +27,7 @@
 #endif
 
 #if !defined(LUA_PROGNAME)
-#define LUA_PROGNAME		"Luax"
+#define LUA_PROGNAME		"lxx"
 #endif
 
 #if !defined(LUA_MAXINPUT)

@@ -1592,6 +1592,34 @@ static int str_replace (lua_State *L) {
   return 2;
 }
 
+static int str_split(lua_State *L) {
+  const char *str = luaL_checkstring(L, 1);
+  const char *sep = luaL_checkstring(L, 2);
+  luaL_checktype(L, 3, LUA_TTABLE);
+  int i = 1;
+
+  while (*str) {
+    int j = 0;
+    const char *p = str;
+    while (*p && *sep && *p == *sep) {
+      p++;
+      sep++;
+      j++;
+    }
+    if (*sep == '\0') {
+      lua_pushinteger(L, i++);
+      lua_pushlstring(L, str, p - str - j);
+      lua_settable(L, 3);
+      str = p;
+      sep = luaL_checkstring(L, 2);
+    } else {
+      sep = luaL_checkstring(L, 2);
+      str++;
+    }
+  }
+
+  return 0;
+}
 
 static const luaL_Reg strlib[] = {
   {"byte", str_byte},
@@ -1612,6 +1640,7 @@ static const luaL_Reg strlib[] = {
   {"pack", str_pack},
   {"packsize", str_packsize},
   {"unpack", str_unpack},
+  {"split", str_split},
   /*{"__index", str__index},*/
   {NULL, NULL}
 };

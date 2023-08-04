@@ -1,7 +1,7 @@
-# luax/examples
-Very useful examples to give you an idea of how to use luax.
+# lxx/examples
+Very useful examples to give you an idea of how to use lxx.
 
-All these examples are in pure luax with no external libraries or modules, and will work out of the box.
+All these examples are in pure lxx with no external libraries or modules, and will work out of the box.
 
 These items are in no particular order.
 
@@ -116,7 +116,7 @@ v.X // -> 1
 v.Y // -> 2
 
 var rv = Vector2.fromScreen(.5, 5, .5, 5, 100, 100) // -> <vector2 object>. Format like xscale, xoffset, yscale, yoffset, screen width, screen height
-// if you are using luax in a game engine screen width and screen height should be autofilled by the engine
+// if you are using lxx in a game engine screen width and screen height should be autofilled by the engine
 ```
 
 ## Transform
@@ -129,7 +129,7 @@ var t2 = Transform.new(Vector3.new(10,10,10), Vector3.new(11,11,11), Vector3.new
 t2.py // -> 13
 ```
 ## File control
-Luax provides a File Control library buildin based on lfs.
+lxx provides a File Control library buildin based on lfs.
 ```js
 file.chdir("path") // Changes the current working directory to path
 file.mkdir("path") // Creates a directory at path
@@ -174,7 +174,7 @@ var thread = parrallel.new(function() {
     }
 })
 
-// - luaxlang 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
+// - lxxlang 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
 swait(10) // Wait 10 seconds so the thread can finish
 thread->pause() // Stop the thread
 thread->resume() // Resume the thread

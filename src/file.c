@@ -5,7 +5,7 @@
 ** Copyright (C) 2003-2010 Kepler Project.
 ** Copyright (C) 2010-2022 The LuaFileSystem authors.
 ** (http://lunarmodules.github.io/luafilesystem)
-** Rewritten for Luax by AsynchronousAI
+** Rewritten for lxx by AsynchronousAI
 */
 
 
@@ -1124,11 +1124,11 @@ static int link_info(lua_State * L)
 static void set_info(lua_State * L)
 {
   lua_pushliteral(L,
-                  "LuaxFileSystem is a modified version of LuaFileSystem which is a Lua library developed to complement "
+                  "lxxFileSystem is a modified version of LuaFileSystem which is a Lua library developed to complement "
                   "the set of functions related to file systems offered by "
                   "the standard Lua distribution");
   lua_setfield(L, -2, "_DESCRIPTION");
-  lua_pushliteral(L, "LuaxFileSystem" LFS_VERSION);
+  lua_pushliteral(L, "lxxFileSystem" LFS_VERSION);
   lua_setfield(L, -2, "_VERSION");
 }
 

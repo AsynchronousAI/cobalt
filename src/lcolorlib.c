@@ -1,5 +1,5 @@
 /*
-** Standard Color library for luax
+** Standard Color library for lxx
 */
 
 #define lcolorlib_c

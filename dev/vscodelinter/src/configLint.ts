@@ -1,5 +1,5 @@
 import * as vscode from "vscode"
-import * as luax from "./luax"
+import * as lxx from "./lxx"
 import { capability, Capabilities } from "./structures/capabilities"
 import { Output } from "./structures/output"
 
@@ -15,7 +15,7 @@ export async function lintConfig(
 
     if (
         document.languageId === "toml" &&
-        !document.uri.path.endsWith("luax.toml")
+        !document.uri.path.endsWith("lxx.toml")
     ) {
         return
     }
@@ -24,10 +24,10 @@ export async function lintConfig(
 
     const tomlSource = document.languageId === "toml" ? "--stdin" : ""
 
-    const output = await luax.luaxCommand(
+    const output = await lxx.lxxCommand(
         context.globalStorageUri,
         `validate-config --display-style=json2 ${tomlSource}`,
-        luax.Expectation.Stderr,
+        lxx.Expectation.Stderr,
         workspaceFolder,
         document.getText(),
     )

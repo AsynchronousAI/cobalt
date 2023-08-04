@@ -1,12 +1,12 @@
 {
 	"comment": "Lua Plus Syntax: version 1.1.1",
 	"fileTypes": [
-		"luax"
+		"lxx"
 	],
 	"firstLineMatch": "\\A#!.*?\\blua(\\d+(\\.\\d+)?)?\\b|\\A//\\s+-\\*-\\s*lua\\s*-\\*-",
 	"keyEquivalent": "^~L",
-	"name": "Luax",
-	"scopeName": "source.luax",
+	"name": "lxx",
+	"scopeName": "source.lxx",
 	"patterns": [
 		{
 			"include": "#general"

@@ -77,6 +77,12 @@ Using it doesnt require any dependencies apart from core.macros() which requires
 - `make`
 This will result in 2 files in the lxx folder, lxx and lxxc. You can test the shell using `./lxx` and try
 some code then install it to your PATH/$PATH.
+### lua-lxx (OPTIONAL)
+This is an optional tool for converting Lua source code to LXX source code. This is not required to use LXX but is a nice tool to have.
+- `make lua-lxx` - Make sure you didnt clean the build folder or this will fail
+You will find newly compiled binaries at lxx-1.0.0/lua-lxx. If you install in the next step it should be in your PATH/$PATH.
+You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and the new code should be in the terminal.
+
 ### Installing
 #### For python3
 - `sudo make setup` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `python3`
@@ -84,11 +90,6 @@ some code then install it to your PATH/$PATH.
 - `sudo make setuppy` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `py` instead of `python3`
 #### For python
 - `sudo make setup-py` - Make sure you didnt clean the build folder or this will fail, this also requires python but installs with `python` instead of `python3` or `py`
-### lua-lxx
-This is an optional tool for converting Lua source code to LXX source code. This is not required to use LXX but is a nice tool to have.
-- `make lua-lxx` - Make sure you didnt clean the build folder or this will fail
-You will find newly compiled binaries at lxx-1.0.0/lua-lxx.
-You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and the new code should be in the terminal.
 
 ### End result
 - `lxx` executable in the cwd for the shell, interpreter, and bytecode interpreter

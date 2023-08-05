@@ -1,8 +1,11 @@
+// Removed in favor of, lib/ffi which also supports interpreted LXX.
+// Only kept as refrerence.
+
 /*
 ** FFI library.
 ** Copyright (C) 2005-2020 Mike Pall. See Copyright Notice in luajit.h
-*/
-
+*//*
+/*
 #define lib_ffi_c
 #define LUA_LIB
 
@@ -33,9 +36,10 @@
 #include "lj_ff.h"
 #include "lj_lib.h"
 
-/* -- C type checks ------------------------------------------------------- */
+/* -- C type checks ------------------------------------------------------- *//*
 
-/* Check first argument for a C type and returns its ID. */
+/* Check first argument for a C type and returns its ID. *//*
+/*
 static CTypeID ffi_checkctype(lua_State *L, CTState *cts, TValue *param)
 {
   TValue *o = L->base;
@@ -43,7 +47,7 @@ static CTypeID ffi_checkctype(lua_State *L, CTState *cts, TValue *param)
   err_argtype:
     lj_err_argtype(L, 1, "C type");
   }
-  if (tvisstr(o)) {  /* Parse an abstract C type declaration. */
+  if (tvisstr(o)) {  /* Parse an abstract C type declaration. *//*
     GCstr *s = strV(o);
     CPState cp;
     int errcode;
@@ -54,7 +58,7 @@ static CTypeID ffi_checkctype(lua_State *L, CTState *cts, TValue *param)
     cp.param = param;
     cp.mode = CPARSE_MODE_ABSTRACT|CPARSE_MODE_NOIMPLICIT;
     errcode = lj_cparse(&cp);
-    if (errcode) lj_err_throw(L, errcode);  /* Propagate errors. */
+    if (errcode) lj_err_throw(L, errcode);  /* Propagate errors. *//*
     return cp.val.id;
   } else {
     GCcdata *cd;
@@ -65,7 +69,7 @@ static CTypeID ffi_checkctype(lua_State *L, CTState *cts, TValue *param)
   }
 }
 
-/* Check argument for C data and return it. */
+/* Check argument for C data and return it. *//*
 static GCcdata *ffi_checkcdata(lua_State *L, int narg)
 {
   TValue *o = L->base + narg-1;
@@ -74,7 +78,7 @@ static GCcdata *ffi_checkcdata(lua_State *L, int narg)
   return cdataV(o);
 }
 
-/* Convert argument to C pointer. */
+/* Convert argument to C pointer. *//*
 static void *ffi_checkptr(lua_State *L, int narg, CTypeID id)
 {
   CTState *cts = ctype_cts(L);
@@ -86,7 +90,7 @@ static void *ffi_checkptr(lua_State *L, int narg, CTypeID id)
   return p;
 }
 
-/* Convert argument to int32_t. */
+/* Convert argument to int32_t. *//*
 static int32_t ffi_checkint(lua_State *L, int narg)
 {
   CTState *cts = ctype_cts(L);
@@ -99,11 +103,11 @@ static int32_t ffi_checkint(lua_State *L, int narg)
   return i;
 }
 
-/* -- C type metamethods -------------------------------------------------- */
+/* -- C type metamethods -------------------------------------------------- *//*
 
 #define LJLIB_MODULE_ffi_meta
 
-/* Handle ctype __index/__newindex metamethods. */
+/* Handle ctype __index/__newindex metamethods. *//*
 static int ffi_index_meta(lua_State *L, CTState *cts, CType *ct, MMS mm)
 {
   CTypeID id = ctype_typeid(cts, ct);
@@ -150,7 +154,7 @@ LJLIB_CF(ffi_meta___index)	LJLIB_REC(cdata_index 0)
   CType *ct;
   uint8_t *p;
   TValue *o = L->base;
-  if (!(o+1 < L->top && tviscdata(o)))  /* Also checks for presence of key. */
+  if (!(o+1 < L->top && tviscdata(o)))  /* Also checks for presence of key. *//*
     lj_err_argt(L, 1, LUA_TCDATA);
   ct = lj_cdata_index(cts, cdataV(o), o+1, &p, &qual);
   if ((qual & 1))
@@ -167,7 +171,7 @@ LJLIB_CF(ffi_meta___newindex)	LJLIB_REC(cdata_index 1)
   CType *ct;
   uint8_t *p;
   TValue *o = L->base;
-  if (!(o+2 < L->top && tviscdata(o)))  /* Also checks for key and value. */
+  if (!(o+2 < L->top && tviscdata(o)))  /* Also checks for key and value. *//*
     lj_err_argt(L, 1, LUA_TCDATA);
   ct = lj_cdata_index(cts, cdataV(o), o+1, &p, &qual);
   if ((qual & 1)) {
@@ -179,14 +183,14 @@ LJLIB_CF(ffi_meta___newindex)	LJLIB_REC(cdata_index 1)
   return 0;
 }
 
-/* Common handler for cdata arithmetic. */
+/* Common handler for cdata arithmetic. *//*
 static int ffi_arith(lua_State *L)
 {
   MMS mm = (MMS)(curr_func(L)->c.ffid - (int)FF_ffi_meta___eq + (int)MM_eq);
   return lj_carith_op(L, mm);
 }
 
-/* The following functions must be in contiguous ORDER MM. */
+/* The following functions must be in contiguous ORDER MM. *//*
 LJLIB_CF(ffi_meta___eq)		LJLIB_REC(cdata_arith MM_eq)
 {
   return ffi_arith(L);
@@ -212,7 +216,7 @@ LJLIB_CF(ffi_meta___concat)	LJLIB_REC(cdata_arith MM_concat)
   return ffi_arith(L);
 }
 
-/* Forward declaration. */
+/* Forward declaration. *//*
 static int lj_cf_ffi_new(lua_State *L);
 
 LJLIB_CF(ffi_meta___call)	LJLIB_REC(cdata_call)
@@ -231,7 +235,7 @@ LJLIB_CF(ffi_meta___call)	LJLIB_REC(cdata_call)
     if (ret >= 0)
       return ret;
   }
-  /* Handle ctype __call/__new metamethod. */
+  /* Handle ctype __call/__new metamethod. *//*
   ct = ctype_raw(cts, id);
   if (ctype_isptr(ct->info)) id = ctype_cid(ct->info);
   tv = lj_ctype_meta(cts, id, mm);
@@ -276,7 +280,7 @@ LJLIB_CF(ffi_meta___unm)	LJLIB_REC(cdata_arith MM_unm)
 {
   return ffi_arith(L);
 }
-/* End of contiguous ORDER MM. */
+/* End of contiguous ORDER MM. *//*
 
 LJLIB_CF(ffi_meta___tostring)
 {
@@ -312,7 +316,7 @@ LJLIB_CF(ffi_meta___tostring)
 	ct = ctype_rawchild(cts, ct);
       }
       if (ctype_isstruct(ct->info) || ctype_isvector(ct->info)) {
-	/* Handle ctype __tostring metamethod. */
+	/* Handle ctype __tostring metamethod. *//*
 	cTValue *tv = lj_ctype_meta(cts, ctype_typeid(cts, ct), MM_tostring);
 	if (tv)
 	  return lj_meta_tailcall(L, tv);
@@ -353,11 +357,11 @@ LJLIB_PUSH("ffi") LJLIB_SET(__metatable)
 
 #include "lj_libdef.h"
 
-/* -- C library metamethods ----------------------------------------------- */
+/* -- C library metamethods ----------------------------------------------- *//*
 
 #define LJLIB_MODULE_ffi_clib
 
-/* Index C library by a name. */
+/* Index C library by a name. *//*
 static TValue *ffi_clib_index(lua_State *L)
 {
   TValue *o = L->base;
@@ -400,7 +404,7 @@ LJLIB_CF(ffi_clib___newindex)	LJLIB_REC(clib_index 0)
     CType *d = ctype_get(cts, cd->ctypeid);
     if (ctype_isextern(d->info)) {
       CTInfo qual = 0;
-      for (;;) {  /* Skip attributes and collect qualifiers. */
+      for (;;) {  /* Skip attributes and collect qualifiers. *//*
 	d = ctype_child(cts, d);
 	if (!ctype_isattrib(d->info)) break;
 	if (ctype_attrib(d->info) == CTA_QUAL) qual |= d->size;
@@ -412,7 +416,7 @@ LJLIB_CF(ffi_clib___newindex)	LJLIB_REC(clib_index 0)
     }
   }
   lj_err_caller(L, LJ_ERR_FFI_WRCONST);
-  return 0;  /* unreachable */
+  return 0;  /* unreachable *//*
 }
 
 LJLIB_CF(ffi_clib___gc)
@@ -425,7 +429,7 @@ LJLIB_CF(ffi_clib___gc)
 
 #include "lj_libdef.h"
 
-/* -- Callback function metamethods --------------------------------------- */
+/* -- Callback function metamethods --------------------------------------- *//*
 
 #define LJLIB_MODULE_ffi_callback
 
@@ -469,7 +473,7 @@ LJLIB_PUSH(top-1) LJLIB_SET(__index)
 
 #include "lj_libdef.h"
 
-/* -- FFI library functions ----------------------------------------------- */
+/* -- FFI library functions ----------------------------------------------- *//*
 
 #define LJLIB_MODULE_ffi
 
@@ -485,7 +489,7 @@ LJLIB_CF(ffi_cdef)
   cp.param = L->base+1;
   cp.mode = CPARSE_MODE_MULTI|CPARSE_MODE_DIRECT;
   errcode = lj_cparse(&cp);
-  if (errcode) lj_err_throw(L, errcode);  /* Propagate errors. */
+  if (errcode) lj_err_throw(L, errcode);  /* Propagate errors. *//*
   lj_gc_check(L);
   return 0;
 }
@@ -506,23 +510,23 @@ LJLIB_CF(ffi_new)	LJLIB_REC(.)
   if (sz == CTSIZE_INVALID)
     lj_err_arg(L, 1, LJ_ERR_FFI_INVSIZE);
   cd = lj_cdata_newx(cts, id, sz, info);
-  setcdataV(L, o-1, cd);  /* Anchor the uninitialized cdata. */
+  setcdataV(L, o-1, cd);  /* Anchor the uninitialized cdata. *//*
   lj_cconv_ct_init(cts, ct, sz, cdataptr(cd),
-		   o, (MSize)(L->top - o));  /* Initialize cdata. */
+		   o, (MSize)(L->top - o));  /* Initialize cdata. *//*
   if (ctype_isstruct(ct->info)) {
-    /* Handle ctype __gc metamethod. Use the fast lookup here. */
+    /* Handle ctype __gc metamethod. Use the fast lookup here. *//*
     cTValue *tv = lj_tab_getinth(cts->miscmap, -(int32_t)id);
     if (tv && tvistab(tv) && (tv = lj_meta_fast(L, tabV(tv), MM_gc))) {
       GCtab *t = cts->finalizer;
       if (gcref(t->metatable)) {
-	/* Add to finalizer table, if still enabled. */
+	/* Add to finalizer table, if still enabled. *//*
 	copyTV(L, lj_tab_set(L, t, o-1), tv);
 	lj_gc_anybarriert(L, t);
 	cd->marked |= LJ_GC_CDATA_FIN;
       }
     }
   }
-  L->top = o;  /* Only return the cdata itself. */
+  L->top = o;  /* Only return the cdata itself. *//*
   lj_gc_check(L);
   return 1;
 }
@@ -533,7 +537,7 @@ LJLIB_CF(ffi_cast)	LJLIB_REC(ffi_new)
   CTypeID id = ffi_checkctype(L, cts, NULL);
   CType *d = ctype_raw(cts, id);
   TValue *o = lj_lib_checkany(L, 2);
-  L->top = o+1;  /* Make sure this is the last item on the stack. */
+  L->top = o+1;  /* Make sure this is the last item on the stack. *//*
   if (!(ctype_isnum(d->info) || ctype_isptr(d->info) || ctype_isenum(d->info)))
     lj_err_arg(L, 1, LJ_ERR_FFI_INVTYPE);
   if (!(tviscdata(o) && cdataV(o)->ctypeid == id)) {
@@ -556,7 +560,7 @@ LJLIB_CF(ffi_typeof)	LJLIB_REC(.)
   return 1;
 }
 
-/* Internal and unsupported API. */
+/* Internal and unsupported API. *//*
 LJLIB_CF(ffi_typeinfo)
 {
   CTState *cts = ctype_cts(L);
@@ -564,7 +568,7 @@ LJLIB_CF(ffi_typeinfo)
   if (id > 0 && id < cts->top) {
     CType *ct = ctype_get(cts, id);
     GCtab *t;
-    lua_createtable(L, 0, 4);  /* Increment hash size if fields are added. */
+    lua_createtable(L, 0, 4);  /* Increment hash size if fields are added. *//*
     t = tabV(L->top-1);
     setintV(lj_tab_setstr(L, t, lj_str_newlit(L, "info")), (int32_t)ct->info);
     if (ct->size != CTSIZE_INVALID)
@@ -607,7 +611,7 @@ LJLIB_CF(ffi_istype)	LJLIB_REC(.)
     }
   }
   setboolV(L->top-1, b);
-  setboolV(&G(L)->tmptv2, b);  /* Remember for trace recorder. */
+  setboolV(&G(L)->tmptv2, b);  /* Remember for trace recorder. *//*
   return 1;
 }
 
@@ -690,7 +694,7 @@ LJLIB_CF(ffi_string)	LJLIB_REC(.)
 		   CCF_ARG(1));
     len = strlen(p);
   }
-  L->top = o+1;  /* Make sure this is the last item on the stack. */
+  L->top = o+1;  /* Make sure this is the last item on the stack. *//*
   setstrV(L, o, lj_str_new(L, p, len));
   lj_gc_check(L);
   return 1;
@@ -703,7 +707,7 @@ LJLIB_CF(ffi_copy)	LJLIB_REC(.)
   TValue *o = L->base+1;
   CTSize len;
   if (tvisstr(o) && o+1 >= L->top)
-    len = strV(o)->len+1;  /* Copy Lua string including trailing '\0'. */
+    len = strV(o)->len+1;  /* Copy Lua string including trailing '\0'. *//*
   else
     len = (CTSize)ffi_checkint(L, 3);
   memcpy(dp, sp, len);
@@ -720,7 +724,7 @@ LJLIB_CF(ffi_fill)	LJLIB_REC(.)
   return 0;
 }
 
-/* Test ABI string. */
+/* Test ABI string. *//*
 LJLIB_CF(ffi_abi)	LJLIB_REC(.)
 {
   GCstr *s = lj_lib_checkstr(L, 1);
@@ -757,11 +761,11 @@ LJLIB_CF(ffi_abi)	LJLIB_REC(.)
 #endif
   ) >= 0;
   setboolV(L->top-1, b);
-  setboolV(&G(L)->tmptv2, b);  /* Remember for trace recorder. */
+  setboolV(&G(L)->tmptv2, b);  /* Remember for trace recorder. *//*
   return 1;
 }
 
-LJLIB_PUSH(top-8) LJLIB_SET(!)  /* Store reference to miscmap table. */
+LJLIB_PUSH(top-8) LJLIB_SET(!)  /* Store reference to miscmap table. *//*
 
 LJLIB_CF(ffi_metatype)
 {
@@ -769,7 +773,7 @@ LJLIB_CF(ffi_metatype)
   CTypeID id = ffi_checkctype(L, cts, NULL);
   GCtab *mt = lj_lib_checktab(L, 2);
   GCtab *t = cts->miscmap;
-  CType *ct = ctype_get(cts, id);  /* Only allow raw types. */
+  CType *ct = ctype_get(cts, id);  /* Only allow raw types. *//*
   TValue *tv;
   GCcdata *cd;
   if (!(ctype_isstruct(ct->info) || ctype_iscomplex(ct->info) ||
@@ -787,7 +791,7 @@ LJLIB_CF(ffi_metatype)
   return 1;
 }
 
-LJLIB_PUSH(top-7) LJLIB_SET(!)  /* Store reference to finalizer table. */
+LJLIB_PUSH(top-7) LJLIB_SET(!)  /* Store reference to finalizer table. *//*
 
 LJLIB_CF(ffi_gc)	LJLIB_REC(.)
 {
@@ -799,11 +803,11 @@ LJLIB_CF(ffi_gc)	LJLIB_REC(.)
 	ctype_isrefarray(ct->info)))
     lj_err_arg(L, 1, LJ_ERR_FFI_INVTYPE);
   lj_cdata_setfin(L, cd, gcval(fin), itype(fin));
-  L->top = L->base+1;  /* Pass through the cdata object. */
+  L->top = L->base+1;  /* Pass through the cdata object. *//*
   return 1;
 }
 
-LJLIB_PUSH(top-5) LJLIB_SET(!)  /* Store clib metatable in func environment. */
+LJLIB_PUSH(top-5) LJLIB_SET(!)  /* Store clib metatable in func environment. *//*
 
 LJLIB_CF(ffi_load)
 {
@@ -819,12 +823,12 @@ LJLIB_PUSH(top-2) LJLIB_SET(arch)
 
 #include "lj_libdef.h"
 
-/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ *//*
 
-/* Create special weak-keyed finalizer table. */
+/* Create special weak-keyed finalizer table. *//*
 static GCtab *ffi_finalizer(lua_State *L)
 {
-  /* NOBARRIER: The table is new (marked white). */
+  /* NOBARRIER: The table is new (marked white). *//*
   GCtab *t = lj_tab_new(L, 0, 1);
   settabV(L, L->top++, t);
   setgcref(t->metatable, obj2gco(t));
@@ -834,7 +838,7 @@ static GCtab *ffi_finalizer(lua_State *L)
   return t;
 }
 
-/* Register FFI module as loaded. */
+/* Register FFI module as loaded. *//*
 static void ffi_register_module(lua_State *L)
 {
   cTValue *tmp = lj_tab_getstr(tabV(registry(L)), lj_str_newlit(L, "_LOADED"));
@@ -851,19 +855,20 @@ LUALIB_API int luaopen_ffi(lua_State *L)
   settabV(L, L->top++, (cts->miscmap = lj_tab_new(L, 0, 1)));
   cts->finalizer = ffi_finalizer(L);
   LJ_LIB_REG(L, NULL, ffi_meta);
-  /* NOBARRIER: basemt is a GC root. */
+  /* NOBARRIER: basemt is a GC root. *//*
   setgcref(basemt_it(G(L), LJ_TCDATA), obj2gco(tabV(L->top-1)));
   LJ_LIB_REG(L, NULL, ffi_clib);
   LJ_LIB_REG(L, NULL, ffi_callback);
-  /* NOBARRIER: the key is new and lj_tab_newkey() handles the barrier. */
+  /* NOBARRIER: the key is new and lj_tab_newkey() handles the barrier. *//*
   settabV(L, lj_tab_setstr(L, cts->miscmap, &cts->g->strempty), tabV(L->top-1));
   L->top--;
-  lj_clib_default(L, tabV(L->top-1));  /* Create ffi.C default namespace. */
+  lj_clib_default(L, tabV(L->top-1));  /* Create ffi.C default namespace. *//*
   lua_pushliteral(L, LJ_OS_NAME);
   lua_pushliteral(L, LJ_ARCH_NAME);
-  LJ_LIB_REG(L, NULL, ffi);  /* Note: no global "ffi" created! */
+  LJ_LIB_REG(L, NULL, ffi);  /* Note: no global "ffi" created! *//*
   ffi_register_module(L);
   return 1;
 }
 
 #endif
+*/

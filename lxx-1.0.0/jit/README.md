@@ -4,4 +4,4 @@ Main source code for lxxJIT, depends on lxx-1.0.0/src libraries. Check /README.m
 # Steps
 - Integrate to CMake
 - Switch to using /src libs
-- Add more features
+- Support latest devices, (ps5, xbox-x, apple-silicon, etc)

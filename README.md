@@ -15,11 +15,10 @@ and made to make applications and games.
 - Read [examples](/Examples.md) for more
 - Supports using lua alongside lxx
 ## Building
-### Requirements
-- Python 3
-- CMake
-- A C/C++ compiler (Preferably GCC or Clang)
-- Git
+### Dependencies
+- Make (if you want to build)
+- GCC or Clang (if you want to build)
+- GCC (if you want to use core.macros())
 ### Building
 - `git clone https://github.com/AsynchronousAI/lxx`
 - `cd lxx`
@@ -32,15 +31,11 @@ and made to make applications and games.
 - `lxxasm` executable in the `../dist` folder for making .o files from bytecode
 - If you chose to move them to the PATH/$PATH they will be there instead of the dist folder
 ## Credits
-- Lua
-- Ljs
-- selene
-- libffifb
-## Dependencies
-- Lua 5.4
-- Make (if you want to build)
-- A C/C++ compiler (if you want to build or use the FFI)
-
+- Lua (Ljs Starting point)
+- Ljs (Starting point)
+- selene (Used in Linter)
+- libffifb (Used in FFI)
+- LuaDist (Alot of their code is used in lxx)
 ## TODO:
 - FFI
 - Publish extension

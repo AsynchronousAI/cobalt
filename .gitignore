@@ -37,3 +37,5 @@ Makefile
 
 # Allow 
 !/lxx-1.0.0/lua-lxx/Makefile
+!/lxx-1.0.0/jit/Makefile
+!/lxx-1.0.0/jit/src/Makefile

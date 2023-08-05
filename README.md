@@ -19,7 +19,7 @@ be a simplified, high lever but at the same time low level language that can be 
 - Lua cannot access memory directly                     
  Lxx can access memory directly
 - Lua cannot use Macros                                 
- Lxx can use Macros, even compiler defined C macros (ex: _\_\APPLE\_\_, _\_\WIN32\_\_, etc)
+ Lxx can use Macros, even compiler defined C macros (ex: _\_APPLE\_\_, _\_WIN32\_\_, etc)
 - Lua uses Makefiles                                    
  Lxx uses CMake
 - Lua uses a garbage collector                          
@@ -40,7 +40,13 @@ be a simplified, high lever but at the same time low level language that can be 
  Lxx has a communication system between threads
 - Lua is more light weight and for scripting            
  Lxx is also light weight but is for longer programs and games
+## Example code
+[This](/Examples.md) markdown file has short examples of LXX code. This shows real short working code that can do really cool stuff.
+[This](/lxx-1.0.0-tests) test directory has ~100 example LXX files. This shows more specific longer tests and examples of LXX code. Most of these were ported from LuaJIT and 
+rewritten in LXX using lua-lxx.
 ## Building
+LXX at the moment requires you to build it and does
+not offer prebuilt binaries. This will change in the future.
 ### Dependencies
 - CMake (if you want to build)
 - NPM (if you want to build the VSCode extension)
@@ -55,19 +61,12 @@ Using it doesnt require any dependencies apart from core.macros() which requires
 - `make`
 This will result in 2 files in the lxx folder, lxx and lxxc. You can test the shell using `./lxx` and try
 some code then install it to your PATH/$PATH.
-### Other options
-- `make install` - Installs the executables to PATH/$PATH and creates library paths
 ### End result
-- `lxx` executable in the cwd for the shell and interpreter
+- `lxx` executable in the cwd for the shell, interpreter, and bytecode interpreter
 - `lxxc` executable in the cwd for compiling to bytecode
 - `lxxjit` executable in the cwd for JIT compiling
+- `lua-lxx` executable for compiling Lua to LXX. 
 - If you chose to move them to the PATH/$PATH they will be there instead of the dist folder
-### Building lua-lxx
-- `cmake .`
-- `make lua-lxx`
-- `cd lxx-1.0.0/lua-lxx`
-In that folder you should see a lua-lxx executable, you can use it like this:
-- `./lua-lxx myfile.lua -o myfile.lxx`
 
 ## Credits
 - Lua (Ljs Starting point)

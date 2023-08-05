@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Open input file */
-  const char *fname = "test.lua";
+  const char *fname = "compile.lua";
   if(argc > 1) fname = argv[fn_argc];
   fp = fopen(fname, "r");
   if(fp == NULL) {

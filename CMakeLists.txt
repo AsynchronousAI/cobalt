@@ -16,14 +16,7 @@ if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
 else()
     set(TOP_LEVEL FALSE)
 endif()
-add_custom_target(lua-lxx
-    COMMAND make ${CMAKE_CURRENT_SOURCE_DIR}/lxx-${CMAKE_PROJECT_VERSION}/lua-lxx
-    COMMENT "Building lua-lxx"
-)
-add_custom_target(setup
-    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-    COMMENT "Installing"
-)
+
 if(TOP_LEVEL)
     option(LUA_BUILD_BINARY "Build lxx binary" ON)
     option(LUA_BUILD_COMPILER "Build luac compiler" ON)
@@ -33,14 +26,14 @@ else()
 endif()
 
 add_subdirectory(lxx-1.0.0)
-
+add_subdirectory(lxx-1.0.0/lua-lxx)
 if(LUA_ENABLE_TESTING)
     add_test(NAME lua-testsuite COMMAND lxx -e "_U=true" all.lxx WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lxx-${CMAKE_PROJECT_VERSION}-tests)
 endif()
 
-if (INSTALL)
-    add_custom_target(my_target
-        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-        COMMENT "Installing binaries"
-    )
-endif()
+#if (INSTALL)
+add_custom_target(setup
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/install.py
+    COMMENT "Installing binaries"
+)
+#endif()

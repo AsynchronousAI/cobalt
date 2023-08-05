@@ -1,4 +1,0 @@
-alloc.lxx
-nosink.lxx
-ffi.lxx +ffi
-ffi_nosink.lxx +ffi

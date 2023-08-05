@@ -20,7 +20,7 @@ add_custom_target(lua-lxx
     COMMAND make ${CMAKE_CURRENT_SOURCE_DIR}/lxx-${CMAKE_PROJECT_VERSION}/lua-lxx
     COMMENT "Building lua-lxx"
 )
-add_custom_target(install
+add_custom_target(setup
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/install.py
     COMMENT "Installing"
 )

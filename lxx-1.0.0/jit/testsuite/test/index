@@ -1,6 +1,0 @@
-lang
-lib +compat5.2
-bc +luajit>=2
-computations.lxx
-trace +jit
-opt +jit

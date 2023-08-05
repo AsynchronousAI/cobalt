@@ -1,6 +1,0 @@
-concat.lxx
-insert.lxx
-new.lxx +table.new
-pack.lxx +compat5.2
-remove.lxx
-sort.lxx

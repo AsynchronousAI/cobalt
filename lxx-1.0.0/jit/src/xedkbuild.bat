@@ -13,22 +13,22 @@
 @set LJLINK=link /nologo
 @set LJMT=mt /nologo
 @set DASMDIR=..\dynasm
-@set DASM=%DASMDIR%\dynasm.ljs
+@set DASM=%DASMDIR%\dynasm.lxx
 @set ALL_LIB=lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c lib_ffi.c
 
-%LJCOMPILE% host\miniljs.c
+%LJCOMPILE% host\minilxx.c
 @if errorlevel 1 goto :BAD
-%LJLINK% /out:miniljs.exe miniljs.obj
+%LJLINK% /out:minilxx.exe minilxx.obj
 @if errorlevel 1 goto :BAD
-if exist miniljs.exe.manifest^
-  %LJMT% -manifest miniljs.exe.manifest -outputresource:miniljs.exe
+if exist minilxx.exe.manifest^
+  %LJMT% -manifest minilxx.exe.manifest -outputresource:minilxx.exe
 
 @rem Error out for 64 bit host compiler
-@miniljs
+@minilxx
 @if errorlevel 8 goto :FAIL
 
 @set DASMFLAGS=-D GPR64 -D FRAME32 -D PPE -D SQRT -D DUALNUM
-miniljs %DASM% -LN %DASMFLAGS% -o host\buildvm_arch.h vm_ppc.dasc
+minilxx %DASM% -LN %DASMFLAGS% -o host\buildvm_arch.h vm_ppc.dasc
 @if errorlevel 1 goto :BAD
 
 %LJCOMPILE% /I "." /I %DASMDIR% /D_XBOX_VER=200 /DLUAJIT_TARGET=LUAJIT_ARCH_PPC  host\buildvm*.c
@@ -48,7 +48,7 @@ buildvm -m libdef -o lj_libdef.h %ALL_LIB%
 @if errorlevel 1 goto :BAD
 buildvm -m recdef -o lj_recdef.h %ALL_LIB%
 @if errorlevel 1 goto :BAD
-buildvm -m vmdef -o jit\vmdef.ljs %ALL_LIB%
+buildvm -m vmdef -o jit\vmdef.lxx %ALL_LIB%
 @if errorlevel 1 goto :BAD
 buildvm -m folddef -o lj_folddef.h lj_opt_fold.c
 @if errorlevel 1 goto :BAD
@@ -75,7 +75,7 @@ buildvm -m folddef -o lj_folddef.h lj_opt_fold.c
 @if errorlevel 1 goto :BAD
 :NOAMALG
 
-@del *.obj *.manifest miniljs.exe buildvm.exe
+@del *.obj *.manifest minilxx.exe buildvm.exe
 @echo.
 @echo === Successfully built LuaJIT for Xbox 360 ===
 

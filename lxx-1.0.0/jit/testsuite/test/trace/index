@@ -1,7 +1,7 @@
-exit_frame.ljs
-exit_growstack.ljs
-exit_jfuncf.ljs
-gc64_slot_revival.ljs
+exit_frame.lxx
+exit_growstack.lxx
+exit_jfuncf.lxx
+gc64_slot_revival.lxx
 phi
-snap.ljs
-stitch.ljs
+snap.lxx
+stitch.lxx

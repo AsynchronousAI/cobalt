@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="ljsjit" />
+		<Option title="lxxjit" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="test-function.ljs" />
+				<Option parameters="test-function.lxx" />
 				<Option projectLinkerOptionsRelation="0" />
 				<Option projectIncludeDirsRelation="0" />
 				<Option projectResourceIncludeDirsRelation="0" />
@@ -49,7 +49,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fno-stack-protector" />
-			<Add option="-DLUAJIT_LJS=1" />
+			<Add option="-DLUAJIT_lxx=1" />
 			<Add option="-DLUAJIT_ENABLE_LUA52COMPAT=1" />
 			<Add option="-DLUAJIT_OS=LUAJIT_OS_LINUX" />
 			<Add option="-DLUAJIT_TARGET=LUAJIT_ARCH_x64" />

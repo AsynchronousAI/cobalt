@@ -20,23 +20,23 @@
 @set LJMT=mt /nologo
 @set LJLIB=lib /nologo /nodefaultlib
 @set DASMDIR=..\dynasm
-@set DASM=%DASMDIR%\dynasm.ljs
+@set DASM=%DASMDIR%\dynasm.lxx
 @set DASC=vm_x64.dasc
 @set LJDLLNAME=lua51.dll
 @set LJLIBNAME=lua51.lib
 @set BUILDTYPE=release
 @set ALL_LIB=lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c lib_ffi.c
 
-%LJCOMPILE% host\miniljs.c
+%LJCOMPILE% host\minilxx.c
 @if errorlevel 1 goto :BAD
-%LJLINK% /out:miniljs.exe miniljs.obj
+%LJLINK% /out:minilxx.exe minilxx.obj
 @if errorlevel 1 goto :BAD
-if exist miniljs.exe.manifest^
-  %LJMT% -manifest miniljs.exe.manifest -outputresource:miniljs.exe
+if exist minilxx.exe.manifest^
+  %LJMT% -manifest minilxx.exe.manifest -outputresource:minilxx.exe
 
 @set DASMFLAGS=-D WIN -D JIT -D FFI -D P64
 @set LJARCH=x64
-@miniljs
+@minilxx
 @if errorlevel 8 goto :X64
 @set DASC=vm_x86.dasc
 @set DASMFLAGS=-D WIN -D JIT -D FFI
@@ -48,7 +48,7 @@ if exist miniljs.exe.manifest^
 @set DASC=vm_x86.dasc
 @set LJCOMPILE=%LJCOMPILE% /DLUAJIT_DISABLE_GC64
 :GC64
-miniljs %DASM% -LN %DASMFLAGS% -o host\buildvm_arch.h %DASC%
+minilxx %DASM% -LN %DASMFLAGS% -o host\buildvm_arch.h %DASC%
 @if errorlevel 1 goto :BAD
 
 %LJCOMPILE% /I "." /I %DASMDIR% host\buildvm*.c
@@ -68,7 +68,7 @@ buildvm -m libdef -o lj_libdef.h %ALL_LIB%
 @if errorlevel 1 goto :BAD
 buildvm -m recdef -o lj_recdef.h %ALL_LIB%
 @if errorlevel 1 goto :BAD
-buildvm -m vmdef -o jit\vmdef.ljs %ALL_LIB%
+buildvm -m vmdef -o jit\vmdef.lxx %ALL_LIB%
 @if errorlevel 1 goto :BAD
 buildvm -m folddef -o lj_folddef.h lj_opt_fold.c
 @if errorlevel 1 goto :BAD
@@ -109,7 +109,7 @@ if exist %LJDLLNAME%.manifest^
 if exist luajit.exe.manifest^
   %LJMT% -manifest luajit.exe.manifest -outputresource:luajit.exe
 
-@del *.obj *.manifest miniljs.exe buildvm.exe
+@del *.obj *.manifest minilxx.exe buildvm.exe
 @del host\buildvm_arch.h
 @del lj_bcdef.h lj_ffdef.h lj_libdef.h lj_recdef.h lj_folddef.h
 @echo.

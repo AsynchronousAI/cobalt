@@ -1,18 +1,18 @@
-andor.ljs
-assignment.ljs
-compare.ljs
-compare_nan.ljs
+andor.lxx
+assignment.lxx
+compare.lxx
+compare_nan.lxx
 constant
-for.ljs
-length.ljs
-modulo.ljs
-concat.ljs
-self.ljs
-table.ljs
+for.lxx
+length.lxx
+modulo.lxx
+concat.lxx
+self.lxx
+table.lxx
 upvalue
-coroutine.ljs
-tail_recursion.ljs
-vararg_jit.ljs
-gc.ljs
-goto.ljs +goto
+coroutine.lxx
+tail_recursion.lxx
+vararg_jit.lxx
+gc.lxx
+goto.lxx +goto
 meta

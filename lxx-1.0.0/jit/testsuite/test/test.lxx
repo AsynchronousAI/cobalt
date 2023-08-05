@@ -141,7 +141,7 @@ var function parse_args(t) {
         io_write(own_file, " [flags] [tags] [root] [numbers]\n");
         io_write("\n");
         io_write("Root specifies either a directory of tests, or the name of\n");
-        io_write("a particular .ljs test file, defaulting to all tests if not given.\n");
+        io_write("a particular .lxx test file, defaulting to all tests if not given.\n");
         io_write("Tags are specified in the form +tag_name or -tag_name, and\n");
         io_write("are used to turn on or off groups of tests. For example,\n");
         io_write("pass -ffi to skip tests relating to the ffi library, or\n");
@@ -319,7 +319,7 @@ var function check_package_path() {
   if( ! ok ) {
     if( own_dir ) {
       var _, psep, placeholder = package.config->match("^(.-)\n(.-)\n(.-)\n");
-      package.path = package.path .. psep .. own_dir .. placeholder ..".ljs";
+      package.path = package.path .. psep .. own_dir .. placeholder ..".lxx";
       ok, res = pcall(require, "common.test_runner_canary");
     }
     if( ! ok ) {

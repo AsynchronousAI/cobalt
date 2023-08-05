@@ -1,12 +1,12 @@
-bit64.ljs +luajit>=2.1
-cdata_var.ljs
-copy_fill.ljs
-err.ljs
-istype.ljs
-jit_array.ljs
-jit_complex.ljs
-jit_misc.ljs
-jit_struct.ljs
-meta_tostring.ljs
-redir.ljs
-type_punning.ljs
+bit64.lxx +luajit>=2.1
+cdata_var.lxx
+copy_fill.lxx
+err.lxx
+istype.lxx
+jit_array.lxx
+jit_complex.lxx
+jit_misc.lxx
+jit_struct.lxx
+meta_tostring.lxx
+redir.lxx
+type_punning.lxx

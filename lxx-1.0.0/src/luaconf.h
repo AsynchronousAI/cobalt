@@ -18,8 +18,8 @@
 ** ===================================================================
 */
 
-#if !defined(LUA_LJS) && !defined(NOLUA_LJS)
-#define LUA_LJS
+#if !defined(LUA_lxx) && !defined(NOLUA_lxx)
+#define LUA_lxx
 #endif
 
 /*
@@ -172,11 +172,11 @@
 #define LUA_PATH_MARK           "?"
 #define LUA_EXEC_DIR            "!"
 
-#ifdef LUA_LJS
+#ifdef LUA_lxx
   #define LUA_SCRIPT_EXT ".lxx"
 #else
   #define LUA_SCRIPT_EXT ".lua"
-#endif // LUA_LJS
+#endif // LUA_lxx
 
 /*
 @@ LUA_PATH_DEFAULT is the default path that Lua uses to look for

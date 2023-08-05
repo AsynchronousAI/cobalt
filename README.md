@@ -53,14 +53,15 @@ Using it doesnt require any dependencies apart from core.macros() which requires
 - `cd lxx`
 - `cmake .`
 - `make`
+- `python3 install.py` - Only do if you want to install to PATH/$PATH and setup library files
 This will result in 2 files in the lxx folder, lxx and lxxc. You can test the shell using `./lxx` and try
 some code then install it to your PATH/$PATH.
 ### Other options
 - `make clean` - Cleans the build
 ### End result
-- `lxx` executable in the `../dist` folder for interpreting
-- `lxxc` executable in the `../dist` folder for compiling to bytecode
-- `lxxasm` executable in the `../dist` folder for making .o files from bytecode
+- `lxx` executable in the cwd for the shell and interpreter
+- `lxxc` executable in the cwd for compiling to bytecode
+- `lxxjit` executable in the cwd for JIT compiling
 - If you chose to move them to the PATH/$PATH they will be there instead of the dist folder
 ## Credits
 - Lua (Ljs Starting point)

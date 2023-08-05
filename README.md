@@ -53,16 +53,22 @@ Using it doesnt require any dependencies apart from core.macros() which requires
 - `cd lxx`
 - `cmake .`
 - `make`
-- `python3 install.py` - Only do if you want to install to PATH/$PATH and setup library files
 This will result in 2 files in the lxx folder, lxx and lxxc. You can test the shell using `./lxx` and try
 some code then install it to your PATH/$PATH.
 ### Other options
-- `make clean` - Cleans the build
+- `make install` - Installs the executables to PATH/$PATH and creates library paths
 ### End result
 - `lxx` executable in the cwd for the shell and interpreter
 - `lxxc` executable in the cwd for compiling to bytecode
 - `lxxjit` executable in the cwd for JIT compiling
 - If you chose to move them to the PATH/$PATH they will be there instead of the dist folder
+### Building lua-lxx
+- `cmake .`
+- `make lua-lxx`
+- `cd lxx-1.0.0/lua-lxx`
+In that folder you should see a lua-lxx executable, you can use it like this:
+- `./lua-lxx myfile.lua -o myfile.lxx`
+
 ## Credits
 - Lua (Ljs Starting point)
 - LuaJIT (LjsJIT Starting point)
@@ -75,4 +81,9 @@ some code then install it to your PATH/$PATH.
 
 ## TODO:
 - FFI
-- Publish extension
+- Rebrand alot of the code
+- Make a better linter
+- Integrate JIT
+- Add tests
+- Install.py for CMake
+- lua-lxx CMake

@@ -755,6 +755,7 @@ static const luaL_Reg pk_funcs[] = {
 static const luaL_Reg ll_funcs[] = {
   //{"module", ll_module}, module clears fenv so it's not recommended to use it
   {"import", ll_require},
+  {"require", ll_require}, // This exists only for compatibility, rather use "import"
   {NULL, NULL}
 };
 

@@ -30,12 +30,10 @@ Makefile
 /lxx/src/CMakeFiles
 /lxx/src/cmake_install.cmake
 /lxx/src/Makefile
-/lxx/src/asm/CMakeLists.txt.user
-/lxx/src/asm/CMakeCache.txt
-/lxx/src/asm/CMakeFiles
-/lxx/src/asm/cmake_install.cmake    
-/lxx/src/asm/Makefile
 *cmake_install.cmake
 *.dylib
 *Config.cmake
 *CTestTestfile.cmake
+
+# Allow 
+!/lxx-1.0.0/lua-lxx/Makefile

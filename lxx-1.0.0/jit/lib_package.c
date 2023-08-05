@@ -571,8 +571,9 @@ static const luaL_Reg package_lib[] = {
 };
 
 static const luaL_Reg package_global[] = {
-  { "module",	lj_cf_package_module },
-  { "require",	lj_cf_package_require },
+  //{ "module",	lj_cf_package_module },
+  { "require",	lj_cf_package_require }, // This exists only for compatibility, use `import` instead.
+  { "import",	lj_cf_package_require },
   { NULL, NULL }
 };
 

@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 3.8)
+
+
 set(LUA_LIB_SRCS 
     "src/lapi.c"
     "src/lcode.c"
@@ -128,26 +131,26 @@ if(LUA_BUILD_BINARY)
     include(CheckIncludeFile)
     CHECK_INCLUDE_FILE("readline/readline.h" HAVE_READLINE_READLINE_H)
 
-    add_executable(lua "src/lua.c")
+    add_executable(lxx "src/lua.c")
     # Can not use lua_shared because some symbols are not exported
-    target_link_libraries(lua PRIVATE lua_static)
-    set_target_properties(lua PROPERTIES 
+    target_link_libraries(lxx PRIVATE lua_static)
+    set_target_properties(lxx PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
     if (HAVE_READLINE_READLINE_H)
-        target_compile_definitions(lua PRIVATE "LUA_USE_READLINE")
-        target_link_libraries(lua PUBLIC readline)
+        target_compile_definitions(lxx PRIVATE "LUA_USE_READLINE")
+        target_link_libraries(lxx PUBLIC readline)
     endif()
-    list(APPEND TARGETS_TO_INSTALL lua)
+    list(APPEND TARGETS_TO_INSTALL lxx)
 endif()
 
 if(LUA_BUILD_COMPILER)
-    add_executable(luac "src/luac.c")
-    target_link_libraries(luac PRIVATE lua_static)
-    set_target_properties(luac PROPERTIES 
+    add_executable(lxxc "src/luac.c")
+    target_link_libraries(lxxc PRIVATE lua_static)
+    set_target_properties(lxxc PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
-    list(APPEND TARGETS_TO_INSTALL luac)
+    list(APPEND TARGETS_TO_INSTALL lxxc)
 endif()
 
 install(TARGETS ${TARGETS_TO_INSTALL}
@@ -161,7 +164,7 @@ include(CMakePackageConfigHelpers)
 get_target_property(LUA_EXPORT_LIBRARY Lua::Library ALIASED_TARGET)
 write_basic_package_version_file(
     Config.cmake
-    VERSION ${PACKAGE_VERSION}
+    VERSION 1.0.0
     COMPATIBILITY SameMajorVersion
 )
 

@@ -1,7 +1,7 @@
 /*
-** DynASM ARM encoding engine.
-** Copyright (C) 2005-2011 Mike Pall. All rights reserved.
-** Released under the MIT/X license. See dynasm.lua for full copyright notice.
+** DynASM ARM64 encoding engine.
+** Copyright (C) 2005-2020 Mike Pall. All rights reserved.
+** Released under the MIT license. See dynasm.lua for full copyright notice.
 */
 
 #include <stddef.h>
@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DASM_ARCH		"arm"
+#define DASM_ARCH		"arm64"
 
 #ifndef DASM_EXTERN
 #define DASM_EXTERN(a,b,c,d)	0
@@ -22,7 +22,7 @@ enum {
   DASM_ALIGN, DASM_REL_LG, DASM_LABEL_LG,
   /* The following actions also have an argument. */
   DASM_REL_PC, DASM_LABEL_PC,
-  DASM_LONG, DASM_IMM, DASM_IMM12, DASM_IMM16, DASM_IMML8, DASM_IMML12,
+  DASM_IMM, DASM_IMM6, DASM_IMM12, DASM_IMM13W, DASM_IMM13X, DASM_IMML,
   DASM__MAX
 };
 
@@ -167,9 +167,49 @@ void dasm_setup(Dst_DECL, const void *actionlist)
 
 static int dasm_imm12(unsigned int n)
 {
-  int i;
-  for (i = 0; i < 16; i++, n = (n << 2) | (n >> 30))
-    if (n <= 255) return (int)(n + (i << 8));
+  if ((n >> 12) == 0)
+    return n;
+  else if ((n & 0xff000fff) == 0)
+    return (n >> 12) | 0x1000;
+  else
+    return -1;
+}
+
+static int dasm_ffs(unsigned long long x)
+{
+  int n = -1;
+  while (x) { x >>= 1; n++; }
+  return n;
+}
+
+static int dasm_imm13(int lo, int hi)
+{
+  int inv = 0, w = 64, s = 0xfff, xa, xb;
+  unsigned long long n = (((unsigned long long)hi) << 32) | (unsigned int)lo;
+  unsigned long long m = 1ULL, a, b, c;
+  if (n & 1) { n = ~n; inv = 1; }
+  a = n & -n; b = (n+a)&-(n+a); c = (n+a-b)&-(n+a-b);
+  xa = dasm_ffs(a); xb = dasm_ffs(b);
+  if (c) {
+    w = dasm_ffs(c) - xa;
+    if (w == 32) m = 0x0000000100000001UL;
+    else if (w == 16) m = 0x0001000100010001UL;
+    else if (w == 8) m = 0x0101010101010101UL;
+    else if (w == 4) m = 0x1111111111111111UL;
+    else if (w == 2) m = 0x5555555555555555UL;
+    else return -1;
+    s = (-2*w & 0x3f) - 1;
+  } else if (!a) {
+    return -1;
+  } else if (xb == -1) {
+    xb = 64;
+  }
+  if ((b-a) * m != n) return -1;
+  if (inv) {
+    return ((w - xb) << 6) | (s+w+xa-xb);
+  } else {
+    return ((w - xa) << 6) | (s+xb-xa);
+  }
   return -1;
 }
 
@@ -211,7 +251,8 @@ void dasm_put(Dst_DECL, int start, ...)
       case DASM_ALIGN: ofs += (ins & 255); b[pos++] = ofs; break;
       case DASM_REL_LG:
 	n = (ins & 2047) - 10; pl = D->lglabels + n;
-	if (n >= 0) { CKPL(lg, LG); goto putrel; }  /* Bkwd rel or global. */
+	/* Bkwd rel or global. */
+	if (n >= 0) { CK(n>=10||*pl<0, RANGE_LG); CKPL(lg, LG); goto putrel; }
 	pl += 10; n = *pl;
 	if (n < 0) n = 0;  /* Start new chain for fwd rel if label exists. */
 	goto linkrel;
@@ -239,14 +280,10 @@ void dasm_put(Dst_DECL, int start, ...)
 	*pl = -pos;  /* Label exists now. */
 	b[pos++] = ofs;  /* Store pass1 offset estimate. */
 	break;
-      case DASM_LONG:
-        ofs += 4;
-        b[pos++] = n;
-        break;
       case DASM_IMM:
-      case DASM_IMM16:
-#ifdef DASM_CHECKS
 	CK((n & ((1<<((ins>>10)&31))-1)) == 0, RANGE_I);
+	n >>= ((ins>>10)&31);
+#ifdef DASM_CHECKS
 	if ((ins & 0x8000))
 	  CK(((n + (1<<(((ins>>5)&31)-1)))>>((ins>>5)&31)) == 0, RANGE_I);
 	else
@@ -254,16 +291,34 @@ void dasm_put(Dst_DECL, int start, ...)
 #endif
 	b[pos++] = n;
 	break;
-      case DASM_IMML8:
-      case DASM_IMML12:
-	CK(n >= 0 ? ((n>>((ins>>5)&31)) == 0) :
-		    (((-n)>>((ins>>5)&31)) == 0), RANGE_I);
+      case DASM_IMM6:
+	CK((n >> 6) == 0, RANGE_I);
 	b[pos++] = n;
 	break;
       case DASM_IMM12:
 	CK(dasm_imm12((unsigned int)n) != -1, RANGE_I);
 	b[pos++] = n;
 	break;
+      case DASM_IMM13W:
+	CK(dasm_imm13(n, n) != -1, RANGE_I);
+	b[pos++] = n;
+	break;
+      case DASM_IMM13X: {
+	int m = va_arg(ap, int);
+	CK(dasm_imm13(n, m) != -1, RANGE_I);
+	b[pos++] = n;
+	b[pos++] = m;
+	break;
+	}
+      case DASM_IMML: {
+#ifdef DASM_CHECKS
+	int scale = (p[-2] >> 30);
+	CK((!(n & ((1<<scale)-1)) && (unsigned int)(n>>scale) < 4096) ||
+	   (unsigned int)(n+256) < 512, RANGE_I);
+#endif
+	b[pos++] = n;
+	break;
+	}
       }
     }
   }
@@ -319,8 +374,9 @@ int dasm_link(Dst_DECL, size_t *szp)
 	case DASM_ALIGN: ofs -= (b[pos++] + ofs) & (ins & 255); break;
 	case DASM_REL_LG: case DASM_REL_PC: pos++; break;
 	case DASM_LABEL_LG: case DASM_LABEL_PC: b[pos++] += ofs; break;
-        case DASM_LONG: case DASM_IMM: case DASM_IMM12: case DASM_IMM16:
-	case DASM_IMML8: case DASM_IMML12: pos++; break;
+	case DASM_IMM: case DASM_IMM6: case DASM_IMM12: case DASM_IMM13W:
+	case DASM_IMML: pos++; break;
+	case DASM_IMM13X: pos += 2; break;
 	}
       }
       stop: (void)0;
@@ -371,44 +427,52 @@ int dasm_encode(Dst_DECL, void *buffer)
 	  break;
 	case DASM_REL_LG:
 	  CK(n >= 0, UNDEF_LG);
+	  /* fallthrough */
 	case DASM_REL_PC:
 	  CK(n >= 0, UNDEF_PC);
-	  n = *DASM_POS2PTR(D, n) - (int)((char *)cp - base) - 4;
+	  n = *DASM_POS2PTR(D, n) - (int)((char *)cp - base) + 4;
 	patchrel:
-	  if ((ins & 0x800) == 0) {
-	    CK((n & 3) == 0 && ((n+0x02000000) >> 26) == 0, RANGE_REL);
-	    cp[-1] |= ((n >> 2) & 0x00ffffff);
-	  } else if ((ins & 0x1000)) {
-	    CK((n & 3) == 0 && -256 <= n && n <= 256, RANGE_REL);
-	    goto patchimml8;
-	  } else {
-	    CK((n & 3) == 0 && -4096 <= n && n <= 4096, RANGE_REL);
-	    goto patchimml12;
+	  if (!(ins & 0xf800)) {  /* B, BL */
+	    CK((n & 3) == 0 && ((n+0x08000000) >> 28) == 0, RANGE_REL);
+	    cp[-1] |= ((n >> 2) & 0x03ffffff);
+	  } else if ((ins & 0x800)) {  /* B.cond, CBZ, CBNZ, LDR* literal */
+	    CK((n & 3) == 0 && ((n+0x00100000) >> 21) == 0, RANGE_REL);
+	    cp[-1] |= ((n << 3) & 0x00ffffe0);
+	  } else if ((ins & 0x3000) == 0x2000) {  /* ADR */
+	    CK(((n+0x00100000) >> 21) == 0, RANGE_REL);
+	    cp[-1] |= ((n << 3) & 0x00ffffe0) | ((n & 3) << 29);
+	  } else if ((ins & 0x3000) == 0x3000) {  /* ADRP */
+	    cp[-1] |= ((n >> 9) & 0x00ffffe0) | (((n >> 12) & 3) << 29);
+	  } else if ((ins & 0x1000)) {  /* TBZ, TBNZ */
+	    CK((n & 3) == 0 && ((n+0x00008000) >> 16) == 0, RANGE_REL);
+	    cp[-1] |= ((n << 3) & 0x0007ffe0);
 	  }
 	  break;
 	case DASM_LABEL_LG:
 	  ins &= 2047; if (ins >= 20) D->globals[ins-10] = (void *)(base + n);
 	  break;
 	case DASM_LABEL_PC: break;
-        case DASM_LONG:
-          *cp++ = n;
-          break;
 	case DASM_IMM:
-	  cp[-1] |= ((n>>((ins>>10)&31)) & ((1<<((ins>>5)&31))-1)) << (ins&31);
+	  cp[-1] |= (n & ((1<<((ins>>5)&31))-1)) << (ins&31);
+	  break;
+	case DASM_IMM6:
+	  cp[-1] |= ((n&31) << 19) | ((n&32) << 26);
 	  break;
 	case DASM_IMM12:
-	  cp[-1] |= dasm_imm12((unsigned int)n);
+	  cp[-1] |= (dasm_imm12((unsigned int)n) << 10);
 	  break;
-	case DASM_IMM16:
-	  cp[-1] |= ((n & 0xf000) << 4) | (n & 0x0fff);
+	case DASM_IMM13W:
+	  cp[-1] |= (dasm_imm13(n, n) << 10);
 	  break;
-	case DASM_IMML8: patchimml8:
-	  cp[-1] |= n >= 0 ? (0x00800000 | (n & 0x0f) | ((n & 0xf0) << 4)) :
-			     ((-n & 0x0f) | ((-n & 0xf0) << 4));
+	case DASM_IMM13X:
+	  cp[-1] |= (dasm_imm13(n, *b++) << 10);
 	  break;
-	case DASM_IMML12: patchimml12:
-	  cp[-1] |= n >= 0 ? (0x00800000 | n) : (-n);
+	case DASM_IMML: {
+	  int scale = (p[-2] >> 30);
+	  cp[-1] |= (!(n & ((1<<scale)-1)) && (unsigned int)(n>>scale) < 4096) ?
+	    ((n << (10-scale)) | 0x01000000) : ((n & 511) << 12);
 	  break;
+	  }
 	default: *cp++ = ins; break;
 	}
       }

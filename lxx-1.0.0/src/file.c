@@ -1132,6 +1132,7 @@ static void set_info(lua_State * L)
   lua_setfield(L, -2, "_VERSION");
 }
 
+// I am a test comment
 
 static const struct luaL_Reg fslib[] = {
   { "attributes", file_info },

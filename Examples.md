@@ -187,32 +187,36 @@ for (i = 1, 60) {
 // Do:
 swait(60) // Better!
 ```
-## Parrallel
+## Async
 ```js
-// Parrallel is a function that runs a function in a new thread
-// It is very useful for running multiple things at once
+// Async is a library that runs a function in a new thread
+// These are real threads and not coroutines like in Lua.
+// they use pthreads on unix and windows threads on windows 
 
-var thread = parrallel.new(function() {
-    while (true) {
-        print("Hello, World!")
-        swait(1)
+var thread = async.new("swait(7); print('Hello, World from Thread 2!')") // Creates a new thread and runs the code in it
+thread->start() // Starts the thread
+// So we can have out own code here while the thread is running
+var index = 0;
+while (swait(1)) {
+    print("Hello, World!")
+    if index == 10 {
+        break
     }
-})
+}
 
-// - lxx 1.0.0 doesnt support thread classes like shown below, but it will be added in the future \\
-swait(10) // Wait 10 seconds so the thread can finish
-thread->pause() // Stop the thread
-thread->resume() // Resume the thread
-thread->kill() // Kill the thread
-
-
-// Or maybe we could 
-var thread2 = thread->clone() // Clone the thread
-thread->kill() // Kill the thread
-// Since the thread has been cloned even though we killed the thread it will still run
-thread2->kill() // Kill the thread
-// Now we should no longer see "Hello, World!" being printed
-
+/*  OUTPUT
+Hello, World!
+Hello, World!
+Hello, World!
+Hello, World!
+Hello, World!
+Hello, World!
+Hello, World!
+Hello, World from Thread 2!
+Hello, World!
+Hello, World!
+Hello, World!
+*/
 ```
 
 ## Signals

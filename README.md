@@ -6,23 +6,40 @@ built in tools for all uses, like a set of VScode tools, a linter, a compiler, a
 be a simplified, high lever but at the same time low level language that can be used for anything and is made to be served as an alternative to Lua, C, and C++.
 
 ## Lua vs Lxx
-- Lua is a scripting language                           | Lxx is a programming language
-- Lua is interpreted and bytecoded                      | Lxx is interpreted, bytecoded, and assembly compiled
-- Lua is made to be embedded                            | Lxx is made to be embedded, bridged, and used as a standalone language
-- Lua is made to be simple                              | Lxx is made to be simple and low level
-- Lua is made to be portable                            | Lxx is made to be portable
-- Lua cannot access memory directly                     | Lxx can access memory directly
-- Lua cannot use Macros                                 | Lxx can use Macros, even compiler defined C macros (ex: _\_\APPLE\_\_, _\_\WIN32\_\_, etc)
-- Lua uses Makefiles                                    | Lxx uses CMake
-- Lua uses a garbage collector                          | Lxx uses a garbage collector, and manual memory management
-- Pure Lua doesnt support complex numbers               | Lxx supports complex numbers
-- Lua doesnt have Vector3, Color, Vector2, etc          | Lxx has Vector3, Color, Vector2, etc
-- Lua has a very "quirky" syntax                        | Lxx has a more C like syntax
-- Lua doesnt have a built in FFI (not including LuaJIT) | Lxx has a built in FFI
-- Lua is good at cross platform                         | Lxx is great at cross platform with alot of tools to help
-- Lua uses coroutines (which arent really threads)      | Lxx uses real threads using pthreads (or windows threads on windows)
-- Lua lacks a communication system between threads      | Lxx has a communication system between threads
-- Lua is more light weight and for scripting            | Lxx is also light weight but is for longer programs and games
+- Lua is a scripting language                           
+ Lxx is a programming language
+- Lua is interpreted and bytecoded                      
+ Lxx is interpreted, bytecoded, and assembly compiled
+- Lua is made to be embedded                            
+ Lxx is made to be embedded, bridged, and used as a standalone language
+- Lua is made to be simple                              
+ Lxx is made to be simple and low level
+- Lua is made to be portable                            
+ Lxx is made to be portable
+- Lua cannot access memory directly                     
+ Lxx can access memory directly
+- Lua cannot use Macros                                 
+ Lxx can use Macros, even compiler defined C macros (ex: _\_\APPLE\_\_, _\_\WIN32\_\_, etc)
+- Lua uses Makefiles                                    
+ Lxx uses CMake
+- Lua uses a garbage collector                          
+ Lxx uses a garbage collector, and manual memory management
+- Pure Lua doesnt support complex numbers               
+ Lxx supports complex numbers
+- Lua doesnt have Vector3, Color, Vector2, etc          
+ Lxx has Vector3, Color, Vector2, etc
+- Lua has a very "quirky" syntax                        
+ Lxx has a more C like syntax
+- Lua doesnt have a built in FFI (not including LuaJIT) 
+ Lxx has a built in FFI
+- Lua is good at cross platform                         
+ Lxx is great at cross platform with alot of tools to help
+- Lua uses coroutines (which arent really threads)      
+ Lxx uses real threads using pthreads (or windows threads on windows)
+- Lua lacks a communication system between threads      
+ Lxx has a communication system between threads
+- Lua is more light weight and for scripting            
+ Lxx is also light weight but is for longer programs and games
 ## Building
 ### Dependencies
 - CMake (if you want to build)

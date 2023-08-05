@@ -17,7 +17,7 @@
 #endif
 
 #ifdef LUAJIT_LJS
-  #define LUA_SCRIPT_EXT ".lxx"
+  #define LUA_SCRIPT_EXT ".ljs"
 #else
   #define LUA_SCRIPT_EXT ".lua"
 #endif

@@ -538,7 +538,7 @@ LJLIB_CF(jit_opt_start)
 
 #define LJLIB_MODULE_jit_profile
 
-/* Not loaded by default, use: local profile = import("jit.profile") */
+/* Not loaded by default, use: local profile = require("jit.profile") */
 
 static const char KEY_PROFILE_THREAD = 't';
 static const char KEY_PROFILE_FUNC = 'f';

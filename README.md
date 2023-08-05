@@ -87,3 +87,4 @@ In that folder you should see a lua-lxx executable, you can use it like this:
 - Add tests
 - Install.py for CMake
 - lua-lxx CMake
+- library installer

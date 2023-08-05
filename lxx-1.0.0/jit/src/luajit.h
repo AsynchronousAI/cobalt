@@ -30,11 +30,11 @@
 
 #include "lua.h"
 
-#define LUAJIT_VERSION		"lxxJIT based on LuaJIT and LJSJIT"
+#define LUAJIT_VERSION		"LJSJIT based on LuaJIT 2.1.0-beta3"
 #define LUAJIT_VERSION_NUM	20100  /* Version 2.1.0 = 02.01.00. */
 #define LUAJIT_VERSION_SYM	luaJIT_version_2_1_0_beta3
-#define LUAJIT_COPYRIGHT	""
-#define LUAJIT_URL		"http://luajit.org/ https://github.com/lxx-lang/lxx"
+#define LUAJIT_COPYRIGHT	"Copyright (C) 2005-2017 Mike Pall, Domingo Alvarez"
+#define LUAJIT_URL		"http://luajit.org/ https://github.com/mingodad/ljsjit"
 
 /* Modes for luaJIT_setmode. */
 #define LUAJIT_MODE_MASK	0x00ff

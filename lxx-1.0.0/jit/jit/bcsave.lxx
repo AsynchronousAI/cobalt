@@ -10,9 +10,9 @@
 //
 //----------------------------------------------------------------------------
 
-var jit = require("jit");
+var jit = import("jit");
 assert(jit.version_num == 20100, "LuaJIT core/library version mismatch");
-var bit = require("bit");
+var bit = import("bit");
 
 // Symbol name prefix for LuaJIT bytecode.
 var LJBC_PREFIX = "luaJIT_BC_";
@@ -577,7 +577,7 @@ var function bcsave_obj(ctx, output, s) {
 
 var function bclist(input, output) {
   var f = readfile(input);
-  require("jit.bc").dump(f, savefile(output, "w"), true);
+  import("jit.bc").dump(f, savefile(output, "w"), true);
 }
 
 var function bcsave(ctx, input, output) {

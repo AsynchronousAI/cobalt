@@ -58,10 +58,10 @@
 //----------------------------------------------------------------------------
 
 // Cache some library functions and objects.
-var jit = require("jit");
+var jit = import("jit");
 assert(jit.version_num == 20100, "LuaJIT core/library version mismatch");
-var jutil = require("jit.util");
-var vmdef = require("jit.vmdef");
+var jutil = import("jit.util");
+var vmdef = import("jit.vmdef");
 var funcinfo, traceinfo = jutil.funcinfo, jutil.traceinfo;
 var type, format = type, string.format;
 var stdout, stderr = io.stdout, io.stderr;

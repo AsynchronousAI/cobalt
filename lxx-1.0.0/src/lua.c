@@ -253,14 +253,14 @@ static int dostring (lua_State *L, const char *s, const char *name) {
 
 
 /*
-** Calls 'require(name)' and stores the result in a global variable
+** Calls 'import(name)' and stores the result in a global variable
 ** with the given name.
 */
 static int dolibrary (lua_State *L, const char *name) {
   int status;
   lua_getglobal(L, "import");
   lua_pushstring(L, name);
-  status = docall(L, 1, 1);  /* call 'require(name)' */
+  status = docall(L, 1, 1);  /* call 'import(name)' */
   if (status == LUA_OK)
     lua_setglobal(L, name);  /* global[name] = require return */
   return report(L, status);

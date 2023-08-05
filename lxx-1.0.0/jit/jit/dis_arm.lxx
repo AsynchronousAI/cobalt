@@ -14,7 +14,7 @@ var type = type;
 var sub, byte, format = string.sub, string.byte, string.format;
 var match, gmatch = string.match, string.gmatch;
 var concat = table.concat;
-var bit = require("bit");
+var bit = import("bit");
 var band, bor, ror, tohex = bit.band, bit.bor, bit.ror, bit.tohex;
 var lshift, rshift, arshift = bit.lshift, bit.rshift, bit.arshift;
 

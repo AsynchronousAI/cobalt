@@ -9,7 +9,7 @@
 //
 // Example usage:
 //
-//   local zone = require("jit.zone")
+//   local zone = import("jit.zone")
 //   zone("AI")
 //   ...
 //     zone("A*")

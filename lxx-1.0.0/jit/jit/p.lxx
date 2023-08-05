@@ -40,10 +40,10 @@
 //--------------------------------------------------------------------------
 
 // Cache some library functions and objects.
-var jit = require("jit");
+var jit = import("jit");
 assert(jit.version_num == 20100, "LuaJIT core/library version mismatch");
-var profile = require("jit.profile");
-var vmdef = require("jit.vmdef");
+var profile = import("jit.profile");
+var vmdef = import("jit.vmdef");
 var math = math;
 var pairs, ipairs, tonumber, floor = pairs, ipairs, tonumber, math.floor;
 var sort, format = table.sort, string.format;
@@ -252,7 +252,7 @@ var function prof_start(mode) {
   var m = {};
   for( c in mode->gmatch(".") ) { m[c] = c; }
   prof_states = m.z || m.v;
-  if( prof_states == "z" ) { zone = require("jit.zone"); }
+  if( prof_states == "z" ) { zone = import("jit.zone"); }
   var scope = m.l || m.f || m.F || (prof_states && "" || "f");
   var flags = (m.p || "");
   prof_raw = m.r;

@@ -27,7 +27,7 @@ var type = type;
 var sub, byte, format = string.sub, string.byte, string.format;
 var match, gmatch, gsub = string.match, string.gmatch, string.gsub;
 var lower, rep = string.lower, string.rep;
-var bit = require("bit");
+var bit = import("bit");
 var tohex = bit.tohex;
 
 // Map for 1st opcode byte in 32 bit mode. Ugly? Well ... read on.

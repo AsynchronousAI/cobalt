@@ -22,7 +22,7 @@
 //
 // This module can also be used programmatically:
 //
-//   local bc = require("jit.bc")
+//   local bc = import("jit.bc")
 //
 //   local function foo() print("hello") end
 //
@@ -40,11 +40,11 @@
 //----------------------------------------------------------------------------
 
 // Cache some library functions and objects.
-var jit = require("jit");
+var jit = import("jit");
 assert(jit.version_num == 20100, "LuaJIT core/library version mismatch");
-var jutil = require("jit.util");
-var vmdef = require("jit.vmdef");
-var bit = require("bit");
+var jutil = import("jit.util");
+var vmdef = import("jit.vmdef");
+var bit = import("bit");
 var sub, gsub, format = string.sub, string.gsub, string.format;
 var byte, band, shr = string.byte, bit.band, bit.rshift;
 var funcinfo, funcbc, funck = jutil.funcinfo, jutil.funcbc, jutil.funck;

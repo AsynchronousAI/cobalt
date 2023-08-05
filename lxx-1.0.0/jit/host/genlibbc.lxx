@@ -6,9 +6,9 @@
 // Released under the MIT license. See Copyright Notice in luajit.h
 //--------------------------------------------------------------------------
 
-var ffi = require("ffi");
-var bit = require("bit");
-var vmdef = require("jit.vmdef");
+var ffi = import("ffi");
+var bit = import("bit");
+var vmdef = import("jit.vmdef");
 var bcnames = vmdef.bcnames;
 
 var format = string.format;

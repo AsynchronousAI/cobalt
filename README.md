@@ -23,11 +23,9 @@ and made to make applications and games.
 ### Building
 - `git clone https://github.com/AsynchronousAI/lxx`
 - `cd lxx`
-- `python3 build.py` for an interactive setup. 
+- `make src`
 ### Other options
-- `python3 build.py help` for help
-- `python3 build.py clean` to clean the build
-You must use build.py to build as it modifys the souce code to work with your requirements and avoids conflicts since this has multiple MakeFiles. 
+- `make clean` - Cleans the build
 ### End result
 - `lxx` executable in the `../dist` folder for interpreting
 - `lxxc` executable in the `../dist` folder for compiling to bytecode
@@ -40,8 +38,7 @@ You must use build.py to build as it modifys the souce code to work with your re
 - libffifb
 ## Dependencies
 - Lua 5.4
-- Python (if you want to build)
-- CMake (if you want to build)
+- Make (if you want to build)
 - A C/C++ compiler (if you want to build or use the FFI)
 
 ## TODO:

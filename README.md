@@ -61,8 +61,9 @@ be a simplified, high lever but at the same time low level language that can be 
 [This](/lxx-1.0.0-tests) test directory has ~100 example LXX files. This shows more specific longer tests and examples of LXX code. Most of these were ported from LuaJIT and 
 rewritten in LXX using lua-lxx.
 ## Building
-LXX at the moment requires you to build it and does
-not offer prebuilt binaries. This will change in the future.
+LXX at the moment requires you to build it and does not offer prebuilt binaries. This will change in the future.
+
+You must have Make installed and CMake must export to Make
 ### Dependencies
 - CMake (if you want to build)
 - NPM (if you want to build the VSCode extension)

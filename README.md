@@ -47,10 +47,14 @@ some code then install it to your PATH/$PATH.
 - If you chose to move them to the PATH/$PATH they will be there instead of the dist folder
 ## Credits
 - Lua (Ljs Starting point)
+- LuaJIT (LjsJIT Starting point)
+
 - Ljs (Starting point)
+- LjsJIT (Starting point for JIT)
 - selene (Used in Linter)
 - libffifb (Used in FFI)
 - LuaDist (Alot of their code is used in lxx)
+
 ## TODO:
 - FFI
 - Publish extension

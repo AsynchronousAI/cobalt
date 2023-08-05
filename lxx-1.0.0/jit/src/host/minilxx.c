@@ -1,5 +1,5 @@
-/* This is a heavily customized and minimized copy of Lua 5.1.5. */
-/* It's only used to build LuaJIT. It does NOT have all standard functions! */
+/* This is a heavily customized and minimized copy of Lxx 1.0.0 . */
+/* It's only used to build LxxJIT. It does NOT have all standard functions! */
 /******************************************************************************
 * Copyright (C) 1994-2012 Lua.org, PUC-Rio.  All rights reserved.
 *

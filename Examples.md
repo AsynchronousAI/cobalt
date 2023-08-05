@@ -101,7 +101,7 @@ collectgarbage("count") // -> 31 (as an integer) // only returns kb
 ## Access macros
 ```js
 // Macros should only be fetched in the start of the program or be initialized in the start of the program
-// Otherwise macros may take a big performance hit
+// Otherwise macros may take a big performance hit.
 core.macros() // Returns a table of all macros; if this is the first time accessing macros, it will initialize them
 core.macros() // Since you did this again it will happen instantly since it is initialized
 
@@ -117,6 +117,10 @@ if (core.macros("_WIN32") == "1") {
 }else {
     print("You are on an unknown device!")
 }
+
+core.macros()["__linux__"] // This WILL NOT work, you must use core.macros("__linux__") for speed and because
+// of how the macros are structured internally this will not work
+
 // All of these macros shown are real C macros that are used in the C preprocessor
 // We do not reccomend using macros for fetching the OS or Device, use device.info(), device.os, or ffi.os instead
 // There are hundreds of macros and all are fully supported in lxx

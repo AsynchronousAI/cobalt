@@ -2,7 +2,7 @@
 FFI library for LXX and LXXJIT, made to be like the LuaJIT FFI library but also interpretable.
 
 Not completed yet
-Based on facebook's luaffifb
+Based on facebook's luaffifb but ported to also support LXXJIT
 
 ## Steps
 - Integrate to CMake

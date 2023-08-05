@@ -1,3 +1,8 @@
+// Do not use! This is replaced with /libs/ffi
+
+#ifdef LJ_HASFFI
+
+
 /*
 ** FFI library.
 ** Copyright (C) 2005-2020 Mike Pall. See Copyright Notice in luajit.h
@@ -866,4 +871,5 @@ LUALIB_API int luaopen_ffi(lua_State *L)
   return 1;
 }
 
+#endif
 #endif

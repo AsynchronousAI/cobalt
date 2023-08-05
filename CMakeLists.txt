@@ -6,6 +6,7 @@ option(LUA_BUILD_AS_CXX "Build lxx as C++" OFF)
 option(LUA_ENABLE_SHARED "Build dynamic liblua" ON)
 option(LUA_ENABLE_TESTING "Build and run tests" ON)
 option(INSTALL "Install binaries to system" OFF)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 enable_language(CXX)
 if(LUA_ENABLE_TESTING)
     enable_testing()
@@ -26,7 +27,12 @@ else()
 endif()
 
 add_subdirectory(lxx-1.0.0)
-add_subdirectory(lxx-1.0.0/lua-lxx)
+add_custom_target(lua-lxx
+    COMMAND make
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lxx-1.0.0/lua-lxx
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building lua-lxx"
+)
 if(LUA_ENABLE_TESTING)
     add_test(NAME lua-testsuite COMMAND lxx -e "_U=true" all.lxx WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lxx-${CMAKE_PROJECT_VERSION}-tests)
 endif()
@@ -34,6 +40,14 @@ endif()
 #if (INSTALL)
 add_custom_target(setup
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/install.py
+    COMMENT "Installing binaries"
+)
+add_custom_target(setuppy
+    COMMAND py ${CMAKE_CURRENT_SOURCE_DIR}/install.py
+    COMMENT "Installing binaries"
+)
+add_custom_target(setup-py
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/install.py
     COMMENT "Installing binaries"
 )
 #endif()

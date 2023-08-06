@@ -39,7 +39,7 @@ This is an optional tool for converting Lua source code to LXX source code. This
 You will find newly compiled binaries at lxx-1.0.0/lua-lxx. If you install in the next step it should be in your PATH/$PATH.
 You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and the new code should be in the terminal.
 
-### Installing
+### Installing binaries and libraries
 #### For python3
 - `sudo make setup` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `python3`
 #### For py

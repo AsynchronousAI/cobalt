@@ -67,7 +67,14 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 
 ## TODO:
 - FFI
-- Copyright 
-- Make a better linter
-- Integrate JIT
+- Copyright
+- Struct like in C
+- Enum like in C
+- Types like in C
+- - Types can be defined, but not checked
+- Custom types
+- Make a better linter (far future)
+- Port libraries to JIT
+- Overall sync JIT
+- Cmake JIT
 - library installer

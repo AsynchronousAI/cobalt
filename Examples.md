@@ -224,6 +224,39 @@ NPC_State = {
 }
 // but that would be modifyable and is a table and the garbage collector will treat it like one.
 ```
+## Arrays and Tables
+```js
+// Unlike in Lua, arrays and tables are different in lxx
+// Tables have a key value, arrays dont
+// Tables would be looped through using pairs, arrays would be looped through using ipairs
+// They are different just for performance reasons and cleaner code
+var myTable = {
+    "a": 1, // Unlike in lua how you would define using
+    // ["a"] = 1, // This is not valid in lxx and will create parser issues
+}
+
+var myArray = [1, 2, 3, 4, 5] // Arrays are defined using square brackets
+
+for (i, v in pairs(myTable)) {
+    print(i, v)
+}
+
+// You could use pairs on an array but it is a good practice to use ipairs
+// pairs gives the key as the first value and the value as the second value
+// ipairs gives the index as the first value and the value as the second value
+
+for (i, v in ipairs(myArray)) {
+    print(i, v)
+}
+
+// You can also use the # operator to get the length of an array
+#myArray // -> 5
+// But with tables
+#myTable // -> 0, Since the index is a string it doesnt register that.
+// But you can loop through tables.
+
+// Tables and Arrays are stores in "similar" fashions but are different.
+```
 ## Async
 ```js
 // Async is a library that runs a function in a new thread

@@ -70,14 +70,12 @@ You can use this by making a `test.lua` in your cwd and running `lua-lxx` and th
 - Copyright
 - Batchfiles 
 - Args, etc std library written in Lxx
-- Types like in C (might have to implement new function alongside)
-- - Types can be defined, but not checked
-- Custom types
 - Make a better linter (far future)
 - Port libraries to JIT
 - Overall sync JIT
 - Cmake JIT
 - library installer
+- Type checker (LJS has a x: y, but it doesnt work just parses)
 
 ## Changes to add to JIT
 - New libraries
@@ -89,3 +87,4 @@ You can use this by making a `test.lua` in your cwd and running `lua-lxx` and th
 - improved output
 - Enum function
 - Integrate to Cmake
+- JIT Goto

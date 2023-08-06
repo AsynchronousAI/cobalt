@@ -288,7 +288,93 @@ t.z = 50 // Since the second argument to new was 50, z is now 50 because of the 
 // All these changes will not affect the original type or any others made from it
 myType.x // -> 10 // When making a class, and using itself it will be read-only
 ```
-# try and xtry
+## goto
+```js
+// NOTE: goto is not available in the JIT compiler.
+
+
+// goto is a keyword that is used to jump to a label
+// Labels are defined using ::label::
+
+// Example:
+goto label
+print("Hello, World!")
+::label::
+print("Hello world 2!")
+
+// Output:
+// Hello world 2!
+
+// Why didnt it print "Hello, World!"?
+// Because goto jumps to the label and skips all code until the label  
+```
+
+## ? and :
+```js
+// One of my favorite features of lxx is the ? and : operators
+// term ? iftrue : iffalse
+
+var x = 10
+
+print(x == 10 ? "x is 10" : "x is not 10") // -> "x is 10"
+
+// This is the same as:
+if (x == 10) {
+    print("x is 10")
+}else {
+    print("x is not 10")
+}
+
+// Another use case is
+x = y ? y : 0
+// X will be y if y is not null. If y is null then x will be 0
+```
+
+## Variable Annotations
+```js
+var x: number = 10
+// This is the same as
+var x = 10
+// But it is a good practice to use annotations
+// not only that but if
+var x: number = "Hello, World!"
+// x will be null, what it was previously defined, because it is breaking the annotation rule
+// but if you redefine it without the annotation it will stay as a string
+
+function myFunc(x: number) {
+    print(x)
+}
+
+// You can also use ? and : so 
+var x: number = "x" 
+x ? x : error("x is null") 
+// defines x as "x", since it is not a number it doesnt get saved, and the error function is called
+
+
+var x: number = 10
+x: number = "hi"
+// x will remain as 10 because it is already defined
+```
+
+## this
+```js
+// this is a keyword that is used to reference the current object
+// kindof like self in lua
+
+myclass = {}
+function myclass::myFunc() {
+    print(this) // Will print the current object, myclass
+}
+function myclass.myfunc2() {
+    print(this) // will print null because it is not a class function
+}
+
+myclass -> myFunc() // -> myclass
+myclass.myfunc2() // -> null
+```
+
+
+## try and xtry
 ```js
 // try is like pcall in lua
 // xtry is like xpcall in lua

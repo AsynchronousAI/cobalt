@@ -330,6 +330,40 @@ x = y ? y : 0
 // X will be y if y is not null. If y is null then x will be 0
 ```
 
+## import & require
+```js
+// import and require may seem similar but they are different
+import("argparse") // Imports the argparse module and saves it as a global variable
+//////////////////////////////////////////////////
+var argparse = require("argparse") // Requires the argparse module and saves it as a local variable
+```
+
+## One liners
+```js
+// One liners are a way to write a for loop, if statement, or while loop in one line
+for (i, v in pairs([1,2,3])) print(i, v) 
+// Prints:
+// 1 1
+// 2 2
+// 3 3
+// You do not need to use curly braces if it is a one liner
+
+
+if (true) print("Hello, World!") else print("Hello, World 2!")
+// Prints:
+// Hello, World!
+
+
+while (true) print("Hello, World!")
+// Prints:
+// Hello, World!
+// Hello, World!
+// Hello, World!
+// Hello, World!
+// ...
+
+```
+
 ## Variable Annotations
 ```js
 var x: number = 10

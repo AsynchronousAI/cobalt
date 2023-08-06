@@ -618,6 +618,47 @@ static void findloader (lua_State *L, const char *name) {
   }
 }
 
+static int ll_import (lua_State *L) {
+  const char *name = luaL_checkstring(L, 1);
+  lua_settop(L, 1);  /* LOADED table will be at index 2 */
+  lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
+  lua_getfield(L, 2, name);  /* LOADED[name] */
+  if (lua_toboolean(L, -1)){  /* is it there? */
+    return 1;  /* package is already loaded */
+  }
+  /* else must load package */
+  lua_pop(L, 1);  /* remove 'getfield' result */
+  findloader(L, name);
+  lua_rotate(L, -2, 1);  /* function <-> loader data */
+  lua_pushvalue(L, 1);  /* name is 1st argument to module loader */
+  lua_pushvalue(L, -3);  /* loader data is 2nd argument */
+  /* stack: ...; loader data; loader function; mod. name; loader data */
+  lua_call(L, 2, 1);  /* run loader to load module */
+  /* stack: ...; loader data; result from loader */
+  if (!lua_isnil(L, -1)){  /* non-nil return? */
+    lua_setfield(L, 2, name);  /* LOADED[name] = returned value */
+  }else{
+    lua_pop(L, 1);  /* pop nil */
+  }
+
+  if (lua_getfield(L, 2, name) == LUA_TNIL) {   /* module set no value? */
+    lua_pushboolean(L, 1);  /* use true as result */
+    lua_copy(L, -1, -2);  /* replace loader result */
+    lua_setfield(L, 2, name);  /* LOADED[name] = true */
+  }
+  lua_rotate(L, -2, 1);  /* loader data <-> module result  */
+
+  // Save the module contents as a global variable under the name of the module name
+  if (lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE) != LUA_TTABLE) {
+    luaL_error(L, "'package.loaded' must be a table");
+  }
+  lua_pushvalue(L, -2);
+  lua_setfield(L, -2, name);
+  lua_pop(L, 1);
+  
+
+  return 2;  /* return module result and loader data */
+}
 
 static int ll_require (lua_State *L) { // This is the same require function as the Lua 5.4.2, which is a bit different from the Lua 5.3.5 version.
   const char *name = luaL_checkstring(L, 1);
@@ -754,7 +795,7 @@ static const luaL_Reg pk_funcs[] = {
 
 static const luaL_Reg ll_funcs[] = {
   //{"module", ll_module}, module clears fenv so it's not recommended to use it
-  {"import", ll_require},
+  {"import", ll_import},
   {"require", ll_require}, // This exists only for compatibility, rather use "import"
   {NULL, NULL}
 };

@@ -13,12 +13,19 @@ LXX at the moment requires you to build it and does not offer prebuilt binaries.
 
 You must have Make installed and CMake must export to Make
 ### Dependencies
-- CMake (if you want to build)
+#### Windows only
+- [Windows equivelent](https://www.cygwin.com) of `make`, `cmake`, and `gcc` (or `clang`) <br>
+You need these because this was originally designed for POSIX systems and some of the dependencies are POSIX only. Luckily cygwin has all of these.
+#### Building source
+- CMake
+- GCC or Clang
+- Make
+#### Building VSCode extension
 - NPM (if you want to build the VSCode extension)
 - VSCE (if you want to build the VSCode extension)
-- GCC or Clang (if you want to build)
-- GCC (if you want to use core.macros())
-Using it doesnt require any dependencies apart from core.macros() which requires GCC in the user's device
+#### Optional tools (for usage)
+- GCC (For accessing C macros, optional feature)
+- Nothing else
 ### Building
 - `git clone https://github.com/AsynchronousAI/lxx`
 - `cd lxx`
@@ -36,7 +43,7 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 #### For python3
 - `sudo make setup` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `python3`
 #### For py
-- `sudo make setuppy` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `py` instead of `python3`
+- `sudo make setuppy` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `py` instead of `python3` usually for windows
 #### For python
 - `sudo make setup-py` - Make sure you didnt clean the build folder or this will fail, this also requires python but installs with `python` instead of `python3` or `py`
 
@@ -48,7 +55,7 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 
 ### Extra options
 - `make clean` - Cleans the build folder and object files
-
+- `vsce package` - Packages the VSCode extension (when your CWD is the VSCode extension folder). You shouldnt need to do this because the plugin is in the VSCode marketplace.
 ## Credits
 - Lua (Ljs Starting point)
 - LuaJIT (LjsJIT Starting point)

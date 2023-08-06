@@ -70,7 +70,7 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 - Copyright
 - Struct like in C
 - Enum like in C
-- Types like in C
+- Types like in C (might have to implement new function alongside)
 - - Types can be defined, but not checked
 - Custom types
 - Make a better linter (far future)

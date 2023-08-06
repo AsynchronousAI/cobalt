@@ -69,6 +69,7 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 - FFI
 - Copyright
 - Struct like in C
+- Batchfiles 
 - Args, etc std library written in Lxx
 - Enum like in C
 - Types like in C (might have to implement new function alongside)

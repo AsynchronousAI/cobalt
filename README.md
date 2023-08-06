@@ -69,15 +69,12 @@ Using `make setup(-/py)` will automatically detect and install the compiled bina
 
 ## TODO:
 - FFI
-- Copyright
-- Batchfiles 
-- Args, etc std library written in Lxx
+- Batchfiles
 - Make a better linter (far future)
 - Port libraries to JIT
 - Overall sync JIT
 - Cmake JIT
 - library installer
-- Type checker (LJS has a x: y, but it doesnt work just parses)
 
 ## Changes to add to JIT
 - New libraries

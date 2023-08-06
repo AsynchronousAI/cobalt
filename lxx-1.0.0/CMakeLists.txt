@@ -40,6 +40,7 @@ set(LUA_LIB_SRCS
     "src/lbitlib.c"
     "src/liolib.c"
     "src/lmathlib.c"
+    "src/bitop.c"
     "src/loadlib.c"
     "src/loslib.c"
     "src/lstrlib.c"

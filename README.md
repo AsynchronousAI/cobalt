@@ -59,13 +59,7 @@ Using `make setup(-/py)` will automatically detect and install the compiled bina
 - `make clean` - Cleans the build folder and object files
 - `vsce package` - Packages the VSCode extension (when your CWD is the VSCode extension folder). You shouldnt need to do this because the plugin is in the VSCode marketplace.
 ## Credits
-- Lua (Ljs Starting point)
-- LuaJIT (LjsJIT Starting point)
-- Ljs (Starting point)
-- LjsJIT (Starting point for JIT)
-- selene (Used in Linter)
-- libffifb (Used in FFI)
-- LuaDist (Alot of their code is used in lxx)
+Read full credits [here](/COPYRIGHTS.md)
 
 ## TODO:
 - FFI

@@ -1,0 +1,1506 @@
+var function deep_update(t1, t2) {
+    for( k, v in pairs(t2) ) {
+       if( type(v) == "table" ) {
+          v = deep_update({}, v);
+       }
+ 
+       t1[k] = v;
+    }
+ 
+    return t1;
+ }
+ 
+ // A property is a tuple {name, callback}.
+ // properties.args is number of properties that can be set as arguments
+ // when calling an object.
+ var function class(prototype, properties, parent) {
+    // Class is the metatable of its instances.
+    var cl = {};
+    cl.__index = cl;
+ 
+    if( parent ) {
+       cl.__prototype = deep_update(deep_update({}, parent.__prototype), prototype);
+    } else {
+       cl.__prototype = prototype;
+    }
+ 
+    if( properties ) {
+       var names = {};
+ 
+       // Create setter methods and fill set of property names.
+       for( _, property in ipairs(properties) ) {
+          var name, callback = property[1], property[2];
+ 
+          cl[name] = function(this, value) {
+             if( ! callback(this, value) ) {
+                this["_" .. name] = value;
+             }
+ 
+             return this;
+          };
+ 
+          names[name] = true;
+       }
+ 
+       function cl.__call(this, ...) {
+          // When calling an object, if the first argument is a table,
+          // interpret keys as property names, else delegate arguments
+          // to corresponding setters in order.
+          if( type((...)) == "table" ) {
+             for( name, value in pairs((...)) ) {
+                if( names[name] ) {
+                   this[name](this, value);
+                }
+             }
+          } else {
+             var nargs = select("#", ...);
+ 
+             for( i, property in ipairs(properties) ) {
+                if( i > nargs || i > properties.args ) {
+                   break;
+                }
+ 
+                var arg = select(i, ...);
+ 
+                if( arg != null ) {
+                   this[property[1]](this, arg);
+                }
+             }
+          }
+ 
+          return this;
+       }
+    }
+ 
+    // If indexing class fails, fallback to its parent.
+    var class_metatable = {};
+    class_metatable.__index = parent;
+ 
+    function class_metatable.__call(this, ...) {
+       // Calling a class returns its instance.
+       // Arguments are delegated to the instance.
+       var object = deep_update({}, this.__prototype);
+       setmetatable(object, this);
+       return object(...);
+    }
+ 
+    return setmetatable(cl, class_metatable);
+ }
+ 
+ var function typecheck(name, types, value) {
+    for( _, type_ in ipairs(types) ) {
+       if( type(value) == type_ ) {
+          return true;
+       }
+    }
+ 
+    error(("bad property '%s' (%s expected, got %s)")->format(name, table.concat(types, " or "), type(value)));
+ }
+ 
+ var function typechecked(name, ...) {
+    var types = {...};
+    return {name, function(_, value) { typecheck(name, types, value); }};
+ }
+ 
+ var multiname = {"name", function(this, value) {
+    typecheck("name", {"string"}, value);
+ 
+    for( alias in value->gmatch("%S+") ) {
+       this._name = this._name || alias;
+       table.insert(this._aliases, alias);
+    }
+ 
+    // Do not set _name as with other properties.
+    return true;
+ }};
+ 
+ var function parse_boundaries(str) {
+    if( tonumber(str) ) {
+       return tonumber(str), tonumber(str);
+    }
+ 
+    if( str == "*" ) {
+       return 0, math.huge;
+    }
+ 
+    if( str == "+" ) {
+       return 1, math.huge;
+    }
+ 
+    if( str == "?" ) {
+       return 0, 1;
+    }
+ 
+    if( str->match ("^%d+%-%d+$") ) {
+       var min, max = str->match ("^(%d+)%-(%d+)$");
+       return tonumber(min), tonumber(max);
+    }
+ 
+    if( str->match ("^%d+%+$") ) {
+       var min = str->match ("^(%d+)%+$");
+       return tonumber(min), math.huge;
+    }
+ }
+ 
+ var function boundaries(name) {
+    return {name, function(this, value) {
+       typecheck(name, {"number", "string"}, value);
+ 
+       var min, max = parse_boundaries(value);
+ 
+       if( ! min ) {
+          error(("bad property '%s'")->format(name));
+       }
+ 
+       this["_min" .. name], this["_max" .. name] = min, max;
+    }};
+ }
+ 
+ var actions = {};
+ 
+ var option_action = {"action", function(_, value) {
+    typecheck("action", {"function", "string"}, value);
+ 
+    if( type(value) == "string" && ! actions[value] ) {
+       error(("unknown action '%s'")->format(value));
+    }
+ }};
+ 
+ var option_init = {"init", function(this) {
+    this._has_init = true;
+ }};
+ 
+ var option_default = {"default", function(this, value) {
+    if( type(value) != "string" ) {
+       this._init = value;
+       this._has_init = true;
+       return true;
+    }
+ }};
+ 
+ var add_help = {"add_help", function(this, value) {
+    typecheck("add_help", {"boolean", "string", "table"}, value);
+ 
+    if( this._has_help ) {
+       table.remove(this._options);
+       this._has_help = false;
+    }
+ 
+    if( value ) {
+       var help = this->flag()
+          ->description ("Show this help message and exit.")
+          ->action(function() {
+             print(this->get_help());
+             os.exit(0);
+          });
+ 
+       if( value != true ) {
+          help = help(value);
+       }
+ 
+       if( ! help._name ) {
+          help ("-h") ("--help");
+       }
+ 
+       this._has_help = true;
+    }
+ }};
+ 
+ var Parser = class({
+    _arguments = {},
+    _options = {},
+    _commands = {},
+    _mutexes = {},
+    _groups = {},
+    _require_command = true,
+    _handle_options = true
+ }, {
+    args = 3,
+    typechecked("name", "string"),
+    typechecked("description", "string"),
+    typechecked("epilog", "string"),
+    typechecked("usage", "string"),
+    typechecked("help", "string"),
+    typechecked("require_command", "boolean"),
+    typechecked("handle_options", "boolean"),
+    typechecked("action", "function"),
+    typechecked("command_target", "string"),
+    typechecked("help_vertical_space", "number"),
+    typechecked("usage_margin", "number"),
+    typechecked("usage_max_width", "number"),
+    typechecked("help_usage_margin", "number"),
+    typechecked("help_description_margin", "number"),
+    typechecked("help_max_width", "number"),
+    add_help
+ });
+ 
+ var Command = class({
+    _aliases = {}
+ }, {
+    args = 3,
+    multiname,
+    typechecked("description", "string"),
+    typechecked("epilog", "string"),
+    typechecked("target", "string"),
+    typechecked("usage", "string"),
+    typechecked("help", "string"),
+    typechecked("require_command", "boolean"),
+    typechecked("handle_options", "boolean"),
+    typechecked("action", "function"),
+    typechecked("command_target", "string"),
+    typechecked("help_vertical_space", "number"),
+    typechecked("usage_margin", "number"),
+    typechecked("usage_max_width", "number"),
+    typechecked("help_usage_margin", "number"),
+    typechecked("help_description_margin", "number"),
+    typechecked("help_max_width", "number"),
+    typechecked("hidden", "boolean"),
+    add_help
+ }, Parser);
+ 
+ var Argument = class({
+    _minargs = 1,
+    _maxargs = 1,
+    _mincount = 1,
+    _maxcount = 1,
+    _defmode = "unused",
+    _show_default = true
+ }, {
+    args = 5,
+    typechecked("name", "string"),
+    typechecked("description", "string"),
+    option_default,
+    typechecked("convert", "function", "table"),
+    boundaries("args"),
+    typechecked("target", "string"),
+    typechecked("defmode", "string"),
+    typechecked("show_default", "boolean"),
+    typechecked("argname", "string", "table"),
+    typechecked("hidden", "boolean"),
+    option_action,
+    option_init
+ });
+ 
+ var Option = class({
+    _aliases = {},
+    _mincount = 0,
+    _overwrite = true
+ }, {
+    args = 6,
+    multiname,
+    typechecked("description", "string"),
+    option_default,
+    typechecked("convert", "function", "table"),
+    boundaries("args"),
+    boundaries("count"),
+    typechecked("target", "string"),
+    typechecked("defmode", "string"),
+    typechecked("show_default", "boolean"),
+    typechecked("overwrite", "boolean"),
+    typechecked("argname", "string", "table"),
+    typechecked("hidden", "boolean"),
+    option_action,
+    option_init
+ }, Argument);
+ 
+ function Parser::_inherit_property(name, default) {
+    var element = this;
+ 
+    while( true ) {
+       var value = element["_" .. name];
+ 
+       if( value != null ) {
+          return value;
+       }
+ 
+       if( ! element._parent ) {
+          return default;
+       }
+ 
+       element = element._parent;
+    }
+ }
+ 
+ function Argument::_get_argument_list() {
+    var buf = {};
+    var i = 1;
+ 
+    while( i <= math.min(this._minargs, 3) ) {
+       var argname = this->_get_argname(i);
+ 
+       if( this._default && this._defmode->find ("a") ) {
+          argname = "[" .. argname .. "]";
+       }
+ 
+       table.insert(buf, argname);
+       ++i  ;
+    }
+ 
+    while( i <= math.min(this._maxargs, 3) ) {
+       table.insert(buf, "[" .. this->_get_argname(i) .. "]");
+       ++i  ;
+ 
+       if( this._maxargs == math.huge ) {
+          break;
+       }
+    }
+ 
+    if( i < this._maxargs ) {
+       table.insert(buf, "...");
+    }
+ 
+    return buf;
+ }
+ 
+ function Argument::_get_usage() {
+    var usage = table.concat(this->_get_argument_list(), " ");
+ 
+    if( this._default && this._defmode->find ("u") ) {
+       if( this._maxargs > 1 || (this._minargs == 1 && ! this._defmode->find ("a")) ) {
+          usage = "[" .. usage .. "]";
+       }
+    }
+ 
+    return usage;
+ }
+ 
+ function actions.store_true(result, target) {
+    result[target] = true;
+ }
+ 
+ function actions.store_false(result, target) {
+    result[target] = false;
+ }
+ 
+ function actions.store(result, target, argument) {
+    result[target] = argument;
+ }
+ 
+ function actions.count(result, target, _, overwrite) {
+    if( ! overwrite ) {
+       result[target] = result[target] + 1;
+    }
+ }
+ 
+ function actions.append(result, target, argument, overwrite) {
+    result[target] = result[target] || {};
+    table.insert(result[target], argument);
+ 
+    if( overwrite ) {
+       table.remove(result[target], 1);
+    }
+ }
+ 
+ function actions.concat(result, target, arguments, overwrite) {
+    if( overwrite ) {
+       error("'concat' action can't handle too many invocations");
+    }
+ 
+    result[target] = result[target] || {};
+ 
+    for( _, argument in ipairs(arguments) ) {
+       table.insert(result[target], argument);
+    }
+ }
+ 
+ function Argument::_get_action() {
+    var action, init;
+ 
+    if( this._maxcount == 1 ) {
+       if( this._maxargs == 0 ) {
+          action, init = "store_true", null;
+       } else {
+          action, init = "store", null;
+       }
+    } else {
+       if( this._maxargs == 0 ) {
+          action, init = "count", 0;
+       } else {
+          action, init = "append", {};
+       }
+    }
+ 
+    if( this._action ) {
+       action = this._action;
+    }
+ 
+    if( this._has_init ) {
+       init = this._init;
+    }
+ 
+    if( type(action) == "string" ) {
+       action = actions[action];
+    }
+ 
+    return action, init;
+ }
+ 
+ // Returns placeholder for `narg`-th argument.
+ function Argument::_get_argname(narg) {
+    var argname = this._argname || this->_get_default_argname();
+ 
+    if( type(argname) == "table" ) {
+       return argname[narg];
+    } else {
+       return argname;
+    }
+ }
+ 
+ function Argument::_get_default_argname() {
+    return "<" .. this._name .. ">";
+ }
+ 
+ function Option::_get_default_argname() {
+    return "<" .. this->_get_default_target() .. ">";
+ }
+ 
+ // Returns labels to be shown in the help message.
+ function Argument::_get_label_lines() {
+    return {this._name};
+ }
+ 
+ function Option::_get_label_lines() {
+    var argument_list = this->_get_argument_list();
+ 
+    if( #argument_list == 0 ) {
+       // Don't put aliases for simple flags like `-h` on different lines.
+       return {table.concat(this._aliases, ", ")};
+    }
+ 
+    var longest_alias_length = -1;
+ 
+    for( _, alias in ipairs(this._aliases) ) {
+       longest_alias_length = math.max(longest_alias_length, #alias);
+    }
+ 
+    var argument_list_repr = table.concat(argument_list, " ");
+    var lines = {};
+ 
+    for( i, alias in ipairs(this._aliases) ) {
+       var line = (" ")->rep(longest_alias_length - #alias) .. alias .. " " .. argument_list_repr;
+ 
+       if( i != #this._aliases ) {
+          line = line .. ",";
+       }
+ 
+       table.insert(lines, line);
+    }
+ 
+    return lines;
+ }
+ 
+ function Command::_get_label_lines() {
+    return {table.concat(this._aliases, ", ")};
+ }
+ 
+ function Argument::_get_description() {
+    if( this._default && this._show_default ) {
+       if( this._description ) {
+          return ("%s (default: %s)")->format(this._description, this._default);
+       } else {
+          return ("default: %s")->format(this._default);
+       }
+    } else {
+       return this._description || "";
+    }
+ }
+ 
+ function Command::_get_description() {
+    return this._description || "";
+ }
+ 
+ function Option::_get_usage() {
+    var usage = this->_get_argument_list();
+    table.insert(usage, 1, this._name);
+    usage = table.concat(usage, " ");
+ 
+    if( this._mincount == 0 || this._default ) {
+       usage = "[" .. usage .. "]";
+    }
+ 
+    return usage;
+ }
+ 
+ function Argument::_get_default_target() {
+    return this._name;
+ }
+ 
+ function Option::_get_default_target() {
+    var res;
+ 
+    for( _, alias in ipairs(this._aliases) ) {
+       if( alias->sub(1, 1) == alias->sub(2, 2) ) {
+          res = alias->sub(3);
+          break;
+       }
+    }
+ 
+    res = res || this._name->sub(2);
+    return (res->gsub("-", "_"));
+ }
+ 
+ function Option::_is_vararg() {
+    return this._maxargs != this._minargs;
+ }
+ 
+ function Parser::_get_fullname() {
+    var parent = this._parent;
+    var buf = {this._name};
+ 
+    while( parent ) {
+       table.insert(buf, 1, parent._name);
+       parent = parent._parent;
+    }
+ 
+    return table.concat(buf, " ");
+ }
+ 
+ function Parser::_update_charset(charset) {
+    charset = charset || {};
+ 
+    for( _, command in ipairs(this._commands) ) {
+       command->_update_charset(charset);
+    }
+ 
+    for( _, option in ipairs(this._options) ) {
+       for( _, alias in ipairs(option._aliases) ) {
+          charset[alias->sub(1, 1)] = true;
+       }
+    }
+ 
+    return charset;
+ }
+ 
+ function Parser::argument(...) {
+    var argument = Argument(...);
+    table.insert(this._arguments, argument);
+    return argument;
+ }
+ 
+ function Parser::option(...) {
+    var option = Option(...);
+ 
+    if( this._has_help ) {
+       table.insert(this._options, #this._options, option);
+    } else {
+       table.insert(this._options, option);
+    }
+ 
+    return option;
+ }
+ 
+ function Parser::flag(...) {
+    return this->option()->args(0)(...);
+ }
+ 
+ function Parser::command(...) {
+    var command = Command()->add_help(true)(...);
+    command._parent = this;
+    table.insert(this._commands, command);
+    return command;
+ }
+ 
+ function Parser::mutex(...) {
+    var elements = {...};
+ 
+    for( i, element in ipairs(elements) ) {
+       var mt = getmetatable(element);
+       assert(mt == Option || mt == Argument, ("bad argument #%d to 'mutex' (Option or Argument expected)")->format(i));
+    }
+ 
+    table.insert(this._mutexes, elements);
+    return this;
+ }
+ 
+ function Parser::group(name, ...) {
+    assert(type(name) == "string", ("bad argument #1 to 'group' (string expected, got %s)")->format(type(name)));
+ 
+    var group = {name = name, ...};
+ 
+    for( i, element in ipairs(group) ) {
+       var mt = getmetatable(element);
+       assert(mt == Option || mt == Argument || mt == Command,
+          ("bad argument #%d to 'group' (Option or Argument or Command expected)")->format(i + 1));
+    }
+ 
+    table.insert(this._groups, group);
+    return this;
+ }
+ 
+ var usage_welcome = "Usage: ";
+ 
+ function Parser::get_usage() {
+    if( this._usage ) {
+       return this._usage;
+    }
+ 
+    var usage_margin = this->_inherit_property("usage_margin", #usage_welcome);
+    var max_usage_width = this->_inherit_property("usage_max_width", 70);
+    var lines = {usage_welcome .. this->_get_fullname()};
+ 
+    var function add(s) {
+       if( #lines[#lines]+1+#s <= max_usage_width ) {
+          lines[#lines] = lines[#lines] .. " " .. s;
+       } else {
+          lines[#lines+1] = (" ")->rep(usage_margin) .. s;
+       }
+    }
+ 
+    // Normally options are before positional arguments in usage messages.
+    // However, vararg options should be after, because they can't be reliable used
+    // before a positional argument.
+    // Mutexes come into play, too, and are shown as soon as possible.
+    // Overall, output usages in the following order:
+    // 1. Mutexes that don't have positional arguments or vararg options.
+    // 2. Options that are not in any mutexes and are not vararg.
+    // 3. Positional arguments - on their own or as a part of a mutex.
+    // 4. Remaining mutexes.
+    // 5. Remaining options.
+ 
+    var elements_in_mutexes = {};
+    var added_elements = {};
+    var added_mutexes = {};
+    var argument_to_mutexes = {};
+ 
+    var function add_mutex(mutex, main_argument) {
+       if( added_mutexes[mutex] ) {
+          return;
+       }
+ 
+       added_mutexes[mutex] = true;
+       var buf = {};
+ 
+       for( _, element in ipairs(mutex) ) {
+          if( ! element._hidden && ! added_elements[element] ) {
+             if( getmetatable(element) == Option || element == main_argument ) {
+                table.insert(buf, element->_get_usage());
+                added_elements[element] = true;
+             }
+          }
+       }
+ 
+       if( #buf == 1 ) {
+          add(buf[1]);
+       } else if( #buf > 1 ) {
+          add("(" .. table.concat(buf, " | ") .. ")");
+       }
+    }
+ 
+    var function add_element(element) {
+       if( ! element._hidden && ! added_elements[element] ) {
+          add(element->_get_usage());
+          added_elements[element] = true;
+       }
+    }
+ 
+    for( _, mutex in ipairs(this._mutexes) ) {
+       var is_vararg = false;
+       var has_argument = false;
+ 
+       for( _, element in ipairs(mutex) ) {
+          if( getmetatable(element) == Option ) {
+             if( element->_is_vararg() ) {
+                is_vararg = true;
+             }
+          } else {
+             has_argument = true;
+             argument_to_mutexes[element] = argument_to_mutexes[element] || {};
+             table.insert(argument_to_mutexes[element], mutex);
+          }
+ 
+          elements_in_mutexes[element] = true;
+       }
+ 
+       if( ! is_vararg && ! has_argument ) {
+          add_mutex(mutex);
+       }
+    }
+ 
+    for( _, option in ipairs(this._options) ) {
+       if( ! elements_in_mutexes[option] && ! option->_is_vararg() ) {
+          add_element(option);
+       }
+    }
+ 
+    // Add usages for positional arguments, together with one mutex containing them, if they are in a mutex.
+    for( _, argument in ipairs(this._arguments) ) {
+       // Pick a mutex as a part of which to show this argument, take the first one that's still available.
+       var mutex;
+ 
+       if( elements_in_mutexes[argument] ) {
+          for( _, argument_mutex in ipairs(argument_to_mutexes[argument]) ) {
+             if( ! added_mutexes[argument_mutex] ) {
+                mutex = argument_mutex;
+             }
+          }
+       }
+ 
+       if( mutex ) {
+          add_mutex(mutex, argument);
+       } else {
+          add_element(argument);
+       }
+    }
+ 
+    for( _, mutex in ipairs(this._mutexes) ) {
+       add_mutex(mutex);
+    }
+ 
+    for( _, option in ipairs(this._options) ) {
+       add_element(option);
+    }
+ 
+    if( #this._commands > 0 ) {
+       if( this._require_command ) {
+          add("<command>");
+       } else {
+          add("[<command>]");
+       }
+ 
+       add("...");
+    }
+ 
+    return table.concat(lines, "\n");
+ }
+ 
+ var function split_lines(s) {
+    if( s == "" ) {
+       return {};
+    }
+ 
+    var lines = {};
+ 
+    if( s->sub(-1) != "\n" ) {
+       s = s .. "\n";
+    }
+ 
+    for( line in s->gmatch("([^\n]*)\n") ) {
+       table.insert(lines, line);
+    }
+ 
+    return lines;
+ }
+ 
+ var function autowrap_line(line, max_length) {
+    // Algorithm for splitting lines is simple and greedy.
+    var result_lines = {};
+ 
+    // Preserve original indentation of the line, put this at the beginning of each result line.
+    // If the first word looks like a list marker ('*', '+', or '-'), add spaces so that starts
+    // of the second and the following lines vertically align with the start of the second word.
+    var indentation = line->match("^ *");
+ 
+    if( line->find("^ *[%*%+%-]") ) {
+       indentation = indentation .. " " .. line->match("^ *[%*%+%-]( *)");
+    }
+ 
+    // Parts of the last line being assembled.
+    var line_parts = {};
+ 
+    // Length of the current line.
+    var line_length = 0;
+ 
+    // Index of the next character to consider.
+    var index = 1;
+ 
+    while( true ) {
+       var word_start, word_finish, word = line->find("([^ ]+)", index);
+ 
+       if( ! word_start ) {
+          // Ignore trailing spaces, if any.
+          break;
+       }
+ 
+       var preceding_spaces = line->sub(index, word_start - 1);
+       index = word_finish + 1;
+ 
+       if( (#line_parts == 0) || (line_length + #preceding_spaces + #word <= max_length) ) {
+          // Either this is the very first word or it fits as an addition to the current line, add it.
+          table.insert(line_parts, preceding_spaces); // For the very first word this adds the indentation.
+          table.insert(line_parts, word);
+          line_length = line_length + #preceding_spaces + #word;
+       } else {
+          // Does not fit, finish current line and put the word into a new one.
+          table.insert(result_lines, table.concat(line_parts));
+          line_parts = {indentation, word};
+          line_length = #indentation + #word;
+       }
+    }
+ 
+    if( #line_parts > 0 ) {
+       table.insert(result_lines, table.concat(line_parts));
+    }
+ 
+    if( #result_lines == 0 ) {
+       // Preserve empty lines.
+       result_lines[1] = "";
+    }
+ 
+    return result_lines;
+ }
+ 
+ // Automatically wraps lines within given array,
+ // attempting to limit line length to `max_length`.
+ // Existing line splits are preserved.
+ var function autowrap(lines, max_length) {
+    var result_lines = {};
+ 
+    for( _, line in ipairs(lines) ) {
+       var autowrapped_lines = autowrap_line(line, max_length);
+ 
+       for( _, autowrapped_line in ipairs(autowrapped_lines) ) {
+          table.insert(result_lines, autowrapped_line);
+       }
+    }
+ 
+    return result_lines;
+ }
+ 
+ function Parser::_get_element_help(element) {
+    var label_lines = element->_get_label_lines();
+    var description_lines = split_lines(element->_get_description());
+ 
+    var result_lines = {};
+ 
+    // All label lines should have the same length (except the last one, it has no comma).
+    // If too long, start description after all the label lines.
+    // Otherwise, combine label and description lines.
+ 
+    var usage_margin_len = this->_inherit_property("help_usage_margin", 3);
+    var usage_margin = (" ")->rep(usage_margin_len);
+    var description_margin_len = this->_inherit_property("help_description_margin", 25);
+    var description_margin = (" ")->rep(description_margin_len);
+ 
+    var help_max_width = this->_inherit_property("help_max_width");
+ 
+    if( help_max_width ) {
+       var description_max_width = math.max(help_max_width - description_margin_len, 10);
+       description_lines = autowrap(description_lines, description_max_width);
+    }
+ 
+    if( #label_lines[1] >= (description_margin_len - usage_margin_len) ) {
+       for( _, label_line in ipairs(label_lines) ) {
+          table.insert(result_lines, usage_margin .. label_line);
+       }
+ 
+       for( _, description_line in ipairs(description_lines) ) {
+          table.insert(result_lines, description_margin .. description_line);
+       }
+    } else {
+       for( i = 1, math.max(#label_lines, #description_lines) ) {
+          var label_line = label_lines[i];
+          var description_line = description_lines[i];
+ 
+          var line = "";
+ 
+          if( label_line ) {
+             line = usage_margin .. label_line;
+          }
+ 
+          if( description_line && description_line != "" ) {
+             line = line .. (" ")->rep(description_margin_len - #line) .. description_line;
+          }
+ 
+          table.insert(result_lines, line);
+       }
+    }
+ 
+    return table.concat(result_lines, "\n");
+ }
+ 
+ var function get_group_types(group) {
+    var types = {};
+ 
+    for( _, element in ipairs(group) ) {
+       types[getmetatable(element)] = true;
+    }
+ 
+    return types;
+ }
+ 
+ function Parser::_add_group_help(blocks, added_elements, label, elements) {
+    var buf = {label};
+ 
+    for( _, element in ipairs(elements) ) {
+       if( ! element._hidden && ! added_elements[element] ) {
+          added_elements[element] = true;
+          table.insert(buf, this->_get_element_help(element));
+       }
+    }
+ 
+    if( #buf > 1 ) {
+       table.insert(blocks, table.concat(buf, ("\n")->rep(this->_inherit_property("help_vertical_space", 0) + 1)));
+    }
+ }
+ 
+ function Parser::get_help() {
+    if( this._help ) {
+       return this._help;
+    }
+ 
+    var blocks = {this->get_usage()};
+ 
+    var help_max_width = this->_inherit_property("help_max_width");
+ 
+    if( this._description ) {
+       var description = this._description;
+ 
+       if( help_max_width ) {
+          description = table.concat(autowrap(split_lines(description), help_max_width), "\n");
+       }
+ 
+       table.insert(blocks, description);
+    }
+ 
+    // 1. Put groups containing arguments first, then other arguments.
+    // 2. Put remaining groups containing options, then other options.
+    // 3. Put remaining groups containing commands, then other commands.
+    // Assume that an element can't be in several groups.
+    var groups_by_type = {
+       [Argument] = {},
+       [Option] = {},
+       [Command] = {}
+    };
+ 
+    for( _, group in ipairs(this._groups) ) {
+       var group_types = get_group_types(group);
+ 
+       for( _, mt in ipairs({Argument, Option, Command}) ) {
+          if( group_types[mt] ) {
+             table.insert(groups_by_type[mt], group);
+             break;
+          }
+       }
+    }
+ 
+    var default_groups = {
+       {name = "Arguments", type = Argument, elements = this._arguments},
+       {name = "Options", type = Option, elements = this._options},
+       {name = "Commands", type = Command, elements = this._commands}
+    };
+ 
+    var added_elements = {};
+ 
+    for( _, default_group in ipairs(default_groups) ) {
+       var type_groups = groups_by_type[default_group.type];
+ 
+       for( _, group in ipairs(type_groups) ) {
+          this->_add_group_help(blocks, added_elements, group.name .. ":", group);
+       }
+ 
+       var default_label = default_group.name .. ":";
+ 
+       if( #type_groups > 0 ) {
+          default_label = "Other " .. default_label->gsub("^.", string.lower);
+       }
+ 
+       this->_add_group_help(blocks, added_elements, default_label, default_group.elements);
+    }
+ 
+    if( this._epilog ) {
+       var epilog = this._epilog;
+ 
+       if( help_max_width ) {
+          epilog = table.concat(autowrap(split_lines(epilog), help_max_width), "\n");
+       }
+ 
+       table.insert(blocks, epilog);
+    }
+ 
+    return table.concat(blocks, "\n\n");
+ }
+ 
+ var function get_tip(context, wrong_name) {
+    var context_pool = {};
+    var possible_name;
+    var possible_names = {};
+ 
+    for( name in pairs(context) ) {
+       if( type(name) == "string" ) {
+          for( i = 1, #name ) {
+             possible_name = name->sub(1, i - 1) .. name->sub(i + 1);
+ 
+             if( ! context_pool[possible_name] ) {
+                context_pool[possible_name] = {};
+             }
+ 
+             table.insert(context_pool[possible_name], name);
+          }
+       }
+    }
+ 
+    for( i = 1, #wrong_name + 1 ) {
+       possible_name = wrong_name->sub(1, i - 1) .. wrong_name->sub(i + 1);
+ 
+       if( context[possible_name] ) {
+          possible_names[possible_name] = true;
+       } else if( context_pool[possible_name] ) {
+          for( _, name in ipairs(context_pool[possible_name]) ) {
+             possible_names[name] = true;
+          }
+       }
+    }
+ 
+    var first = next(possible_names);
+ 
+    if( first ) {
+       if( next(possible_names, first) ) {
+          var possible_names_arr = {};
+ 
+          for( name in pairs(possible_names) ) {
+             table.insert(possible_names_arr, "'" .. name .. "'");
+          }
+ 
+          table.sort(possible_names_arr);
+          return "\nDid you mean one of these: " .. table.concat(possible_names_arr, " ") .. "?";
+       } else {
+          return "\nDid you mean '" .. first .. "'?";
+       }
+    } else {
+       return "";
+    }
+ }
+ 
+ var ElementState = class({
+    invocations = 0
+ });
+ 
+ function ElementState::__call(state, element) {
+    this.state = state;
+    this.result = state.result;
+    this.element = element;
+    this.target = element._target || element->_get_default_target();
+    this.action, this.result[this.target] = element->_get_action();
+    return this;
+ }
+ 
+ function ElementState::error(fmt, ...) {
+    this.state->error(fmt, ...);
+ }
+ 
+ function ElementState::convert(argument, index) {
+    var converter = this.element._convert;
+ 
+    if( converter ) {
+       var ok, err;
+ 
+       if( type(converter) == "function" ) {
+          ok, err = converter(argument);
+       } else if( type(converter[index]) == "function" ) {
+          ok, err = converter[index](argument);
+       } else {
+          ok = converter[argument];
+       }
+ 
+       if( ok == null ) {
+          this->error(err && "%s" || "malformed argument '%s'", err || argument);
+       }
+ 
+       argument = ok;
+    }
+ 
+    return argument;
+ }
+ 
+ function ElementState::default(mode) {
+    return this.element._defmode->find(mode) && this.element._default;
+ }
+ 
+ var function bound(noun, min, max, is_max) {
+    var res = "";
+ 
+    if( min != max ) {
+       res = "at " .. (is_max && "most" || "least") .. " ";
+    }
+ 
+    var number = is_max && max || min;
+    return res .. tostring(number) .. " " .. noun ..  (number == 1 && "" || "s");
+ }
+ 
+ function ElementState::set_name(alias) {
+    this.name = ("%s '%s'")->format(alias && "option" || "argument", alias || this.element._name);
+ }
+ 
+ function ElementState::invoke() {
+    this.open = true;
+    this.overwrite = false;
+ 
+    if( this.invocations >= this.element._maxcount ) {
+       if( this.element._overwrite ) {
+          this.overwrite = true;
+       } else {
+          var num_times_repr = bound("time", this.element._mincount, this.element._maxcount, true);
+          this->error("%s must be used %s", this.name, num_times_repr);
+       }
+    } else {
+       this.invocations = this.invocations + 1;
+    }
+ 
+    this.args = {};
+ 
+    if( this.element._maxargs <= 0 ) {
+       this->close();
+    }
+ 
+    return this.open;
+ }
+ 
+ function ElementState::pass(argument) {
+    argument = this->convert(argument, #this.args + 1);
+    table.insert(this.args, argument);
+ 
+    if( #this.args >= this.element._maxargs ) {
+       this->close();
+    }
+ 
+    return this.open;
+ }
+ 
+ function ElementState::complete_invocation() {
+    while( #this.args < this.element._minargs ) {
+       this->pass(this.element._default);
+    }
+ }
+ 
+ function ElementState::close() {
+    if( this.open ) {
+       this.open = false;
+ 
+       if( #this.args < this.element._minargs ) {
+          if( this->default("a") ) {
+             this->complete_invocation();
+          } else {
+             if( #this.args == 0 ) {
+                if( getmetatable(this.element) == Argument ) {
+                   this->error("missing %s", this.name);
+                } else if( this.element._maxargs == 1 ) {
+                   this->error("%s requires an argument", this.name);
+                }
+             }
+ 
+             this->error("%s requires %s", this.name, bound("argument", this.element._minargs, this.element._maxargs));
+          }
+       }
+ 
+       var args;
+ 
+       if( this.element._maxargs == 0 ) {
+          args = this.args[1];
+       } else if( this.element._maxargs == 1 ) {
+          if( this.element._minargs == 0 && this.element._mincount != this.element._maxcount ) {
+             args = this.args;
+          } else {
+             args = this.args[1];
+          }
+       } else {
+          args = this.args;
+       }
+ 
+       this.action(this.result, this.target, args, this.overwrite);
+    }
+ }
+ 
+ var ParseState = class({
+    result = {},
+    options = {},
+    arguments = {},
+    argument_i = 1,
+    element_to_mutexes = {},
+    mutex_to_element_state = {},
+    command_actions = {}
+ });
+ 
+ function ParseState::__call(parser, error_handler) {
+    this.parser = parser;
+    this.error_handler = error_handler;
+    this.charset = parser->_update_charset();
+    this->switch(parser);
+    return this;
+ }
+ 
+ function ParseState::error(fmt, ...) {
+    this.error_handler(this.parser, fmt->format(...));
+ }
+ 
+ function ParseState::switch(parser) {
+    this.parser = parser;
+ 
+    if( parser._action ) {
+       table.insert(this.command_actions, {action = parser._action, name = parser._name});
+    }
+ 
+    for( _, option in ipairs(parser._options) ) {
+       option = ElementState(this, option);
+       table.insert(this.options, option);
+ 
+       for( _, alias in ipairs(option.element._aliases) ) {
+          this.options[alias] = option;
+       }
+    }
+ 
+    for( _, mutex in ipairs(parser._mutexes) ) {
+       for( _, element in ipairs(mutex) ) {
+          if( ! this.element_to_mutexes[element] ) {
+             this.element_to_mutexes[element] = {};
+          }
+ 
+          table.insert(this.element_to_mutexes[element], mutex);
+       }
+    }
+ 
+    for( _, argument in ipairs(parser._arguments) ) {
+       argument = ElementState(this, argument);
+       table.insert(this.arguments, argument);
+       argument->set_name();
+       argument->invoke();
+    }
+ 
+    this.handle_options = parser._handle_options;
+    this.argument = this.arguments[this.argument_i];
+    this.commands = parser._commands;
+ 
+    for( _, command in ipairs(this.commands) ) {
+       for( _, alias in ipairs(command._aliases) ) {
+          this.commands[alias] = command;
+       }
+    }
+ }
+ 
+ function ParseState::get_option(name) {
+    var option = this.options[name];
+ 
+    if( ! option ) {
+       this->error("unknown option '%s'%s", name, get_tip(this.options, name));
+    } else {
+       return option;
+    }
+ }
+ 
+ function ParseState::get_command(name) {
+    var command = this.commands[name];
+ 
+    if( ! command ) {
+       if( #this.commands > 0 ) {
+          this->error("unknown command '%s'%s", name, get_tip(this.commands, name));
+       } else {
+          this->error("too many arguments");
+       }
+    } else {
+       return command;
+    }
+ }
+ 
+ function ParseState::check_mutexes(element_state) {
+    if( this.element_to_mutexes[element_state.element] ) {
+       for( _, mutex in ipairs(this.element_to_mutexes[element_state.element]) ) {
+          var used_element_state = this.mutex_to_element_state[mutex];
+ 
+          if( used_element_state && used_element_state != element_state ) {
+             this->error("%s can not be used together with %s", element_state.name, used_element_state.name);
+          } else {
+             this.mutex_to_element_state[mutex] = element_state;
+          }
+       }
+    }
+ }
+ 
+ function ParseState::invoke(option, name) {
+    this->close();
+    option->set_name(name);
+    this->check_mutexes(option, name);
+ 
+    if( option->invoke() ) {
+       this.option = option;
+    }
+ }
+ 
+ function ParseState::pass(arg) {
+    if( this.option ) {
+       if( ! this.option->pass(arg) ) {
+          this.option = null;
+       }
+    } else if( this.argument ) {
+       this->check_mutexes(this.argument);
+ 
+       if( ! this.argument->pass(arg) ) {
+          this.argument_i = this.argument_i + 1;
+          this.argument = this.arguments[this.argument_i];
+       }
+    } else {
+       var command = this->get_command(arg);
+       this.result[command._target || command._name] = true;
+ 
+       if( this.parser._command_target ) {
+          this.result[this.parser._command_target] = command._name;
+       }
+ 
+       this->switch(command);
+    }
+ }
+ 
+ function ParseState::close() {
+    if( this.option ) {
+       this.option->close();
+       this.option = null;
+    }
+ }
+ 
+ function ParseState::finalize() {
+    this->close();
+ 
+    for( i = this.argument_i, #this.arguments ) {
+       var argument = this.arguments[i];
+       if( #argument.args == 0 && argument->default("u") ) {
+          argument->complete_invocation();
+       } else {
+          argument->close();
+       }
+    }
+ 
+    if( this.parser._require_command && #this.commands > 0 ) {
+       this->error("a command is required");
+    }
+ 
+    for( _, option in ipairs(this.options) ) {
+       option.name = option.name || ("option '%s'")->format(option.element._name);
+ 
+       if( option.invocations == 0 ) {
+          if( option->default("u") ) {
+             option->invoke();
+             option->complete_invocation();
+             option->close();
+          }
+       }
+ 
+       var mincount = option.element._mincount;
+ 
+       if( option.invocations < mincount ) {
+          if( option->default("a") ) {
+             while( option.invocations < mincount ) {
+                option->invoke();
+                option->close();
+             }
+          } else if( option.invocations == 0 ) {
+             this->error("missing %s", option.name);
+          } else {
+             this->error("%s must be used %s", option.name, bound("time", mincount, option.element._maxcount));
+          }
+       }
+    }
+ 
+    for( i = #this.command_actions, 1, -1 ) {
+       this.command_actions[i].action(this.result, this.command_actions[i].name);
+    }
+ }
+ 
+ function ParseState::parse(args) {
+    for( _, arg in ipairs(args) ) {
+       var plain = true;
+ 
+       if( this.handle_options ) {
+          var first = arg->sub(1, 1);
+ 
+          if( this.charset[first] ) {
+             if( #arg > 1 ) {
+                plain = false;
+ 
+                if( arg->sub(2, 2) == first ) {
+                   if( #arg == 2 ) {
+                      if( this.options[arg] ) {
+                         var option = this->get_option(arg);
+                         this->invoke(option, arg);
+                      } else {
+                         this->close();
+                      }
+ 
+                      this.handle_options = false;
+                   } else {
+                      var equals = arg->find ("=");
+                      if( equals ) {
+                         var name = arg->sub(1, equals - 1);
+                         var option = this->get_option(name);
+ 
+                         if( option.element._maxargs <= 0 ) {
+                            this->error("option '%s' does not take arguments", name);
+                         }
+ 
+                         this->invoke(option, name);
+                         this->pass(arg->sub(equals + 1));
+                      } else {
+                         var option = this->get_option(arg);
+                         this->invoke(option, arg);
+                      }
+                   }
+                } else {
+                   for( i = 2, #arg ) {
+                      var name = first .. arg->sub(i, i);
+                      var option = this->get_option(name);
+                      this->invoke(option, name);
+ 
+                      if( i != #arg && option.element._maxargs > 0 ) {
+                         this->pass(arg->sub(i + 1));
+                         break;
+                      }
+                   }
+                }
+             }
+          }
+       }
+ 
+       if( plain ) {
+          this->pass(arg);
+       }
+    }
+ 
+    this->finalize();
+    return this.result;
+ }
+ 
+ function Parser::error(msg) {
+    io.stderr->write(("%s\n\nError: %s\n")->format(this->get_usage(), msg));
+    os.exit(1);
+ }
+ 
+ // Compatibility with strict.lua and other checkers:
+ var default_cmdline = rawget(_G, "arg") || {};
+ 
+ function Parser::_parse(args, error_handler) {
+    return ParseState(this, error_handler)->parse(args || default_cmdline);
+ }
+ 
+ function Parser::parse(args) {
+    return this->_parse(args, this.error);
+ }
+ 
+ var function xpcall_error_handler(err) {
+    return tostring(err) .. "\noriginal " .. debug.traceback("", 2)->sub(2);
+ }
+ 
+ function Parser::pparse(args) {
+    var parse_error;
+ 
+    var ok, result = xpcall(function() {
+       return this->_parse(args, function(_, err) {
+          parse_error = err;
+          error(err, 0);
+       });
+    }, xpcall_error_handler);
+ 
+    if( ok ) {
+       return true, result;
+    } else if( ! parse_error ) {
+       error(result, 0);
+    } else {
+       return false, parse_error;
+    }
+ }
+ 
+ var argparse = {};
+ 
+ argparse.version = "0.6.0";
+ 
+ setmetatable(argparse, {__call = function(_, ...) {
+    return Parser(default_cmdline[0])->add_help(true)(...);
+ }});
+ 
+ return argparse;

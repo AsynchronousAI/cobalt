@@ -62,6 +62,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_SIGNALNAME, luaopen_signal},
   {LUA_SOCKETNAME, luaopen_chan},
   {LUA_BITLIBNAME, luaopen_bit32},
+  {LUA_BITOPNAME, luaopen_bit},
   {NULL, NULL}
 };
 

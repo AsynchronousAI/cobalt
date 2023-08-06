@@ -71,6 +71,9 @@ LUAMOD_API int (luaopen_complex) (lua_State *L);
 #define LUA_STRUCTNAME	"struct"
 LUAMOD_API int (luaopen_struct) (lua_State *L);
 
+#define LUA_BITOPNAME	"bit"
+LUAMOD_API int (luaopen_bit) (lua_State *L);
+
 #define LUA_SIGNALNAME	"signal"
 LUAMOD_API int (luaopen_signal) (lua_State *L);
 

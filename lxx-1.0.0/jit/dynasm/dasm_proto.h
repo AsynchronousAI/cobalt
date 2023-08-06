@@ -11,7 +11,7 @@
 #include <stdarg.h>
 
 #define DASM_IDENT	"DynASM 1.4.0"
-#define DASM_VERSION	10400	/* 1.4.0 */
+#define DASM_VERSION	10300	/* 1.4.0 */
 
 #ifndef Dst_DECL
 #define Dst_DECL	dasm_State **Dst

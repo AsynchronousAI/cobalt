@@ -62,6 +62,39 @@ for binary in installable:
 ####################################################################
 ### Binaries installed! Now install the libraries and header files #
 ####################################################################
+            
+# Create include path
+print("[*] \033[32mCreating include path...\033[0m")
+if sys.platform == "win32":
+    if not os.path.isdir("\\include\\"):
+        os.mkdir("\\include\\")
+    if not os.path.isdir("\\include\\lxx\\"):
+        os.mkdir("\\include\\lxx\\")
+    if not os.path.isdir("\\..\\include\\lxx\\"):
+        os.mkdir("\\..\\include\\lxx\\")
+else:
+    if not os.path.isdir("/usr/local/include/lxx/"):
+        os.mkdir("/usr/local/include/lxx/")
+        
+# Move all header files to the include path
+print("[*] \033[32mMoving header files...\033[0m")
+# Create alias for the following:
+# lauxlib.h
+# lua.h
+# luaconf.h
+# lualib.h
+# lua.hpp
+
+alias = ["lauxlib.h", "lua.h", "luaconf.h", "lualib.h", "lua.hpp"]
+# They are located in script-dir/lxx-1.0.0/src/
+for item in os.listdir(scriptPath + "/lxx-1.0.0/src/"):
+    if item in alias:
+        if sys.platform == "win32":
+            os.system("cp " + scriptPath + "/lxx-1.0.0/src/" + item + " " + "\\include\\lxx\\" + item)
+        else:
+            os.system("cp " + scriptPath + "/lxx-1.0.0/src/" + item + " " + "/usr/local/include/lxx/" + item)
+        
+# Create library path
 print("[*] \033[32mCreating library path\033[0m")
 """C Refrence:
 // VDIR is "lxx"
@@ -109,14 +142,13 @@ print("[*] \033[32mInstalling standard libraries...\033[0m")
 for item in os.listdir(scriptPath + "/lxx-1.0.0/lib"):
     if os.path.isdir(scriptPath + "/lxx-1.0.0/lib/" + item):
         # Change cwd to the directory
-        os.chdir(scriptPath + "/lxx-1.0.0/lib/" + item)
+        #os.chdir(scriptPath + "/lxx-1.0.0/lib/" + item)
         # Compile the library
-        os.system("make -w")
+        #os.system("make -w")
         # Move the library to the install path
-        os.rename(scriptPath + "/lxx-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
+        #os.rename(scriptPath + "/lxx-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
+        pass
     elif os.path.isfile(scriptPath + "/lxx-1.0.0/lib/" + item):
         # Make sure it is a lxx file
         if item.endswith(".lxx"):
-            # duplicate the file to the install path
-            os.rename(scriptPath + "/lxx-1.0.0/lib/" + item, LDIR + item)
-            
+            os.system("cp " + scriptPath + "/lxx-1.0.0/lib/" + item + " " + LDIR + item)

@@ -109,9 +109,7 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 
 ## TODO:
 - FFI
-- Rebrand alot of the code
+- Copyright 
 - Make a better linter
 - Integrate JIT
-- Add tests
-- Install.py for CMake
 - library installer

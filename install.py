@@ -14,8 +14,8 @@ if os.path.isfile(scriptPath + "/lxxc"):
     installable.append("lxxc")
 if os.path.isfile(scriptPath + "/lxxjit"):
     installable.append("lxxjit")
-if os.path.isfile(scriptPath + "/lua-lxx"):
-    installable.append("lua-lxx")
+if os.path.isfile(scriptPath + "/lxx-1.0.0/lua-lxx/lua-lxx"):
+    installable.append("lxx-1.0.0/lua-lxx/lua-lxx")
     
             ### Windows Specific ###
 if os.path.isfile(scriptPath + "/lxx.exe"):
@@ -24,8 +24,8 @@ if os.path.isfile(scriptPath + "/lxxc.exe"):
     installable.append("lxxc.exe")
 if os.path.isfile(scriptPath + "/lxxjit.exe"):
     installable.append("lxxjit.exe")
-if os.path.isfile(scriptPath + "/lua-lxx.exe"):
-    installable.append("lua-lxx.exe")
+if os.path.isfile(scriptPath + "\\lxx-1.0.0\\lua-lxx\\lua-lxx.exe"):
+    installable.append("lxx-1.0.0\\lua-lxx\\lua-lxx.exe")
     
 
 # Get the install path based on the users operating systems $PATH/%PATH%/etc. 
@@ -47,7 +47,18 @@ else:
 # Move each binary to the install path
 print("[*] \033[32mInstalling binaries...\033[0m")
 for binary in installable:
-    os.rename(scriptPath + "/" + binary, installPath + "/" + binary)
+    oldbinary = binary
+    if binary.endswith(".exe"):
+        binary = binary.split("\\")[-1]
+    else:
+        binary = binary.split("/")[-1]
+    
+    if oldbinary == binary:
+        os.rename(scriptPath + "/" + binary, installPath + "/" + binary)
+    else:
+        os.rename(scriptPath + "/" + oldbinary, installPath + "/" + binary)
+    
+    
 ####################################################################
 ### Binaries installed! Now install the libraries and header files #
 ####################################################################

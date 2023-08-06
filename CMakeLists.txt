@@ -28,7 +28,7 @@ endif()
 
 add_subdirectory(lxx-1.0.0)
 add_custom_target(lua-lxx
-    COMMAND make
+    COMMAND make -w
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lxx-1.0.0/lua-lxx
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building lua-lxx"

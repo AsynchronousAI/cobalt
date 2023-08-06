@@ -3,7 +3,7 @@ Very useful examples to give you an idea of how to use lxx.
 
 All these examples are in pure lxx with no external libraries or modules, and will work out of the box.
 
-These items are in no particular order.
+These items are in no particular order, But I will try to keep easier examples at the top.
 
 ## Get system specs
 You could use the built in library `device` to get the system specs for all platforms, it provides a abstraction layer for all platforms.
@@ -257,6 +257,52 @@ for (i, v in ipairs(myArray)) {
 
 // Tables and Arrays are stores in "similar" fashions but are different.
 ```
+## new and types/typedef
+```js
+// new is kindof like Javascript's new keyword
+// It creates a new instance of a class or object. 
+
+// For example:
+var v = Vector3.new(1, 2, 3) // Creates a new Vector3 object with the values 1, 2, 3
+
+typedef("myType", {
+    // typedef doesnt do anything right now, it just makes it easier to create a new type
+    "x": 10,
+    "myFunc": function() {
+        print(this.x)
+    }
+
+    "new": function(z) {
+        var new = this
+        new.z = z
+        return new // Duplicates itself and returns it
+    }
+})
+
+var t = myType.new(50) // Creates a new instance of myType
+t->myFunc() // -> 10
+// Using -> is like using : in Lua, it passes the `this` variable (self in Lua) to the function
+t.x = 20
+t.z = 50 // Since the second argument to new was 50, z is now 50 because of the __new method
+
+// All these changes will not affect the original type or any others made from it
+myType.x // -> 10 // When making a class, and using itself it will be read-only
+```
+# try and xtry
+```js
+// try is like pcall in lua
+// xtry is like xpcall in lua
+
+try(function() {
+    print("Hello, World!")
+})
+
+xtry(function() { // function to try
+    print("Hello, World!")
+}, function(err) { // error handler
+    print("Error: " + err)
+})
+```
 ## Async
 ```js
 // Async is a library that runs a function in a new thread
@@ -302,7 +348,8 @@ signal.call("test") // Calls the signal "test" and will print "Hello, World!"
 ```
 ## Structs
 ```js
-// Structs are a way to compress data into a single variable
+// Structs are a way to pack structures data into a single variable/string
+// they are not like C structs, they are more like Python's struct module
 
 struct.pack("ii", 1, 2) // Packs 1 and 2 into a struct
 // -> �

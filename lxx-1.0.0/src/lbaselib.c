@@ -680,21 +680,27 @@ static int luaB_inputf(lua_State *L) {
   return 1;
 }
 
+static int luaB_typedef(lua_State *L) {
+  // typedef(name, table)
+  // adds a new method to the table if it doesnt exist
+  // saves the table in the global namespace
+  // the new method returns an unlocked version of the table
+  // otherwise the table will be read-only
+  const char *name = luaL_checkstring(L, 1);
+  luaL_checktype(L, 2, LUA_TTABLE);
 
-static int luaB_new(lua_State *L) {
-  // Runs arg1.new(arg2, arg3, ...)
-  // So new(arg1, arg2, arg3, ...) is equivalent to arg1.new(arg2, arg3, ...)
-  int nargs = lua_gettop(L);
-  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
-  luaL_argcheck(L, lua_type(L, 1) == LUA_TTABLE, 1, "expected a table");
+  // Check that the name isnt already taken
+  lua_getglobal(L, name);
+  if (!lua_isnil(L, -1)) {
+    return luaL_error(L, "type name '%s' is already taken", name);
+  }
+  lua_pop(L, 1);
+  // Duplicate the inputted table and save it globally
+  lua_pushvalue(L, 2);
+  lua_setglobal(L, name);
 
-  lua_getfield(L, 1, "new");
-  lua_insert(L, 1);
-  lua_remove(L, 1);
-  lua_call(L, nargs, 1);
   return 1;
 }
-
 static int luaB_range(lua_State *L) {
   // range(start, stop, step)
   // returns a table of numbers from start to stop (inclusive) with step
@@ -761,7 +767,7 @@ static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"range", luaB_range},
   {"enum", newenum},
-  //{"new", luaB_new},
+  {"typedef", luaB_typedef},
   //{"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},

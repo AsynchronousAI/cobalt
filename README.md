@@ -68,10 +68,8 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 ## TODO:
 - FFI
 - Copyright
-- Struct like in C
 - Batchfiles 
 - Args, etc std library written in Lxx
-- Enum like in C
 - Types like in C (might have to implement new function alongside)
 - - Types can be defined, but not checked
 - Custom types
@@ -80,3 +78,9 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 - Overall sync JIT
 - Cmake JIT
 - library installer
+
+## Changes to add to JIT
+- New libraries
+- Range function
+- Enum function
+- Integrate to Cmake

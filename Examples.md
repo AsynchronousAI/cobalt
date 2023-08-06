@@ -187,6 +187,43 @@ for (i = 1, 60) {
 // Do:
 swait(60) // Better!
 ```
+## Enum
+```js
+// LXX enums are kindof like C enums
+enum("myenum", {
+    "a": 0,
+    "b": 1,
+    "c": 2
+})
+
+myenum.a // -> 0
+myenum.b // -> 1
+myenum.c // -> 2
+
+// Example usage
+enum("NPC_State", {
+    "Idle": 0,
+    "Walking": 1,
+    "Running": 2,
+    "Attacking": 3,
+    "Dead": 4
+})
+
+var npc = NPC_State.Idle
+if (npc == NPC_State.Idle) {
+    print("NPC is idle")
+}
+
+// You could do this:
+NPC_State = {
+    "Idle": 0,
+    "Walking": 1,
+    "Running": 2,
+    "Attacking": 3,
+    "Dead": 4
+}
+// but that would be modifyable and is a table and the garbage collector will treat it like one.
+```
 ## Async
 ```js
 // Async is a library that runs a function in a new thread

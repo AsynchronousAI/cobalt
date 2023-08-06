@@ -93,7 +93,7 @@ else:
         
 print("[*] \033[32mCreated library paths\033[0m")
 print("[*] \033[32mInstalling standard libraries...\033[0m")
-
+"""
 # Go through all lxx-1.0.0/lib and compile all directories
 for item in os.listdir(scriptPath + "/lxx-1.0.0/lib"):
     if os.path.isdir(scriptPath + "/lxx-1.0.0/lib/" + item):
@@ -108,3 +108,4 @@ for item in os.listdir(scriptPath + "/lxx-1.0.0/lib"):
         if item.endswith(".lxx"):
             # Move the library to the install path
             os.rename(scriptPath + "/lxx-1.0.0/lib/" + item, LDIR + item)
+"""

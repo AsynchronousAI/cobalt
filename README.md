@@ -36,8 +36,10 @@ some code then install it to your PATH/$PATH.
 ### lua-lxx (OPTIONAL)
 This is an optional tool for converting Lua source code to LXX source code. This is not required to use LXX but is a nice tool to have.
 - `make lua-lxx` - Make sure you didnt clean the build folder or this will fail
-You will find newly compiled binaries at lxx-1.0.0/lua-lxx. If you install in the next step it should be in your PATH/$PATH.
-You can use this by making a `test.lua` in your cwd and running `lua-lxx` and the new code should be in the terminal.
+
+Using `make setup(-/py)` will automatically detect and install the compiled binaries of lua-lxx alongside the main lxx binaries.
+#### Usage:
+- `lua-lxx myfile.lua > myfile.lxx` - Converts myfile.lua to myfile.lxx
 
 ### Installing binaries and libraries
 #### For python3

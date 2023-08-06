@@ -1,6 +1,6 @@
 # lxx
 ## What is it?
-lxx is meant to be a *modernized* version of C/C++ based on Lua source code.
+lxx is meant to be a *modernized* version of C/C++ based on Lua source code. This is written in C and LXX so it is ultraportable.
 ## Why?
 Lua is a great language but it has some flaws. Lxx is meant to fix these flaws and make it more low level with features such
 as accessing C macros, manual memory management, classes for real OOP, real threads (not coroutines 🤮), and more.
@@ -69,6 +69,7 @@ You can use this by making a `compile.lua` in your cwd and running `lua-lxx` and
 - FFI
 - Copyright
 - Struct like in C
+- Args, etc std library written in Lxx
 - Enum like in C
 - Types like in C (might have to implement new function alongside)
 - - Types can be defined, but not checked

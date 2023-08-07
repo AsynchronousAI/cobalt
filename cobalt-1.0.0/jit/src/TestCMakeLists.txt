@@ -203,7 +203,7 @@ else()
 endif()
 
 set(BUILDVM_ARCH_H ${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h)
-set(DASM_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../dynasm/dynasm.lua)
+set(DASM_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../dynasm/dynasm.cobalt)
 
 if (NOT LJ_BIG_ENDIAN)
   set(DASM_FLAGS ${DASM_FLAGS} -D ENDIAN_LE)
@@ -383,7 +383,7 @@ set(LJ_LIBDEF_PATH ${CMAKE_CURRENT_BINARY_DIR}/lj_libdef.h)
 set(LJ_RECDEF_PATH ${CMAKE_CURRENT_BINARY_DIR}/lj_recdef.h)
 set(LJ_FFDEF_PATH ${CMAKE_CURRENT_BINARY_DIR}/lj_ffdef.h)
 set(LJ_BCDEF_PATH ${CMAKE_CURRENT_BINARY_DIR}/lj_bcdef.h)
-set(LJ_VMDEF_PATH ${CMAKE_CURRENT_BINARY_DIR}/jit/vmdef.lua)
+set(LJ_VMDEF_PATH ${CMAKE_CURRENT_BINARY_DIR}/jit/vmdef.cobalt)
 
 set(LJ_LIB_SOURCES
   lib_base.c  lib_math.c lib_bit.c lib_string.c lib_table.c

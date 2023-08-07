@@ -9,8 +9,25 @@
 #include <complex.h>
 #define Complex	double complex
 
+
+
 #include "lua.h"
 #include "lauxlib.h"
+#include "lualib.h"
+
+#include "lj_obj.h"
+#include "lj_err.h"
+#include "lj_buf.h"
+#include "lj_strscan.h"
+#include "lj_strfmt.h"
+#if LJ_HASFFI
+#include "lj_ctype.h"
+#include "lj_cdata.h"
+#include "lj_cconv.h"
+#include "lj_carith.h"
+#endif
+#include "lj_ff.h"
+#include "lj_lib.h"
 
 #define MYNAME		"complex"
 #define MYTYPE		MYNAME " number"

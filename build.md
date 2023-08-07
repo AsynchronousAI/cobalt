@@ -14,7 +14,8 @@ The following is needed for building Cobalt:
 - GCC (preferably but any other compiler should work)
 - Python 3
 
-Some of these are not available on windows, cygwin is going to be really helpful for this.
+Some of these are not available on windows, cygwin is going to be really helpful for this, or you can check [other-platforms.md](other-platforms.md) for more information
+on how to build for Windows, XBOX, Nintendo, PS, and more.
 ## Step 3: Building
 ```bash
 $ cmake .

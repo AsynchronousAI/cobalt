@@ -31,9 +31,9 @@
 #include "lua.h"
 
 #define LUAJIT_VERSION		"cobaltJIT based on LuaJIT & ljsJIT"
-#define LUAJIT_VERSION_NUM	20100  /* Version 2.1.0 = 02.01.00. */
+#define LUAJIT_VERSION_NUM	10000  /* Version 1.0.0 = 01.00.00. */
 #define LUAJIT_VERSION_SYM	luaJIT_version_2_1_0_beta3
-#define LUAJIT_COPYRIGHT	"Copyright (C) 2005-2017 Mike Pall, Domingo Alvarez"
+#define LUAJIT_COPYRIGHT	"Copyright (C) 2005-2017 Mike Pall, Domingo Alvarez, cobalt lang team"
 #define LUAJIT_URL		"https://github.com/cobalt-lang/cobalt | http://luajit.org/ https://github.com/mingodad/ljsjit"
 
 /* Modes for luaJIT_setmode. */

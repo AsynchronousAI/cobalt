@@ -841,14 +841,18 @@ LJLIB_NOREG LJLIB_ASM(coroutine_wrap_aux)
   return ffh_resume(L, threadV(lj_lib_upvalue(L, 1)), 1);
 }
 
+//
 /* Inline declarations. */
+
 LJ_ASMF void lj_ff_coroutine_wrap_aux(void);
 #if !(LJ_TARGET_MIPS && defined(ljamalg_c))
 LJ_FUNCA_NORET void LJ_FASTCALL lj_ffh_coroutine_wrap_err(lua_State *L,
 							  lua_State *co);
 #endif
 
+//
 /* Error handler, called from assembler VM. */
+
 void LJ_FASTCALL lj_ffh_coroutine_wrap_err(lua_State *L, lua_State *co)
 {
   co->top--; copyTV(L, L->top, co->top); L->top++;
@@ -858,7 +862,8 @@ void LJ_FASTCALL lj_ffh_coroutine_wrap_err(lua_State *L, lua_State *co)
     lj_err_run(L);
 }
 
-/* Forward declaration. */
+///* Forward declaration. */
+
 static void setpc_wrap_aux(lua_State *L, GCfunc *fn);
 
 LJLIB_CF(coroutine_wrap)

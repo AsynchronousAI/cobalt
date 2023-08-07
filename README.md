@@ -90,4 +90,3 @@ everything they need to make a great program with a great experience.
 
 #### Changes to add to JIT
 - New libraries
-- Print tables

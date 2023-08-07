@@ -147,6 +147,7 @@ for item in os.listdir(scriptPath + "/lxx-1.0.0/lib"):
         #os.system("make -w")
         # Move the library to the install path
         #os.rename(scriptPath + "/lxx-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
+        print("\033[33m[!] " + item + " is not a C script and unsupported right now. Skipping...\033[0m")
         pass
     elif os.path.isfile(scriptPath + "/lxx-1.0.0/lib/" + item):
         # Make sure it is a lxx file

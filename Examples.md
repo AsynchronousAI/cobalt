@@ -272,7 +272,7 @@ typedef("myType", {
         print(this.x)
     }
 
-    "\\new": function(z) {
+    "\\new": function(z) { // I added the \\ to make it not a keyword, DO NOT PUT THE \\ IN REAL CODE
         var new = this
         new.z = z
         return new // Duplicates itself and returns it

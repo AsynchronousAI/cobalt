@@ -455,6 +455,22 @@ Hello, World!
 */
 ```
 
+## msg
+```js
+// msg is a built in library that allows you to communicate across threads.
+
+var thread = async.new("msg.send('test', 'Hello, World!')") // Creates a new thread and sends a message to the thread
+msg.recieve("test", function(data) { // Recieves a message from the thread
+    print("Recieved", data) // Prints "Hello, World!"
+})
+
+thread->start() // Starts the thread
+
+// OUTPUT
+// Recieved Hello, World!
+
+```
+
 ## Signals
 ```js
 // Signals are a way to communicate between threads

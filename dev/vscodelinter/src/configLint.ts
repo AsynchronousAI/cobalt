@@ -1,5 +1,5 @@
 import * as vscode from "vscode"
-import * as lxx from "./lxx"
+import * as cobalt from "./cobalt"
 import { capability, Capabilities } from "./structures/capabilities"
 import { Output } from "./structures/output"
 
@@ -15,7 +15,7 @@ export async function lintConfig(
 
     if (
         document.languageId === "toml" &&
-        !document.uri.path.endsWith("lxx.toml")
+        !document.uri.path.endsWith("cobalt.toml")
     ) {
         return
     }
@@ -24,10 +24,10 @@ export async function lintConfig(
 
     const tomlSource = document.languageId === "toml" ? "--stdin" : ""
 
-    const output = await lxx.lxxCommand(
+    const output = await cobalt.cobaltCommand(
         context.globalStorageUri,
         `validate-config --display-style=json2 ${tomlSource}`,
-        lxx.Expectation.Stderr,
+        cobalt.Expectation.Stderr,
         workspaceFolder,
         document.getText(),
     )

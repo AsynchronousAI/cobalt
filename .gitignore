@@ -20,22 +20,22 @@ Makefile
 /src 
 
 # CMake Ignore (Very large) 
-/lxx/CMakeLists.txt.user
-/lxx/CMakeCache.txt
-/lxx/CMakeFiles
-/lxx/cmake_install.cmake
-/lxx/Makefile
-/lxx/src/CMakeLists.txt.user
-/lxx/src/CMakeCache.txt
-/lxx/src/CMakeFiles
-/lxx/src/cmake_install.cmake
-/lxx/src/Makefile
+/cobalt/CMakeLists.txt.user
+/cobalt/CMakeCache.txt
+/cobalt/CMakeFiles
+/cobalt/cmake_install.cmake
+/cobalt/Makefile
+/cobalt/src/CMakeLists.txt.user
+/cobalt/src/CMakeCache.txt
+/cobalt/src/CMakeFiles
+/cobalt/src/cmake_install.cmake
+/cobalt/src/Makefile
 *cmake_install.cmake
 *.dylib
 *Config.cmake
 *CTestTestfile.cmake
 
 # Allow 
-!/lxx-1.0.0/lua-lxx/Makefile
-!/lxx-1.0.0/jit/Makefile
-!/lxx-1.0.0/jit/src/Makefile
+!/cobalt-1.0.0/lua-cobalt/Makefile
+!/cobalt-1.0.0/jit/Makefile
+!/cobalt-1.0.0/jit/src/Makefile

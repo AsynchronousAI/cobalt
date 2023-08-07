@@ -1,7 +1,7 @@
 {
-	"name": "lxx-highlighting",
-	"displayName": "lxx Syntax Highlighting",
-	"description": "Official lxx syntax highlighting for Visual Studio Code",
+	"name": "cobalt-highlighting",
+	"displayName": "cobalt Syntax Highlighting",
+	"description": "Official cobalt syntax highlighting for Visual Studio Code",
 	"categories": [
 		"Programming Languages"
 	],
@@ -13,7 +13,7 @@
 	"icon": "icon.png",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/AsynchronousAI/lxx.git"
+		"url": "https://github.com/AsynchronousAI/cobalt.git"
 	},
 	"engines": {
 		"vscode": "*"
@@ -21,23 +21,23 @@
 	"contributes": {
 		"languages": [
 			{
-				"id": "lxx",
+				"id": "cobalt",
 				"extensions": [
-					".lxx",
-					".lxxcheckrc"
+					".cobalt",
+					".cobaltcheckrc"
 				],
 				"aliases": [
-					"lxx",
-					"lxx"
+					"cobalt",
+					"cobalt"
 				],
 				"configuration": "./language-configuration.json"
 			}
 		],
 		"grammars": [
 			{
-				"language": "lxx",
-				"scopeName": "source.lxx",
-				"path": "./syntaxes/lxx.json"
+				"language": "cobalt",
+				"scopeName": "source.cobalt",
+				"path": "./syntaxes/cobalt.json"
 			}
 		]
 	},

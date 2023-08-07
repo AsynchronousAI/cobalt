@@ -1,5 +1,5 @@
 import * as os from "os"
-import * as lxx from "./lxx"
+import * as cobalt from "./cobalt"
 import * as requestNative from "request"
 import * as request from "request-promise-native"
 import * as unzip from "unzipper"
@@ -18,16 +18,16 @@ interface GithubRelease {
     tag_name: string
 }
 
-let getLatestlxxReleasePromise: Promise<GithubRelease>
+let getLatestcobaltReleasePromise: Promise<GithubRelease>
 
-export async function getLatestlxxRelease(): Promise<GithubRelease> {
-    if (getLatestlxxReleasePromise) {
-        return getLatestlxxReleasePromise
+export async function getLatestcobaltRelease(): Promise<GithubRelease> {
+    if (getLatestcobaltReleasePromise) {
+        return getLatestcobaltReleasePromise
     }
 
     return request(GITHUB_RELEASES, {
         headers: {
-            "User-Agent": "lxx-vscode",
+            "User-Agent": "cobalt-vscode",
         },
     }).then((body) => {
         return JSON.parse(body) as GithubRelease
@@ -45,7 +45,7 @@ export function platformIsSupported(): boolean {
     }
 }
 
-function getlxxFilename(): string {
+function getcobaltFilename(): string {
     switch (os.platform()) {
         case "win32":
             return "selene.exe"
@@ -57,7 +57,7 @@ function getlxxFilename(): string {
     }
 }
 
-function getlxxFilenamePattern(): RegExp {
+function getcobaltFilenamePattern(): RegExp {
     switch (os.platform()) {
         case "win32":
             return /selene-[^-]+-windows.zip/
@@ -83,14 +83,14 @@ async function fileExists(filename: vscode.Uri): Promise<boolean> {
     }
 }
 
-export async function downloadlxx(directory: vscode.Uri): Promise<void> {
-    vscode.window.showInformationMessage("Downloading lxx Extension...")
+export async function downloadcobalt(directory: vscode.Uri): Promise<void> {
+    vscode.window.showInformationMessage("Downloading cobalt Extension...")
 
-    const filename = getlxxFilename()
-    const filenamePattern = getlxxFilenamePattern()
-    const release = await getLatestlxxRelease().catch((error) => {
+    const filename = getcobaltFilename()
+    const filenamePattern = getcobaltFilenamePattern()
+    const release = await getLatestcobaltRelease().catch((error) => {
         vscode.window.showErrorMessage(
-            `Couldn't look for new lxx release to download.\n\n${error.toString()}`,
+            `Couldn't look for new cobalt release to download.\n\n${error.toString()}`,
         )
 
         return Promise.reject(error)
@@ -108,7 +108,7 @@ export async function downloadlxx(directory: vscode.Uri): Promise<void> {
             return new Promise((resolve, reject) => {
                 requestNative(asset.browser_download_url, {
                     headers: {
-                        "User-Agent": "lxx-vscode",
+                        "User-Agent": "cobalt-vscode",
                     },
                 })
                     .pipe(unzip.Parse())
@@ -128,52 +128,52 @@ export async function downloadlxx(directory: vscode.Uri): Promise<void> {
     }
 }
 
-export async function getlxxPath(
+export async function getcobaltPath(
     storagePath: vscode.Uri,
 ): Promise<vscode.Uri | undefined> {
     const settingPath = vscode.workspace
-        .getConfiguration("lxx")
-        .get<string | null>("lxxPath")
+        .getConfiguration("cobalt")
+        .get<string | null>("cobaltPath")
     if (settingPath) {
         return vscode.Uri.file(settingPath)
     }
 
-    const downloadPath = vscode.Uri.joinPath(storagePath, getlxxFilename())
+    const downloadPath = vscode.Uri.joinPath(storagePath, getcobaltFilename())
     if (await fileExists(downloadPath)) {
         return downloadPath
     }
 }
 
-export async function ensurelxxExists(
+export async function ensurecobaltExists(
     storagePath: vscode.Uri,
 ): Promise<void> {
-    const path = await getlxxPath(storagePath)
+    const path = await getcobaltPath(storagePath)
 
     if (path === undefined) {
         await vscode.workspace.fs.createDirectory(storagePath)
-        return downloadlxx(storagePath)
+        return downloadcobalt(storagePath)
     } else {
         if (!(await fileExists(path))) {
-            return Promise.reject("Path given for lxx does not exist")
+            return Promise.reject("Path given for cobalt does not exist")
         }
 
         const version = (
-            await lxx.lxxCommand(
+            await cobalt.cobaltCommand(
                 storagePath,
                 "--version",
-                lxx.Expectation.Stdout,
+                cobalt.Expectation.Stdout,
             )
         )?.trim()
 
-        return getLatestlxxRelease()
+        return getLatestcobaltRelease()
             .then((release) => {
-                if (version !== `lxx ${release.tag_name}`) {
+                if (version !== `cobalt ${release.tag_name}`) {
                     openUpdatePrompt(storagePath, release)
                 }
             })
             .catch((error) => {
                 vscode.window.showErrorMessage(
-                    `Couldn't look for new lxx releases.\n\n${error.toString()}`,
+                    `Couldn't look for new cobalt releases.\n\n${error.toString()}`,
                 )
             })
     }
@@ -182,7 +182,7 @@ export async function ensurelxxExists(
 function openUpdatePrompt(directory: vscode.Uri, release: GithubRelease) {
     vscode.window
         .showInformationMessage(
-            `There's an update available for lxx: ${release.tag_name}`,
+            `There's an update available for cobalt: ${release.tag_name}`,
             "Install Update",
             "Later",
             "Release Notes",
@@ -190,7 +190,7 @@ function openUpdatePrompt(directory: vscode.Uri, release: GithubRelease) {
         .then((option) => {
             switch (option) {
                 case "Install Update":
-                    downloadlxx(directory).then(() =>
+                    downloadcobalt(directory).then(() =>
                         vscode.window.showInformationMessage(
                             "Update succeeded.",
                         ),

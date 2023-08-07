@@ -1,7 +1,7 @@
-# lxx/examples
-Very useful examples to give you an idea of how to use lxx.
+# cobalt/examples
+Very useful examples to give you an idea of how to use cobalt.
 
-All these examples are in pure lxx with no external libraries or modules, and will work out of the box.
+All these examples are in pure cobalt with no external libraries or modules, and will work out of the box.
 
 These items are in no particular order, But I will try to keep easier examples at the top.
 
@@ -123,7 +123,7 @@ core.macros()["__linux__"] // This WILL NOT work, you must use core.macros("__li
 
 // All of these macros shown are real C macros that are used in the C preprocessor
 // We do not reccomend using macros for fetching the OS or Device, use device.info(), device.os, or ffi.os instead
-// There are hundreds of macros and all are fully supported in lxx
+// There are hundreds of macros and all are fully supported in cobalt
 ```
 
 ## Vector3
@@ -141,7 +141,7 @@ v.X // -> 1
 v.Y // -> 2
 
 var rv = Vector2.fromScreen(.5, 5, .5, 5, 100, 100) // -> <vector2 object>. Format like xscale, xoffset, yscale, yoffset, screen width, screen height
-// if you are using lxx in a game engine screen width and screen height should be autofilled by the engine
+// if you are using cobalt in a game engine screen width and screen height should be autofilled by the engine
 ```
 
 ## Transform
@@ -154,7 +154,7 @@ var t2 = Transform.new(Vector3.new(10,10,10), Vector3.new(11,11,11), Vector3.new
 t2.PY // -> 13 | PY means Pivot Y (Pivot Y axis)
 ```
 ## File control
-lxx provides a File Control library buildin based on lfs.
+cobalt provides a File Control library buildin based on lfs.
 ```js
 file.chdir("path") // Changes the current working directory to path
 file.mkdir("path") // Creates a directory at path
@@ -189,7 +189,7 @@ swait(60) // Better!
 ```
 ## Enum
 ```js
-// LXX enums are kindof like C enums
+// cobalt enums are kindof like C enums
 enum("myenum", {
     "a": 0,
     "b": 1,
@@ -226,13 +226,13 @@ NPC_State = {
 ```
 ## Arrays and Tables
 ```js
-// Unlike in Lua, arrays and tables are different in lxx
+// Unlike in Lua, arrays and tables are different in cobalt
 // Tables have a key value, arrays dont
 // Tables would be looped through using pairs, arrays would be looped through using ipairs
 // They are different just for performance reasons and cleaner code
 var myTable = {
     "a": 1, // Unlike in lua how you would define using
-    // ["a"] = 1, // This is not valid in lxx and will create parser issues
+    // ["a"] = 1, // This is not valid in cobalt and will create parser issues
 }
 
 var myArray = [1, 2, 3, 4, 5] // Arrays are defined using square brackets
@@ -311,7 +311,7 @@ print("Hello world 2!")
 
 ## ? and :
 ```js
-// One of my favorite features of lxx is the ? and : operators
+// One of my favorite features of cobalt is the ? and : operators
 // term ? iftrue : iffalse
 
 var x = 10

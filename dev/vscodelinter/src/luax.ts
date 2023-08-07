@@ -7,23 +7,23 @@ export enum Expectation {
     Stdout,
 }
 
-export async function lxxCommand(
+export async function cobaltCommand(
     storagePath: vscode.Uri,
     command: string,
     expectation: Expectation,
     workspace?: vscode.WorkspaceFolder,
     stdin?: string,
 ): Promise<string | null> {
-    return util.getlxxPath(storagePath).then((lxxPath) => {
+    return util.getcobaltPath(storagePath).then((cobaltPath) => {
         return new Promise((resolve, reject) => {
-            if (lxxPath === undefined) {
-                return reject("Could not find lxx.")
+            if (cobaltPath === undefined) {
+                return reject("Could not find cobalt.")
             }
 
             const workspaceFolders = vscode.workspace.workspaceFolders
 
             const child = childProcess.exec(
-                `"${lxxPath.fsPath}" ${command}`,
+                `"${cobaltPath.fsPath}" ${command}`,
                 {
                     cwd:
                         workspace?.uri.fsPath ||

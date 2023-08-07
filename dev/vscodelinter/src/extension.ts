@@ -1,5 +1,5 @@
 //import * as roblox from "./roblox"
-import * as lxx from "./lxx"
+import * as cobalt from "./cobalt"
 import * as timers from "timers"
 import * as util from "./util"
 import * as vscode from "vscode"
@@ -9,7 +9,7 @@ import { lintConfig } from "./configLint"
 import { byteToCharMap } from "./byteToCharMap"
 import { Capabilities } from "./structures/capabilities"
 
-let trylxx: Promise<boolean>
+let trycobalt: Promise<boolean>
 
 enum RunType {
     OnSave = "onSave",
@@ -36,18 +36,18 @@ function labelToRange(
 export async function activate(
     context: vscode.ExtensionContext,
 ): Promise<void> {
-    console.log("lxx-vscode activated")
+    console.log("cobalt-vscode activated")
 
     let capabilities: Capabilities = {}
 
-    trylxx = util
-        .ensurelxxExists(context.globalStorageUri)
+    trycobalt = util
+        .ensurecobaltExists(context.globalStorageUri)
         .then(() => {
-            lxx
-                .lxxCommand(
+            cobalt
+                .cobaltCommand(
                     context.globalStorageUri,
                     "capabilities --display-style=json2",
-                    lxx.Expectation.Stdout,
+                    cobalt.Expectation.Stdout,
                 )
                 .then((output) => {
                     if (output === null) {
@@ -57,7 +57,7 @@ export async function activate(
                     capabilities = JSON.parse(output.toString())
                 })
                 .catch(() => {
-                    // lxx version is too old
+                    // cobalt version is too old
                     return
                 })
         })
@@ -66,36 +66,36 @@ export async function activate(
         })
         .catch((error) => {
             vscode.window.showErrorMessage(
-                `An error occurred when finding lxx:\n${error}`,
+                `An error occurred when finding cobalt:\n${error}`,
             )
             return false
         })
 
-    await trylxx
+    await trycobalt
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("lxx.reinstall", () => {
-            trylxx = util
-                .downloadlxx(context.globalStorageUri)
+        vscode.commands.registerCommand("cobalt.reinstall", () => {
+            trycobalt = util
+                .downloadcobalt(context.globalStorageUri)
                 .then(() => true)
                 .catch(() => false)
-            return trylxx
+            return trycobalt
         }),
     )
 
     const diagnosticsCollection =
-        vscode.languages.createDiagnosticCollection("lxx")
+        vscode.languages.createDiagnosticCollection("cobalt")
     context.subscriptions.push(diagnosticsCollection)
 
     //let hasWarnedAboutRoblox = false
 
     async function lint(document: vscode.TextDocument) {
-        if (!(await trylxx)) {
+        if (!(await trycobalt)) {
             return
         }
 
         switch (document.languageId) {
-            case "lxx":
+            case "cobalt":
                 break
             case "toml":
             case "yaml":
@@ -110,10 +110,10 @@ export async function activate(
                 return
         }
 
-        const output = await lxx.lxxCommand(
+        const output = await cobalt.cobaltCommand(
             context.globalStorageUri,
             "--display-style=json2 --no-summary -",
-            lxx.Expectation.Stderr,
+            cobalt.Expectation.Stderr,
             vscode.workspace.getWorkspaceFolder(document.uri),
             document.getText(),
         )
@@ -176,7 +176,7 @@ export async function activate(
                     : vscode.DiagnosticSeverity.Warning,
             )
 
-            diagnostic.source = `lxx::${data.code}`
+            diagnostic.source = `cobalt::${data.code}`
 
             if (data.code === "unused_variable") {
                 diagnostic.tags = [vscode.DiagnosticTag.Unnecessary]
@@ -196,7 +196,7 @@ export async function activate(
 
             //if (
             //    vscode.workspace
-            //        .getConfiguration("lxx")
+            //        .getConfiguration("cobalt")
             //        .get<boolean>("warnRoblox")
             //) {
                 //if (
@@ -216,7 +216,7 @@ export async function activate(
     let lastTimeout: NodeJS.Timeout
     function listenToChange() {
         switch (
-            vscode.workspace.getConfiguration("lxx").get<RunType>("run")
+            vscode.workspace.getConfiguration("cobalt").get<RunType>("run")
         ) {
             case RunType.OnSave:
                 return vscode.workspace.onDidSaveTextDocument(lint)
@@ -240,7 +240,7 @@ export async function activate(
                 })
             case RunType.OnIdle: {
                 const idleDelay = vscode.workspace
-                    .getConfiguration("lxx")
+                    .getConfiguration("cobalt")
                     .get<number>("idleDelay") as number
 
                 return vscode.workspace.onDidChangeTextDocument((event) => {
@@ -258,8 +258,8 @@ export async function activate(
     let disposable = listenToChange()
     vscode.workspace.onDidChangeConfiguration((event) => {
         if (
-            event.affectsConfiguration("lxx.run") ||
-            event.affectsConfiguration("lxx.idleDelay")
+            event.affectsConfiguration("cobalt.run") ||
+            event.affectsConfiguration("cobalt.idleDelay")
         ) {
             disposable?.dispose()
             disposable = listenToChange()

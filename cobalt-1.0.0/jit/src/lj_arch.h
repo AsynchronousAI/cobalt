@@ -530,7 +530,7 @@
 #endif
 
 /* Disable or enable the FFI extension. */
-#define LJ_HASFFI		0 // Always disable FFI
+#define LJ_HASFFI		1
 
 #if defined(LUAJIT_DISABLE_PROFILE)
 #define LJ_HASPROFILE		0

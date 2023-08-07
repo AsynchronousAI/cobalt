@@ -7,7 +7,11 @@
 */
 
 #include <stdio.h>
-
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 #define lib_base_c
 #define LUA_LIB
 
@@ -491,6 +495,7 @@ LJLIB_CF(newproxy)
   return 1;
 }
 
+/* -- Output functions ---------------------------------------------------- */
 LJLIB_PUSH("tostring")
 LJLIB_CF(print)
 {
@@ -531,6 +536,224 @@ LJLIB_CF(print)
   return 0;
 }
 
+LJLIB_CF(inputf) {
+  const char *prompt = luaL_optstring(L, 1, " ");
+  const char *fmt = luaL_optstring(L, 2, "*l");
+  int nargs = lua_gettop(L);
+  luaL_argcheck(L, nargs <= 2, 2, "expected at most 2 arguments");
+  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
+
+  printf("%s", prompt);
+  char buf[1024];
+  fgets(buf, sizeof(buf), stdin);
+  buf[strlen(buf) - 1] = '\0';
+
+  if (strcmp(fmt, "*n") == 0) {
+    lua_pushnumber(L, atof(buf));
+  } else if (strcmp(fmt, "*a") == 0) {
+    lua_pushstring(L, buf);
+  } else if (strcmp(fmt, "*l") == 0) {
+    lua_pushstring(L, buf);
+  } else {
+    return luaL_error(L, "invalid format");
+  }
+
+  return 1;
+}
+LJLIB_CF(warn) {
+  int n = lua_gettop(L);  /* number of arguments */
+  int i;
+  lua_getglobal(L, "tostring");
+  lua_getglobal(L, "print");
+  for (i=1; i<=n; i++) {
+    const char *s;
+    size_t l;
+    lua_pushvalue(L, -2);  /* function to be called */
+    lua_pushvalue(L, i);   /* value to print */
+    lua_call(L, 1, 1);
+    lua_pushstring(L, "\033[1;33mwarning: \033[0m");
+    lua_insert(L, -2);
+    lua_concat(L, 2);
+    s = lua_tolstring(L, -1, &l);  /* get result */
+    if (s == NULL)
+      return luaL_error(L, "'tostring' must return a string to 'warn'");
+    lua_call(L, 1, 0);
+  }
+  return 0;
+}
+
+LJLIB_CF(info) {
+  int n = lua_gettop(L);  /* number of arguments */
+  int i;
+  lua_getglobal(L, "tostring");
+  lua_getglobal(L, "print");
+  for (i=1; i<=n; i++) {
+    const char *s;
+    size_t l;
+    lua_pushvalue(L, -2);  /* function to be called */
+    lua_pushvalue(L, i);   /* value to print */
+    lua_call(L, 1, 1);
+    lua_pushstring(L, "\033[1;34minfo: \033[0m");
+    lua_insert(L, -2);
+    lua_concat(L, 2);
+    s = lua_tolstring(L, -1, &l);  /* get result */
+    if (s == NULL)
+      return luaL_error(L, "'tostring' must return a string to 'info'");
+    lua_call(L, 1, 0);
+  }
+  return 0;
+}
+
+/* -- Time functions ------------------------------------------------------ */
+LJLIB_CF(uwait) {
+  float m = luaL_optnumber(L, 1, 1);
+  #ifdef _WIN32
+  if (m >= 1000) {
+    Sleep(m);
+  } else {
+    lua_error(L, "uwait not supported for less than 1000 microseconds on Windows.");
+  }
+  #else
+  usleep(m);
+  #endif
+  // returns a function that waits m without needing any arguments
+  /*
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_pushnumber(L, seconds * 1000000);
+  lua_pushcclosure(L, luaB_uwait, 1);*/
+  return 1;
+}
+
+LJLIB_CF(wait) {
+  float seconds = luaL_optnumber(L, 1, 1);
+  #ifdef _WIN32
+  Sleep(seconds * 1000);
+  #else
+  usleep(seconds * 1000000);
+  #endif
+  
+  // returns a function that waits m without needing any arguments
+  /*
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_pushnumber(L, seconds * 1000000);
+  lua_pushcclosure(L, luaB_uwait, 1);*/
+  return 1;
+}
+
+LJLIB_CF(swait) {
+  float seconds = luaL_optnumber(L, 1, 1);
+  #ifdef _WIN32
+  Sleep(seconds * 1000);
+  #else
+  usleep(seconds * 1000000);
+  #endif
+  
+  // returns a function that waits m without needing any arguments
+  /*
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_pushnumber(L, seconds * 1000000);
+  lua_pushcclosure(L, luaB_uwait, 1);*/
+  return 1;
+}
+
+LJLIB_CF(mwait) {
+  float ms = luaL_optnumber(L, 1, 1);
+  #ifdef _WIN32
+  Sleep(ms);
+  #else
+  usleep(ms * 1000);
+  #endif
+  // returns a function that waits m without needing any arguments
+  /*
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_pushnumber(L, seconds * 1000000);
+  lua_pushcclosure(L, luaB_uwait, 1);*/
+  return 1;
+}
+/* -- Other functions ----------------------------------------------------- */
+LJLIB_CF(typedef){
+  // typedef(name, table)
+  // adds a new method to the table if it doesnt exist
+  // saves the table in the global namespace
+  // the new method returns an unlocked version of the table
+  // otherwise the table will be read-only
+  const char *name = luaL_checkstring(L, 1);
+  luaL_checktype(L, 2, LUA_TTABLE);
+
+  // Check that the name isnt already taken
+  lua_getglobal(L, name);
+  if (!lua_isnil(L, -1)) {
+    return luaL_error(L, "type name '%s' is already taken", name);
+  }
+  lua_pop(L, 1);
+  // Duplicate the inputted table and save it globally
+  lua_pushvalue(L, 2);
+  lua_setglobal(L, name);
+
+  return 1;
+}
+LJLIB_CF(range) {
+  // range(start, stop, step)
+  // returns a table of numbers from start to stop (inclusive) with step
+  // if step is not provided, it defaults to 1
+  int nargs = lua_gettop(L);
+  luaL_argcheck(L, nargs >= 2, 2, "expected at least 2 arguments");
+  luaL_argcheck(L, nargs <= 3, 3, "expected at most 3 arguments");
+
+  int start = luaL_checkinteger(L, 1);
+  int stop = luaL_checkinteger(L, 2);
+  int step = 1;
+
+  if (nargs >= 3) {
+    step = luaL_checkinteger(L, 3);
+    luaL_argcheck(L, step != 0, 3, "step cannot be zero");
+  }
+
+  if (start < 0) {
+    start = stop + start + 1;
+  }
+
+  if (stop < 0) {
+    stop = stop + stop + 1;
+  }
+
+  luaL_argcheck(L, start >= 1 && start <= stop, 1, "start index out of range");
+  luaL_argcheck(L, stop >= 1 && stop <= stop, 2, "stop index out of range");
+
+  lua_newtable(L);
+  int j = 1;
+
+  for (int i = start; i <= stop; i += step) {
+    lua_pushinteger(L, i);
+    lua_rawseti(L, -2, j);
+    j++;
+  }
+
+  return 1;
+}
+LJLIB_CF(enum) {
+    const char *name = luaL_checkstring(L, 1);
+    luaL_checktype(L, 2, LUA_TTABLE);
+
+    // Check that the name isnt already taken
+    lua_getglobal(L, name);
+    if (!lua_isnil(L, -1)) {
+        return luaL_error(L, "enum name '%s' is already taken", name);
+    }
+    lua_pop(L, 1);
+    // Create the enum table
+    lua_newtable(L);
+    lua_pushvalue(L, -1);
+    lua_setglobal(L, name);
+    // Add the enum values
+    lua_pushnil(L);
+    while (lua_next(L, 2) != 0) {
+        lua_pushvalue(L, -2);
+        lua_insert(L, -2);
+        lua_settable(L, -4);
+    }
+    return 1;
+}
 LJLIB_PUSH(top-3)
 LJLIB_SET(_VERSION)
 

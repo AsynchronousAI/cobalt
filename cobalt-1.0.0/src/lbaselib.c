@@ -19,8 +19,11 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
-
+#endif
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -580,7 +583,15 @@ static int luaB_tostring (lua_State *L) {
 }
 static int luaB_uwait(lua_State *L) {
   float m = luaL_optnumber(L, 1, 1);
+  #ifdef _WIN32
+  if (m >= 1000) {
+    Sleep(m);
+  } else {
+    lua_error(L, "uwait not supported for less than 1000 microseconds on Windows.");
+  }
+  #else
   usleep(m);
+  #endif
   // returns a function that waits m without needing any arguments
   lua_pushvalue(L, lua_upvalueindex(1));
   lua_pushnumber(L, m);
@@ -590,7 +601,12 @@ static int luaB_uwait(lua_State *L) {
 
 static int luaB_wait(lua_State *L) {
   float seconds = luaL_optnumber(L, 1, 1);
+  #ifdef _WIN32
+  Sleep(seconds * 1000);
+  #else
   usleep(seconds * 1000000);
+  #endif
+
   // returns a function that waits m without needing any arguments
   lua_pushvalue(L, lua_upvalueindex(1));
   lua_pushnumber(L, seconds * 1000000);
@@ -600,7 +616,12 @@ static int luaB_wait(lua_State *L) {
 
 static int luaB_mwait(lua_State *L) {
   float ms = luaL_optnumber(L, 1, 1);
+  #ifdef _WIN32
+  Sleep(ms);
+  #else
   usleep(ms * 1000);
+  #endif
+
   // returns a function that waits m without needing any arguments
   lua_pushvalue(L, lua_upvalueindex(1));
   lua_pushnumber(L, ms * 1000);

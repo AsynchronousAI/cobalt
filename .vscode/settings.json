@@ -2,6 +2,7 @@
     "files.associations": {
         "lauxlib.h": "c",
         "lua.hh": "c",
-        "cstddef": "cpp"
+        "cstddef": "cpp",
+        "__locale": "c"
     }
 }

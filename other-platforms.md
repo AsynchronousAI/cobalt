@@ -12,6 +12,7 @@ $ make jit-msvc
 ```
 
 ## Building for console
+> NOTE: Bytecode or Compiler is not available for any of these platforms, only JIT.
 ### XBOX One
 XBOX One has the JIT available, but you will need to build it yourself. Currently the normal
 interpreter is not available for XBOX One. 

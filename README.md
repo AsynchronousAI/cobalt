@@ -65,10 +65,11 @@ Read full credits [here](/COPYRIGHTS.md)
 - FFI
 - Batchfiles
 - Make a better linter (far future)
+- library installer
+
 - Port libraries to JIT
 - Overall sync JIT
 - Cmake JIT
-- library installer
 
 ## Changes to add to JIT
 - New libraries

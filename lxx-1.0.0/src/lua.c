@@ -35,7 +35,7 @@
 #endif
 
 #if !defined(LUA_INIT_VAR)
-#define LUA_INIT_VAR		"lxx_INIT"
+#define LUA_INIT_VAR		"luaX_INIT"
 #endif
 
 #define LUA_INITVARVERSION	LUA_INIT_VAR LUA_VERSUFFIX

@@ -39,31 +39,6 @@ add_custom_target(jit
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
-# MSVC BUILD (WINDOWS AND POSIX)
-add_custom_target(jit-msvc
-    COMMAND start msvcbuild.bat
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Building cobaltJIT (this may take a while)"
-)
-add_custom_target(jit-msvc-posix
-    COMMAND ./msvcbuild.bat
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Building cobaltJIT (this may take a while)"
-)
-add_custom_target(msvc
-    COMMAND start winbuild.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/src
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Building cobaltJIT (this may take a while)"
-)
-add_custom_target(msvc-posix
-    COMMAND ./winbuild.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/src
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Building cobaltJIT (this may take a while)"
-)
 # WINDOWS BUILD JIT CONSOLES
 add_custom_target(jit-xbox
     COMMAND start xb1build.bat

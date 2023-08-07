@@ -1,4 +1,8 @@
 # Building for other platforms
+> **Known issues:**
+> - Unsupported platforms
+> - Interpreter is not available for some platforms
+> - Consoles will have issues when being compiled on posix systems 
 # JIT Consoles
 ## Building for console
 ### XBOX One

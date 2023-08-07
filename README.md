@@ -1,65 +1,82 @@
 # cobalt
-## What is it?
-cobalt is meant to be a *modernized* version of C/C++ based on Lua source code. This is written in C and cobalt so it is ultraportable.
+A programming language made in C and C++ made to be the *portable, simple, and modern* successor of C.
+
+## Example code:
+The following code is a snippet that shows off some of the genera features of cobalt.
+
+Read [examples.md](/Examples.md) for more short examples that work. 
+Check out [/cobalt-tests](/cobalt-1.0.0-tests/) for 100+ longer test examples.
+
+```js
+import("notareallibrary") // Not a real library, just an example
+
+if (core.macros("__APPLE__") == "1"){ // Real C macros
+    print("Seems that you are on an apple device");
+}
+
+print(device.os); // "windows" or "linux" or "darwin"
+// This is a comment
+var a = 1; // Type declarations are now optional
+var b: number = 2; // This is a number, and will always be a number
+
+for (i in range(0, 10)) {
+    print(i);
+}
+
+var memoryaddress = core.memory.alloc(10); // Allocates 10 bytes of memory
+var memoryaddress = core.memory.realloc(memoryaddress, 20); // Reallocates 20 bytes of memory
+core.memory.free(memoryaddress); // Frees the memory
+
+// Enums!
+enum("myenum", {
+    a = 1,
+    b = 2,
+    c = 3
+})
+
+print(myenum.a) // 1
+
+var myarray = [1,2,3,4]
+var mytable = {
+    "a": 1,
+    "b": 2,
+    "c": 3
+}
+
+async.new("print('I am in thread 2')")->start(); // Real threads, using pthreads and windows threads
+```
+
 ## Why?
-Lua is a great language but it has some flaws. cobalt is meant to fix these flaws and make it more low level with features such
-as accessing C macros, manual memory management, classes for real OOP, real threads (not coroutines 🤮), and more.
-## Example code
-[This](/Examples.md) markdown file has short examples of cobalt code. This shows real short working code that can do really cool stuff.
-[This](/cobalt-1.0.0-tests) test directory has ~100 example cobalt files. This shows more specific longer tests and examples of cobalt code. Most of these were ported from LuaJIT and 
-rewritten in cobalt using lua-cobalt.
-## Building
-cobalt at the moment requires you to build it and does not offer prebuilt binaries. This will change in the future.
+C is a great language same for C++, but they dont appeal to the modern programmer. Cobalt is a language that is made from the groundwork of Lua & LuaJIT which are some of the fastest languages of all-time and we improved it
+to have C like features like enums, memory, macros, and used ljs syntax to look like C rather than Lua's quirky
+syntax.
 
-You must have Make installed and CMake must export to Make
-### Dependencies
-#### Windows only
-- [Windows equivelent](https://www.cygwin.com) of `make`, `cmake`, and `gcc` (or `clang`) <br>
-You need these because this was originally designed for POSIX systems and some of the dependencies are POSIX only. Luckily cygwin has all of these.
-#### Building source
-- CMake
-- GCC or Clang
-- Make
-#### Building VSCode extension
-- NPM (if you want to build the VSCode extension)
-- VSCE (if you want to build the VSCode extension)
-#### Optional tools (for usage)
-- GCC (For accessing C macros, optional feature)
-- Nothing else
-### Building
-- `git clone https://github.com/cobalt-lang/cobalt`
-- `cd cobalt`
-- `cmake .`
-- `make` <br>
-This will result in 2 files in the cobalt folder, cobalt and cobaltc. You can test the shell using `./cobalt` and try
-some code then install it to your PATH/$PATH.
-### lua-cobalt (OPTIONAL)
-This is an optional tool for converting Lua source code to cobalt source code. This is not required to use cobalt but is a nice tool to have.
-- `make lua-cobalt` - Make sure you didnt clean the build folder or this will fail
+## Speed?
+Cobalt is as fast as Lua(JIT) which it is based upon. LuaJIT is considered to be as fast as C and C++ in some cases, and Rust in most cases. Cobalt has its own performance improvements over LuaJIT, so can be considered to
+match C, C++, and Rust in nearly all cases.
 
-Using `make setup(-/py)` will automatically detect and install the compiled binaries of lua-cobalt alongside the main cobalt binaries.
-#### Usage:
-- `lua-cobalt myfile.lua > myfile.cobalt` - Converts myfile.lua to myfile.cobalt
+## Features
+- Direct memory access
+- Type annotations and checking
+- Real threads
+- Ultra portable
+- Real macros
+- Enums
+- Ultra fast
+- Manual memory management
+- Better syntax
 
-### Installing binaries and libraries
-#### For python3
-- `sudo make setup` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `python3`
-#### For py
-- `sudo make setuppy` - Make sure you didnt clean the build folder or this will fail, this also requires python3 but installs with `py` instead of `python3` usually for windows
-#### For python
-- `sudo make setup-py` - Make sure you didnt clean the build folder or this will fail, this also requires python but installs with `python` instead of `python3` or `py`
+## Why should I switch from what I am using?
+Its not my choice to make but I believe regardless on what you are using cobalt should have something that applys to you, Cobalt is ultrafast and portable
+since it is based on Lua, and LuaJIT source code. Not only that but it comes packaged with all the essentials
+like memory access, typechecker, threads, and more. If you are using C/++ or Rust switching will give you
+an overall better programming experience regardless if you are a beginner, a professional, or a hobbyist,
+doing this as a job, or just for fun. Cobalt is a language that is made for everyone to give them
+everything they need to make a great program with a great experience.
 
-### End result
-- `cobalt` executable in the cwd for the shell, interpreter, and bytecode interpreter
-- `cobaltc` executable in the cwd for compiling to bytecode
-- `cobaltjit` executable in the cwd for JIT compiling
-- `lua-cobalt` executable in the cwd for converting Lua source code to cobalt source code if you did that step
-
-### Extra options
-- `make clean` - Cleans the build folder and object files
-- `vsce package` - Packages the VSCode extension (when your CWD is the VSCode extension folder). You shouldnt need to do this because the plugin is in the VSCode marketplace.
-## Credits
-Read full credits [here](/COPYRIGHTS.md)
+## [How to build and install"](/build.md)
+## [Credits](/COPYRIGHTS.md)
+***
 
 ## TODO:
 - FFI (far future) (alongside library installer)

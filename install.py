@@ -12,8 +12,8 @@ if os.path.isfile(scriptPath + "/cobalt"):
     installable.append("cobalt")
 if os.path.isfile(scriptPath + "/cobaltc"):
     installable.append("cobaltc")
-if os.path.isfile(scriptPath + "/cobaltjit"):
-    installable.append("cobaltjit")
+if os.path.isfile(scriptPath + "/cobalt-1.0.0/jit/src/cobaltjit"):
+    installable.append("cobalt-1.0.0/jit/src/cobaltjit")
 if os.path.isfile(scriptPath + "/cobalt-1.0.0/lua-cobalt/lua-cobalt"):
     installable.append("cobalt-1.0.0/lua-cobalt/lua-cobalt")
     
@@ -24,7 +24,7 @@ if os.path.isfile(scriptPath + "/cobaltc.exe"):
     installable.append("cobaltc.exe")
 if os.path.isfile(scriptPath + "/cobaltjit.exe"):
     installable.append("cobaltjit.exe")
-if os.path.isfile(scriptPath + "\\cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe"):
+if os.path.isfile(scriptPath + "/cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe"):
     installable.append("cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe")
     
 

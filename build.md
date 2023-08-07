@@ -23,14 +23,15 @@ You should have build files ready now run
 ```bash
 $ make
 ```
-this should build the binaries.
+this should build the binaries and you can find `cobalt`, `cobaltc`, and `cobaltjit`. The cobaltjit binary
+will be hidden in the source files, step 4 will install it to your system.
 ## (OPTIONAL): lua-cobalt
 If you would like to compile Lua source code to cobalt source code 
 follow through this step to learn how to build lua-cobalt.
 ```bash
 $ make lua-cobalt
 ```
-You shouldnt see any new files, but the next step will help you install it.
+The binary will be hidden in the source files, the next step will install it to your system.    
 
 You can use lua-cobalt by running
 ```bash

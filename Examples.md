@@ -420,7 +420,7 @@ try(function() {
 xtry(function() { // function to try
     print("Hello, World!")
 }, function(err) { // error handler
-    print("Error: " + err)
+    print("Error: " .. err)
 })
 ```
 ## Async

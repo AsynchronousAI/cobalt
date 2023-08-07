@@ -26,7 +26,7 @@ ABIVER=  5.1
 # the paths in src/luaconf.h, too. Note: PREFIX must be an absolute path!
 #
 #export PREFIX= /usr/local
-export PREFIX= $(HOME)/local/ljsjit
+export PREFIX= $(HOME)/local/lxxjit
 export MULTILIB= lib
 ##############################################################################
 
@@ -45,8 +45,8 @@ INSTALL_CMOD= $(INSTALL_CMODD)/$(ABIVER)
 INSTALL_MAN= $(INSTALL_SHARE)/man/man1
 INSTALL_PKGCONFIG= $(INSTALL_LIB)/pkgconfig
 
-INSTALL_TNAME= ljsjit-$(VERSION)
-INSTALL_TSYMNAME= ljsjit
+INSTALL_TNAME= lxxjit-$(VERSION)
+INSTALL_TSYMNAME= lxxjit
 INSTALL_ANAME= libluajit-$(ABIVER).a
 INSTALL_SOSHORT1= libluajit-$(ABIVER).so
 INSTALL_SOSHORT2= libluajit-$(ABIVER).so.$(MAJVER)
@@ -54,7 +54,7 @@ INSTALL_SONAME= $(INSTALL_SOSHORT2).$(MINVER).$(RELVER)
 INSTALL_DYLIBSHORT1= libluajit-$(ABIVER).dylib
 INSTALL_DYLIBSHORT2= libluajit-$(ABIVER).$(MAJVER).dylib
 INSTALL_DYLIBNAME= libluajit-$(ABIVER).$(MAJVER).$(MINVER).$(RELVER).dylib
-INSTALL_PCNAME= ljsjit.pc
+INSTALL_PCNAME= lxxjit.pc
 
 INSTALL_STATIC= $(INSTALL_LIB)/$(INSTALL_ANAME)
 INSTALL_DYN= $(INSTALL_LIB)/$(INSTALL_SONAME)
@@ -80,16 +80,16 @@ LDCONFIG= ldconfig -n 2>/dev/null
 SED_PC= sed -e "s|^prefix=.*|prefix=$(PREFIX)|" \
             -e "s|^multilib=.*|multilib=$(MULTILIB)|"
 
-FILE_T= ljsjit
+FILE_T= lxxjit
 FILE_A= libluajit.a
 FILE_SO= libluajit.so
-FILE_MAN= ljsjit.1
-FILE_PC= ljsjit.pc
+FILE_MAN= lxxjit.1
+FILE_PC= lxxjit.pc
 FILES_INC= lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h
-FILES_JITLIB= bc.ljs bcsave.ljs dump.ljs p.ljs v.ljs zone.ljs \
-	      dis_x86.ljs dis_x64.ljs dis_arm.ljs dis_arm64.ljs \
-	      dis_arm64be.ljs dis_ppc.ljs dis_mips.ljs dis_mipsel.ljs \
-	      dis_mips64.ljs dis_mips64el.ljs vmdef.ljs
+FILES_JITLIB= bc.lxx bcsave.lxx dump.lxx p.lxx v.lxx zone.lxx \
+	      dis_x86.lxx dis_x64.lxx dis_arm.lxx dis_arm64.lxx \
+	      dis_arm64be.lxx dis_ppc.lxx dis_mips.lxx dis_mipsel.lxx \
+	      dis_mips64.lxx dis_mips64el.lxx vmdef.lxx
 
 ifeq (,$(findstring Windows,$(OS)))
   HOST_SYS:= $(shell uname -s)
@@ -107,7 +107,7 @@ endif
 
 ##############################################################################
 
-INSTALL_DEP= src/ljsjit
+INSTALL_DEP= src/lxxjit
 
 default all $(INSTALL_DEP):
 	@echo "==== Building LuaJIT $(VERSION) ===="

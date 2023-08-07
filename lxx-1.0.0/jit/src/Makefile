@@ -195,7 +195,7 @@ LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
 
 HOST_CC= $(CC)
 HOST_RM?= rm -f
-# If left blank, miniljs is built and used. You can supply an installed
+# If left blank, minilxx is built and used. You can supply an installed
 # copy of (plain) LJS Lua 5.1 or LJS 5.2, plus Lua BitOp. E.g. with: HOST_LUA=lua
 HOST_LUA=
 
@@ -381,9 +381,9 @@ endif
 # Files and pathnames.
 ##############################################################################
 
-MINILUA_O= host/miniljs.o
+MINILUA_O= host/minilxx.o
 MINILUA_LIBS= -lm
-MINILUA_T= host/miniljs
+MINILUA_T= host/minilxx
 MINILUA_X= $(MINILUA_T)
 
 ifeq (,$(HOST_LUA))
@@ -392,7 +392,7 @@ ifeq (,$(HOST_LUA))
 endif
 
 DASM_DIR= ../dynasm
-DASM= $(HOST_LUA) $(DASM_DIR)/dynasm.ljs
+DASM= $(HOST_LUA) $(DASM_DIR)/dynasm.lxx
 DASM_XFLAGS=
 DASM_AFLAGS=
 DASM_ARCH= $(TARGET_LJARCH)
@@ -504,13 +504,13 @@ LJCORE_O= lj_gc.o lj_err.o lj_char.o lj_bc.o lj_obj.o lj_buf.o \
 LJVMCORE_O= $(LJVM_O) $(LJCORE_O)
 LJVMCORE_DYNO= $(LJVMCORE_O:.o=_dyn.o)
 
-LIB_VMDEF= jit/vmdef.ljs
+LIB_VMDEF= jit/vmdef.lxx
 LIB_VMDEFP= $(LIB_VMDEF)
 
 LUAJIT_O= luajit.o
 LUAJIT_A= libluajit.a
 LUAJIT_SO= libluajit.so
-LUAJIT_T= ljsjit
+LUAJIT_T= lxxjit
 
 ALL_T= $(LUAJIT_T) $(LUAJIT_A) $(LUAJIT_SO) $(HOST_T)
 ALL_HDRGEN= lj_bcdef.h lj_ffdef.h lj_libdef.h lj_recdef.h lj_folddef.h \
@@ -559,10 +559,10 @@ ifeq (PS3,$(TARGET_SYS))
 endif
 
 ifeq (Windows,$(HOST_SYS))
-  MINILUA_T= host/miniljs.exe
+  MINILUA_T= host/minilxx.exe
   BUILDVM_T= host/buildvm.exe
   ifeq (,$(HOST_MSYS))
-    MINILUA_X= host\miniljs
+    MINILUA_X= host\minilxx
     BUILDVM_X= host\buildvm
     ALL_RM:= $(subst /,\,$(ALL_RM))
     HOST_RM= del
@@ -613,7 +613,7 @@ clean:
 	$(HOST_RM) $(ALL_RM)
 
 libbc:
-	./$(LUAJIT_T) host/genlibbc.ljs -o host/buildvm_libbc.h $(LJLIB_C)
+	./$(LUAJIT_T) host/genlibbc.lxx -o host/buildvm_libbc.h $(LJLIB_C)
 	$(MAKE) all
 
 depend:
@@ -640,7 +640,7 @@ $(MINILUA_T): $(MINILUA_O)
 	$(E) "HOSTLINK  $@"
 	$(Q)$(HOST_CC) $(HOST_ALDFLAGS) -o $@ $(MINILUA_O) $(MINILUA_LIBS) $(HOST_ALIBS)
 
-host/buildvm_arch.h: $(DASM_DASC) $(DASM_DEP) $(DASM_DIR)/*.ljs
+host/buildvm_arch.h: $(DASM_DASC) $(DASM_DEP) $(DASM_DIR)/*.lxx
 	$(E) "DYNASM    $@"
 	$(Q)$(DASM) $(DASM_FLAGS) -o $@ $(DASM_DASC)
 

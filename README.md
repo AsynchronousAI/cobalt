@@ -67,11 +67,12 @@ Read full credits [here](/COPYRIGHTS.md)
 - Make a better linter (far future)
 - library installer
 
+### LuaJIT compatibility
 - Port libraries to JIT
 - Overall sync JIT
 - Cmake JIT
 
-## Changes to add to JIT
+#### Changes to add to JIT
 - New libraries
 - Range function
 - inputf

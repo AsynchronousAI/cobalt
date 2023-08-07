@@ -39,44 +39,102 @@ add_custom_target(jit
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
+# MSVC BUILD (WINDOWS AND POSIX)
 add_custom_target(jit-msvc
-    COMMAND bat msvcbuild.bat
+    COMMAND start msvcbuild.bat
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
+add_custom_target(jit-msvc-posix
+    COMMAND ./msvcbuild.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(msvc
+    COMMAND start winbuild.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(msvc-posix
+    COMMAND ./winbuild.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+# WINDOWS BUILD JIT CONSOLES
 add_custom_target(jit-xbox
-    COMMAND bat xb1build.bat
+    COMMAND start xb1build.bat
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
 add_custom_target(jit-xbox360
-    COMMAND bat xedkbuild.bat
+    COMMAND start xedkbuild.bat
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
 add_custom_target(jit-ps5
-    COMMAND bat ps5build.bat
+    COMMAND start ps5build.bat
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
 add_custom_target(jit-ps4
-    COMMAND bat ps4build.bat
+    COMMAND start ps4build.bat
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
 add_custom_target(jit-vita
-    COMMAND bat psvitabuild.bat
+    COMMAND start psvitabuild.bat
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
 add_custom_target(jit-switch
-    COMMAND bat nxbuild.bat
+    COMMAND start nxbuild.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+
+# POSIX BUILD JIT CONSOLES
+add_custom_target(jit-xbox-posix
+    COMMAND ./xb1build.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-xbox360-posix
+    COMMAND ./xedkbuild.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-ps5-posix
+    COMMAND ./ps5build.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-ps4-posix
+    COMMAND ./ps4build.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-vita-posix
+    COMMAND ./psvitabuild.sh
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-switch-posix
+    COMMAND ./nxbuild.sh
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"

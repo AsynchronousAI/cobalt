@@ -1,6 +1,6 @@
 # Building for other platforms
 > NOTE: None of these are implemented to the Makefile, only a groundwork idea of how to build for these platforms and some scripts.
-## Windows
+# Windows
 If you have windows, we highly reccomend using cygwin to get GNU Make which is required to build Cobalt for 
 all platforms.
 
@@ -10,7 +10,9 @@ $ cmake .
 $ make msvc
 $ make jit-msvc
 ```
-
+# Unix
+Read [build.md](build.md) for more information on how to build for Unix.
+# Consoles
 ## Building for console
 > NOTE: Bytecode or Compiler is not available for any of these platforms, only JIT.
 ### XBOX One
@@ -76,3 +78,21 @@ interpreter is not available for Xbox 360.
 $ cmake .
 $ make jit-xbox360
 ```
+## Finding build files for console
+- JIT: `cobalt-1.0.0/jit/src/cobaltjit(.exe)`
+- Compiler: `cobalt-1.0.0/cobaltc(.exe)`
+- Interpreter: `cobalt-1.0.0/cobalt(.exe)`
+# Apple Platforms
+## iOS, iPadOS, tvOS, watchOS, xrOS
+Use the Swift - Cobalt bridge to use Cobalt on these plartforms. [Swift - Cobalt](https://github.com/cobalt-lang/swift-cobalt)
+## macOS
+Read [build.md](build.md) for more information on how to build for macOS.
+***
+# Android
+Android support is not yet available, but it will be soon.
+***
+# Web
+Cobalt is not available for web yet, you can try using
+lua-cobalt to compile a Lua Web Framework to work with Cobalt.
+***
+# Other

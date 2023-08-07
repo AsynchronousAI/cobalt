@@ -408,16 +408,16 @@ myclass.myfunc2() // -> null
 ```
 
 
-## try and xtry
+## pcall and xpcall
 ```js
-// try is like pcall in lua
-// xtry is like xpcall in lua
+// pcall is like pcall in lua
+// xpcall is like xpcall in lua
 
-try(function() {
+pcall(function() {
     print("Hello, World!")
 })
 
-xtry(function() { // function to try
+xpcall(function() { // function to try
     print("Hello, World!")
 }, function(err) { // error handler
     print("Error: " .. err)

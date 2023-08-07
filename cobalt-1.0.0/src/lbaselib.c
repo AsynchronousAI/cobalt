@@ -801,7 +801,7 @@ static const luaL_Reg base_funcs[] = {
   {"loadstring", luaB_load},
   {"next", luaB_next},
   {"pairs", luaB_pairs},
-  {"try", luaB_pcall},
+  {"pcall", luaB_pcall},
   {"print", luaB_print},
   {"warn", luaB_warn},
   {"info", luaB_info},
@@ -814,7 +814,7 @@ static const luaL_Reg base_funcs[] = {
   {"tonumber", luaB_tonumber},
   {"tostring", luaB_tostring},
   {"type", luaB_type},
-  {"xtry", luaB_xpcall},
+  {"xpcall", luaB_xpcall},
   
   {"wait", luaB_wait},
   /*subwait*/

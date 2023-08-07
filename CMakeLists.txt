@@ -39,6 +39,48 @@ add_custom_target(jit
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
+add_custom_target(jit-msvc
+    COMMAND bat msvcbuild.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-xbox
+    COMMAND bat xb1build.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-xbox360
+    COMMAND bat xedkbuild.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-ps5
+    COMMAND bat ps5build.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-ps4
+    COMMAND bat ps4build.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-vita
+    COMMAND bat psvitabuild.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
+add_custom_target(jit-switch
+    COMMAND bat nxbuild.bat
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit/src
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
 if(LUA_ENABLE_TESTING)
     add_test(NAME lua-testsuite COMMAND cobalt -e "_U=true" all.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-${CMAKE_PROJECT_VERSION}-tests)
 endif()

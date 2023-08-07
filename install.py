@@ -141,12 +141,20 @@ print("[*] \033[32mInstalling standard libraries...\033[0m")
 # Go through all lxx-1.0.0/lib and compile all directories
 for item in os.listdir(scriptPath + "/lxx-1.0.0/lib"):
     if os.path.isdir(scriptPath + "/lxx-1.0.0/lib/" + item):
+        if item == "ffi":
+            print("\033[34m[!] FFI Library will require libffi before install, please install or enter skip to continue. \033[0m")
+            val = input("Installed libffi? [Y/skip]: ")
+            if val.lower() == "y":
+                pass
+            else:
+                print("\033[33m[!] Skipping FFI Library...\033[0m")
+                continue
         # Change cwd to the directory
-        #os.chdir(scriptPath + "/lxx-1.0.0/lib/" + item)
+        os.chdir(scriptPath + "/lxx-1.0.0/lib/" + item)
         # Compile the library
-        #os.system("make -w")
+        os.system("make -w")
         # Move the library to the install path
-        #os.rename(scriptPath + "/lxx-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
+        os.rename(scriptPath + "/lxx-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
         print("\033[33m[!] " + item + " is not a C script and unsupported right now. Skipping...\033[0m")
         pass
     elif os.path.isfile(scriptPath + "/lxx-1.0.0/lib/" + item):

@@ -8,7 +8,12 @@
 *.a
 *.so
 /node_modules
-
+/cobalt
+/cobaltc
+!/cobalt-1.0.0/jit/src/cobaltjit
+!/cobalt-1.0.0/jit/src/host/buildvm
+!/cobalt-1.0.0/jit/src/host/buildvm_arch.h
+!/cobalt-1.0.0/jit/src/jit/vmdef.cobalt
 # CMake Ignore
 CMakeLists.txt.user
 CMakeCache.txt

@@ -74,7 +74,7 @@ an overall better programming experience regardless if you are a beginner, a pro
 doing this as a job, or just for fun. Cobalt is a language that is made for everyone to give them
 everything they need to make a great program with a great experience.
 
-## [How to build and install"](/build.md)
+## [How to build and install](/build.md)
 ## [Credits](/COPYRIGHTS.md)
 ***
 

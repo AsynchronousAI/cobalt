@@ -9,13 +9,12 @@ $ cd cobalt
 ```
 ## Step 2: Preparing build dependencies
 The following is needed for building Cobalt:
-- CMake
-- Make
-- GCC (preferably but any other compiler should work)
-- Python 3
+- CMake (Windows and Unix) (Required)
+- Make (Unix, For windows get from MinGW or Cygwin) (Required)
+- GCC (reccomended) or any compiler (Required)
+- Python 3 (Required)
 
-Some of these are not available on windows, cygwin is going to be really helpful for this, or you can check [other-platforms.md](other-platforms.md) for more information
-on how to build for Windows, XBOX, Nintendo, PS, and more.
+Check [other-platforms.md](other-platforms.md) for more information on how to build for Xbox, Nintendo, PS4, visionOS, and more.
 ## Step 3: Building
 ```bash
 $ cmake .

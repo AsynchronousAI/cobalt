@@ -1,24 +1,6 @@
 # Building for other platforms
-> **IMPORTANT:** Alot of these have not been fully tested, some may not work at all or be missing features. For windows we highly reccomend using cygwin to get GNU Make which is required to build Cobalt for all platforms. 
-
-> NOTE: None of these are implemented to the Makefile, only a groundwork idea of how to build for these platforms and some scripts.
-# Windows
-If you have windows, we highly reccomend using cygwin to get GNU Make which is required to build Cobalt for 
-all platforms.
-
-You can use
-```bash
-$ cmake .
-$ make msvc # Add a -posix if you are on a POSIX/Unix system
-# (cobalt interpreter windows is not stable, use cygwin or just JIT)
-$ make jit-msvc # Add a -posix if you are on a POSIX/Unix system
-```
-# Unix
-Read [build.md](build.md) for more information on how to build for Unix.
-# Consoles
+# JIT Consoles
 ## Building for console
-> NOTE: Bytecode or Compiler is not available for any of these platforms, only JIT.
-> NOTE: If you are using a POSIX/Unix system, add a `-posix` to the end of the make command. Otherwise for windows, ignore this.
 ### XBOX One
 XBOX One has the JIT available, but you will need to build it yourself. Currently the normal
 interpreter is not available for XBOX One. 

@@ -79,10 +79,5 @@ everything they need to make a great program with a great experience.
 ***
 
 ## TODO:
-- FFI (far future) (alongside library installer)
-- Batchfiles (far future)
-- Make a better linter (far future)
-- library installer
-
-### LuaJIT compatibility
-- Port libraries to JIT
+- Port all libraries to JIT (in progress)
+- Linter

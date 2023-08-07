@@ -55,37 +55,37 @@ static int push_vec2(lua_State *L, float x, float y) {
 }
 
 
-static int vec2_add(lua_State *L) {
+LJLIB_CF(vec2_add) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x + b->x, a->y + b->y);
   return 1;
 }
-static int vec2_sub(lua_State *L) {
+LJLIB_CF(vec2_sub) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x - b->x, a->y - b->y);
   return 1;
 }
-static int vec2_mul(lua_State *L) {
+LJLIB_CF(vec2_mul) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x * b->x, a->y * b->y);
   return 1;
 }
-static int vec2_div(lua_State *L) {
+LJLIB_CF(vec2_div) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x / b->x, a->y / b->y);
   return 1;
 }
-static int vec2_new(lua_State *L) {
+LJLIB_CF(vec2_new) {
   float x = luaL_checknumber(L, 1);
   float y = luaL_checknumber(L, 2);
   push_vec2(L, x, y);
   return 1;
 }
-static int vec2_fromOffsetScale(lua_State *L) {
+LJLIB_CF(vec2_fromOffsetScale) {
   float x = luaL_checknumber(L, 1);
   float y = luaL_checknumber(L, 2);
   float ox = luaL_checknumber(L, 3);

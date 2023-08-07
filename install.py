@@ -141,14 +141,6 @@ print("[*] \033[32mInstalling standard libraries...\033[0m")
 # Go through all lxx-1.0.0/lib and compile all directories
 for item in os.listdir(scriptPath + "/lxx-1.0.0/lib"):
     if os.path.isdir(scriptPath + "/lxx-1.0.0/lib/" + item):
-        if item == "ffi":
-            print("\033[34m[!] FFI Library will require libffi before install, please install or enter skip to continue. \033[0m")
-            val = input("Installed libffi? [Y/skip]: ")
-            if val.lower() == "y":
-                pass
-            else:
-                print("\033[33m[!] Skipping FFI Library...\033[0m")
-                continue
         # Change cwd to the directory
         os.chdir(scriptPath + "/lxx-1.0.0/lib/" + item)
         # Compile the library

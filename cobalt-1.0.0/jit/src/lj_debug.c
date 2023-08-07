@@ -659,7 +659,8 @@ LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1, const char *msg,
   int top = (int)(L->top - L->base);
   int lim = TRACEBACK_LEVELS1;
   lua_Debug ar;
-  if (msg) lua_pushfstring(L, "%s\n", msg);
+  if (msg)
+    lua_pushfstring(L, "\033[1;31m%s\033[0m\n", msg);
   lua_pushliteral(L, "stack traceback:");
   while (lua_getstack(L1, level++, &ar)) {
     GCfunc *fn;

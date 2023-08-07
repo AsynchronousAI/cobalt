@@ -61,14 +61,6 @@ add_library(lua_internal INTERFACE)
 
 add_library(lua_include INTERFACE)
 
-execute_process(
-    COMMAND make
-    RESULT_VARIABLE result
-    OUTPUT_VARIABLE output
-    ERROR_VARIABLE error
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/jit
-)
-
 target_include_directories(lua_include INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>

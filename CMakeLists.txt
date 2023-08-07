@@ -33,6 +33,12 @@ add_custom_target(lua-cobalt
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building lua-cobalt"
 )
+add_custom_target(jit
+    COMMAND make -w
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-1.0.0/jit
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltJIT (this may take a while)"
+)
 if(LUA_ENABLE_TESTING)
     add_test(NAME lua-testsuite COMMAND cobalt -e "_U=true" all.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-${CMAKE_PROJECT_VERSION}-tests)
 endif()

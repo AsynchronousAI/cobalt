@@ -9,22 +9,30 @@ installable = []
 print("[*] \033[32mChecking for binaries...\033[0m")
             ### Unix/Posix Specific ###
 if os.path.isfile(scriptPath + "/cobalt"):
+    print("[*] \033[32mFound cobalt binary!\033[0m")
     installable.append("cobalt")
 if os.path.isfile(scriptPath + "/cobaltc"):
+    print("[*] \033[32mFound cobaltc binary!\033[0m")
     installable.append("cobaltc")
 if os.path.isfile(scriptPath + "/cobalt-1.0.0/jit/src/cobaltjit"):
+    print("[*] \033[32mFound cobaltjit binary!\033[0m")
     installable.append("cobalt-1.0.0/jit/src/cobaltjit")
 if os.path.isfile(scriptPath + "/cobalt-1.0.0/lua-cobalt/lua-cobalt"):
+    print("[*] \033[32mFound lua-cobalt binary!\033[0m")
     installable.append("cobalt-1.0.0/lua-cobalt/lua-cobalt")
     
             ### Windows Specific ###
 if os.path.isfile(scriptPath + "/cobalt.exe"):
+    print("[*] \033[32mFound cobalt binary!\033[0m")
     installable.append("cobalt.exe")
 if os.path.isfile(scriptPath + "/cobaltc.exe"):
+    print("[*] \033[32mFound cobaltc binary!\033[0m")
     installable.append("cobaltc.exe")
 if os.path.isfile(scriptPath + "/cobaltjit.exe"):
+    print("[*] \033[32mFound cobaltjit binary!\033[0m")
     installable.append("cobaltjit.exe")
 if os.path.isfile(scriptPath + "/cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe"):
+    print("[*] \033[32mFound lua-cobalt binary!\033[0m")
     installable.append("cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe")
     
 

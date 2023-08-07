@@ -22,6 +22,7 @@ $ cmake .
 You should have build files ready now run
 ```bash
 $ make
+$ make jit # This is an optional command if you want to install the JIT
 ```
 this should build the binaries and you can find `cobalt`, `cobaltc`, and `cobaltjit`. The cobaltjit binary
 will be hidden in the source files, step 4 will install it to your system.

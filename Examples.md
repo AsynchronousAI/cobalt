@@ -272,7 +272,7 @@ typedef("myType", {
         print(this.x)
     }
 
-    "new": function(z) {
+    "\\new": function(z) {
         var new = this
         new.z = z
         return new // Duplicates itself and returns it

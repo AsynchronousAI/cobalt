@@ -1,7 +1,7 @@
 /*
 ** DynASM PPC/PPC64 encoding engine.
 ** Copyright (C) 2005-2020 Mike Pall. All rights reserved.
-** Released under the MIT license. See dynasm.lua for full copyright notice.
+** Released under the MIT license. See dynasm.cobalt for full copyright notice.
 */
 
 #include <stddef.h>

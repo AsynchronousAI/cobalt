@@ -61,6 +61,8 @@ add_library(lua_internal INTERFACE)
 
 add_library(lua_include INTERFACE)
 
+#add_subdirectory("jit")
+
 target_include_directories(lua_include INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>

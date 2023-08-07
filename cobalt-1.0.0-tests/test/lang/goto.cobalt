@@ -2,7 +2,7 @@ var loadstring = loadstring || load;
 
 var function expect(src, msg) {
   var ok, err = loadstring(src);
-  if( msg ) {
+  if( msg && msg != null) {
     assert(! ok && string.find(err, msg), err);
   } else {
     assert(ok, err);

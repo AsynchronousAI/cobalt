@@ -4,6 +4,7 @@ import sys
 
 scriptPath = os.path.dirname(os.path.realpath(__file__))
 installable = []
+jitFound = False
 
 # Check for the existence of the binaries, cobalt, cobaltc, cobaltjit, and lua-cobalt. Which ever ones are found, add them to the installable list.
 print("[*] \033[32mChecking for binaries...\033[0m")
@@ -17,6 +18,7 @@ if os.path.isfile(scriptPath + "/cobaltc"):
 if os.path.isfile(scriptPath + "/cobalt-1.0.0/jit/src/cobaltjit"):
     print("[*] \033[32mFound cobaltjit binary!\033[0m")
     installable.append("cobalt-1.0.0/jit/src/cobaltjit")
+    jitFound = True
 if os.path.isfile(scriptPath + "/cobalt-1.0.0/lua-cobalt/lua-cobalt"):
     print("[*] \033[32mFound lua-cobalt binary!\033[0m")
     installable.append("cobalt-1.0.0/lua-cobalt/lua-cobalt")
@@ -31,6 +33,7 @@ if os.path.isfile(scriptPath + "/cobaltc.exe"):
 if os.path.isfile(scriptPath + "/cobaltjit.exe"):
     print("[*] \033[32mFound cobaltjit binary!\033[0m")
     installable.append("cobaltjit.exe")
+    jitFound = True
 if os.path.isfile(scriptPath + "/cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe"):
     print("[*] \033[32mFound lua-cobalt binary!\033[0m")
     installable.append("cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe")
@@ -149,6 +152,11 @@ print("[*] \033[32mInstalling standard libraries...\033[0m")
 # Go through all cobalt-1.0.0/lib and compile all directories
 for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
     if os.path.isdir(scriptPath + "/cobalt-1.0.0/lib/" + item):
+        if item == "jit":
+            print("[*] \033[32mFound JIT Library\033[0m")
+            # Duplicate JIT library directory to the install path
+            os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + CDIR + item)
+            continue
         # Change cwd to the directory
         os.chdir(scriptPath + "/cobalt-1.0.0/lib/" + item)
         # Compile the library

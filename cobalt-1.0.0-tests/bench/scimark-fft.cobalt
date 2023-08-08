@@ -1,1 +1,0 @@
-require("scimark_lib").FFT(1024)(tonumber(arg && arg[1]) || 50000);

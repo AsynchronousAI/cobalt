@@ -1,3 +1,0 @@
-// Random tests I make often
-
-argparse = import('argparse')

@@ -525,7 +525,7 @@ static const luaL_Reg chan_fns[] = {
     { NULL, NULL }
 };
 
-int luaopen_chan(lua_State* L)
+LUALIB_API int luaopen_chan(lua_State* L)
 {
     luaL_newmetatable(L, METATABLE_NAME);
     lua_pushvalue(L, -1);

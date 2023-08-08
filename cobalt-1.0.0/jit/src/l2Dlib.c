@@ -2,11 +2,6 @@
 #define l2Dlib_c
 #define LUA_LIB
 
-
-
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
@@ -25,6 +20,10 @@
 #include "lj_ff.h"
 #include "lj_lib.h"
 
+
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
 
 #include "classes.h"
 
@@ -55,37 +54,37 @@ static int push_vec2(lua_State *L, float x, float y) {
 }
 
 
-LJLIB_CF(vec2_add) {
+static int vec2_add(lua_State *L) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x + b->x, a->y + b->y);
   return 1;
 }
-LJLIB_CF(vec2_sub) {
+static int vec2_sub(lua_State *L) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x - b->x, a->y - b->y);
   return 1;
 }
-LJLIB_CF(vec2_mul) {
+static int vec2_mul(lua_State *L) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x * b->x, a->y * b->y);
   return 1;
 }
-LJLIB_CF(vec2_div) {
+static int vec2_div(lua_State *L) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x / b->x, a->y / b->y);
   return 1;
 }
-LJLIB_CF(vec2_new) {
+static int vec2_new(lua_State *L) {
   float x = luaL_checknumber(L, 1);
   float y = luaL_checknumber(L, 2);
   push_vec2(L, x, y);
   return 1;
 }
-LJLIB_CF(vec2_fromOffsetScale) {
+static int vec2_fromOffsetScale(lua_State *L) {
   float x = luaL_checknumber(L, 1);
   float y = luaL_checknumber(L, 2);
   float ox = luaL_checknumber(L, 3);
@@ -119,7 +118,7 @@ static const luaL_Reg vec2lib[] = {
 
 
 
-LUAMOD_API int luaopen_2D (lua_State *L) {
+LUALIB_API int luaopen_2D (lua_State *L) {
   luaL_newlib(L, vec2lib);
 
   push_vec2(L, 0, 0);

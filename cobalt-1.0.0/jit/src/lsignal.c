@@ -339,7 +339,7 @@ static const struct luaL_Reg lsignal_lib[] = {
   {NULL, NULL}
 };
 
-int luaopen_signal(lua_State *L)
+LUALIB_API int luaopen_signal(lua_State *L)
 {
   int i = 0;
 

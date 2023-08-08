@@ -33,19 +33,24 @@
 /*
 ** Adapted from Lua 5.2.0
 */
+/*
 static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
   luaL_checkstack(L, nup, "too many upvalues");
   for (; l->name != NULL; l++) {  /* fill the table with given functions */
+  /*
     int i;
     for (i = 0; i < nup; i++)  /* copy upvalues to the top */
+	/*
       lua_pushvalue(L, -nup);
     lua_pushstring(L, l->name);
     lua_pushcclosure(L, l->func, nup);  /* closure with those upvalues */
+	/*
     lua_settable(L, -(nup + 3));
   }
   lua_pop(L, nup);  /* remove upvalues */
+  /*
 }
-
+*/
 #define lua_load_no_mode(L, reader, data, source) \
 	lua_load(L, reader, data, source)
 
@@ -55,13 +60,13 @@ static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
 
 #define lua_load_no_mode(L, reader, data, source) \
 	lua_load(L, reader, data, source, NULL)
-
+/*
 static int luaL_typerror (lua_State *L, int narg, const char *tname) {
   const char *msg = lua_pushfstring(L, "%s expected, got %s",
                                     tname, luaL_typename(L, narg));
   return luaL_argerror(L, narg, msg);
 }
-
+*/
 
 #define REG_PACKAGE_IS_CONSTRUCTOR 0
 #define REG_MODULES_AS_GLOBALS 0
@@ -1815,7 +1820,7 @@ static void create_object_instance_cache(lua_State *L) {
 	lua_rawset(L, LUA_REGISTRYINDEX);  /* create reference to weak table. */
 }
 
-LUAMOD_API int luaopen_coroutine(lua_State *L) {
+LUALIB_API int luaopen_coroutine(lua_State *L) {
 	const reg_sub_module *reg = reg_sub_modules;
 	const luaL_Reg *submodules = submodule_libs;
 	int priv_table = -1;

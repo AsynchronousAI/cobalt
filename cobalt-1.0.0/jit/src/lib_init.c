@@ -26,7 +26,7 @@ static const luaL_Reg lj_lib_load[] = {
   { LUA_DBLIBNAME,	luaopen_debug },
   { LUA_BITLIBNAME,	luaopen_bit },
   { "bit32",	luaopen_bit },
-  { LUA_JITLIBNAME,	luaopen_jit },/*
+  { LUA_JITLIBNAME,	luaopen_jit },
   {LUA_COLORLIBNAME, luaopen_color},
   {LUA_2DLIBNAME, luaopen_2D},
   {LUA_3DLIBNAME, luaopen_3D},
@@ -37,7 +37,8 @@ static const luaL_Reg lj_lib_load[] = {
   {LUA_COMPLEXNAME, luaopen_complex},
   {LUA_STRUCTNAME, luaopen_struct},
   {LUA_SIGNALNAME, luaopen_signal},
-  {LUA_SOCKETNAME, luaopen_chan},*/
+  {LUA_SOCKETNAME, luaopen_chan},
+  {LUA_ASYNCNAME, luaopen_coroutine},
   { NULL,		NULL }
 };
 

@@ -215,7 +215,7 @@ static const luaL_Reg lib[] = {
   {NULL, NULL}
 };
 
-LUAMOD_API int luaopen_transform (lua_State *L) {
+LUALIB_API int luaopen_transform (lua_State *L) {
   luaL_newlib(L, lib);
 
   push_transform(L, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0);

@@ -3,6 +3,7 @@
         "lauxlib.h": "c",
         "lua.hh": "c",
         "cstddef": "cpp",
-        "__locale": "c"
+        "__locale": "c",
+        "lj_strscan.h": "c"
     }
 }

@@ -29,7 +29,7 @@
 #endif
 #include "lj_ff.h"
 #include "lj_lib.h"
-
+#include "classes.h"
 /*
 TO BE ADDED FUNCTIONS:
 Color->to_rgb
@@ -236,7 +236,7 @@ static const luaL_Reg colorlib[] = {
 /*
 ** Open color library
 */
-LUAMOD_API int luaopen_color (lua_State *L) {
+LUALIB_API int luaopen_color (lua_State *L) {
   luaL_newlib(L, colorlib);
   push_color(L, 0,0,0);
   lua_setfield(L, -2, "black");

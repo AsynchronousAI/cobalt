@@ -158,7 +158,7 @@ static const luaL_Reg vec3_lib[] = {
   {NULL, NULL}
 };
 
-LUAMOD_API int luaopen_3D (lua_State *L) {
+LUALIB_API int luaopen_3D (lua_State *L) {
   luaL_newlib(L, vec3_lib);
   return 1;
 }

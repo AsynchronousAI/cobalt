@@ -154,8 +154,10 @@ for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
     if os.path.isdir(scriptPath + "/cobalt-1.0.0/lib/" + item):
         if item == "jit":
             print("[*] \033[32mFound JIT Library\033[0m")
+            """
             # Duplicate JIT library directory to the install path
             os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + CDIR + item)
+            """
             continue
         # Change cwd to the directory
         os.chdir(scriptPath + "/cobalt-1.0.0/lib/" + item)

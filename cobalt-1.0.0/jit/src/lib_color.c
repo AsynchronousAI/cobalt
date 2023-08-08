@@ -245,3 +245,6 @@ LUALIB_API int luaopen_color (lua_State *L) {
   return 1;
 }
 
+LUALIB_API int luaget_color () {
+  return colorlib;
+}

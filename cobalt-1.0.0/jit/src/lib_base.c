@@ -896,6 +896,14 @@ static void newproxy_weaktable(lua_State *L)
   t->nomm = (uint8_t)(~(1u<<MM_mode));
 }
 
+// The following section has been modified from the original LuaJIT source to include Cobalt libraries
+/*
+int lj_lib_init_color(lua_State *L){
+  luaopen_color(L);
+}
+int lj_lib_cf_luaget_color(lua_State *L){
+  luaopen_color(L);
+}*/
 LUALIB_API int luaopen_base(lua_State *L)
 {
   /* NOBARRIER: Table and value are the same. */
@@ -904,7 +912,11 @@ LUALIB_API int luaopen_base(lua_State *L)
   lua_pushliteral(L, LUA_VERSION);  /* top-3. */
   newproxy_weaktable(L);  /* top-2. */
   LJ_LIB_REG(L, "_G", base);
-  LJ_LIB_REG(L, LUA_COLIBNAME, coroutine);
+  //LJ_LIB_REG(L, LUA_COLIBNAME, coroutine); Disable coroutine library, use Async instead for real threading
+
+  /* Open Cobalt Libraries */
+  //LJ_LIB_REG(L, "Color", luaget_color());
+
   return 2;
 }
 

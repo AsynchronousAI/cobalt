@@ -4,6 +4,7 @@
         "lua.hh": "c",
         "cstddef": "cpp",
         "__locale": "c",
-        "lj_strscan.h": "c"
+        "lj_strscan.h": "c",
+        "lj_ctype.h": "c"
     }
 }

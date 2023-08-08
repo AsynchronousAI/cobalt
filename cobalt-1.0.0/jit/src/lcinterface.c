@@ -119,7 +119,7 @@ static int resize_memory(lua_State* L) {
 
 // MACROS:
 static int dumpmacros(lua_State* L){
-  lua_error("Not supported on JIT. Use ffi instead.");
+  lua_error("cobaltJIT does not support core.macros, please use #defined with the FFI.");
 
   return 1;
 }

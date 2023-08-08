@@ -311,7 +311,7 @@ static int loadjitmodule(lua_State *L)
   if (lua_isnil(L, -1)) {
   nomodule:
     l_message(progname,
-	      "unknown luaJIT command or jit.* modules not installed");
+	      "unknown cobaltJIT command or jit.* modules not installed");
     return 1;
   }
   lua_remove(L, -2);  /* Drop module table. */

@@ -1,6 +1,6 @@
 var isJIT = jit ~= null;
 if (!isJIT) {
-	error("Attempt to ")
+	error("Attempt to use analysis without JIT.")
 	return;
 }
 var bit = require ('bit');

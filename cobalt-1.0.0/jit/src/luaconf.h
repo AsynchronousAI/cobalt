@@ -30,10 +30,16 @@
 */
 #define LUA_LDIR	"!\\lua\\"
 #define LUA_CDIR	"!\\"
-#define LUA_PATH_DEFAULT \
-  ".\\?" LUA_SCRIPT_EXT ";" LUA_LDIR "? " LUA_SCRIPT_EXT ";" LUA_LDIR"?\\init" LUA_SCRIPT_EXT ";"
+#define LUA_SHRDIR	"!\\..\\share\\lua\\cobalt\\"
+#define LUA_PATH_DEFAULT  \
+		LUA_LDIR"?" LUA_SCRIPT_EXT ";"  LUA_LDIR"?\\init" LUA_SCRIPT_EXT ";" \
+		LUA_CDIR"?" LUA_SCRIPT_EXT ";"  LUA_CDIR"?\\init" LUA_SCRIPT_EXT ";" \
+		LUA_SHRDIR"?" LUA_SCRIPT_EXT ";" LUA_SHRDIR"?\\init" LUA_SCRIPT_EXT ";" \
+		".\\?" LUA_SCRIPT_EXT ";" ".\\?\\init" LUA_SCRIPT_EXT 
 #define LUA_CPATH_DEFAULT \
-  ".\\?.dll;" LUA_CDIR"?.dll;" LUA_CDIR"loadall.dll"
+		LUA_CDIR"?.dll;" \
+		LUA_CDIR"..\\lib\\lua\\" LUA_VDIR "\\?.dll;" \
+		LUA_CDIR"loadall.dll;" ".\\?.dll"
 #else
 /*
 ** Note to distribution maintainers: do NOT patch the following lines!
@@ -42,13 +48,12 @@
 #ifndef LUA_MULTILIB
 #define LUA_MULTILIB	"lib"
 #endif
-#ifndef LUA_LMULTILIB
+#ifndef LUA_LMULTILIB 
 #define LUA_LMULTILIB	"lib"
 #endif
 #define LUA_LROOT	"/usr/local"
-#define LUA_LUADIR	"/lua/5.1/"
-#define LUA_LJDIR	"/luajit-2.1.0-beta3/"
-
+#define LUA_LUADIR	"/lua/cobalt/"
+#define LUA_LJDIR	"/jit/"
 #ifdef LUA_ROOT
 #define LUA_JROOT	LUA_ROOT
 #define LUA_RLDIR	LUA_ROOT "/share" LUA_LUADIR
@@ -62,9 +67,11 @@
 #endif
 
 #define LUA_JPATH	";" LUA_JROOT "/share" LUA_LJDIR "?" LUA_SCRIPT_EXT
-#define LUA_LLDIR	LUA_LROOT "/share" LUA_LUADIR
+#define LUA_LLDIR	LUA_LROOT "/share" LUA_LUADIR "jit/"
+#define LUA_LLDIR_ALT	LUA_LROOT "/share" LUA_LUADIR
 #define LUA_LCDIR	LUA_LROOT "/" LUA_LMULTILIB LUA_LUADIR
-#define LUA_LLPATH	";" LUA_LLDIR "?" LUA_SCRIPT_EXT ";" LUA_LLDIR "?/init" LUA_SCRIPT_EXT
+#define LUA_LLPATH	";" LUA_LLDIR "?" LUA_SCRIPT_EXT ";" LUA_LLDIR "?/init" LUA_SCRIPT_EXT \
+      ";" LUA_LLDIR_ALT "?" LUA_SCRIPT_EXT ";" LUA_LLDIR_ALT "?/init" LUA_SCRIPT_EXT
 #define LUA_LCPATH1	";" LUA_LCDIR "?.so"
 #define LUA_LCPATH2	";" LUA_LCDIR "loadall.so"
 

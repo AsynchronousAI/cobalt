@@ -904,7 +904,7 @@ return {
 	off = loomstop,
 
 	start = function (opt, out) {
-		var tmpl = template(opt || 'loom-ljs.html');
+		var tmpl = template(opt || 'loom-cobalt.html');
 		defer = newproxy(true);
 		getmetatable(defer).__gc = function() { xpcall(function () {
 			var o = loomstop(tmpl);

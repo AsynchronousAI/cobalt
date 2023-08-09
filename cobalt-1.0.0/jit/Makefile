@@ -26,7 +26,7 @@ ABIVER=  5.1
 # the paths in src/luaconf.h, too. Note: PREFIX must be an absolute path!
 #
 #export PREFIX= /usr/local
-export PREFIX= $(HOME)/local/ljsjit
+export PREFIX= $(HOME)/local/cobalt
 export MULTILIB= lib
 ##############################################################################
 
@@ -34,9 +34,9 @@ DPREFIX= $(DESTDIR)$(PREFIX)
 INSTALL_BIN=   $(DPREFIX)/bin
 INSTALL_LIB=   $(DPREFIX)/$(MULTILIB)
 INSTALL_SHARE= $(DPREFIX)/share
-INSTALL_INC=   $(DPREFIX)/include/luajit-$(MAJVER).$(MINVER)
+INSTALL_INC=   $(DPREFIX)/include/cobalt-$(MAJVER).$(MINVER)
 
-INSTALL_LJLIBD= $(INSTALL_SHARE)/luajit-$(VERSION)
+INSTALL_LJLIBD= $(INSTALL_SHARE)/cobalt-$(VERSION)
 INSTALL_JITLIB= $(INSTALL_LJLIBD)/jit
 INSTALL_LMODD= $(INSTALL_SHARE)/lua
 INSTALL_LMOD= $(INSTALL_LMODD)/$(ABIVER)
@@ -45,8 +45,8 @@ INSTALL_CMOD= $(INSTALL_CMODD)/$(ABIVER)
 INSTALL_MAN= $(INSTALL_SHARE)/man/man1
 INSTALL_PKGCONFIG= $(INSTALL_LIB)/pkgconfig
 
-INSTALL_TNAME= ljsjit-$(VERSION)
-INSTALL_TSYMNAME= ljsjit
+INSTALL_TNAME= cobalt-$(VERSION)
+INSTALL_TSYMNAME= cobalt
 INSTALL_ANAME= libluajit-$(ABIVER).a
 INSTALL_SOSHORT1= libluajit-$(ABIVER).so
 INSTALL_SOSHORT2= libluajit-$(ABIVER).so.$(MAJVER)
@@ -54,7 +54,7 @@ INSTALL_SONAME= $(INSTALL_SOSHORT2).$(MINVER).$(RELVER)
 INSTALL_DYLIBSHORT1= libluajit-$(ABIVER).dylib
 INSTALL_DYLIBSHORT2= libluajit-$(ABIVER).$(MAJVER).dylib
 INSTALL_DYLIBNAME= libluajit-$(ABIVER).$(MAJVER).$(MINVER).$(RELVER).dylib
-INSTALL_PCNAME= ljsjit.pc
+INSTALL_PCNAME= cobalt.pc
 
 INSTALL_STATIC= $(INSTALL_LIB)/$(INSTALL_ANAME)
 INSTALL_DYN= $(INSTALL_LIB)/$(INSTALL_SONAME)
@@ -80,16 +80,16 @@ LDCONFIG= ldconfig -n 2>/dev/null
 SED_PC= sed -e "s|^prefix=.*|prefix=$(PREFIX)|" \
             -e "s|^multilib=.*|multilib=$(MULTILIB)|"
 
-FILE_T= ljsjit
+FILE_T= cobalt
 FILE_A= libluajit.a
 FILE_SO= libluajit.so
-FILE_MAN= ljsjit.1
-FILE_PC= ljsjit.pc
+FILE_MAN= cobalt.1
+FILE_PC= cobalt.pc
 FILES_INC= lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h
-FILES_JITLIB= bc.ljs bcsave.ljs dump.ljs p.ljs v.ljs zone.ljs \
-	      dis_x86.ljs dis_x64.ljs dis_arm.ljs dis_arm64.ljs \
-	      dis_arm64be.ljs dis_ppc.ljs dis_mips.ljs dis_mipsel.ljs \
-	      dis_mips64.ljs dis_mips64el.ljs vmdef.ljs
+FILES_JITLIB= bc.cobalt bcsave.cobalt dump.cobalt p.cobalt v.cobalt zone.cobalt \
+	      dis_x86.cobalt dis_x64.cobalt dis_arm.cobalt dis_arm64.cobalt \
+	      dis_arm64be.cobalt dis_ppc.cobalt dis_mips.cobalt dis_mipsel.cobalt \
+	      dis_mips64.cobalt dis_mips64el.cobalt vmdef.cobalt
 
 ifeq (,$(findstring Windows,$(OS)))
   HOST_SYS:= $(shell uname -s)
@@ -107,7 +107,7 @@ endif
 
 ##############################################################################
 
-INSTALL_DEP= src/ljsjit
+INSTALL_DEP= src/cobalt
 
 default all $(INSTALL_DEP):
 	@echo "==== Building cobaltJIT $(VERSION) ===="

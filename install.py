@@ -152,12 +152,21 @@ print("[*] \033[32mInstalling standard libraries...\033[0m")
 # Go through all cobalt-1.0.0/lib and compile all directories
 for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
     if os.path.isdir(scriptPath + "/cobalt-1.0.0/lib/" + item):
-        if item == "jit":
+        if item == "jit" or item == "pre":
             print("[*] \033[32mFound JIT Library\033[0m")
-            """
-            # Duplicate JIT library directory to the install path
-            os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + CDIR + item)
-            """
+            # Duplicate all of the children to the install path
+            for child in os.listdir(scriptPath + "/cobalt-1.0.0/lib/" + item):
+                # Make sure it is a cobalt file
+                if child.endswith(".cobalt"):
+                    # If the <item> folder doesnt exist, create it
+                    if not os.path.isdir(LDIR + item):
+                        os.mkdir(LDIR + item)
+                    # Copy the file to the install path
+                
+                    if sys.platform == "win32":
+                        os.system("cp " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
+                    else:
+                        os.system("cp " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
             continue
         # Change cwd to the directory
         os.chdir(scriptPath + "/cobalt-1.0.0/lib/" + item)
@@ -169,5 +178,5 @@ for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
         pass
     elif os.path.isfile(scriptPath + "/cobalt-1.0.0/lib/" + item):
         # Make sure it is a cobalt file
-        if item.endswith(".cblt"):
+        if item.endswith(".cobalt"):
             os.system("cp " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + LDIR + item)

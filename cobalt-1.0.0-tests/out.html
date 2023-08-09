@@ -25,7 +25,16 @@
 			.hilight {
 				background-color: lightsteelblue;
 			}
+			.fn001 {
+				background-color: hsla(286, 100%, 90%, 1);
+			}
 			
+			.tr001 {
+				background-color: hsla(252, 80%, 75%, 1);
+			}
+			.tr002 {
+				background-color: hsla(213, 80%, 75%, 1);
+			}
 					</style>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 		<script>
@@ -52,12 +61,841 @@
 				});
 			});
 		</script>
-		<title>cobaltjit -jloom test.cobalt</title>
+		<title>cobaltjit -jloom -e &quot;require('test').lulu()&quot;</title>
 	</head>
 	<body>
-	<h2>cobaltjit -jloom test.cobalt</h2>
+	<h2>cobaltjit -jloom -e "require('test').lulu()"</h2>
 	<table class="code" cellpadding="0" cellspacing="0">
-			</table>
+					<tr>
+				<th colspan="2">./test.cobalt</th>
+				<th colspan="3">Bytecode</th>
+			</th>
+						<tr >
+				<td > 3 </td>
+				<td > loom.start(); </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td > 4 </td>
+				<td > function Sm.lulu() { </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr class="bordertop">
+				<td > 5 </td>
+				<td > 	for( i = 1, 1000 ) { </td>
+				<td class="fn001"> 0001    KSHORT   0   1 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0002    KSHORT   1 1000 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0003    KSHORT   2   1 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0004    FORI     0 =&gt; 0011 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr class="bordertop">
+				<td > 6 </td>
+				<td > 		for( j = 1, 1000 ) { </td>
+				<td class="fn001"> 0005 =&gt; KSHORT   4   1 </td>
+				<td> <a href="#tr002" name="tr002_002"><span
+						id="tr002_002"
+						class="tr002"
+					>2/2</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0006    KSHORT   5 1000 </td>
+				<td> <a href="#tr002" name="tr002_003"><span
+						id="tr002_003"
+						class="tr002"
+					>2/3</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0007    KSHORT   6   1 </td>
+				<td> <a href="#tr002" name="tr002_004"><span
+						id="tr002_004"
+						class="tr002"
+					>2/4</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0008    JFORI    4 =&gt; 0010 </td>
+				<td> <a href="#tr002" name="tr002_005"><span
+						id="tr002_005"
+						class="tr002"
+					>2/5</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0009    JFORL    4   1 </td>
+				<td> <a href="#tr001" name="tr001_001"><span
+						id="tr001_001"
+						class="tr001"
+					>1/1</span></a> </td>
+				<td> <span>"start" [n=1]</span> </td>
+			</tr>
+						<tr class="bordertop">
+				<td class="phantom"> 5 </td>
+				<td class="phantom"> 	for( i = 1, 1000 ) { </td>
+				<td class="fn001"> 0010 =&gt; FORL     0 =&gt; 0005 </td>
+				<td> <a href="#tr002" name="tr002_001"><span
+						id="tr002_001"
+						class="tr002"
+					>2/1</span></a> </td>
+				<td> <span>"start" [n=1]</span> </td>
+			</tr>
+						<tr >
+				<td > 7 </td>
+				<td > 		} </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td > 8 </td>
+				<td > 	} </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr class="bordertop">
+				<td > 9 </td>
+				<td > } </td>
+				<td class="fn001"> 0011 =&gt; RET0     0   1 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						</table>
 
+			<br/>
+		<a name="#tr1d"><table class="popup trace tr001" id="tr001" cellpadding="4">
+			<tr>
+				<th colspan="3" class="titlebar">Trace #1:  loop
+</th>
+			</tr>
+			<tr class="white">
+				<th class="bc" >bytecode</th>
+				<th class="ir" >IR</th>
+				<th class="mcode" >mcode</th>
+			</tr>
+			<tr class="white" valign="top">
+				<td class="code bc"><table cellpadding="0" cellspacing="0">
+										<tr class="code">
+						<td class="tr001"><a href="#tr001_001">1/1</a> </td>
+						<td class="fn001"> 0009  JFORL    4   1 </td>
+						<td class="src opt">./test.cobalt:6 		for( j = 1, 1000 ) {</td>
+					</tr>
+									</table></td>
+				<td class="code ir"><table>
+											<tr class="snap_0" title="[ ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#0</td>
+													<td class=""><span class="opt">[ ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0001" title="">							<td class="ref_0001">0001</td>
+													<td class="">rbp</td>
+													<td class=""></td>
+													<td class="">int</td>
+													<td class="">SLOAD</td>
+													<td class="">#6</td>
+													<td class="">CI</td>
+						</tr>
+											<tr class="ref_0002" title="">							<td class="ref_0002">0002</td>
+													<td class="">rbp</td>
+													<td class=""> +</td>
+													<td class="">int</td>
+													<td class="">ADD</td>
+													<td class="ref_0001">0001</td>
+													<td class="">+1</td>
+						</tr>
+											<tr class="snap_1" title="[ ---- ---- ---- ---- ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#1</td>
+													<td class=""><span class="opt">[ ---- ---- ---- ---- ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0003" title="">							<td class="ref_0003">0003</td>
+													<td class=""></td>
+													<td class="">></td>
+													<td class="">int</td>
+													<td class="">LE</td>
+													<td class="ref_0002">0002</td>
+													<td class="ref_1000">+1000</td>
+						</tr>
+											<tr class="snap_2" title="[ ---- ---- ---- ---- ---- ---- 0002 ---- ---- 0002 ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#2</td>
+													<td class="ref_0002 ref_0002"><span class="opt">[ ---- ---- ---- ---- ---- ---- 0002 ---- ---- 0002 ]</span></td>
+						</tr>
+											<tr class="ref_0004" title="">							<td class="ref_0004">0004</td>
+													<td class="">------</td>
+													<td class="">---</td>
+													<td class="">---</td>
+													<td class="">LOOP --</td>
+													<td class="">------</td>
+													<td class="">----</td>
+						</tr>
+											<tr class="ref_0005" title="">							<td class="ref_0005">0005</td>
+													<td class="">rbp</td>
+													<td class=""> +</td>
+													<td class="">int</td>
+													<td class="">ADD</td>
+													<td class="ref_0002">0002</td>
+													<td class="">+1</td>
+						</tr>
+											<tr class="snap_3" title="[ ---- ---- ---- ---- ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#3</td>
+													<td class=""><span class="opt">[ ---- ---- ---- ---- ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0006" title="">							<td class="ref_0006">0006</td>
+													<td class=""></td>
+													<td class="">></td>
+													<td class="">int</td>
+													<td class="">LE</td>
+													<td class="ref_0005">0005</td>
+													<td class="ref_1000">+1000</td>
+						</tr>
+											<tr class="ref_0007" title="">							<td class="ref_0007">0007</td>
+													<td class="">rbp</td>
+													<td class=""></td>
+													<td class="">int</td>
+													<td class="">PHI</td>
+													<td class="ref_0002">0002</td>
+													<td class="ref_0005">0005</td>
+						</tr>
+									</table></td>
+				<td class="code mcode">08559fd1  mov dword [r14-0xed0], 0x1
+08559fdc  cvttsd2si ebp, [rdx+0x20]
+08559fe1  add ebp, +0x01
+08559fe4  cmp ebp, 0x3e8
+08559fea  jg 0x0854a014	-&gt;1
+-&gt;LOOP:
+08559ff0  add ebp, +0x01
+08559ff3  cmp ebp, 0x3e8
+08559ff9  jle 0x08559ff0	-&gt;LOOP
+08559ffb  jmp 0x08559f79	-&gt;<span class="tr002">Trace #2</span> (exit 1/3 [n=10])
+</td>
+			</tr>
+		</table></a>
+			<br/>
+		<a name="#tr2d"><table class="popup trace tr002" id="tr002" cellpadding="4">
+			<tr>
+				<th colspan="3" class="titlebar">Trace #2: (1/3)  -&gt; 1
+</th>
+			</tr>
+			<tr class="white">
+				<th class="bc" >bytecode</th>
+				<th class="ir" >IR</th>
+				<th class="mcode" >mcode</th>
+			</tr>
+			<tr class="white" valign="top">
+				<td class="code bc"><table cellpadding="0" cellspacing="0">
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_001">2/1</a> </td>
+						<td class="fn001"> 0010  FORL     0 =&gt; 0005 </td>
+						<td class="src opt">./test.cobalt:5 	for( i = 1, 1000 ) {</td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_002">2/2</a> </td>
+						<td class="fn001"> 0005  KSHORT   4   1 </td>
+						<td class="src opt">./test.cobalt:6 		for( j = 1, 1000 ) {</td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_003">2/3</a> </td>
+						<td class="fn001"> 0006  KSHORT   5 1000 </td>
+						<td class="src opt"></td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_004">2/4</a> </td>
+						<td class="fn001"> 0007  KSHORT   6   1 </td>
+						<td class="src opt"></td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_005">2/5</a> </td>
+						<td class="fn001"> 0008  JFORI    4 =&gt; 0010 </td>
+						<td class="src opt"></td>
+					</tr>
+									</table></td>
+				<td class="code ir"><table>
+											<tr class="snap_0" title="[ ---- ---- ---- ---- ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#0</td>
+													<td class=""><span class="opt">[ ---- ---- ---- ---- ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0001" title="">							<td class="ref_0001">0001</td>
+													<td class="">xmm7</td>
+													<td class=""></td>
+													<td class="">num</td>
+													<td class="">SLOAD</td>
+													<td class="">#2</td>
+													<td class="">I</td>
+						</tr>
+											<tr class="ref_0002" title="">							<td class="ref_0002">0002</td>
+													<td class="">xmm7</td>
+													<td class=""></td>
+													<td class="">num</td>
+													<td class="">ADD</td>
+													<td class="ref_0001">0001</td>
+													<td class="">+1</td>
+						</tr>
+											<tr class="snap_1" title="[ ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#1</td>
+													<td class=""><span class="opt">[ ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0003" title="">							<td class="ref_0003">0003</td>
+													<td class=""></td>
+													<td class="">></td>
+													<td class="">num</td>
+													<td class="">LE</td>
+													<td class="ref_0002">0002</td>
+													<td class="ref_1000">+1000</td>
+						</tr>
+											<tr class="snap_2" title="[ ---- ---- 0002 ---- ---- 0002 +1   +1000 +1   +1   ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#2</td>
+													<td class="ref_0002 ref_0002 ref_1000"><span class="opt">[ ---- ---- 0002 ---- ---- 0002 +1   +1000 +1   +1   ]</span></td>
+						</tr>
+									</table></td>
+				<td class="code mcode">08559f79  mov dword [r14-0xed0], 0x2
+08559f84  movsd xmm6, [r14+0x45370]
+08559f8d  movsd xmm5, [r14+0x45380]
+08559f96  movsd xmm7, [rdx]
+08559f9a  addsd xmm7, xmm6
+08559f9e  ucomisd xmm5, xmm7
+08559fa2  jb 0x0854a014	-&gt;1
+08559fa8  movsd [rdx+0x38], xmm6
+08559fad  movsd [rdx+0x30], xmm6
+08559fb2  movsd [rdx+0x28], xmm5
+08559fb7  movsd [rdx+0x20], xmm6
+08559fbc  movsd [rdx+0x18], xmm7
+08559fc1  movsd [rdx], xmm7
+08559fc5  jmp 0x08559fd1	-&gt;<span class="tr001">Trace #1</span>
+</td>
+			</tr>
+		</table></a>
+		</body>
+</html><!DOCTYPE html>
+<html lang="en">
+	
+		<head>
+		<meta charset="utf-8" />
+		<style media="screen" type="text/css">
+			.code {
+				font-family: monospace;
+				white-space: pre;
+				tab-size: 4;
+			}
+			.opt { display: none; }
+			.codespan {
+				width: 100%;
+			}
+			.bordertop td {
+				border-top: thin lightgray solid;
+			}
+			.phantom {
+				color: #ccc;
+			}
+			.white {
+				background-color: white;
+			}
+			.hilight {
+				background-color: lightsteelblue;
+			}
+			.fn001 {
+				background-color: hsla(272, 100%, 90%, 1);
+			}
+			
+			.tr001 {
+				background-color: hsla(30, 80%, 75%, 1);
+			}
+			.tr002 {
+				background-color: hsla(238, 80%, 75%, 1);
+			}
+					</style>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script>
+			var sameref = function (elm, parent) {
+				var refmatch = elm.className.match(/ref_\d+/);
+				return refmatch ? $(elm).closest(parent).find('.'+refmatch[0])
+						: $();
+				return $(elm).closest(parent).find('.'+refclass);
+			}
+			$(function() {
+				$('th.bc').click(function(e) {
+					$('.bc .opt').toggle();
+				});
+				$('th.ir').click(function(e) {
+					$('.ir .opt').toggle();
+				});
+				$('th.titlebar').click(function(e) {
+					$(e.target).closest('tr').siblings().toggle();
+				});
+				$('[class^="ref_"]').mouseenter(function(e) {
+					sameref(e.target, '.ir').addClass('hilight');
+				}).mouseleave(function(e){
+					sameref(e.target, '.ir').removeClass('hilight');
+				});
+			});
+		</script>
+		<title>cobaltjit -jloom -e &quot;require('test').lulu()&quot;</title>
+	</head>
+	<body>
+	<h2>cobaltjit -jloom -e "require('test').lulu()"</h2>
+	<table class="code" cellpadding="0" cellspacing="0">
+					<tr>
+				<th colspan="2">./test.cobalt</th>
+				<th colspan="3">Bytecode</th>
+			</th>
+						<tr >
+				<td > 3 </td>
+				<td > loom.start(); </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td > 4 </td>
+				<td > function Sm.lulu() { </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr class="bordertop">
+				<td > 5 </td>
+				<td > 	for( i = 1, 1000 ) { </td>
+				<td class="fn001"> 0001    KSHORT   0   1 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0002    KSHORT   1 1000 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0003    KSHORT   2   1 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0004    FORI     0 =&gt; 0011 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr class="bordertop">
+				<td > 6 </td>
+				<td > 		for( j = 1, 1000 ) { </td>
+				<td class="fn001"> 0005 =&gt; KSHORT   4   1 </td>
+				<td> <a href="#tr002" name="tr002_002"><span
+						id="tr002_002"
+						class="tr002"
+					>2/2</span></a>  <a href="#tr002" name="tr002_007"><span
+						id="tr002_007"
+						class="tr002"
+					>2/7</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0006    KSHORT   5 1000 </td>
+				<td> <a href="#tr002" name="tr002_003"><span
+						id="tr002_003"
+						class="tr002"
+					>2/3</span></a>  <a href="#tr002" name="tr002_008"><span
+						id="tr002_008"
+						class="tr002"
+					>2/8</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0007    KSHORT   6   1 </td>
+				<td> <a href="#tr002" name="tr002_004"><span
+						id="tr002_004"
+						class="tr002"
+					>2/4</span></a>  <a href="#tr002" name="tr002_009"><span
+						id="tr002_009"
+						class="tr002"
+					>2/9</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0008    JFORI    4 =&gt; 0010 </td>
+				<td> <a href="#tr002" name="tr002_005"><span
+						id="tr002_005"
+						class="tr002"
+					>2/5</span></a>  <a href="#tr002" name="tr002_010"><span
+						id="tr002_010"
+						class="tr002"
+					>2/10</span></a> </td>
+				<td></td>
+			</tr>
+						<tr >
+				<td class="phantom">  </td>
+				<td class="phantom">  </td>
+				<td class="fn001"> 0009    JFORL    4   1 </td>
+				<td> <a href="#tr001" name="tr001_001"><span
+						id="tr001_001"
+						class="tr001"
+					>1/1</span></a>  <a href="#tr001" name="tr001_002"><span
+						id="tr001_002"
+						class="tr001"
+					>1/2</span></a> </td>
+				<td> <span>"start" [n=2]</span> </td>
+			</tr>
+						<tr class="bordertop">
+				<td class="phantom"> 5 </td>
+				<td class="phantom"> 	for( i = 1, 1000 ) { </td>
+				<td class="fn001"> 0010 =&gt; FORL     0 =&gt; 0005 </td>
+				<td> <a href="#tr002" name="tr002_001"><span
+						id="tr002_001"
+						class="tr002"
+					>2/1</span></a>  <a href="#tr002" name="tr002_006"><span
+						id="tr002_006"
+						class="tr002"
+					>2/6</span></a> </td>
+				<td> <span>"start" [n=2]</span> </td>
+			</tr>
+						<tr >
+				<td > 7 </td>
+				<td > 		} </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr >
+				<td > 8 </td>
+				<td > 	} </td>
+				<td >  </td>
+				<td></td>
+				<td></td>
+			</tr>
+						<tr class="bordertop">
+				<td > 9 </td>
+				<td > } </td>
+				<td class="fn001"> 0011 =&gt; RET0     0   1 </td>
+				<td></td>
+				<td></td>
+			</tr>
+						</table>
+
+			<br/>
+		<a name="#tr1d"><table class="popup trace tr001" id="tr001" cellpadding="4">
+			<tr>
+				<th colspan="3" class="titlebar">Trace #1:  loop
+</th>
+			</tr>
+			<tr class="white">
+				<th class="bc" >bytecode</th>
+				<th class="ir" >IR</th>
+				<th class="mcode" >mcode</th>
+			</tr>
+			<tr class="white" valign="top">
+				<td class="code bc"><table cellpadding="0" cellspacing="0">
+										<tr class="code">
+						<td class="tr001"><a href="#tr001_001">1/1</a> </td>
+						<td class="fn001"> 0009  JFORL    4   1 </td>
+						<td class="src opt">./test.cobalt:6 		for( j = 1, 1000 ) {</td>
+					</tr>
+										<tr class="code">
+						<td class="tr001"><a href="#tr001_002">1/2</a> </td>
+						<td class="fn001"> 0009  JFORL    4   1 </td>
+						<td class="src opt"></td>
+					</tr>
+									</table></td>
+				<td class="code ir"><table>
+											<tr class="snap_0" title="[ ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#0</td>
+													<td class=""><span class="opt">[ ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0001" title="">							<td class="ref_0001">0001</td>
+													<td class="">rbp</td>
+													<td class=""></td>
+													<td class="">int</td>
+													<td class="">SLOAD</td>
+													<td class="">#6</td>
+													<td class="">CI</td>
+						</tr>
+											<tr class="ref_0002" title="">							<td class="ref_0002">0002</td>
+													<td class="">rbp</td>
+													<td class=""> +</td>
+													<td class="">int</td>
+													<td class="">ADD</td>
+													<td class="ref_0001">0001</td>
+													<td class="">+1</td>
+						</tr>
+											<tr class="snap_1" title="[ ---- ---- ---- ---- ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#1</td>
+													<td class=""><span class="opt">[ ---- ---- ---- ---- ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0003" title="">							<td class="ref_0003">0003</td>
+													<td class=""></td>
+													<td class="">></td>
+													<td class="">int</td>
+													<td class="">LE</td>
+													<td class="ref_0002">0002</td>
+													<td class="ref_1000">+1000</td>
+						</tr>
+											<tr class="snap_2" title="[ ---- ---- ---- ---- ---- ---- 0002 ---- ---- 0002 ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#2</td>
+													<td class="ref_0002 ref_0002"><span class="opt">[ ---- ---- ---- ---- ---- ---- 0002 ---- ---- 0002 ]</span></td>
+						</tr>
+											<tr class="ref_0004" title="">							<td class="ref_0004">0004</td>
+													<td class="">------</td>
+													<td class="">---</td>
+													<td class="">---</td>
+													<td class="">LOOP --</td>
+													<td class="">------</td>
+													<td class="">----</td>
+						</tr>
+											<tr class="ref_0005" title="">							<td class="ref_0005">0005</td>
+													<td class="">rbp</td>
+													<td class=""> +</td>
+													<td class="">int</td>
+													<td class="">ADD</td>
+													<td class="ref_0002">0002</td>
+													<td class="">+1</td>
+						</tr>
+											<tr class="snap_3" title="[ ---- ---- ---- ---- ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#3</td>
+													<td class=""><span class="opt">[ ---- ---- ---- ---- ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0006" title="">							<td class="ref_0006">0006</td>
+													<td class=""></td>
+													<td class="">></td>
+													<td class="">int</td>
+													<td class="">LE</td>
+													<td class="ref_0005">0005</td>
+													<td class="ref_1000">+1000</td>
+						</tr>
+											<tr class="ref_0007" title="">							<td class="ref_0007">0007</td>
+													<td class="">rbp</td>
+													<td class=""></td>
+													<td class="">int</td>
+													<td class="">PHI</td>
+													<td class="ref_0002">0002</td>
+													<td class="ref_0005">0005</td>
+						</tr>
+									</table></td>
+				<td class="code mcode">08559fd1  mov dword [r14-0xed0], 0x1
+08559fdc  cvttsd2si ebp, [rdx+0x20]
+08559fe1  add ebp, +0x01
+08559fe4  cmp ebp, 0x3e8
+08559fea  jg 0x0854a014	-&gt;1
+-&gt;LOOP:
+08559ff0  add ebp, +0x01
+08559ff3  cmp ebp, 0x3e8
+08559ff9  jle 0x08559ff0	-&gt;LOOP
+08559ffb  jmp 0x08559f79	-&gt;<span class="tr002">Trace #2</span> (exit 1/3 [n=20])
+</td>
+			</tr>
+		</table></a>
+			<br/>
+		<a name="#tr2d"><table class="popup trace tr002" id="tr002" cellpadding="4">
+			<tr>
+				<th colspan="3" class="titlebar">Trace #2: (1/3)  -&gt; 1
+</th>
+			</tr>
+			<tr class="white">
+				<th class="bc" >bytecode</th>
+				<th class="ir" >IR</th>
+				<th class="mcode" >mcode</th>
+			</tr>
+			<tr class="white" valign="top">
+				<td class="code bc"><table cellpadding="0" cellspacing="0">
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_001">2/1</a> </td>
+						<td class="fn001"> 0010  FORL     0 =&gt; 0005 </td>
+						<td class="src opt">./test.cobalt:5 	for( i = 1, 1000 ) {</td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_002">2/2</a> </td>
+						<td class="fn001"> 0005  KSHORT   4   1 </td>
+						<td class="src opt">./test.cobalt:6 		for( j = 1, 1000 ) {</td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_003">2/3</a> </td>
+						<td class="fn001"> 0006  KSHORT   5 1000 </td>
+						<td class="src opt"></td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_004">2/4</a> </td>
+						<td class="fn001"> 0007  KSHORT   6   1 </td>
+						<td class="src opt"></td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_005">2/5</a> </td>
+						<td class="fn001"> 0008  JFORI    4 =&gt; 0010 </td>
+						<td class="src opt"></td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_006">2/6</a> </td>
+						<td class="fn001"> 0010  FORL     0 =&gt; 0005 </td>
+						<td class="src opt">./test.cobalt:5 	for( i = 1, 1000 ) {</td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_007">2/7</a> </td>
+						<td class="fn001"> 0005  KSHORT   4   1 </td>
+						<td class="src opt">./test.cobalt:6 		for( j = 1, 1000 ) {</td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_008">2/8</a> </td>
+						<td class="fn001"> 0006  KSHORT   5 1000 </td>
+						<td class="src opt"></td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_009">2/9</a> </td>
+						<td class="fn001"> 0007  KSHORT   6   1 </td>
+						<td class="src opt"></td>
+					</tr>
+										<tr class="code">
+						<td class="tr002"><a href="#tr002_010">2/10</a> </td>
+						<td class="fn001"> 0008  JFORI    4 =&gt; 0010 </td>
+						<td class="src opt"></td>
+					</tr>
+									</table></td>
+				<td class="code ir"><table>
+											<tr class="snap_0" title="[ ---- ---- ---- ---- ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#0</td>
+													<td class=""><span class="opt">[ ---- ---- ---- ---- ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0001" title="">							<td class="ref_0001">0001</td>
+													<td class="">xmm7</td>
+													<td class=""></td>
+													<td class="">num</td>
+													<td class="">SLOAD</td>
+													<td class="">#2</td>
+													<td class="">I</td>
+						</tr>
+											<tr class="ref_0002" title="">							<td class="ref_0002">0002</td>
+													<td class="">xmm7</td>
+													<td class=""></td>
+													<td class="">num</td>
+													<td class="">ADD</td>
+													<td class="ref_0001">0001</td>
+													<td class="">+1</td>
+						</tr>
+											<tr class="snap_1" title="[ ---- ---- ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#1</td>
+													<td class=""><span class="opt">[ ---- ---- ]</span></td>
+						</tr>
+											<tr class="ref_0003" title="">							<td class="ref_0003">0003</td>
+													<td class=""></td>
+													<td class="">></td>
+													<td class="">num</td>
+													<td class="">LE</td>
+													<td class="ref_0002">0002</td>
+													<td class="ref_1000">+1000</td>
+						</tr>
+											<tr class="snap_2" title="[ ---- ---- 0002 ---- ---- 0002 +1   +1000 +1   +1   ]">							<td class="">....</td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class=""></td>
+													<td class="">SNAP</td>
+													<td class="">#2</td>
+													<td class="ref_0002 ref_0002 ref_1000"><span class="opt">[ ---- ---- 0002 ---- ---- 0002 +1   +1000 +1   +1   ]</span></td>
+						</tr>
+									</table></td>
+				<td class="code mcode">08559f79  mov dword [r14-0xed0], 0x2
+08559f84  movsd xmm6, [r14+0x45370]
+08559f8d  movsd xmm5, [r14+0x45380]
+08559f96  movsd xmm7, [rdx]
+08559f9a  addsd xmm7, xmm6
+08559f9e  ucomisd xmm5, xmm7
+08559fa2  jb 0x0854a014	-&gt;1
+08559fa8  movsd [rdx+0x38], xmm6
+08559fad  movsd [rdx+0x30], xmm6
+08559fb2  movsd [rdx+0x28], xmm5
+08559fb7  movsd [rdx+0x20], xmm6
+08559fbc  movsd [rdx+0x18], xmm7
+08559fc1  movsd [rdx], xmm7
+08559fc5  jmp 0x08559fd1	-&gt;<span class="tr001">Trace #1</span>
+</td>
+			</tr>
+		</table></a>
 		</body>
 </html>

@@ -1,1 +1,0 @@
-cobaltjit -jloom -e "require('test').lulu()" > out.html

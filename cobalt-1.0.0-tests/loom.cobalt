@@ -1,6 +1,4 @@
 var Sm = {};
-var loom = require('jit.loom');
-loom.start();
 function Sm.lulu() {
 	for( i = 1, 1000 ) {
 		for( j = 1, 1000 ) {

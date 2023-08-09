@@ -1,0 +1,85 @@
+Hello, World!
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+2
+<!DOCTYPE html>
+<html lang="en">
+	
+		<head>
+		<meta charset="utf-8" />
+		<style media="screen" type="text/css">
+			.code {
+				font-family: monospace;
+				white-space: pre;
+				tab-size: 4;
+			}
+			.opt { display: none; }
+			.codespan {
+				width: 100%;
+			}
+			.bordertop td {
+				border-top: thin lightgray solid;
+			}
+			.phantom {
+				color: #ccc;
+			}
+			.white {
+				background-color: white;
+			}
+			.hilight {
+				background-color: lightsteelblue;
+			}
+			
+					</style>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script>
+			var sameref = function (elm, parent) {
+				var refmatch = elm.className.match(/ref_\d+/);
+				return refmatch ? $(elm).closest(parent).find('.'+refmatch[0])
+						: $();
+				return $(elm).closest(parent).find('.'+refclass);
+			}
+			$(function() {
+				$('th.bc').click(function(e) {
+					$('.bc .opt').toggle();
+				});
+				$('th.ir').click(function(e) {
+					$('.ir .opt').toggle();
+				});
+				$('th.titlebar').click(function(e) {
+					$(e.target).closest('tr').siblings().toggle();
+				});
+				$('[class^="ref_"]').mouseenter(function(e) {
+					sameref(e.target, '.ir').addClass('hilight');
+				}).mouseleave(function(e){
+					sameref(e.target, '.ir').removeClass('hilight');
+				});
+			});
+		</script>
+		<title>cobaltjit -jloom test.cobalt</title>
+	</head>
+	<body>
+	<h2>cobaltjit -jloom test.cobalt</h2>
+	<table class="code" cellpadding="0" cellspacing="0">
+			</table>
+
+		</body>
+</html>

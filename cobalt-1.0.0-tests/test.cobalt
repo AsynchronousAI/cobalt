@@ -1,0 +1,15 @@
+print("Hello, World!")
+
+for (i in pairs(range(1, 10))){
+    print(i)
+}
+
+var x = 10
+for (i in pairs(range(1, x))){
+    print(i)
+}
+
+x = x?a:b
+x = x?1:2
+
+print(x)

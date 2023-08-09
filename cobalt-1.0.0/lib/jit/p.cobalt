@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------
 // LuaJIT profiler.
 //
-// Copyright (C) 2005-2017 Mike Pall. All rights reserved.
+// Copyright (C) 2005-2021 Mike Pall. All rights reserved.
 // Released under the MIT license. See Copyright Notice in luajit.h
 //--------------------------------------------------------------------------
 //
@@ -121,7 +121,7 @@ var function prof_cb(th, samples, vmmode) {
 var function prof_top(count1, count2, samples, indent) {
   var t, n = {}, 0;
   for( k in pairs(count1) ) {
-    n +=   1;
+    ++n    ;
     t[n] = k;
   }
   sort(t, function(a, b) { return count1[a] > count1[b]; });
@@ -213,7 +213,7 @@ var function prof_annotate(count1, samples) {
 	out->write(format(fmtn, line));
       }
     next:
-      n +=   1;
+      ++n    ;
     }
     fp->close();
   }
@@ -238,6 +238,7 @@ var function prof_finish() {
     prof_count1 = null;
     prof_count2 = null;
     prof_ud = null;
+    if( out != stdout ) { out->close(); }
   }
 }
 

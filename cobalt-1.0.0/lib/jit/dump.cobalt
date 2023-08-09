@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------
 // LuaJIT compiler dump module.
 //
-// Copyright (C) 2005-2017 Mike Pall. All rights reserved.
+// Copyright (C) 2005-2021 Mike Pall. All rights reserved.
 // Released under the MIT license. See Copyright Notice in luajit.h
 //--------------------------------------------------------------------------
 //
@@ -91,7 +91,7 @@ var function fillsymtab_tr(tr, nexit) {
   }
   for( i=0,nexit-1 ) {
     var addr = traceexitstub(tr, i);
-    if( addr < 0 ) { addr +=   2**32; }
+    if( addr < 0 ) { addr = addr + 2**32; }
     t[addr] = tostring(i);
   }
   var addr = traceexitstub(tr, nexit);
@@ -102,11 +102,13 @@ var function fillsymtab_tr(tr, nexit) {
 var function fillsymtab(tr, nexit) {
   var t = symtab;
   if( nexitsym == 0 ) {
+    var maskaddr = jit.arch == "arm" && -2;
     var ircall = vmdef.ircall;
     for( i=0,#ircall ) {
       var addr = ircalladdr(i);
       if( addr != 0 ) {
-	if( addr < 0 ) { addr +=   2**32; }
+	if( maskaddr ) { addr = band(addr, maskaddr); }
+	if( addr < 0 ) { addr = addr + 2**32; }
 	t[addr] = ircall[i];
       }
     }
@@ -122,7 +124,7 @@ var function fillsymtab(tr, nexit) {
 	nexit = 1000000;
 	break;
       }
-      if( addr < 0 ) { addr +=   2**32; }
+      if( addr < 0 ) { addr = addr + 2**32; }
       t[addr] = tostring(i);
     }
     nexitsym = nexit;
@@ -141,7 +143,7 @@ var function dump_mcode(tr) {
   var mcode, addr, loop = tracemc(tr);
   if( ! mcode ) { return; }
   if( ! disass ) { disass = require("jit.dis_"..jit.arch); }
-  if( addr < 0 ) { addr +=   2**32; }
+  if( addr < 0 ) { addr = addr + 2**32; }
   out->write("---- TRACE ", tr, " mcode ", #mcode, "\n");
   var ctx = disass.create(mcode, addr, dumpwrite);
   ctx.hexdump = 0;
@@ -217,8 +219,10 @@ var function colorize_text(s) {
   return s;
 }
 
-var function colorize_ansi(s, t) {
-  return format(colortype_ansi[t], s);
+var function colorize_ansi(s, t, extra) {
+  var out = format(colortype_ansi[t], s);
+  if( extra ) { out = "\027[3m"..out; }
+  return out;
 }
 
 var irtype_ansi = setmetatable({},
@@ -227,9 +231,10 @@ var irtype_ansi = setmetatable({},
 
 var html_escape = { ["<"] = "&lt;", [">"] = "&gt;", ["&"] = "&amp;", };
 
-var function colorize_html(s, t) {
+var function colorize_html(s, t, extra) {
   s = gsub(s, "[<>&]", html_escape);
-  return format('<span class="irt_%s">%s</span>', irtype_text[t], s);
+  return format('<span class="irt_%s%s">%s</span>',
+		irtype_text[t], extra && " irt_extra" || "", s);
 }
 
 var irtype_html = setmetatable({},
@@ -254,6 +259,7 @@ span.irt_tab { color: #c00000; }
 span.irt_udt, span.irt_lud { color: #00c0c0; }
 span.irt_num { color: #4040c0; }
 span.irt_int, span.irt_i8, span.irt_u8, span.irt_i16, span.irt_u16 { color: #b040b0; }
+span.irt_extra { font-style: italic; }
 </style>
 ]=];
 
@@ -269,6 +275,7 @@ var litname = {
     if( band(mode, 8) != 0 ) { s = s.."C"; }
     if( band(mode, 16) != 0 ) { s = s.."R"; }
     if( band(mode, 32) != 0 ) { s = s.."I"; }
+    if( band(mode, 64) != 0 ) { s = s.."K"; }
     t[mode] = s;
     return s;
   }}),
@@ -277,15 +284,18 @@ var litname = {
     var s = irtype[band(mode, 31)];
     s = irtype[band(shr(mode, 5), 31)].."."..s;
     if( band(mode, 0x800) != 0 ) { s = s.." sext"; }
-    var c = shr(mode, 14);
-    if( c == 2 ) { s = s.." index"; } else if( c == 3 ) { s = s.." check"; }
+    var c = shr(mode, 12);
+    if( c == 1 ) { s = s.." none";
+    } else if( c == 2 ) { s = s.." index";
+    } else if( c == 3 ) { s = s.." check"; }
     t[mode] = s;
     return s;
   }}),
   ["FLOAD "] = vmdef.irfield,
   ["FREF  "] = vmdef.irfield,
   ["FPMATH"] = vmdef.irfpm,
-  ["BUFHDR"] = { [0] = "RESET", "APPEND" },
+  ["TMPREF"] = { [0] = "", "IN", "OUT", "INOUT", "", "", "OUT2", "INOUT2" },
+  ["BUFHDR"] = { [0] = "RESET", "APPEND", "WRITE" },
   ["TOSTR "] = { [0] = "INT", "NUM", "CHAR" },
 };
 
@@ -315,7 +325,9 @@ var function formatk(tr, idx, sn) {
   var tn = type(k);
   var s;
   if( tn == "number" ) {
-    if( band(sn || 0, 0x30000) != 0 ) {
+    if( t < 12 ) {
+      s = k == 0 && "NULL" || format("[0x%08x]", k);
+    } else if( band(sn || 0, 0x30000) != 0 ) {
       s = band(sn, 0x20000) != 0 && "contpc" || "ftsz";
     } else if( k == 2**52+2**51 ) {
       s = "bias";
@@ -343,7 +355,7 @@ var function formatk(tr, idx, sn) {
   } else {
     s = tostring(k); // For primitives.
   }
-  s = colorize(format("%-4s", s), t);
+  s = colorize(format("%-4s", s), t, band(sn || 0, 0x100000) != 0);
   if( slot ) {
     s = format("%s @%d", s, slot);
   }
@@ -355,7 +367,7 @@ var function printsnap(tr, snap) {
   for( s=0,snap[1]-1 ) {
     var sn = snap[n];
     if( shr(sn, 24) == s ) {
-      n +=   1;
+      ++n    ;
       var ref = band(sn, 0xffff) - 0x8000; // REF_BIAS
       if( ref < 0 ) {
 	out->write(formatk(tr, ref, sn));
@@ -363,7 +375,7 @@ var function printsnap(tr, snap) {
 	out->write(colorize(format("%04d/%04d", ref, ref+1), 14));
       } else {
 	var m, ot, op1, op2 = traceir(tr, ref);
-	out->write(colorize(format("%04d", ref), band(ot, 31)));
+	out->write(colorize(format("%04d", ref), band(ot, 31), band(sn, 0x100000) != 0));
       }
       out->write(band(sn, 0x10000) == 0 && " " || "|"); // SNAP_FRAME
     } else {
@@ -457,7 +469,7 @@ var function dump_ir(tr, dumpsnap, dumpreg) {
 	out->write(format("....        SNAP   #%-3d [ ", snapno));
       }
       printsnap(tr, snap);
-      snapno +=   1;
+      ++snapno    ;
       snap = tracesnap(tr, snapno);
       snapref = snap && snap[0] || 65536;
     }
@@ -582,7 +594,7 @@ var function dump_trace(what, tr, func, pc, otr, oex) {
 }
 
 // Dump recorded bytecode.
-var function dump_record(tr, func, pc, depth, callee) {
+var function dump_record(tr, func, pc, depth) {
   if( depth != recdepth ) {
     recdepth = depth;
     recprefix = rep(" .", depth);
@@ -591,9 +603,11 @@ var function dump_record(tr, func, pc, depth, callee) {
   if( pc >= 0 ) {
     line = bcline(func, pc, recprefix);
     if( dumpmode.H ) { line = gsub(line, "[<>&]", html_escape); }
+    if( pc > 0 ) {
+      line = sub(line, 1, -2) .. "       (" .. fmtfunc(func, pc) .. ")\n";
+    }
   } else {
     line = "0000 "..recprefix.." FUNCC      \n";
-    callee = func;
   }
   if( pc <= 0 ) {
     out->write(sub(line, 1, -2), "         ; ", fmtfunc(func), "\n");
@@ -607,12 +621,15 @@ var function dump_record(tr, func, pc, depth, callee) {
 
 //----------------------------------------------------------------------------
 
+var gpr64 = jit.arch->match("64");
+var fprmips32 = jit.arch == "mips" || jit.arch == "mipsel";
+
 // Dump taken trace exits.
 var function dump_texit(tr, ex, ngpr, nfpr, ...) {
   out->write("---- TRACE ", tr, " exit ", ex, "\n");
   if( dumpmode.X ) {
     var regs = {...};
-    if( jit.arch == "x64" ) {
+    if( gpr64 ) {
       for( i=1,ngpr ) {
 	out->write(format(" %016x", regs[i]));
 	if( i % 4 == 0 ) { out->write("\n"); }
@@ -623,7 +640,7 @@ var function dump_texit(tr, ex, ngpr, nfpr, ...) {
 	if( i % 8 == 0 ) { out->write("\n"); }
       }
     }
-    if( jit.arch == "mips" || jit.arch == "mipsel" ) {
+    if( fprmips32 ) {
       for( i=1,nfpr,2 ) {
 	out->write(format(" %+17.14g", regs[ngpr+i]));
 	if( i % 8 == 7 ) { out->write("\n"); }

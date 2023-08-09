@@ -1,4 +1,8 @@
-
+var isJIT = jit ~= null;
+if (!isJIT) {
+	error("Attempt to ")
+	return;
+}
 var bit = require ('bit');
 var jutil = require ('jit.util');
 var vmdef = require ('jit.vmdef');
@@ -904,7 +908,9 @@ return {
 	off = loomstop,
 
 	start = function (opt, out) {
-		var tmpl = template(opt || 'loom-cobalt.html');
+		// Check that a file "template.html" exists in cwd
+
+		var tmpl = template(opt || 'template.html');
 		defer = newproxy(true);
 		getmetatable(defer).__gc = function() { xpcall(function () {
 			var o = loomstop(tmpl);

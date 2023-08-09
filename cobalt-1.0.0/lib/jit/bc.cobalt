@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------
 // LuaJIT bytecode listing module.
 //
-// Copyright (C) 2005-2017 Mike Pall. All rights reserved.
+// Copyright (C) 2005-2021 Mike Pall. All rights reserved.
 // Released under the MIT license. See Copyright Notice in luajit.h
 //--------------------------------------------------------------------------
 //
@@ -63,15 +63,21 @@ var function ctlsub(c) {
 }
 
 // Return one bytecode line.
-var function bcline(func, pc, prefix) {
-  var ins, m = funcbc(func, pc);
+var function bcline(func, pc, prefix, lineinfo) {
+  var ins, m, l = funcbc(func, pc, lineinfo && 1 || 0);
   if( ! ins ) { return; }
   var ma, mb, mc = band(m, 7), band(m, 15*8), band(m, 15*128);
   var a = band(shr(ins, 8), 0xff);
   var oidx = 6*band(ins, 0xff);
   var op = sub(bcnames, oidx+1, oidx+6);
-  var s = format("%04d %s %-6s %3s ",
-    pc, prefix || "  ", op, ma == 0 && "" || a);
+  var s;
+  if( lineinfo ) {
+    s = format("%04d %7s %s %-6s %3s ",
+      pc, "["..l.."]", prefix || "  ", op, ma == 0 && "" || a);
+  } else {
+    s = format("%04d %s %-6s %3s ",
+      pc, prefix || "  ", op, ma == 0 && "" || a);
+  }
   var d = shr(ins, 16);
   if( mc == 13*128 ) { // BCMjump
     return format("%s=> %04d\n", s, pc+d-0x7fff);
@@ -87,7 +93,7 @@ var function bcline(func, pc, prefix) {
     kc = format(#kc > 40 && '"%.40s"~' || '"%s"', gsub(kc, "%c", ctlsub));
   } else if( mc == 9*128 ) { // BCMnum
     kc = funck(func, d);
-    if( op == "TSETM " ) { kc -=   2**52; }
+    if( op == "TSETM " ) { kc = kc - 2**52; }
   } else if( mc == 12*128 ) { // BCMfunc
     var fi = funcinfo(funck(func, -d-1));
     if( fi.ffid ) {
@@ -124,20 +130,52 @@ var function bctargets(func) {
 }
 
 // Dump bytecode instructions of a function.
-var function bcdump(func, out, all) {
+var function bcdump(func, out, all, lineinfo) {
   if( ! out ) { out = stdout; }
   var fi = funcinfo(func);
   if( all && fi.children ) {
     for( n=-1,-1000000000,-1 ) {
       var k = funck(func, n);
       if( ! k ) { break; }
-      if( type(k) == "proto" ) { bcdump(k, out, true); }
+      if( type(k) == "proto" ) { bcdump(k, out, true, lineinfo); }
     }
   }
   out->write(format("-- BYTECODE -- %s-%d\n", fi.loc, fi.lastlinedefined));
+
+  for( n=-1,-1000000000,-1 ) {
+    var kc = funck(func, n);
+    if( ! kc ) { break; }
+
+    var typ = type(kc);
+    if( typ == "string" ) {
+      kc = format(#kc > 40 && '"%.40s"~' || '"%s"', gsub(kc, "%c", ctlsub));
+      out->write(format("KGC    %d    %s\n", -(n + 1), kc));
+    } else if( typ == "proto" ) {
+      fi = funcinfo(kc);
+      if( fi.ffid ) {
+	kc = vmdef.ffnames[fi.ffid];
+      } else {
+	kc = fi.loc;
+      }
+      out->write(format("KGC    %d    %s\n", -(n + 1), kc));
+    } else if( typ == "table" ) {
+      out->write(format("KGC    %d    table\n", -(n + 1)));
+    } else {
+      // error("unknown KGC type: " .. typ)
+    }
+  }
+
+  for( n=1,1000000000 ) {
+    var kc = funck(func, n);
+    if( ! kc ) { break; }
+    if( type(kc) == "number" ) {
+      out->write(format("KN    %d    %s\n", n, kc));
+    }
+  }
+
   var target = bctargets(func);
   for( pc=1,1000000000 ) {
-    var s = bcline(func, pc, target[pc] && "=>");
+    var s = bcline(func, pc, target[pc] && "=>", lineinfo);
     if( ! s ) { break; }
     out->write(s);
   }

@@ -1,0 +1,3 @@
+// Interpreter wrapper for `out`
+
+return require('genout')

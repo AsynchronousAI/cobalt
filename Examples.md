@@ -340,6 +340,17 @@ import("argparse")
 require("argparse")
 ```
 
+## lambda
+```js
+// Lambda is a way to create a function in one line
+// it is included in the standard library, you will 
+// not be able to use it if you didnt setup.
+
+import("lambda") // Lambda isnt loaded by default, you must import it
+var add = lambda("(x, y) -> x + y") // Creates a new lambda function
+add(1, 2) // -> 3
+```
+
 ## One liners
 ```js
 // One liners are a way to write a for loop, if statement, or while loop in one line

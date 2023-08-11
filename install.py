@@ -168,13 +168,20 @@ for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
                     else:
                         os.system("cp " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
             continue
-        # Change cwd to the directory
-        os.chdir(scriptPath + "/cobalt-1.0.0/lib/" + item)
-        # Compile the library
-        os.system("make -w")
-        # Move the library to the install path
-        os.rename(scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
-        print("\033[33m[!] " + item + " is not a C script and unsupported right now. Skipping...\033[0m")
+        # Otherwise check if a Makefile exists
+        if os.path.isfile(scriptPath + "/cobalt-1.0.0/lib/" + item + "/Makefile"):
+            # Change cwd to the directory
+            os.chdir(scriptPath + "/cobalt-1.0.0/lib/" + item)
+            # Compile the library
+            os.system("make -w")
+            # Move the library to the install path
+            os.rename(scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
+            print("\033[33m[!] " + item + " is not a C script and unsupported right now. Skipping...\033[0m")
+            continue
+        else:   
+            # Simply copy the directory to the install path as it is a pure cobalt library
+            os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + LDIR + item)
+            continue
         pass
     elif os.path.isfile(scriptPath + "/cobalt-1.0.0/lib/" + item):
         # Make sure it is a cobalt file

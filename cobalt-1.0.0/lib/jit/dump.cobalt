@@ -106,7 +106,7 @@ var function fillsymtab(tr, nexit) {
     var ircall = vmdef.ircall;
     for( i=0,#ircall ) {
       var addr = ircalladdr(i);
-      if( addr != 0 ) {
+      if( addr != 0 && addr != null ) {
 	if( maskaddr ) { addr = band(addr, maskaddr); }
 	if( addr < 0 ) { addr = addr + 2**32; }
 	t[addr] = ircall[i];

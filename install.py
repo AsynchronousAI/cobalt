@@ -181,6 +181,12 @@ for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
         else:   
             # Simply copy the directory to the install path as it is a pure cobalt library
             os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + LDIR + item)
+            # if a /jit is available in the install path also copy it there
+            if jitFound:
+                if os.path.isdir(LDIR + "jit"):
+                    os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/jit " + LDIR + item + "/jit")
+                elif os.path.isdir(scriptPath + "/cobalt-1.0.0/lib/" + item + "/jit"):
+                    os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/jit " + LDIR + item + "/jit")
             continue
         pass
     elif os.path.isfile(scriptPath + "/cobalt-1.0.0/lib/" + item):

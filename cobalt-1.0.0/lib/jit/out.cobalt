@@ -1,3 +1,0 @@
-// JIT wrapper for `out`
-
-return require('genout')

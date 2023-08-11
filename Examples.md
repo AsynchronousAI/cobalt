@@ -332,10 +332,12 @@ x = y ? y : 0
 
 ## import & require
 ```js
-// import and require may seem similar but they are different
-import("argparse") // Imports the argparse module and saves it as a global variable
+// import is the same as require. It is just a different name
+// import just looks cleaner
+
+import("argparse")
 //////////////////////////////////////////////////
-var argparse = require("argparse") // Requires the argparse module and saves it as a local variable
+require("argparse")
 ```
 
 ## One liners

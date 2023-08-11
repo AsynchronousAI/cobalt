@@ -159,7 +159,7 @@ var DataCollector
       // JIT \\
       function dumpfun(outfile){
          outfile = os.getenv("LUAJIT_DUMPFILE")
-         dump.start()
+         dump.start() // Issue: This goes to output so when `> file` is used, it goes to the file
 
          // Collect the data of outfile and then clear it
          var data = outfile->read("*a")

@@ -133,7 +133,17 @@ v.X // -> 1
 v.Y // -> 2
 v.Z // -> 3
 ```
+## Import all libraries in JIT
+```js
+// This will only work in JIT
+// This is for built in libraries like device, core, Vector3, etc.
+// Some of them dont get loaded by default, so you must import them
 
+Vector3.new(1, 2, 3) // This may error because Vector3 is not loaded
+
+Vector3 = import("Vector3") // Now you can be sure that you are using the built in Vector3 library
+Vector3.new(1, 2, 3) // -> <vector3 object>
+```
 ## Vector2
 ```js
 var v = Vector2.new(1, 2) // -> <vector2 object>

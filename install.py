@@ -175,13 +175,21 @@ for item in os.listdir(scriptPath + "/cobalt23/lib"):
             continue
         # Otherwise check if a Makefile exists
         if os.path.isfile(scriptPath + "/cobalt23/lib/" + item + "/Makefile"):
+            print("[*] \033[32mBuilding Makefile for " + item + "\033[0m")
             # Change cwd to the directory
             os.chdir(scriptPath + "/cobalt23/lib/" + item)
             # Compile the library
             os.system("make -w")
             # Move the library to the install path
-            os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
-            print("\033[33m[!] " + item + " is not a C script and unsupported right now. Skipping...\033[0m")
+            # Verify .dll or .so exists
+            if not os.path.isfile(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".dll") and not os.path.isfile(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".so"):
+                print("[!] \033[33mWarning: Library " + item + " was not compiled correctly.\033[0m")
+                continue
+            
+            if sys.platform == "win32":
+                os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".dll", CDIR + item + ".dll")
+            else:
+                os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
             continue
         else:   
             # Simply copy the directory to the install path as it is a pure cobalt library

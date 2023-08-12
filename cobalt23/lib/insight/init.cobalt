@@ -182,8 +182,47 @@ var DataCollector
       "dump": dumpfun,
    }
 }
-// TEST \\
 
+// OPERATION \\
+var Operation 
+{
+   function getLocalVariables(func){
+      var i = 1
+      var locals = {}
+  
+      while (true) {
+          var name, value = debug.getlocal(func, i)
+          if (!name) break
+          locals[name] = value
+          i = i + 1
+      }
+  
+      return locals
+   }
+   function load(filename, onerr){
+      var func = loadfile(filename)
+      var success, output = xpcall(func, onerr)
+
+      if (success){
+         var locals = getLocalVariables(func)
+         return {
+            "success": true,
+            "output": output,
+            "locals": locals,
+         }
+      }else{
+         return {
+            "success": false,
+            "output": output,
+         }
+      }
+   }
+   Operation = {
+      "getLocalVariables": getLocalVariables,
+   }
+}
+// TEST \\
+logs = []
 print(Generator.generateHTML({
    "filename": "test.cobalt",
    "totalspeed": "0.00000",
@@ -201,3 +240,67 @@ print(Generator.generateHTML({
    "source": generateSpeedBlame([ [255,0,0] ], "print(\"Hello World\")"),
    "lintissues": "0",
 }))
+
+return {
+   "log": function(){
+      // @arguments none
+      // Adds current CPU clock time to the logs table with the key being the line number
+      // @return null
+      logs[debug.getinfo(2, "l")] = os.clock()
+   },
+   "generate": function(filename: string){
+      // @arguments filename: string
+      // Generates the HTML file and outputs it to the filename
+      // @return HTML: string
+      filename = filename ? filename : "output.html" // Default filename
+
+      // Get the data
+      /// Name of file that is being run
+      var callername = debug.getinfo(3, "S").source->sub(2)
+
+      /// Run a linter on the file
+      //// TODO: Linter
+
+
+      /// Get the data from the file
+      var source = callername->read("*a")
+      callername->close()
+
+      var fakesource = source
+
+      /// Run the file
+      //// First make some changes to fakesource
+      // TODO:
+      /********/
+
+      var compileissues = {}
+
+      var start = os.clock()
+      var results = Operation.load(callername, function(){
+         // Add the error to "compileissues"
+         table.insert(compileissues, debug.traceback())
+      })
+      var end = os.clock()
+      var totalspeed = end - start
+
+      /// Get the bytecode, mcode, IR TODO
+
+      // Get the Variables
+      var Variables = results.locals
+
+      // GENERATE HTML \\
+      Generator.generateHTML({
+
+      })
+
+
+      // TODO:
+      // - lint
+      // - get bytecode, IR, mcode
+      // - generate 
+      // - generate speed blame
+      // - get requires
+      // - format compileissues
+      // - DataCollector needs to be finished
+   }
+}

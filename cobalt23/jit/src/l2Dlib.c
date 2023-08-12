@@ -28,6 +28,8 @@
 #include "classes.h"
 
 
+#define LJLIB_MODULE_Vector2
+
 static int vec2_index(lua_State *L) {
   Vec2* vec2 = (Vec2*)lua_touserdata(L, 1);
   const char* key = luaL_checkstring(L, 2);
@@ -54,37 +56,37 @@ static int push_vec2(lua_State *L, float x, float y) {
 }
 
 
-static int vec2_add(lua_State *L) {
+LJLIB_CF(Vector2_add) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x + b->x, a->y + b->y);
   return 1;
 }
-static int vec2_sub(lua_State *L) {
+LJLIB_CF(Vector2_sub) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x - b->x, a->y - b->y);
   return 1;
 }
-static int vec2_mul(lua_State *L) {
+LJLIB_CF(Vector2_mul) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x * b->x, a->y * b->y);
   return 1;
 }
-static int vec2_div(lua_State *L) {
+LJLIB_CF(Vector2_div) {
   Vec2* a = (Vec2*)lua_touserdata(L, 1);
   Vec2* b = (Vec2*)lua_touserdata(L, 2);
   push_vec2(L, a->x / b->x, a->y / b->y);
   return 1;
 }
-static int vec2_new(lua_State *L) {
+LJLIB_CF(Vector2_new) {
   float x = luaL_checknumber(L, 1);
   float y = luaL_checknumber(L, 2);
   push_vec2(L, x, y);
   return 1;
 }
-static int vec2_fromOffsetScale(lua_State *L) {
+LJLIB_CF(Vector2_fromOffsetScale) {
   float x = luaL_checknumber(L, 1);
   float y = luaL_checknumber(L, 2);
   float ox = luaL_checknumber(L, 3);
@@ -106,24 +108,11 @@ static int vec2_fromOffsetScale(lua_State *L) {
   return 1;
 }
 
-static const luaL_Reg vec2lib[] = {
-    {"new", vec2_new},
-    {"add", vec2_add},
-    {"sub", vec2_sub},
-    {"mul", vec2_mul},
-    {"div", vec2_div},
-    {"fromScreen", vec2_fromOffsetScale},
-    {NULL, NULL}
-};
+#include "lj_libdef.h"
 
-
-
-LUALIB_API int luaopen_2D (lua_State *L) {
-  luaL_newlib(L, vec2lib);
-
-  push_vec2(L, 0, 0);
-  lua_setfield(L, -2, "zero");
-  push_vec2(L, 1, 1);
-  lua_setfield(L, -2, "one");
+LUALIB_API int luaopen_2D(lua_State *L)
+{
+  LJ_LIB_REG(L, LUA_2DLIBNAME, Vector2);
   return 1;
 }
+

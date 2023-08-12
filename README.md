@@ -83,5 +83,4 @@ everything they need to make a great program with a great experience.
 
 # Add the following to credits:
 - Lambda
-- LuaFun
 - LuaJIT Jit library

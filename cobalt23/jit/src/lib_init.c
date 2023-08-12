@@ -46,6 +46,20 @@ static const luaL_Reg lj_lib_preload[] = {
 #if LJ_HASFFI
   { LUA_FFILIBNAME,	luaopen_ffi }, 
 #endif
+  { "bit32",	luaopen_bit },
+  { LUA_JITLIBNAME,	luaopen_jit },
+  {LUA_COLORLIBNAME, luaopen_color},
+  {LUA_2DLIBNAME, luaopen_2D},
+  {LUA_3DLIBNAME, luaopen_3D},
+  {LUA_TRANSFORMNAME, luaopen_transform},
+  {LUA_CORENAME, luaopen_lcinterface},
+  {LUA_DEVICENAME, luaopen_device},
+  {LUA_FILESYSTEMNAME, luaopen_lfs},
+  {LUA_COMPLEXNAME, luaopen_complex},
+  {LUA_STRUCTNAME, luaopen_struct},
+  {LUA_SIGNALNAME, luaopen_signal},
+  {LUA_SOCKETNAME, luaopen_chan},
+  {LUA_ASYNCNAME, luaopen_coroutine},
   { NULL,		NULL }
 };
 

@@ -10,11 +10,11 @@
 /node_modules
 /cobalt
 /cobaltc
-/cobalt-1.0.0/jit/src/cobaltjit
-/cobalt-1.0.0/jit/src/host/buildvm
-/cobalt-1.0.0/jit/src/host/minicobalt
-/cobalt-1.0.0/jit/src/host/buildvm_arch.h
-/cobalt-1.0.0/jit/src/jit/vmdef.cobalt
+/cobalt23/jit/src/cobaltjit
+/cobalt23/jit/src/host/buildvm
+/cobalt23/jit/src/host/minicobalt
+/cobalt23/jit/src/host/buildvm_arch.h
+/cobalt23/jit/src/jit/vmdef.cobalt
 # CMake Ignore
 CMakeLists.txt.user
 CMakeCache.txt
@@ -42,6 +42,6 @@ Makefile
 *CTestTestfile.cmake
 
 # Allow 
-!/cobalt-1.0.0/lua-cobalt/Makefile
-!/cobalt-1.0.0/jit/Makefile
-!/cobalt-1.0.0/jit/src/Makefile
+!/cobalt23/lua-cobalt/Makefile
+!/cobalt23/jit/Makefile
+!/cobalt23/jit/src/Makefile

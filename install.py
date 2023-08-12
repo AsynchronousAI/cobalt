@@ -15,13 +15,13 @@ if os.path.isfile(scriptPath + "/cobalt"):
 if os.path.isfile(scriptPath + "/cobaltc"):
     print("[*] \033[32mFound cobaltc binary!\033[0m")
     installable.append("cobaltc")
-if os.path.isfile(scriptPath + "/cobalt-1.0.0/jit/src/cobaltjit"):
+if os.path.isfile(scriptPath + "/cobalt23/jit/src/cobaltjit"):
     print("[*] \033[32mFound cobaltjit binary!\033[0m")
-    installable.append("cobalt-1.0.0/jit/src/cobaltjit")
+    installable.append("cobalt23/jit/src/cobaltjit")
     jitFound = True
-if os.path.isfile(scriptPath + "/cobalt-1.0.0/lua-cobalt/lua-cobalt"):
+if os.path.isfile(scriptPath + "/cobalt23/lua-cobalt/lua-cobalt"):
     print("[*] \033[32mFound lua-cobalt binary!\033[0m")
-    installable.append("cobalt-1.0.0/lua-cobalt/lua-cobalt")
+    installable.append("cobalt23/lua-cobalt/lua-cobalt")
     
             ### Windows Specific ###
 if os.path.isfile(scriptPath + "/cobalt.exe"):
@@ -34,9 +34,9 @@ if os.path.isfile(scriptPath + "/cobaltjit.exe"):
     print("[*] \033[32mFound cobaltjit binary!\033[0m")
     installable.append("cobaltjit.exe")
     jitFound = True
-if os.path.isfile(scriptPath + "/cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe"):
+if os.path.isfile(scriptPath + "/cobalt23\\lua-cobalt\\lua-cobalt.exe"):
     print("[*] \033[32mFound lua-cobalt binary!\033[0m")
-    installable.append("cobalt-1.0.0\\lua-cobalt\\lua-cobalt.exe")
+    installable.append("cobalt23\\lua-cobalt\\lua-cobalt.exe")
     
 
 # Get the install path based on the users operating systems $PATH/%PATH%/etc. 
@@ -97,13 +97,13 @@ print("[*] \033[32mMoving header files...\033[0m")
 # lua.hpp
 
 alias = ["lauxlib.h", "lua.h", "luaconf.h", "lualib.h", "lua.hpp"]
-# They are located in script-dir/cobalt-1.0.0/src/
-for item in os.listdir(scriptPath + "/cobalt-1.0.0/src/"):
+# They are located in script-dir/cobalt23/src/
+for item in os.listdir(scriptPath + "/cobalt23/src/"):
     if item in alias:
         if sys.platform == "win32":
-            os.system("cp " + scriptPath + "/cobalt-1.0.0/src/" + item + " " + "\\include\\cobalt\\" + item)
+            os.system("cp " + scriptPath + "/cobalt23/src/" + item + " " + "\\include\\cobalt\\" + item)
         else:
-            os.system("cp " + scriptPath + "/cobalt-1.0.0/src/" + item + " " + "/usr/local/include/cobalt/" + item)
+            os.system("cp " + scriptPath + "/cobalt23/src/" + item + " " + "/usr/local/include/cobalt/" + item)
         
 # Create library path
 print("[*] \033[32mCreating library path\033[0m")
@@ -149,13 +149,13 @@ else:
 print("[*] \033[32mCreated library paths\033[0m")
 print("[*] \033[32mInstalling standard libraries...\033[0m")
 
-# Go through all cobalt-1.0.0/lib and compile all directories
-for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
-    if os.path.isdir(scriptPath + "/cobalt-1.0.0/lib/" + item):
+# Go through all cobalt23/lib and compile all directories
+for item in os.listdir(scriptPath + "/cobalt23/lib"):
+    if os.path.isdir(scriptPath + "/cobalt23/lib/" + item):
         if item == "jit" or item == "pre":
             print("[*] \033[32mFound JIT Library\033[0m")
             # Duplicate all of the children to the install path
-            for child in os.listdir(scriptPath + "/cobalt-1.0.0/lib/" + item):
+            for child in os.listdir(scriptPath + "/cobalt23/lib/" + item):
                 # Make sure it is a cobalt file
                 if child.endswith(".cobalt"):
                     # If the <item> folder doesnt exist, create it
@@ -164,32 +164,32 @@ for item in os.listdir(scriptPath + "/cobalt-1.0.0/lib"):
                     # Copy the file to the install path
                 
                     if sys.platform == "win32":
-                        os.system("cp " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
+                        os.system("cp " + scriptPath + "/cobalt23/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
                     else:
-                        os.system("cp " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
+                        os.system("cp " + scriptPath + "/cobalt23/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
             continue
         # Otherwise check if a Makefile exists
-        if os.path.isfile(scriptPath + "/cobalt-1.0.0/lib/" + item + "/Makefile"):
+        if os.path.isfile(scriptPath + "/cobalt23/lib/" + item + "/Makefile"):
             # Change cwd to the directory
-            os.chdir(scriptPath + "/cobalt-1.0.0/lib/" + item)
+            os.chdir(scriptPath + "/cobalt23/lib/" + item)
             # Compile the library
             os.system("make -w")
             # Move the library to the install path
-            os.rename(scriptPath + "/cobalt-1.0.0/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
+            os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
             print("\033[33m[!] " + item + " is not a C script and unsupported right now. Skipping...\033[0m")
             continue
         else:   
             # Simply copy the directory to the install path as it is a pure cobalt library
-            os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + LDIR + item)
+            os.system("cp -r " + scriptPath + "/cobalt23/lib/" + item + " " + LDIR + item)
             # if a /jit is available in the install path also copy it there
-            if jitFound:
-                if os.path.isdir(LDIR + "jit"):
-                    os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/jit " + LDIR + item + "/jit")
-                elif os.path.isdir(scriptPath + "/cobalt-1.0.0/lib/" + item + "/jit"):
-                    os.system("cp -r " + scriptPath + "/cobalt-1.0.0/lib/" + item + "/jit " + LDIR + item + "/jit")
+            #if jitFound:
+            #    if os.path.isdir(LDIR + "jit"):
+            #        os.system("cp -r " + scriptPath + "/cobalt23/lib/" + item + "/jit " + LDIR + item + "/jit")
+            #    elif os.path.isdir(scriptPath + "/cobalt23/lib/" + item + "/jit"):
+            #        os.system("cp -r " + scriptPath + "/cobalt23/lib/" + item + "/jit " + LDIR + item + "/jit")
             continue
         pass
-    elif os.path.isfile(scriptPath + "/cobalt-1.0.0/lib/" + item):
+    elif os.path.isfile(scriptPath + "/cobalt23/lib/" + item):
         # Make sure it is a cobalt file
         if item.endswith(".cobalt"):
-            os.system("cp " + scriptPath + "/cobalt-1.0.0/lib/" + item + " " + LDIR + item)
+            os.system("cp " + scriptPath + "/cobalt23/lib/" + item + " " + LDIR + item)

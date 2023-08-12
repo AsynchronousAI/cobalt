@@ -1,4 +1,4 @@
-/* This is a heavily customized and minimized copy of cobalt 1.0.0 . */
+/* This is a heavily customized and minimized copy of cobalt 23 . */
 /* It's only used to build cobaltJIT. It does NOT have all standard functions! */
 /******************************************************************************
 * Copyright (C) 1994-2012 Lua.org, PUC-Rio.  All rights reserved.

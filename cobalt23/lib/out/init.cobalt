@@ -158,7 +158,7 @@ var DataCollector
    if (isJit){
       // JIT \\
       function dumpfun(outfile){
-         outfile = os.getenv("LUAJIT_DUMPFILE")
+         var outfile = os.getenv("LUAJIT_DUMPFILE") || error("Output file not provided")
          dump.start() // Issue: This goes to output so when `> file` is used, it goes to the file
 
          // Collect the data of outfile and then clear it

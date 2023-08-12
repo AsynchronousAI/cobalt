@@ -165,7 +165,7 @@ include(CMakePackageConfigHelpers)
 get_target_property(LUA_EXPORT_LIBRARY Lua::Library ALIASED_TARGET)
 write_basic_package_version_file(
     Config.cmake
-    VERSION 1.0.0
+    VERSION 23
     COMPATIBILITY SameMajorVersion
 )
 

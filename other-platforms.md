@@ -69,9 +69,9 @@ $ cmake .
 $ make jit-xbox360
 ```
 ## Finding build files for console
-- JIT: `cobalt-1.0.0/jit/src/cobaltjit(.exe)`
-- Compiler: `cobalt-1.0.0/cobaltc(.exe)`
-- Interpreter: `cobalt-1.0.0/cobalt(.exe)`
+- JIT: `cobalt23/jit/src/cobaltjit(.exe)`
+- Compiler: `cobalt23/cobaltc(.exe)`
+- Interpreter: `cobalt23/cobalt(.exe)`
 # Apple Platforms
 ## iOS, iPadOS, tvOS, watchOS, xrOS
 Use the Swift - Cobalt bridge to use Cobalt on these plartforms. [Swift - Cobalt](https://github.com/cobalt-lang/swift-cobalt)

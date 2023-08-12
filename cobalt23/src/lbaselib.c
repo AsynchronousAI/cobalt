@@ -836,7 +836,7 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "_G");
   /* set global _VERSION */
-  lua_pushliteral(L, "cobalt 1.0.0");
+  lua_pushliteral(L, "cobalt 23");
   lua_setfield(L, -2, "_VERSION");
   return 1;
 }

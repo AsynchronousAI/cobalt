@@ -1,4 +1,4 @@
-prefix=/Users/aaravs/Documents/lux/cobalt-1.0.0/jit/install
+prefix=/Users/aaravs/Documents/lux/cobalt23/jit/install
 multilib=lib
 
 Name: cobaltjit

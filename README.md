@@ -8,7 +8,7 @@ A programming language made in C and C++ made to be the *portable, simple, and m
 The following code is a snippet that shows off some of the genera features of cobalt.
 
 Read [examples.md](/Examples.md) for more short examples that work. 
-Check out [/cobalt-tests](/cobalt-1.0.0-tests/) for 100+ longer test examples.
+Check out [/cobalt-tests](/cobalt23-tests/) for 100+ longer test examples.
 
 ```js
 import("notareallibrary") // Not a real library, just an example

@@ -148,7 +148,12 @@ else:
         
 print("[*] \033[32mCreated library paths\033[0m")
 print("[*] \033[32mInstalling standard libraries...\033[0m")
-
+# If the install path has items clear themq
+if os.listdir(LDIR) != []:
+    print("[!] \033[33mWarning: Library path is not empty.\033[0m")
+elif os.listdir(CDIR) != []:
+    print("[!] \033[33mWarning: Library path is not empty.\033[0m")
+        
 # Go through all cobalt23/lib and compile all directories
 for item in os.listdir(scriptPath + "/cobalt23/lib"):
     if os.path.isdir(scriptPath + "/cobalt23/lib/" + item):

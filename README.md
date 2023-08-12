@@ -1,4 +1,4 @@
-# cobalt
+# cobalt23
 A programming language made in C and C++ made to be the *portable, simple, and modern* successor of C.
 
 > **Known issues:**
@@ -80,3 +80,8 @@ everything they need to make a great program with a great experience.
 ## [How to build and install](/build.md)
 ## [Credits](/COPYRIGHTS.md)
 ***
+
+# Add the following to credits:
+- Lambda
+- LuaFun
+- LuaJIT Jit library

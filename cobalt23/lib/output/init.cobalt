@@ -47,15 +47,16 @@ auto move_right(int amount) -> move_right_sequence;
 auto move_up   (int amount) -> move_up_sequence;
 auto move_down (int amount) -> move_down_sequence;
 */
+
+// Init \\
 var self = require("controller")
 self->init()
-
 self.Colors = require("helpers.color_names")
 
 // Output library \\
-var Output = {}
+typedef("Output",
 {
-    Output["new"] = function(color: Color, text: string, styles: table){
+    "new": function(color: Color, text: string, styles: table, restrict: boolean){
         // @arguements Color: Color object, text: string, styles: table
         // @returns string
         // @description Returns a string with the color code and text
@@ -120,14 +121,30 @@ var Output = {}
 
         return start.. (restrict == null ? text.."\27[0m" : "")
     }
+})
 
-    for (i, v in pairs(self.Colors)) {
-        Output[v.identifier] = function(text: string, styles: table){
-            return Output.new(Color.new(v.rgb[1],v.rgb[2],v.rgb[3]), text, styles)
-        }
+for (i, v in pairs(self.Colors)) {
+    Output[v.identifier] = function(text: string, styles: table){
+        return Output.new(Color.new(v.rgb[1],v.rgb[2],v.rgb[3]), text, styles)
     }
-
 }
 
+// Cursor library \\
+typedef("Cursor",
+{
+    "pos": function(position){
+        var x, y = position.X, position.Y
+        // @arguements position: Vector2: position
+        // @returns boolean
+        // @description Applies the cursor to the terminal
+
+        io.write(string.format("\27[%d;%df", y, x))
+    }
+})
+
+// Apply and return \\
 self.Output = Output
+self.Cursor = Cursor
+
+print(Cursor.fg(Color.new(255, 0, 0)))
 return self

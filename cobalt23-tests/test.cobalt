@@ -1,0 +1,6 @@
+output = import("output")
+
+var Size = Vector2.new(10, 10)
+
+// Create empty space in the terminal of the size
+output.Cursor.space(Size, Color.new(0, 255, 0))

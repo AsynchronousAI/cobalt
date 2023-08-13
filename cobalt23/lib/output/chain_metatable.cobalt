@@ -1,5 +1,5 @@
-var Style = require ('style');
-var HELPERS = require ('helpers');
+var Style = require ('output.style');
+var HELPERS = require ('output.helpers');
 var TableHelper = require ('helpers.table');
 
 var ChainMetatable = {

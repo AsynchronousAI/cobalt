@@ -1,9 +1,9 @@
-var Theme = require ('theme');
-var Style = require ('style');
-var ANSI = require ('ansi');
-var ChainMetatable = require ('chain_metatable');
-var Color = require ('color');
-var Sgr = require ('sgr');
+var Theme = require ('output.theme');
+var Style = require ('output.style');
+var ANSI = require ('output.ansi');
+var ChainMetatable = require ('output.chain_metatable');
+var Color = require ('output.color');
+var Sgr = require ('output.sgr');
 
 var Controller = {
   is_controller = true,

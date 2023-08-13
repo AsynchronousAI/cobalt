@@ -2,11 +2,11 @@ var ColorReductor = {};
 
 var ColorHelper = require ('helpers.color');
 var TableHelper = require ('helpers.table');
-var ANSI = require ('ansi');
+var ANSI = require ('output.ansi');
 
 ColorReductor['COLOR_PALETTES'] = {
-  [256] = require ('reductor.256_vga'),
-  [16]  = require ('reductor.16_vga'),
+  [256] = require ('output.reductor.256_vga'),
+  [16]  = require ('output.reductor.16_vga'),
   [8]   = {}
 };
 

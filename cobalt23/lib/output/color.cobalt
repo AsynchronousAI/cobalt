@@ -1,9 +1,9 @@
 var Color = {};
 
-var ANSI = require ('ansi');
-var Sgr = require ('sgr');
+var ANSI = require ('output.ansi');
+var Sgr = require ('output.sgr');
 
-var ColorReductor = require ('color_reductor');
+var ColorReductor = require ('output.color_reductor');
 var ColorHelper = require ('helpers.color');
 
 function Color.apply_string(content, sgr_code, input, colors) {

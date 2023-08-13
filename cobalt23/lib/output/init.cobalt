@@ -1,0 +1,133 @@
+// Cobalt output library inspired
+// by C++ oof.h by @s9w
+
+// @AsynchronousAI
+
+/*
+REFRENCE OOF API:
+
+// Sets the foreground RGB color
+auto fg_color(const color& col) -> fg_rgb_color_sequence;
+
+// Sets the background RGB color
+auto bg_color(const color& col) -> bg_rgb_color_sequence;
+
+// Sets the foreground indexed color. Index must be in [1, 255]
+auto fg_color(int index) -> fg_index_color_sequence;
+
+// Sets the background indexed color. Index must be in [1, 255]
+auto bg_color(int index) -> bg_index_color_sequence;
+
+// Sets the indexed color. Index must be in [1, 255]
+auto set_index_color(int index, const color& col) -> set_index_color_sequence;
+
+// Sets the underline state
+auto underline(bool new_value = true) -> underline_sequence;
+
+// Sets the bold state. Warning: Bold is not supported by all console, see readme
+auto bold(bool new_value = true) -> bold_sequence;
+
+// Sets cursor visibility state. Recommended to turn off before doing real-time displays
+auto cursor_visibility(bool new_value) -> cursor_visibility_sequence;
+
+// Resets foreground- and background color, underline and bold state
+auto reset_formatting() -> reset_sequence;
+
+// Clears the screen
+auto clear_screen() -> clear_screen_sequence;
+
+// Sets the cursor position. Zero-based ie 0, 0 is first line, first column
+auto position(int line, int column) -> position_sequence;
+auto vposition(int line) -> vposition_sequence;
+auto hposition(int column) -> hposition_sequence;
+
+// Moves the cursor a certain amount
+auto move_left (int amount) -> move_left_sequence;
+auto move_right(int amount) -> move_right_sequence;
+auto move_up   (int amount) -> move_up_sequence;
+auto move_down (int amount) -> move_down_sequence;
+*/
+var self = require("controller")
+self->init()
+
+self.Colors = require("helpers.color_names")
+
+// Output library \\
+var Output = {}
+{
+    Output["new"] = function(color: Color, text: string, styles: table){
+        // @arguements Color: Color object, text: string, styles: table
+        // @returns string
+        // @description Returns a string with the color code and text
+
+        var r, g, b, start = color.R, color.G, color.B, ""
+        // Convert RGB values to a single integer
+        color = (r * 65536) + (g * 256) + b
+    
+        // Check if the color is in the 256-color range
+        s = false
+        if (color >= 0 && color <= 255) {
+            start = "\27[38;5;" .. color .. "m"
+        }else if (color >= 256 && color <= 16777215) {
+            start = "\27[38;2;" .. r .. ";" .. g .. ";" .. b .. "m"
+        }else{
+            error("Invalid color: " .. color .. "")
+        }
+
+        // Apply styles
+        for (i, v in pairs(styles || {})) {
+            if (v == "bold") {
+                start = start .. "\27[1m"
+            } else if(v == "underline") {
+                start = start .. "\27[4m"
+            } else if (v == "italic") {
+                start = start .. "\27[3m"
+            } else if (v == "strikethrough") {
+                start = start .. "\27[9m"
+            } else if (v == "reset") {
+                start = start .. "\27[0m"
+            } else if (v == "clear") {
+                start = start .. "\27[2J"
+            } else if (v == "invert") {
+                start = start .. "\27[7m"
+            } else if (v == "hide") {
+                start = start .. "\27[8m"
+            } else if (v == "crossed") {
+                start = start .. "\27[29m"
+            }else if (v == "blink"){
+                start = start .. "\27[5m"
+            } else if (v == "framed") {
+                start = start .. "\27[51m"
+            } else if (v == "encircled") {
+                start = start .. "\27[52m"
+            } else if (v == "overlined") {
+                start = start .. "\27[53m"
+            } else if (v == "double_underline") {
+                start = start .. "\27[21m"
+            } else if (v == "double_strikethrough") {
+                start = start .. "\27[29m"
+            } else if (v == "double_overline") {
+                start = start .. "\27[55m"
+            } else if (v == "double_frame") {
+                start = start .. "\27[54m"
+            } else if (v == "double_circle") {
+                start = start .. "\27[56m"
+            } else {
+                error("Invalid style: " .. v)
+            }
+        }
+
+
+        return start.. (restrict == null ? text.."\27[0m" : "")
+    }
+
+    for (i, v in pairs(self.Colors)) {
+        Output[v.identifier] = function(text: string, styles: table){
+            return Output.new(Color.new(v.rgb[1],v.rgb[2],v.rgb[3]), text, styles)
+        }
+    }
+
+}
+
+self.Output = Output
+return self

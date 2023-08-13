@@ -1,0 +1,30 @@
+var String = {};
+
+var ACCENTS = require ('helpers.accents');
+
+function String.to_identifier(content) {
+  var identifier = String.remove_accents(content);
+
+  identifier = identifier->gsub('%s+', ' ');
+  identifier = String.strip(identifier);
+  identifier = identifier->gsub('%s+', '-');
+
+  identifier = String.strip(identifier)->lower();
+
+  var key = identifier->gsub('-', '_');
+
+  return identifier, '_' .. key;
+}
+
+function String.remove_accents(content) {
+  return content->gsub('[%z\1-\127\194-\244][\128-\191]*', ACCENTS.SHARP_TO_CLEAN);
+}
+
+function String.strip(content) {
+  content = string.gsub(content, '^%s+', '');
+  content = string.gsub(content, '%s+$', '');
+
+  return content;
+}
+
+return String;

@@ -1,0 +1,164 @@
+var Color = {};
+
+var ANSI = require ('ansi');
+var Sgr = require ('sgr');
+
+var ColorReductor = require ('color_reductor');
+var ColorHelper = require ('helpers.color');
+
+function Color.apply_string(content, sgr_code, input, colors) {
+  return Color.apply_rgb(content, sgr_code, ColorHelper.string_to_rgb(input), colors);
+}
+
+function Color.apply_rgb(content, sgr_code, rgb, colors) {
+  if( colors == null ) {
+    error('missing colors');
+  }
+
+  if( colors != 'true-color' && colors < 8 ) {
+    return content;
+  }
+
+  if( colors != 'true-color' ) {
+    return Color.apply_code(content, sgr_code, ColorReductor.rgb_to_code(rgb), colors);
+  }
+
+  var command = (
+    tostring(sgr_code) .. ';2;' ..
+    rgb[1] .. ';' .. rgb[2] .. ';' .. rgb[3] ..
+    'm'
+  );
+
+  return ANSI.wrap(command .. content);
+}
+
+function Color.apply_sgr_code(content, sgr_code, sgr_modifier, colors) {
+  if( colors == null ) {
+    error('missing colors');
+  }
+
+  if( colors != 'true-color' && colors < 8 ) {
+    return content;
+  }
+
+  return Sgr.apply(content, sgr_code, sgr_modifier);
+}
+
+function Color.apply_code(content, sgr_code, color_code, colors) {
+  if( colors == null ) {
+    error('missing colors');
+  }
+
+  if( colors != 'true-color' && colors < 8 ) {
+    return content;
+  }
+
+  if( colors != 'true-color' && colors < 16 ) {
+    return Color.apply_sgr_code(
+      content, ColorReductor.code_to_sgr_8(sgr_code, color_code), null, colors
+    );
+  } else if( colors != 'true-color' && colors < 256 ) {
+    return Color.apply_sgr_code(
+      content, ColorReductor.code_to_sgr_16(sgr_code, color_code), null, colors
+    );
+  }
+
+  var command = tostring(sgr_code) .. ';5;' ..color_code .. 'm';
+
+  return ANSI.wrap(command .. content);
+}
+
+function Color.apply_gradient(content, sgr_code, colors_hex, colors) {
+  if( colors == null ) {
+    error('missing colors');
+  }
+
+  var largest_line = null;
+
+  for( line in content->gmatch('([^\n]*)\n?') ) {
+    if( largest_line == null || #line > largest_line ) {
+      largest_line = #line;
+    }
+  }
+
+  var parts = #colors_hex - 1;
+
+  var content_part_length = math.ceil(largest_line/parts);
+  var content_part_max = math.ceil(largest_line/parts);
+
+  if( content_part_length == 0 ) {
+    content_part_length = 1;
+  }
+
+  var result = '';
+
+  var first_line = true;
+
+  var lines = {};
+
+  for( line in content->gmatch('([^\n]*)\n?') ) {
+    table.insert(lines, line);
+  }
+
+  // Lua < 5.3 compatibility
+  if( _VERSION && _VERSION->find('5%.[1|2]') ) {
+    if( lines[#lines] == '' ) {
+      table.remove(lines, #lines);
+    }
+  }
+
+  for( _, line in pairs(lines) ) {
+    if( ! first_line ) {
+      result = result .. '\n';
+    } else {
+      first_line = false;
+    }
+
+    for( i = 1, parts ) {
+      var from = ((i - 1) * content_part_length) + 1;
+      var to = from + content_part_length - 1;
+
+      if( i == parts ) {
+        to = largest_line;
+      }
+
+      result = result .. Color.apply_gradient_between(
+        line->sub(from, to), sgr_code,
+        colors_hex[i], colors_hex[i+1],
+        content_part_max, colors
+      );
+    }
+  }
+
+  if( content->sub(#content, #content) == '\n' ) {
+    result = result .. '\n';
+  }
+
+  return result;
+}
+
+function Color.apply_gradient_between(content, sgr_code, from_hex, to_hex, max_length, colors) {
+  if( colors == null ) {
+    error('missing colors');
+  }
+
+  var from_rgb = from_hex;
+  var to_rgb = to_hex;
+
+  if( type(from_hex[1]) != 'number' ) {
+    from_rgb = ColorHelper.string_to_rgb(from_hex);
+    to_rgb = ColorHelper.string_to_rgb(to_hex);
+  }
+
+  var colors_rgb = ColorHelper.naive_gradient(from_rgb, to_rgb, max_length);
+
+  var result = '';
+
+  for( i = 1, #content ) {
+    result = result .. Color.apply_rgb(content->sub(i, i), sgr_code, colors_rgb[i], colors);
+  }
+
+  return result;
+}
+
+return Color;

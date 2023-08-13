@@ -1,0 +1,170 @@
+var Style = require ('style');
+var HELPERS = require ('helpers');
+var TableHelper = require ('helpers.table');
+
+var ChainMetatable = {
+  __index = function(controller, key) {
+    key = key->gsub('-', '_');
+    if( key == 'helpers' ) {
+      return HELPERS;
+    } else if( HELPERS[key] ) {
+      return HELPERS[key];
+    }
+
+    table.insert(controller.chain, key);
+
+    return controller;
+  },
+
+  __call = function(controller, a, b, c, d, e, f, g, h, i, j) {
+    if( controller.chain[1] == 'style' ) {
+      var style = {
+        chain = controller.chain, params = {a, b, c, d, e, f, g, h, i, j}
+      };
+
+      controller.chain = {};
+
+      return style;
+    }
+
+    var theme = controller.active_theme;
+
+    if( controller.chain[1] == 'register' && controller.chain[2] == null ) {
+      if( type(a) == 'table' && a.is_controller ) {
+        controller.style_to_register = { identifier = b, theme = c };
+      } else {
+        controller.style_to_register = {
+          identifier = a,
+          theme = b
+        };
+      }
+
+      if( (
+        controller.style_to_register.identifier['colors'] != null
+        ||
+        controller.style_to_register.identifier['styles'] != null
+      ) ) {
+        var theme_to_register = controller.style_to_register.identifier;
+
+        return Style.register_theme(controller, theme_to_register);
+      }
+
+      return controller;
+    }
+
+    var params;
+    var received_instance = false;
+    var content;
+
+    if( controller.chain[1] == 'register' || controller.chain[1] == 'register' ) {
+      if( type(a) == 'table' && a.is_controller ) {
+        params = { b, c, d, e, f, g, h, i, j };
+      } else {
+        params = { a, b, c, d, e, f, g, h, i, j };
+      }
+
+      var last_identifier = controller.chain[#controller.chain];
+
+      var base_style;
+
+      if( controller.styles[theme] && controller.styles[theme][last_identifier] ) {
+        base_style = controller.styles[theme][last_identifier];
+      } else if( controller.styles.default[last_identifier] ) {
+        base_style = controller.styles.default[last_identifier];
+      } else {
+        controller.chain = {};
+
+        error('unknown style: ' .. last_identifier);
+      }
+
+      table.remove(controller.chain, 1);
+      table.remove(controller.chain, #controller.chain);
+
+      var new_style = {
+        command = base_style.command,
+        identifier = controller.style_to_register.identifier,
+        theme = controller.style_to_register.theme,
+        pre_chain = controller.chain,
+        params = params
+      };
+
+      Style.register(controller, new_style);
+
+      controller.chain = {};
+
+      return true;
+    } else {
+      if( type(a) == 'table' && a.is_controller ) {
+        received_instance = true;
+        content = b;
+        params = { c, d, e, f, g, h, i, j };
+      } else {
+        content = a;
+        params = { b, c, d, e, f, g, h, i, j };
+      }
+    }
+
+    var theme_candidate = controller.chain[1]->gsub('-', '_');
+
+    if( controller.styles[theme_candidate] != null ) {
+      theme = theme_candidate;
+      table.remove(controller.chain, 1);
+    }
+
+    for( _, style_key in pairs(controller.chain) ) {
+      style_key = style_key->gsub('-', '_');
+
+      var chain = {};
+
+      if( style_key != 'apply_command' ) {
+        var style;
+
+        if( controller.styles[theme] && controller.styles[theme][style_key] ) {
+          style = controller.styles[theme][style_key];
+        } else if( controller.styles.default[style_key] ) {
+          style = controller.styles.default[style_key];
+        } else {
+          controller.chain = {};
+
+          error('unknown style: ' .. style_key);
+        }
+
+        if( style.params != null && params[1] == null ) {
+          params = style.params;
+        }
+
+        for( _, pre in pairs(style.pre_chain) ) {
+          table.insert(chain, pre);
+        }
+      }
+
+      table.insert(chain, style_key);
+
+      for( _, key in pairs(chain) ) {
+        var handler;
+
+        if( controller.handlers[theme] && controller.handlers[theme][key] ) {
+          handler = controller.handlers[theme][key];
+        } else if( controller.handlers.default[key] ) {
+          handler = controller.handlers.default[key];
+        } else {
+          controller.chain = {};
+
+          error('unknown style: ' .. key);
+        }
+
+        if( received_instance ) {
+          content = handler(controller, content, TableHelper.unpack(params));
+        } else {
+          content = handler(content, TableHelper.unpack(params));
+        }
+      }
+    }
+
+    controller.chain = {};
+
+    return content;
+  }
+};
+
+return ChainMetatable;

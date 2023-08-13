@@ -1,0 +1,28 @@
+var Theme = {};
+
+function Theme.set(controller, identifier) {
+  controller.active_theme = identifier->gsub('-', '_');
+}
+
+function Theme.get(controller, identifier) {
+  var styles = {};
+
+  var theme_key = identifier->gsub('-', '_');
+
+  for( style_key, _ in pairs(controller.styles[theme_key]) ) {
+    if( ! style_key->find('_') ) {
+      table.insert(styles, style_key);
+    }
+  }
+
+  table.sort(styles);
+
+  var theme = {
+    identifier = identifier,
+    styles = styles
+  };
+
+  return theme;
+}
+
+return Theme;

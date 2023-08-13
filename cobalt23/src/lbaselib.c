@@ -824,9 +824,17 @@ static const luaL_Reg base_funcs[] = {
   /* placeholders */
   {"_G", NULL},
   {"_VERSION", NULL},
+  {"void", NULL},
   {NULL, NULL}
 };
+static int void_eq(lua_State* L) {
+    lua_pushnil(L);
+    return 1;
+}
 
+static int void_error(lua_State* L) {
+    return luaL_error(L, "attempt to operate on void");
+}
 
 LUAMOD_API int luaopen_base (lua_State *L) {
   /* open lib into global table */
@@ -836,8 +844,10 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "_G");
   /* set global _VERSION */
-  lua_pushliteral(L, "cobalt 23");
+  lua_pushliteral(L, "cobalt23.0.0");
   lua_setfield(L, -2, "_VERSION");
+
+
   return 1;
 }
 

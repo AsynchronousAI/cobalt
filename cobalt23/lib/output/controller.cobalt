@@ -1,0 +1,155 @@
+var Theme = require ('theme');
+var Style = require ('style');
+var ANSI = require ('ansi');
+var ChainMetatable = require ('chain_metatable');
+var Color = require ('color');
+var Sgr = require ('sgr');
+
+var Controller = {
+  is_controller = true,
+  enabled = true,
+  chain = {},
+  style_to_register = null,
+  handlers = { default = {} },
+  styles = { default = {} },
+  active_theme = 'default',
+  colors = 'true-color'
+};
+
+function Controller::init() {
+  this.enabled = true;
+  this.chain = {};
+  this.style_to_register = null;
+  this.handlers = { default = {} };
+  this.styles = { default = {} };
+  this.active_theme = 'default';
+
+  // TODO:
+  // 0 8 16 256 true-color
+  this.colors = 'true-color';
+  // echo $COLORTERM
+
+  var env_colors = os.getenv('COBALT_COLORS');
+
+  if( env_colors != null ) {
+    if( tostring(tonumber(env_colors)) == env_colors ) {
+      this.colors = tonumber(env_colors);
+    } else if( env_colors == 't' || env_colors == 'true_color' ) {
+      this.colors = 'true-color';
+    } else {
+      this.colors = env_colors;
+    }
+  }
+
+  this.handlers.default['apply_command'] = Controller.apply_command;
+
+  for( _, style in pairs(ANSI.SGR_COMMANDS) ) {
+    Style.register(this, style);
+  }
+
+  Style.register(this, { identifier = 'gradient',   command = 'gradient' });
+  Style.register(this, { identifier = 'bg_gradient',   command = 'bg_gradient' });
+  Style.register(this, { identifier = 'background_gradient',   command = 'background_gradient' });
+}
+
+function Controller::set_colors(colors) {
+  if( colors == 't' || colors == 'true_color' ) {
+    colors = 'true-color';
+  }
+
+  this.colors = colors;
+}
+
+Controller['set-colors'] = Controller.set_colors;
+
+function Controller::enable() {
+  this.enabled = true;
+}
+
+function Controller::disable() {
+  this.enabled = false;
+}
+
+function Controller::set_theme(theme) {
+  Theme.set(this, theme);
+}
+
+Controller['set-theme'] = Controller.set_theme;
+
+function Controller::get_theme(identifier) {
+  return Theme.get(this, identifier);
+}
+
+Controller['get-theme'] = Controller.get_theme;
+
+function Controller.apply_command(a, b, c, d, e, f) {
+  var instance, content, command, extra;
+
+  if( type(a) == 'table' && a.is_controller ) {
+    instance, content, command = a, b, c;
+    extra = {d, e, f};
+  } else {
+    content, command = a, b;
+    extra = {c, d, e};
+  }
+
+  if( instance != null && ! instance.enabled ) {
+    return content;
+  }
+
+  var colors = 'true-color';
+
+  if( instance != null ) {
+    colors = instance.colors;
+  }
+
+  if( command == 'gradient' || command == 'bg_gradient' || command == 'background_gradient' ) {
+    var sgr_code = ANSI.SGR_CODES.color;
+
+    if( command == 'bg_gradient' || command == 'background_gradient' ) {
+      sgr_code = ANSI.SGR_CODES.background;
+    }
+
+    if( type(extra[1]) != 'table' && extra[2] != null ) {
+      return Color.apply_gradient(content, sgr_code, { extra[1], extra[2] }, colors);
+    } else {
+      return Color.apply_gradient(content, sgr_code, extra[1], colors);
+    }
+
+  } else if((
+    command == ANSI.SGR_CODES.color ||
+    command == ANSI.SGR_CODES.background ||
+    command == ANSI.SGR_CODES.underline_color
+  ) ) {
+    if( type(extra[1]) == 'string' ) {
+      return Color.apply_string(content, command, extra[1], colors);
+    } else if( type(extra[1]) == 'table' ) {
+      return Color.apply_rgb(content, command, extra[1], colors);
+    } else if( extra[3] != null ) {
+      return Color.apply_rgb(content, command, { extra[1], extra[2], extra[3] }, colors);
+    } else {
+      return Color.apply_code(content, command, extra[1], colors);
+    }
+  }
+
+  var sgr_modifier = null;
+
+  if( type(extra[1]) == 'boolean' && extra[1] ) {
+    sgr_modifier = '1';
+  }
+
+  if( (
+    (command >= 30 && command <= 37)
+    || (command >= 40 && command <= 47)
+    || (command >= 90 && command <= 97)
+    || (command >= 100 && command <= 107)
+  ) ) {
+    return Color.apply_sgr_code(content, command, sgr_modifier, colors);
+  }
+
+  return Sgr.apply(content, command, sgr_modifier);
+}
+
+Controller = setmetatable(Controller, ChainMetatable);
+
+return Controller;

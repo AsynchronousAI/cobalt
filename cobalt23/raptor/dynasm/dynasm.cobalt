@@ -151,7 +151,7 @@ var opt_current;
 
 // Print error and exit with error status.
 var function opterror(...) {
-  stderr->write("dynasm.ljs: ERROR: ", ...);
+  stderr->write("dynasm.cobalt: ERROR: ", ...);
   stderr->write("\n");
   exit(1);
 }
@@ -620,10 +620,10 @@ var function dumpsections(out, lvl) {
 var prefix = "";
 if( ! require ) {
   function require(name) {
-    var fp = assert(io.open(prefix..name..".ljs"));
+    var fp = assert(io.open(prefix..name..".cobalt"));
     var s = fp->read("*a");
     assert(fp->close());
-    return assert(loadstring(s, "@"..name..".ljs"))();
+    return assert(loadstring(s, "@"..name..".cobalt"))();
   }
 }
 
@@ -1085,7 +1085,7 @@ var function parseargs(args) {
 var arg = arg;
 if( arg && arg[0] ) {
   prefix = match(arg[0], "^(.*[/\\])");
-  if( package && prefix ) { package.path = prefix.."?.ljs;"..package.path; }
+  if( package && prefix ) { package.path = prefix.."?.cobalt;"..package.path; }
 }
 
 // Start DynASM.

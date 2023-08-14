@@ -135,7 +135,7 @@ LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
 
 HOST_CC= $(CC)
 HOST_RM= rm -f
-HOST_LUA=ljsjit
+HOST_LUA=cobaltraptor
 
 HOST_XCFLAGS= -I.
 HOST_XLDFLAGS=
@@ -204,7 +204,7 @@ Host_XCFLAGS+= -DLUAJIT_OS=LUAJIT_OS_LINUX
 ##############################################################################
 
 DASM_DIR= ../dynasm
-DASM= $(HOST_LUA) $(DASM_DIR)/dynasm.ljs
+DASM= $(HOST_LUA) $(DASM_DIR)/dynasm.cobalt
 DASM_ARCH= x64
 DASM_DASC= vm_$(DASM_ARCH).dasc
 
@@ -288,7 +288,7 @@ reusevm:
 	@echo "Copied reference VM. Ready to build."
 
 libbc:
-	./$(LUAJIT_T) host/genlibbc.ljs -o host/buildvm_libbc.h $(LJLIB_C)
+	./$(LUAJIT_T) host/genlibbc.cobalt -o host/buildvm_libbc.h $(LJLIB_C)
 	$(MAKE) all
 
 depend:
@@ -311,7 +311,7 @@ depend:
 # Rules for generated files.
 ##############################################################################
 
-host/buildvm_arch.h: $(DASM_DASC) $(DASM_DEP) $(DASM_DIR)/*.ljs
+host/buildvm_arch.h: $(DASM_DASC) $(DASM_DEP) $(DASM_DIR)/*.cobalt
 	@command -v $(DASM) 2>/dev/null || { \
 	  echo "Error: Missing dependency (luajit) for bootstrapping the VM."; \
 	  echo "";                                                             \

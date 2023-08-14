@@ -30,11 +30,11 @@
 
 #include "lua.h"
 
-#define LUAJIT_VERSION		"RaptorJIT-LJS 1.0.0"
+#define LUAJIT_VERSION		"cobalt23 raptor"
 #define LUAJIT_VERSION_NUM	10000  /* Version 1.0.0 = 01.00.00. */
 #define LUAJIT_VERSION_SYM	luaJIT_version_1_0_0
 
-#define LUAJIT_URL		"http://github.com/raptorjit/raptorjit"
+#define LUAJIT_URL		"http://github.com/cobaltlang/cobalt"
 
 /* Modes for luaJIT_setmode. */
 #define LUAJIT_MODE_MASK	0x00ff

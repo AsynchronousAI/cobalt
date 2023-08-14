@@ -17,7 +17,7 @@
 #endif
 
 #ifdef LUAJIT_LJS
-  #define LUA_SCRIPT_EXT ".ljs"
+  #define LUA_SCRIPT_EXT ".cobalt"
 #else
   #define LUA_SCRIPT_EXT ".lua"
 #endif
@@ -46,8 +46,8 @@
 #define LUA_LMULTILIB	"lib"
 #endif
 #define LUA_LROOT	"/usr/local"
-#define LUA_LUADIR	"/lua/5.1/"
-#define LUA_LJDIR	"/raptorjit-1.0.0/"
+#define LUA_LUADIR	"/lua/cobalt/"
+#define LUA_LJDIR	""
 
 #ifdef LUA_ROOT
 #define LUA_JROOT	LUA_ROOT

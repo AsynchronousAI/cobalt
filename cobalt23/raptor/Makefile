@@ -73,7 +73,7 @@ FILE_T= raptorjit
 FILE_A= libraptorjit.a
 FILE_SO= libraptorjit.so
 FILES_INC= lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h
-FILES_JITLIB= bc.ljs bcsave.ljs vmdef.ljs
+FILES_JITLIB= bc.cobalt bcsave.cobalt vmdef.cobalt
 
 ifeq (,$(findstring Windows,$(OS)))
   HOST_SYS:= $(shell uname -s)

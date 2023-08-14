@@ -20,7 +20,7 @@
 #define LUA_VERSION_NUM		503
 #define LUA_VERSION_RELEASE	"0"
 
-#define LUA_VERSION	"cobalt " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR "." LUA_VERSION_RELEASE " based on Lua 5.3 and LJS"
+#define LUA_VERSION	"cobalt23"
 #define LUA_RELEASE	LUA_VERSION "."
 #define LUA_COPYRIGHT	LUA_VERSION
 #define LUA_AUTHORS	""

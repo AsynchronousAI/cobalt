@@ -7,10 +7,14 @@
 
 > **Binaries:** `cobalt` `cobaltc`
 
+Original Cobalt interpreter and bytecoder. It can be compiled using
+`make` and is the default option, it has the most and newest features and is
+the most stable and portable.  
 ## cobaltjit 
 > **Type:** (Optional JIT Compiler) 
 
 > **Binary:** `cobaltjit`
+
 Optional tool used for JIT compilation. It can be compiled using
 `make cobaltjit` command. It is slower than Raptor. It is 
 a inbetween of the interpreter and Raptor.
@@ -19,6 +23,7 @@ a inbetween of the interpreter and Raptor.
 > **Type:** (Optional Ultrafast JIT Compiler) 
 
 > **Binary:** `cobaltraptor`
+
 Optional tool used for ultrafast JIT compilation. It can be compiled using
 `make cobaltraptor` command. It is faster than CobaltJIT, and 
 compatible with it. It also includes more tools to 
@@ -30,12 +35,14 @@ optimize the code. It is the fastest Cobalt compiler.
 > **Type:** (Optional Lua to Cobalt transpiler) 
 
 > **Binary:** `lua-cobalt`
+
 Optional tool used to convert Lua code to Cobalt code. It can be compiled using
 `make lua-cobalt` command.
 ## minicobalt 
 > **Type:** (Minimized one script version) 
 
 > **File:** `jit/minicobalt`
+
 Used for internal use by JIT and Raptor compilers. Generated
 using `jit/genminicobalt` script.
 ***

@@ -18,7 +18,8 @@ a inbetween of the interpreter and Raptor.
 > **Binary:** `cobaltraptor`
 Optional tool used for ultrafast JIT compilation. It can be compiled using
 `make cobaltraptor` command. It is faster than CobaltJIT, and 
-compatible with it.
+compatible with it. It also includes more tools to 
+optimize the code. It is the fastest Cobalt compiler.
 
 ***
 # Other:

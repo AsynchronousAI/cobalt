@@ -3,6 +3,7 @@
 > - Unsupported platforms
 > - Interpreter is not available for some platforms
 > - Consoles will have issues when being compiled on posix systems 
+> - Raptor is ready to be supported but will need some work
 # JIT Consoles
 ## Building for console
 ### XBOX One

@@ -21,21 +21,24 @@ CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 Makefile
+.DS_Store
+*.S
 
 # Argon be annoying sometimes
 /src 
 
 # CMake Ignore (Very large) 
-/cobalt/CMakeLists.txt.user
-/cobalt/CMakeCache.txt
-/cobalt/CMakeFiles
-/cobalt/cmake_install.cmake
-/cobalt/Makefile
-/cobalt/src/CMakeLists.txt.user
-/cobalt/src/CMakeCache.txt
-/cobalt/src/CMakeFiles
-/cobalt/src/cmake_install.cmake
-/cobalt/src/Makefile
+/cobalt23/raptor/src/host/buildvm_arch.h
+/cobalt23/CMakeLists.txt.user
+/cobalt23/CMakeCache.txt
+/cobalt23/CMakeFiles
+/cobalt23/cmake_install.cmake
+/cobalt23/Makefile
+/cobalt23/src/CMakeLists.txt.user
+/cobalt23/src/CMakeCache.txt
+/cobalt23/src/CMakeFiles
+/cobalt23/src/cmake_install.cmake
+/cobalt23/src/Makefile
 *cmake_install.cmake
 *.dylib
 *Config.cmake

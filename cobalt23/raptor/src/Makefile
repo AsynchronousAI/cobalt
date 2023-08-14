@@ -135,7 +135,7 @@ LDOPTIONS= $(CCDEBUG) $(LDFLAGS)
 
 HOST_CC= $(CC)
 HOST_RM= rm -f
-HOST_LUA=cobaltraptor
+HOST_LUA=cobaltjit
 
 HOST_XCFLAGS= -I.
 HOST_XLDFLAGS=
@@ -247,10 +247,10 @@ LJVMCORE_DYNO= $(LJVMCORE_O:.o=_dyn.o)
 
 LIB_VMDEF= jit/vmdef.lua
 
-LUAJIT_O= raptorjit.o
-LUAJIT_A= raptorjit.a
-LUAJIT_SO= libraptorjit.so
-LUAJIT_T= raptorjit
+LUAJIT_O= cobaltjit.o
+LUAJIT_A= cobaltjit.a
+LUAJIT_SO= libcobaltjit.so
+LUAJIT_T= cobaltraptor
 
 ALL_T= $(LUAJIT_T) $(LUAJIT_A) $(LUAJIT_SO) $(HOST_T)
 ALL_HDRGEN= lj_bcdef.h lj_ffdef.h lj_libdef.h lj_recdef.h lj_folddef.h \
@@ -315,13 +315,13 @@ host/buildvm_arch.h: $(DASM_DASC) $(DASM_DEP) $(DASM_DIR)/*.cobalt
 	@command -v $(DASM) 2>/dev/null || { \
 	  echo "Error: Missing dependency (luajit) for bootstrapping the VM."; \
 	  echo "";                                                             \
-	  echo "Here are your options to build RaptorJIT:";                    \
+	  echo "Here are your options to build cobalt raptor:";                    \
 	  echo "  make reusevm     # copy reference VM from reusevm/";          \
 	  echo "  (install luajit) # satisfy the dependency";                   \
 	  echo "  nix-build        # use nix to satisfy the dependencies";      \
 	  echo "";                                                             \
 	  echo "Warning:";                                                     \
-	  echo "  Only reusevm when running a pristine copy of RaptorJIT from";\
+	  echo "  Only reusevm when running a pristine copy of cobalt raptor from";\
 	  echo "  a repository that keeps the reference VM up-to-date.";       \
 	  echo "  (Otherwise you might mix some stale code into your build.)"; \
 	  echo;                                                                \
@@ -392,7 +392,7 @@ $(DWARF_DWO): %.dwo: %.c
 	$(E) "CC(debug) $@"
 	$(Q)$(TARGET_CC) -g3 -fno-eliminate-unused-debug-types -gsplit-dwarf -c $<
 
-# Embed DWARF debug information as binary data available to raptorjit.
+# Embed DWARF debug information as binary data available to cobaltjit.
 lj_dwarf_dwo.o lj_dwarf_dwo_dyn.o: $(DWARF_DWO)
 	$(E) "EMBED     $@"
 	$(Q)$(LD) -r -b binary -o $@ $<
@@ -416,6 +416,6 @@ $(LUAJIT_SO): $(LJVMCORE_O)
 $(LUAJIT_T): $(TARGET_O) $(LUAJIT_O) $(TARGET_DEP)
 	$(E) "LINK      $@"
 	$(Q)$(TARGET_LD) $(TARGET_ALDFLAGS) -o $@ $(LUAJIT_O) $(TARGET_O) $(TARGET_ALIBS)
-	$(E) "OK        Successfully built RaptorJIT"
+	$(E) "OK        Successfully built cobaltraptor"
 
 ##############################################################################

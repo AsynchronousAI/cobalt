@@ -55,6 +55,16 @@ syntax.
 Cobalt is as fast as Lua(JIT) which it is based upon. LuaJIT is considered to be as fast as C and C++ in some cases, and Rust in most cases. Cobalt has its own performance improvements over LuaJIT, so can be considered to
 match C, C++, and Rust in nearly all cases.
 
+## Dependencies:
+- CMake
+- Make
+- Python 3
+- C/C++ Compiler
+- Assembler
+#### For Raptor:
+- LuaJIT
+- cobaltJIT
+
 ## Features
 - Direct memory access
 - Type annotations and checking

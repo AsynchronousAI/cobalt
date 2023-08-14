@@ -50,9 +50,8 @@ auto move_down (int amount) -> move_down_sequence;
 
 // Init \\
 var self = require("output.controller")
-var lpty = require("lpty")
 self->init()
-self.Colors = require("helpers.color_names")
+self.Colors = require("helpers.color_names_by_key")
 // Officially decreapted in favor of newer ANSI library
 // Output library \\
 typedef("Output",
@@ -87,7 +86,7 @@ for (i, v in pairs(self.Colors)) {
 }
 
 // Cursor library \\\
-typedef("Cursor",
+typedef("Canvas",
 {
     "pos": function(position){
         var x, y = position.X, position.Y
@@ -97,18 +96,18 @@ typedef("Cursor",
 
         io.write(string.format("\27[%d;%df", y, x))
     },
-    "current": function(){
-        // returns current cursor position as Vector2
-        // @arguements none
-        // @returns Vector2
-        // @description Returns the current cursor position as a Vector2
-
-        var term = lpty.new()
-
-        term:write("\27[6n")
-        var x, y = term:read():match("\27%[(%d+);(%d+)R")
-        term->close()
-        return Vector2.new(x, y)
+    "relpos": function(position){
+        var x, y = position.X, position.Y
+        // @arguements position: Vector2: position
+        // @returns null
+        // @description Applies the cursor to the terminal
+        // Move the cursor up Y rows
+        io.write(string.format("\27[%dA", -y))
+        // Move the cursor left X columns
+        io.write(string.format("\27[%dD", -x))
+    },
+    "reset": function(){
+        io.write("\27[999;1H")
     },
     "space": function(size, color){
         // @arguements size: Vector2: size
@@ -126,10 +125,7 @@ typedef("Cursor",
 })
 
 // Apply and return \\
-self.Cursor = Cursor
+self.Canvas = Canvas
 self.Output = Output
 
-print(Cursor.current().X, Cursor.current().Y)
-
-print("lol")
 return self

@@ -39,6 +39,12 @@ add_custom_target(jit
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
 )
+add_custom_target(raptor
+    COMMAND make -w
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/raptor
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building cobaltRaptor (this may take a while)"
+)
 # WINDOWS BUILD JIT CONSOLES
 add_custom_target(jit-xbox
     COMMAND start xb1build.bat

@@ -1,9 +1,6 @@
 # cobalt23
 A programming language made in C and C++ made to be the *portable, simple, and modern* successor of C.
 
-> **Known issues:**
-> - [`cobaltJIT`] is missing some build in libraries
-> - [`cobaltJIT`] anaylzer is not done
 ## Example code:
 The following code is a snippet that shows off some of the genera features of cobalt.
 
@@ -84,3 +81,5 @@ everything they need to make a great program with a great experience.
 # Add the following to credits:
 - Lambda
 - LuaJIT Jit library
+- RaptorJIT/Ljs
+- Supernova

@@ -203,7 +203,7 @@ else()
 endif()
 
 set(BUILDVM_ARCH_H ${CMAKE_CURRENT_BINARY_DIR}/buildvm_arch.h)
-set(DASM_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../dynasm/dynasm.cobalt)
+set(DASM_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../asm/dynasm.cobalt)
 
 if (NOT LJ_BIG_ENDIAN)
   set(DASM_FLAGS ${DASM_FLAGS} -D ENDIAN_LE)

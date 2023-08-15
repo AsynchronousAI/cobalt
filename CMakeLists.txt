@@ -27,6 +27,20 @@ else()
 endif()
 
 add_subdirectory(cobalt23)
+# CLEAR
+add_custom_target(cleanjit
+    COMMAND make -w clean
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/jit
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Clearing cobalt23"
+)
+add_custom_target(cleanraptor
+    COMMAND make -w clean
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/jit
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Clearing cobalt23"
+)
+# BUILD
 add_custom_target(lua-cobalt
     COMMAND make -w
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/lua-cobalt

@@ -41,7 +41,7 @@
 #define Dst_REF		(ctx->D)
 #define DASM_CHECKS	1
 
-#include "../dynasm/dasm_proto.h"
+#include "../../asm/dasm_proto.h"
 
 /* Glue macros for DynASM. */
 static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type);
@@ -56,15 +56,15 @@ static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type);
 
 /* Embed architecture-specific DynASM encoder. */
 #if LJ_TARGET_X86ORX64
-#include "../dynasm/dasm_x86.h"
+#include "../../asm/dasm_x86.h"
 #elif LJ_TARGET_ARM
-#include "../dynasm/dasm_arm.h"
+#include "../../asm/dasm_arm.h"
 #elif LJ_TARGET_ARM64
-#include "../dynasm/dasm_arm64.h"
+#include "../../asm/dasm_arm64.h"
 #elif LJ_TARGET_PPC
-#include "../dynasm/dasm_ppc.h"
+#include "../../asm/dasm_ppc.h"
 #elif LJ_TARGET_MIPS
-#include "../dynasm/dasm_mips.h"
+#include "../../asm/dasm_mips.h"
 #else
 #error "No support for this architecture (yet)"
 #endif

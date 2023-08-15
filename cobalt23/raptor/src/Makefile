@@ -203,7 +203,7 @@ Host_XCFLAGS+= -DLUAJIT_OS=LUAJIT_OS_LINUX
 # Files and pathnames.
 ##############################################################################
 
-DASM_DIR= ../dynasm
+DASM_DIR= ../../asm
 DASM= $(HOST_LUA) $(DASM_DIR)/dynasm.cobalt
 DASM_ARCH= x64
 DASM_DASC= vm_$(DASM_ARCH).dasc

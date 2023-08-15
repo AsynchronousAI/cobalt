@@ -391,7 +391,7 @@ ifeq (,$(HOST_LUA))
   DASM_DEP= $(MINILUA_T)
 endif
 
-DASM_DIR= ../dynasm
+DASM_DIR= ../../asm
 DASM= $(HOST_LUA) $(DASM_DIR)/dynasm.cobalt
 DASM_XFLAGS=
 DASM_AFLAGS=

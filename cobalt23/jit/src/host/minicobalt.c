@@ -6787,6 +6787,7 @@ static const luaL_Reg base_funcs[]={
 {"loadstring",luaB_loadstring},
 {"next",luaB_next},
 {"pcall",luaB_pcall},
+{"try", luaB_pcall},
 {"rawget",luaB_rawget},
 {"setfenv",luaB_setfenv},
 {"setmetatable",luaB_setmetatable},

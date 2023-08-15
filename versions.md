@@ -53,6 +53,17 @@ cobalt24 JIT, only given to testers and developers. [beta page](https://cobaltla
 cobalt24 Raptor, only given to testers and developers. [beta page](https://cobaltlang.vercel.app/beta)
 ***
 # Other:
+## cobaltasm
+> **Type:** (Optional Assembler)
+
+> **Binary:** `cobaltasm`
+
+> **Directory:** `asm`
+
+Assembler used by JIT and Raptor. It is can be made using
+`make jit` or `make raptor` and installed with `make setup` after `make jit` or `make raptor` is ran.
+
+It converts assembly code to machine code  is used by JIT and Raptor, and based on DynASM.
 ## lua-cobalt 
 > **Type:** (Optional Lua to Cobalt transpiler) 
 
@@ -61,13 +72,16 @@ cobalt24 Raptor, only given to testers and developers. [beta page](https://cobal
 Optional tool used to convert Lua code to Cobalt code. It can be compiled using
 `make lua-cobalt` command.
 ## minicobalt 
-> **Type:** (Minimized one script version) 
+> **Type:** (Minimized one script interpreter ) 
+
+> **Binary:** `minicobalt`
 
 > **File:** `jit/minicobalt`
 
-Ultralightweight version of cobalt minimized to ~4k lines. It will be built along side 
-cobaltJIT and is not documentated and will need to be installed manually. It is not
-recommended to use this, it is just for internal JIT use and for our own testing.
+Lightweight ~4k lines version of cobalt, Included with `cobaltjit` and `cobaltraptor`, installed with
+`make setup` after `make jit` or `make raptor` is ran. Documentation is not provided and 
+it is not recommended to use it because of its lack of features and stability.
+
 ***
 
 <sub>Read credits [here](https://github.com/cobalt-lang/cobalt/blob/master/COPYRIGHTS.md)</sub>

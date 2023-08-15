@@ -53,15 +53,26 @@ cobalt24 JIT, only given to testers and developers. [beta page](https://cobaltla
 cobalt24 Raptor, only given to testers and developers. [beta page](https://cobaltlang.vercel.app/beta)
 ***
 # Other:
+## asm
+> **Type:** (Assembler)
+
+> **Directory:** `asm`
+
+JIT Assembler, Based on DynASM, designed for Cobalt JIT.
+
+## raptorasm
+> **Type:** (Assembler)
+
+> **Directory:** `raptorasm`
+
+Raptor Assembler, Based on DynASM, designed for Cobalt Raptor.
+
 ## cobaltasm
 > **Type:** (Optional Assembler)
 
 > **Binary:** `cobaltasm`
 
-> **Directory:** `asm`
-
-Assembler used by JIT and Raptor. It is can be made using
-`make jit` or `make raptor` and installed with `make setup` after `make jit` or `make raptor` is ran.
+asm & raptorasm combined to a binary, install using `make asm`.
 
 It converts assembly code to machine code  is used by JIT and Raptor, and based on DynASM.
 ## lua-cobalt 

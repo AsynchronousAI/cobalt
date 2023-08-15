@@ -203,7 +203,7 @@ Host_XCFLAGS+= -DLUAJIT_OS=LUAJIT_OS_LINUX
 # Files and pathnames.
 ##############################################################################
 
-DASM_DIR= ../../asm
+DASM_DIR= ../../asm/sub
 DASM= $(HOST_LUA) $(DASM_DIR)/dynasm.cobalt
 DASM_ARCH= x64
 DASM_DASC= vm_$(DASM_ARCH).dasc
@@ -312,6 +312,7 @@ depend:
 ##############################################################################
 
 host/buildvm_arch.h: $(DASM_DASC) $(DASM_DEP) $(DASM_DIR)/*.cobalt
+	@echo $(DASM)
 	@command -v $(DASM) 2>/dev/null || { \
 	  echo "Error: Missing dependency (luajit) for bootstrapping the VM."; \
 	  echo "";                                                             \

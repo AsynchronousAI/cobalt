@@ -36,7 +36,7 @@ add_custom_target(cleanjit
 )
 add_custom_target(cleanraptor
     COMMAND make -w clean
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/jit
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/raptor
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Clearing cobalt23"
 )

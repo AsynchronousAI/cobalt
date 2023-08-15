@@ -364,7 +364,7 @@ static int32_t ra_spill(ASMState *as, IRIns *ir)
   return sps_scale(slot);
 }
 
-/* Release the temporarily allocated register in ASMREF_TMP1/ASMREF_TMP2. */
+/* Release the temporarily allocated register in ASMREF_TMP1/asm/subREF_TMP2. */
 static Reg ra_releasetmp(ASMState *as, IRRef ref)
 {
   IRIns *ir = IR(ref);

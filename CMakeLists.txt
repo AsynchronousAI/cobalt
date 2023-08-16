@@ -34,6 +34,12 @@ add_custom_target(cleanjit
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Clearing cobalt23"
 )
+add_custom_target(cleanlua
+    COMMAND make -w clean
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/lua-cobalt
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Clearing cobalt23"
+)
 # BUILD
 add_custom_target(lua-cobalt
     COMMAND make -w

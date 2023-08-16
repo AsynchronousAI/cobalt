@@ -1,6 +1,6 @@
 parser_fn = lua-parser
 #CFLAGS=-O2 -DNDEBUG
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -w
 
 lua-cobalt: $(parser_fn).c
 	$(CC) $(CFLAGS) -o $@ $<

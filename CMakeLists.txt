@@ -34,12 +34,6 @@ add_custom_target(cleanjit
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Clearing cobalt23"
 )
-add_custom_target(cleanraptor
-    COMMAND make -w clean
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/raptor
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Clearing cobalt23"
-)
 # BUILD
 add_custom_target(lua-cobalt
     COMMAND make -w
@@ -52,12 +46,6 @@ add_custom_target(jit
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/jit
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building cobaltJIT (this may take a while)"
-)
-add_custom_target(raptor
-    COMMAND make -w
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/raptor
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Building cobaltRaptor (this may take a while)"
 )
 # WINDOWS BUILD JIT CONSOLES
 add_custom_target(jit-xbox

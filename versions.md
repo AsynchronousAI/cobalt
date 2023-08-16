@@ -10,23 +10,14 @@
 
 Original lightweight Cobalt interpreter and bytecoder. It can be compiled using
 `make` and is the default option, it has the most and newest features and is
-the most stable and portable. On sync with cobaltjit, and cobaltraptor.
+the most stable and portable. On sync with cobaltjit.
 ### cobaltjit 
 > **Type:** (Optional JIT Compiler) 
 
 > **Binary:** `cobaltjit`
 
 Optional tool used for JIT compilation. It can be compiled using
-`make jit` command. It is slower than Raptor. It is 
-a inbetween of the interpreter and Raptor.
-
-### cobaltraptor
-> **Type:** (Optional Ultrafast JIT Compiler) 
-
-> **Binary:** `cobaltraptor`
-
-Optional tool like JIT but includes more tools for optimization. It can be compiled using
-`make raptor` command. It is faster than JIT but heavier in executable size.
+`make jit` command. 
 
 ## 24
 ## cobalt-one
@@ -46,35 +37,16 @@ cobalt24, only given to testers and developers. [beta page](https://cobaltlang.v
 
 cobalt24 JIT, only given to testers and developers. [beta page](https://cobaltlang.vercel.app/beta)
 
-## cobaltraptor
-> **Type:** (Optional Ultrafast JIT Compiler)
-> **Binary:** `cobaltraptor`
-
-cobalt24 Raptor, only given to testers and developers. [beta page](https://cobaltlang.vercel.app/beta)
 ***
 # Other:
-## asm
-> **Type:** (Assembler)
-
-> **Directory:** `asm`
-
-JIT Assembler, Based on DynASM, designed for Cobalt JIT.
-
-## raptorasm
-> **Type:** (Assembler)
-
-> **Directory:** `raptorasm`
-
-Raptor Assembler, Based on DynASM, designed for Cobalt Raptor.
-
 ## cobaltasm
 > **Type:** (Optional Assembler)
 
 > **Binary:** `cobaltasm`
 
-asm & raptorasm combined to a binary, install using `make asm`.
+asm combined to a binary, install using `make asm`.
 
-It converts assembly code to machine code  is used by JIT and Raptor, and based on DynASM.
+It converts assembly code to machine code is used by JIT, and based on DynASM.
 ## lua-cobalt 
 > **Type:** (Optional Lua to Cobalt transpiler) 
 
@@ -89,8 +61,8 @@ Optional tool used to convert Lua code to Cobalt code. It can be compiled using
 
 > **File:** `jit/minicobalt`
 
-Lightweight ~4k lines version of cobalt, Included with `cobaltjit` and `cobaltraptor`, installed with
-`make setup` after `make jit` or `make raptor` is ran. Documentation is not provided and 
+Lightweight ~4k lines version of cobalt, Included with `cobaltjit`, installed with
+`make setup` after `make jit` is ran. Documentation is not provided and 
 it is not recommended to use it because of its lack of features and stability.
 
 ***

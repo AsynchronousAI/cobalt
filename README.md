@@ -60,10 +60,6 @@ match C, C++, and Rust in nearly all cases.
 - Make
 - Python 3
 - C/C++ Compiler
-- Assembler
-#### For Raptor:
-- LuaJIT
-- cobaltJIT
 
 ## Features
 - Direct memory access
@@ -91,5 +87,5 @@ everything they need to make a great program with a great experience.
 # Add the following to credits:
 - Lambda
 - LuaJIT Jit library
-- RaptorJIT/Ljs
+- Ljs
 - Supernova

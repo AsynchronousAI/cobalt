@@ -38,14 +38,6 @@ cobalt24 JIT, only given to testers and developers. [beta page](https://cobaltla
 > **Binary:** `cobalt-one`
 
 cobalt24 standalone executable compiler. `make one`
-## cobaltasm
-> **Type:** (Optional Assembler)
-
-> **Binary:** `cobaltasm`
-
-asm combined to a binary, install using `make asm`.
-
-It converts assembly code to machine code is used by JIT, and based on DynASM.
 ### cobaltpre
 > **Type:** (Optional Preprocessor)
 

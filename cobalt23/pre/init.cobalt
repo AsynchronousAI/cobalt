@@ -1,5 +1,5 @@
 // Very short CLI wrapper for the preprocessor
-// compile to executable using cobaltone
+// compile to executable using cobaltjit -b preprocessor.lua preprocessor.o
 
 
 preprocessor = import("preprocessor") 

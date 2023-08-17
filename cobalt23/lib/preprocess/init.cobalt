@@ -246,6 +246,12 @@ function process(str){
                     newlines[v[1]] = ""
                     return // Skip this line
                 }
+                // If the second character is a !, ignore the line
+                if (v[2]->sub(1, 1) == "!") {
+                    newlines[v[1]] = ""
+                    return // Skip this line
+                }
+                
                 // Execute everything past the # as a cobalt line
                 var code = v[2]->sub(2, #v[2])
                 

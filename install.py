@@ -22,6 +22,12 @@ if os.path.isfile(scriptPath + "/cobalt23/jit/src/cobaltjit"):
 if os.path.isfile(scriptPath + "/cobalt23/lua-cobalt/lua-cobalt"):
     print("[*] \033[32mFound lua-cobalt binary!\033[0m")
     installable.append("cobalt23/lua-cobalt/lua-cobalt")
+if os.path.isfile(scriptPath + "/cobalt23/jit/host/minicobalt"):
+    print("[*] \033[32mFound minicobalt binary!\033[0m")
+    installable.append("cobalt23/jit/host/minicobalt")
+if os.path.isfile(scriptPath + "/cobalt23/pre/cobaltpre"):
+    print("[*] \033[32mFound cobalt preprocessor!\033[0m")
+    installable.append("cobalt23/pre/cobaltpre")
     
             ### Windows Specific ###
 if os.path.isfile(scriptPath + "/cobalt.exe"):
@@ -37,6 +43,12 @@ if os.path.isfile(scriptPath + "/cobaltjit.exe"):
 if os.path.isfile(scriptPath + "/cobalt23\\lua-cobalt\\lua-cobalt.exe"):
     print("[*] \033[32mFound lua-cobalt binary!\033[0m")
     installable.append("cobalt23\\lua-cobalt\\lua-cobalt.exe")
+if os.path.isfile(scriptPath + "/cobalt23/jit/host/minicobalt.exe"):
+    print("[*] \033[32mFound minicobalt binary!\033[0m")
+    installable.append("cobalt23/jit/host/minicobalt.exe")
+if os.path.isfile(scriptPath + "/cobalt23/pre/cobaltpre.exe"):
+    print("[*] \033[32mFound cobalt preprocessor!\033[0m")
+    installable.append("cobalt23/pre/cobaltpre.exe")
     
 
 # Get the install path based on the users operating systems $PATH/%PATH%/etc. 

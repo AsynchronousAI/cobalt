@@ -5,7 +5,23 @@
 // #elif is not supported, use #else #if instead
 // #ifdef and #ifndef are not supported, use #if (defined()) and #if (!defined()) instead
 // #line is not supported
+/*
+#include "file.cobalt" // Looks for file.cobalt in package.searchers
+// Replaces that line with the contents of file.cobalt
 
+#define PI 3.14 // Sets PI to 3.14
+
+#if defined("__APPLE__")
+// Maybe put some cross platform Mac code here
+#endif
+#if defined(_WIN32)
+// Maybe put some cross platform Windows code here
+#endif
+
+for (i = 1, PI*100){
+    print(i/100)
+}
+*/
 switch = import("switch") // Switch library for cobalt
 
 function process(str){

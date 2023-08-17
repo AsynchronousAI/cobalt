@@ -1593,32 +1593,21 @@ static int str_replace (lua_State *L) {
 }
 
 static int str_split(lua_State *L) {
-  const char *str = luaL_checkstring(L, 1);
-  const char *sep = luaL_checkstring(L, 2);
-  luaL_checktype(L, 3, LUA_TTABLE);
-  int i = 1;
-
-  while (*str) {
-    int j = 0;
-    const char *p = str;
-    while (*p && *sep && *p == *sep) {
-      p++;
-      sep++;
-      j++;
+    const char *str1 = luaL_checkstring(L, 1);
+    const char *str2 = luaL_checkstring(L, 2);
+    const char *delim = str2;
+    char *token, *str1_copy, *saveptr;
+    lua_newtable(L);
+    int i = 1;
+    str1_copy = strdup(str1);
+    token = strtok_r(str1_copy, delim, &saveptr);
+    while (token != NULL) {
+        lua_pushstring(L, token);
+        lua_rawseti(L, -2, i++);
+        token = strtok_r(NULL, delim, &saveptr);
     }
-    if (*sep == '\0') {
-      lua_pushinteger(L, i++);
-      lua_pushlstring(L, str, p - str - j);
-      lua_settable(L, 3);
-      str = p;
-      sep = luaL_checkstring(L, 2);
-    } else {
-      sep = luaL_checkstring(L, 2);
-      str++;
-    }
-  }
-
-  return 0;
+    free(str1_copy);
+    return 1;
 }
 
 static const luaL_Reg strlib[] = {

@@ -509,7 +509,24 @@ LJLIB_CF(string_match)
 {
   return str_find_aux(L, 0);
 }
-
+LJLIB_CF(string_split)
+{
+    const char *str1 = luaL_checkstring(L, 1);
+    const char *str2 = luaL_checkstring(L, 2);
+    const char *delim = str2;
+    char *token, *str1_copy, *saveptr;
+    lua_newtable(L);
+    int i = 1;
+    str1_copy = strdup(str1);
+    token = strtok_r(str1_copy, delim, &saveptr);
+    while (token != NULL) {
+        lua_pushstring(L, token);
+        lua_rawseti(L, -2, i++);
+        token = strtok_r(NULL, delim, &saveptr);
+    }
+    free(str1_copy);
+    return 1;
+}
 LJLIB_NOREG LJLIB_CF(string_gmatch_aux)
 {
   const char *p = strVdata(lj_lib_upvalue(L, 2));

@@ -26,9 +26,36 @@ function process(str){
     }
     
     // 3: Execute preprocess lines
+    var env = {
+        "cobalt": true, 
+        "cobaltversion": "23",
+    }
     var newlines = lines
     var activeifs = []
     var run = true
+    function table_to_string(tbl){
+        var str = "{"
+        for (k, v in pairs(tbl)) {
+            if (type(k) == "number") {
+                str = str .. v .. ","
+            }else if (type(k) == "string") {
+                str = str .. '"' .. k .. '": ' .. tostring(v) .. ","
+            }
+        }
+        str = str .. "}"
+        return str
+    }
+    function envload(str){
+        return loadstring([[function defined(val){
+            // check if it is in env, if it return the value
+            env = ]]..table_to_string(env)..[[;
+            if (env[val] != null) {
+                return env[val]
+            }
+        }
+        
+        ]]..str)
+    }
     for (i, v in pairs(lines)) {
         // Check if i is v[1] for one of the preprocess lines
         var found = false
@@ -57,6 +84,18 @@ function process(str){
             os.exit()
         }
         switch(v[2]->match("%S+"), {
+            "#define": function(){
+                // split v[2] by spaces
+                var split = v[2]->split(" ")
+                // 1: Get the name
+                var name = split[2]
+                // 2: Get the value
+                var value = envload("return "..split[3] || "false")()
+                // 3: Set the value in the env
+                env[name] = value
+                // 4: Remove the line
+                newlines[v[1]] = ""
+            },
             "#include": function(){
                 var file = v[2]->gsub("#include \"", "")
                 // File should be a string that ends with " and may have stuff after the "
@@ -115,7 +154,7 @@ function process(str){
                 }
                 // 2: Evaluate the condition
                 var success, result = xpcall(function(){
-                    return (loadstring("return "..condition) || errorpreprocessor("Failed to load preprocessor condition"))()
+                    return (envload("return "..condition) || errorpreprocessor("Failed to load preprocessor condition"))()
                 }, function(err){
                     errorpreprocessor(err)
                 })
@@ -146,7 +185,7 @@ function process(str){
                 // Execute everything past the # as a cobalt line
                 var code = v[2]->sub(2, #v[2])
                 var success, result = xpcall(function(){
-                    return (loadstring(code) || errorpreprocessor("Failed to load preprocessor command"))()
+                    return (envload(code) || errorpreprocessor("Failed to load preprocessor command"))()
                 }, function(err){
                     errorpreprocessor(err)
                 })
@@ -174,6 +213,5 @@ function process(str){
     newlines = null
     return joined
 }
-
 
 return process

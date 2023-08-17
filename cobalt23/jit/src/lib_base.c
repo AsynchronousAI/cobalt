@@ -731,6 +731,52 @@ LJLIB_CF(range) {
 
   return 1;
 }
+LJLIB_CF(sizeof) {
+  // Like C sizeof, but for Lua
+  // sizeof(x) returns the size of x in bytes
+  // sizeof(x, y, z) returns the sum of the sizes of x, y, and z in bytes
+  int nargs = lua_gettop(L);
+  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
+  size_t size = 0;
+
+  for (int i = 1; i <= nargs; i++) {
+    int type = lua_type(L, i);
+
+    switch (type) {
+      case LUA_TNIL:
+        size += sizeof(void *);
+        break;
+      case LUA_TNUMBER:
+        size += sizeof(lua_Number);
+        break;
+      case LUA_TBOOLEAN:
+        size += sizeof(int);
+        break;
+      case LUA_TSTRING:
+        size += sizeof(luaL_Buffer);
+        break;
+      case LUA_TTABLE:
+        size += sizeof(luaL_Buffer);
+        break;
+      case LUA_TFUNCTION:
+        size += sizeof(luaL_Buffer);
+        break;
+      case LUA_TUSERDATA:
+        size += sizeof(luaL_Buffer);
+        break;
+      case LUA_TTHREAD:
+        size += sizeof(luaL_Buffer);
+        break;
+      case LUA_TLIGHTUSERDATA:
+        size += sizeof(luaL_Buffer);
+        break;
+      default:
+        return luaL_error(L, "invalid type");
+    }
+  }
+  return 1;
+}
+
 LJLIB_CF(enum) {
     const char *name = luaL_checkstring(L, 1);
     luaL_checktype(L, 2, LUA_TTABLE);

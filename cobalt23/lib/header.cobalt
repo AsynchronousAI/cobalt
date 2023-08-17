@@ -1,0 +1,4 @@
+// Example cobalt header for testing
+// the cobalt preprocessor
+
+#include "cobalt.h" // This is a 

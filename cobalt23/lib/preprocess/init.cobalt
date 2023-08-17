@@ -1,0 +1,115 @@
+switch = import("switch") // Switch library for cobalt
+
+function process(str){
+    // 1: Split lines
+    var lines = []
+    for (line in str->gmatch("[^\r\n]+")) {
+        lines[#lines + 1] = line
+    }
+    
+    // 2: Look for preprocess lines
+    var preprocess = []
+    for (i, v in pairs(lines)) {
+        var first = v->sub(1, 1) 
+        var char = 1
+
+        while (first == " " || first == "\t") {
+            char++;
+            first = v->sub(char, char)
+        }
+
+        if (first == "#") {
+            v = v->sub(char, #v)
+        
+            table.insert(preprocess, [i, v])
+        }
+    }
+    
+    // 3: Execute preprocess lines
+    var newlines = lines
+    for (i, v in pairs(preprocess)) {
+        // Get the first word of the line
+        function errorpreprocessor(error){
+            print("\27[1;31mPreprocessor error:\27[0m")
+            print("\27[1;31mError with the '"..v[2].."' preprocessor command.\27[0m\n\n")
+            if (error) {
+                print("\27[1;31m"..error.."\27[0m\n\n")
+            }
+            print("\27[1;31mStopping preprocessor.\27[0m")
+            os.exit()
+        }
+        switch(v[2]->match("%S+"), {
+            "#include": function(){
+                var file = v[2]->gsub("#include \"", "")
+                // File should be a string that ends with " and may have stuff after the "
+                // Remove the last " and only keep everything before it
+                for (i = 1, #file) {
+                    var v = file->sub(i, i)
+                    if (v == "\"") {
+                        file = file->sub(1, i - 1)
+                        break;
+                    }
+                }
+
+                var f;
+                for (i, v in pairs(package.searchers)){
+                    if (#table.pack(v(file)) == 2 &&  table.pack(v(file))[1] != null) {
+                        f = table.pack(v(file));
+                        break;
+                    }
+                }
+                if (!f) {
+                    errorpreprocessor("File '"..file.."' not found")
+                }
+                file = io.open(f[2])
+                var content = file->read("*all")
+                file->close()
+                
+                // Set i line number to r(content)
+    
+                newlines[v[1]] = process(content)
+
+                // Avoid memory leaks
+                file = null
+                content = null
+                f = null
+            },
+            "default": function(value){
+                // Execute everything past the # as a cobalt line
+                var code = v[2]->sub(2, #v[2])
+                var success, result = xpcall(function(){
+                    return (loadstring(code) || errorpreprocessor("Failed to load preprocessor command"))()
+                }, function(err){
+                    errorpreprocessor(err)
+                })
+                if (!success) {
+                    errorpreprocessor(result)
+                }else {
+                    newlines[v[1]] = result
+                }
+            }
+        })
+        // Remove line from newlines
+    }
+
+    // 4: Join newlines and return
+    lines = null
+    preprocess = null
+    str = null
+    var joined = ""
+    for (i, v in pairs(newlines)) {
+        joined = joined..v.."\n"
+    }
+    newlines = null
+    return joined
+}
+
+print(process([[
+#include "switch" // Comment
+for (i, v in pairs({1, 2, 3})) {
+    #if (true){ print("Hello") }
+    print(v)
+}
+]]))
+
+return process

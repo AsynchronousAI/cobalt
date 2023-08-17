@@ -1,0 +1,45 @@
+// Switch library for cobalt
+/*
+    switch(x, {
+        1: function(){
+            // Will execute if x is one
+        },
+        2: "two", // Will print "two" if x is two
+        3: function(){
+            // Will execute if x is three
+        },
+        "a": function(value){
+            // Will execute if x is "a"
+            // Value will be "a"
+        }
+        "default": function(value){ // Default can also be a string
+            // Will execute if x is not one, two or three
+        }
+    })
+*/
+
+return function(value, cases){
+    if (type(cases) != "table"){
+        error("Switch expects a table as the second argument")
+    }
+    
+    if(cases[value]){
+        if (type(cases[value]) == "string"){
+            print(cases[value])
+            return
+        } else {
+            cases[value](value)
+            return
+        }
+    }
+    if(cases["default"]){
+        if (type(cases["default"]) == "string"){
+            print(cases["default"])
+            return
+        } else {
+            cases["default"](value)
+            return
+        }
+    }
+    warn("Switch cannot find a case for " .. tostring(value) .. " and no default case was provided")
+}

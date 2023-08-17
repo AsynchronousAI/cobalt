@@ -20,13 +20,13 @@ Engine = {
     "data": {}
 }
 {
-    function Engine::init(this){
+    function Engine::init(){
         for (i = 1, size.X){
             this.data[i] = 0
         }
 
     }
-    function Engine::add(this, x){
+    function Engine::add(x){
         // Renders a new snow particle and animates it falling down and then adds it to the data table
         this.data[x] += 1
 

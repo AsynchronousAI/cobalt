@@ -27,7 +27,25 @@ function process(str){
     
     // 3: Execute preprocess lines
     var newlines = lines
-    for (i, v in pairs(preprocess)) {
+    var activeifs = []
+    var run = true
+    for (i, v in pairs(lines)) {
+        // Check if i is v[1] for one of the preprocess lines
+        var found = false
+        for (i2, v2 in pairs(preprocess)) {
+            if (v2[1] == i) {
+                v = v2
+                found = true
+                break;
+            }
+        }
+        if (!found) {
+            if (!run) {
+                newlines[i] = ""
+            }
+            continue;
+        }
+
         // Get the first word of the line
         function errorpreprocessor(error){
             print("\27[1;31mPreprocessor error:\27[0m")
@@ -74,7 +92,57 @@ function process(str){
                 content = null
                 f = null
             },
+            "#if": function(){
+                // Example:
+                // #if (true)
+                
+                // 1: Get the condition, Everything in between the ()
+                var condition = v[2]->gsub("#if ", "")
+                /// Get everything in between the ()
+                for (i = 1, #condition) {
+                    var v = condition->sub(i, i)
+                    if (v == "(") {
+                        condition = condition->sub(i + 1, #condition)
+                        break;
+                    }
+                }
+                for (i = #condition, 1, -1) {
+                    var v = condition->sub(i, i)
+                    if (v == ")") {
+                        condition = condition->sub(1, i - 1)
+                        break;
+                    }
+                }
+                // 2: Evaluate the condition
+                var success, result = xpcall(function(){
+                    return (loadstring("return "..condition) || errorpreprocessor("Failed to load preprocessor condition"))()
+                }, function(err){
+                    errorpreprocessor(err)
+                })
+                if (!success) {
+                    errorpreprocessor(result)
+                }
+                // 3: Remove the line 
+                newlines[v[1]] = ""
+                table.insert(activeifs, result)
+
+                // 4: Remove all code if result is false until #endif or #else
+                run = result
+            },
+            "#else": function(){
+                run = !run
+                newlines[v[1]] = ""
+            },
+            "#endif": function(){
+                activeifs[#activeifs] = null
+                newlines[v[1]] = ""
+                run = true
+            },
             "default": function(value){
+                if (!run){
+                    newlines[v[1]] = ""
+                    return // Skip this line
+                }
                 // Execute everything past the # as a cobalt line
                 var code = v[2]->sub(2, #v[2])
                 var success, result = xpcall(function(){
@@ -93,6 +161,9 @@ function process(str){
     }
 
     // 4: Join newlines and return
+    if (#activeifs > 0) {
+        errorpreprocessor("Missing #endif(s)")
+    }
     lines = null
     preprocess = null
     str = null
@@ -104,12 +175,5 @@ function process(str){
     return joined
 }
 
-print(process([[
-#include "switch" // Comment
-for (i, v in pairs({1, 2, 3})) {
-    #if (true){ print("Hello") }
-    print(v)
-}
-]]))
 
 return process

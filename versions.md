@@ -20,25 +20,24 @@ Optional tool used for JIT compilation. It can be compiled using
 `make jit` command. 
 
 ## 24
-## cobalt-one
-> **Type:** (Optional Standalone executable compiler)
-> **Binary:** `cobalt-one`
-
-cobalt24 standalone executable compiler, only given to testers and developers. [beta page](https://cobaltlang.vercel.app/beta)
-## cobalt24
+### cobalt24
 > **Type:** (Beta Interpreter and Bytecoder)
 > **Binary:** `cobalt` `cobaltc`
 
 cobalt24, only given to testers and developers. [beta page](https://cobaltlang.vercel.app/beta)
 
-## cobaltjit
+### cobaltjit
 > **Type:** (Optional JIT Compiler)
 > **Binary:** `cobaltjit`
 
 cobalt24 JIT, only given to testers and developers. [beta page](https://cobaltlang.vercel.app/beta)
-
 ***
 # Other:
+### cobalt-one
+> **Type:** (Optional Standalone executable compiler)
+> **Binary:** `cobalt-one`
+
+cobalt24 standalone executable compiler. `make one`
 ## cobaltasm
 > **Type:** (Optional Assembler)
 
@@ -47,6 +46,14 @@ cobalt24 JIT, only given to testers and developers. [beta page](https://cobaltla
 asm combined to a binary, install using `make asm`.
 
 It converts assembly code to machine code is used by JIT, and based on DynASM.
+### cobaltpre
+> **Type:** (Optional Preprocessor)
+
+> **Binary:** `cobaltpre`
+
+Preprocessor for cobalt, it can be compiled using `make pre` command. It is
+optional and uses the `preprocess` cobalt library but as a CLI tool. It is
+written in cobalt.
 ## lua-cobalt 
 > **Type:** (Optional Lua to Cobalt transpiler) 
 

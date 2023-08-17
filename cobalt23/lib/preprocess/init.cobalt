@@ -1,3 +1,11 @@
+// Cobalt preprocessor
+// process(strcode) -> processed code
+// This is a very basic preprocessor, it only supports #define, #include, #if, #else, #endif, #undef, #error, #warning, #pragma
+// It supports built in macros in #define but not lambdas in #define
+// #elif is not supported, use #else #if instead
+// #ifdef and #ifndef are not supported, use #if (defined()) and #if (!defined()) instead
+// #line is not supported
+
 switch = import("switch") // Switch library for cobalt
 
 function process(str){
@@ -46,15 +54,22 @@ function process(str){
         return str
     }
     function envload(str){
-        return loadstring([[function defined(val){
-            // check if it is in env, if it return the value
+        return loadstring([[
+            // Cobalt execution environment
+            // Ignore.
             env = ]]..table_to_string(env)..[[;
-            if (env[val] != null) {
-                return env[val]
+            for (i, v in pairs(env)){
+                _ENV[i] = v
             }
-        }
-        
-        ]]..str)
+            core = import("core")
+            function defined(val){
+                // check if it is in env, if it return the value
+                if (env[val] != null) {
+                    return env[val]
+                }else{
+                    return core.macros(val)
+                }
+            }]]..str)
     }
     for (i, v in pairs(lines)) {
         // Check if i is v[1] for one of the preprocess lines
@@ -90,11 +105,18 @@ function process(str){
                 // 1: Get the name
                 var name = split[2]
                 // 2: Get the value
-                var value = envload("return "..split[3] || "false")()
+                var value 
+                var fun, err = envload("return "..split[3] || "false")
+                if (!fun){
+                    errorpreprocessor(err)
+                }else{
+                    value = fun()
+                }
                 // 3: Set the value in the env
                 env[name] = value
                 // 4: Remove the line
-                newlines[v[1]] = ""
+                newlines[v[1]] = "var "..name.." = "..value
+                return
             },
             "#include": function(){
                 var file = v[2]->gsub("#include \"", "")
@@ -154,7 +176,7 @@ function process(str){
                 }
                 // 2: Evaluate the condition
                 var success, result = xpcall(function(){
-                    return (envload("return "..condition) || errorpreprocessor("Failed to load preprocessor condition"))()
+                    return (envload("return "..condition) || errorpreprocessor("Failed to check condition"))()
                 }, function(err){
                     errorpreprocessor(err)
                 })
@@ -177,6 +199,32 @@ function process(str){
                 newlines[v[1]] = ""
                 run = true
             },
+            "#undef": function(){
+                // split v[2] by spaces
+                var split = v[2]->split(" ")
+                // 1: Get the name
+                var name = split[2]
+                // 2: Remove the value in the env
+                env[name] = null
+                // 3: Remove the line
+                newlines[v[1]] = ""
+            },
+            "#error": function(){
+                var error = v[2]->gsub("#error ", "")
+                print("\27[1;31mRaised error:\27[0m")
+                print("\27[1;31m"..error.."\27[0m\n\n")
+                os.exit()
+            },
+            "#warning": function(){
+                var warning = v[2]->gsub("#warning ", "")
+                warn(warning)
+                newlines[v[1]] = ""
+            },
+            "#pragma": function(){
+                var pragma = v[2]->gsub("#pragma ", "")
+                warn("Pragma: "..pragma)
+                newlines[v[1]] = ""
+            },
             "default": function(value){
                 if (!run){
                     newlines[v[1]] = ""
@@ -184,6 +232,7 @@ function process(str){
                 }
                 // Execute everything past the # as a cobalt line
                 var code = v[2]->sub(2, #v[2])
+                
                 var success, result = xpcall(function(){
                     return (envload(code) || errorpreprocessor("Failed to load preprocessor command"))()
                 }, function(err){
@@ -213,5 +262,4 @@ function process(str){
     newlines = null
     return joined
 }
-
 return process

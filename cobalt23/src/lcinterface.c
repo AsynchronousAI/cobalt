@@ -122,7 +122,7 @@ static int dumpmacros(lua_State* L){
     char* output = NULL;
     size_t output_len = 0;
 
-    fp = popen("gcc -dM -E - < /dev/null 2>/dev/null", "r");
+    fp = popen("gcc -dM -E - < /dev/null", "r");
     if (fp == NULL) {
       return NULL;
     }

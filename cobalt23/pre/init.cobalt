@@ -1,0 +1,10 @@
+// Very short CLI wrapper for the preprocessor
+// compile to executable using cobaltone
+
+
+preprocessor = import("preprocessor") 
+
+inputfile = arg[1]
+inputcontents = io.open(inputfile)->read("*all")
+
+io.write(preprocessor(inputcontents))

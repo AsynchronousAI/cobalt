@@ -267,37 +267,6 @@ for (i, v in ipairs(myArray)) {
 
 // Tables and Arrays are stores in "similar" fashions but are different.
 ```
-## new and types/typedef
-```js
-// new is kindof like Javascript's new keyword
-// It creates a new instance of a class or object. 
-
-// For example:
-var v = Vector3.new(1, 2, 3) // Creates a new Vector3 object with the values 1, 2, 3
-
-typedef("myType", {
-    // typedef doesnt do anything right now, it just makes it easier to create a new type
-    "x": 10,
-    "myFunc": function() {
-        print(this.x)
-    }
-
-    "\\new": function(z) { // I added the \\ to make it not a keyword, DO NOT PUT THE \\ IN REAL CODE
-        var new = this
-        new.z = z
-        return new // Duplicates itself and returns it
-    }
-})
-
-var t = myType.new(50) // Creates a new instance of myType
-t->myFunc() // -> 10
-// Using -> is like using : in Lua, it passes the `this` variable (self in Lua) to the function
-t.x = 20
-t.z = 50 // Since the second argument to new was 50, z is now 50 because of the __new method
-
-// All these changes will not affect the original type or any others made from it
-myType.x // -> 10 // When making a class, and using itself it will be read-only
-```
 ## goto
 ```js
 // NOTE: goto is not available in the JIT compiler.

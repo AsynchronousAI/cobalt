@@ -812,7 +812,6 @@ static int newenum(lua_State *L) {
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"sizeof", luaB_sizeof},
-  {"range", luaB_range},
   {"enum", newenum},
   //{"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},

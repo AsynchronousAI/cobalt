@@ -671,66 +671,6 @@ LJLIB_CF(mwait) {
   return 1;
 }
 /* -- Other functions ----------------------------------------------------- */
-LJLIB_CF(typedef){
-  // typedef(name, table)
-  // adds a new method to the table if it doesnt exist
-  // saves the table in the global namespace
-  // the new method returns an unlocked version of the table
-  // otherwise the table will be read-only
-  const char *name = luaL_checkstring(L, 1);
-  luaL_checktype(L, 2, LUA_TTABLE);
-
-  // Check that the name isnt already taken
-  lua_getglobal(L, name);
-  if (!lua_isnil(L, -1)) {
-    return luaL_error(L, "type name '%s' is already taken", name);
-  }
-  lua_pop(L, 1);
-  // Duplicate the inputted table and save it globally
-  lua_pushvalue(L, 2);
-  lua_setglobal(L, name);
-
-  return 1;
-}
-LJLIB_CF(range) {
-  // range(start, stop, step)
-  // returns a table of numbers from start to stop (inclusive) with step
-  // if step is not provided, it defaults to 1
-  int nargs = lua_gettop(L);
-  luaL_argcheck(L, nargs >= 2, 2, "expected at least 2 arguments");
-  luaL_argcheck(L, nargs <= 3, 3, "expected at most 3 arguments");
-
-  int start = luaL_checkinteger(L, 1);
-  int stop = luaL_checkinteger(L, 2);
-  int step = 1;
-
-  if (nargs >= 3) {
-    step = luaL_checkinteger(L, 3);
-    luaL_argcheck(L, step != 0, 3, "step cannot be zero");
-  }
-
-  if (start < 0) {
-    start = stop + start + 1;
-  }
-
-  if (stop < 0) {
-    stop = stop + stop + 1;
-  }
-
-  luaL_argcheck(L, start >= 1 && start <= stop, 1, "start index out of range");
-  luaL_argcheck(L, stop >= 1 && stop <= stop, 2, "stop index out of range");
-
-  lua_newtable(L);
-  int j = 1;
-
-  for (int i = start; i <= stop; i += step) {
-    lua_pushinteger(L, i);
-    lua_rawseti(L, -2, j);
-    j++;
-  }
-
-  return 1;
-}
 LJLIB_CF(sizeof) {
   // Like C sizeof, but for Lua
   // sizeof(x) returns the size of x in bytes

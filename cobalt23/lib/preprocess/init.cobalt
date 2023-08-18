@@ -3,9 +3,11 @@
 // and needs to be built using `make pre` and
 // used before compiling the source code
 
+// The preprocessor replaces preprocessor directives with
+// cobalt code depending on system and other factors
 
 /* Dependencies
-   // Switch
+   // Switch (Installed with `make setup`)
    // Preloaded libraries (You shouldnt need to import these as they are in the source code)
 */
 
@@ -103,6 +105,21 @@ function process(str, itemtype, out){
     }
     for (i, v in pairs(lines)) {
         // Check if i is v[1] for one of the preprocess lines
+        /// Go through every character, if a /* is found make incomment true, if a */ is found make incomment false
+        /// If incomment is true, remove the line
+        if (incomment) {
+            if (v->find("*/")) {
+                incomment = false
+            }
+            continue;
+        }
+        if (v->find("/*")) {
+            incomment = true
+            continue;
+        }
+        if (incomment) {
+            continue;
+        }
         var found = false
         for (i2, v2 in pairs(preprocess)) {
             if (v2[1] == i) {
@@ -457,6 +474,9 @@ function process(str, itemtype, out){
                 var warning = v[2]->gsub("#warning ", "")
                 warn(warning)
                 newlines[v[1]] = ""
+            },
+            "#pragma": function(){
+                errorpreprocessor("Pragma is not supported")
             },
             "default": function(value){
                 if (!run){

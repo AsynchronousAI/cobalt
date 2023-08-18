@@ -716,7 +716,6 @@ LJLIB_CF(sizeof) {
   }
   return 1;
 }
-
 LJLIB_CF(enum) {
     const char *name = luaL_checkstring(L, 1);
     luaL_checktype(L, 2, LUA_TTABLE);
@@ -731,6 +730,10 @@ LJLIB_CF(enum) {
     lua_newtable(L);
     lua_pushvalue(L, -1);
     lua_setglobal(L, name);
+
+    lua_pushstring(L, "Attempt to modify an immutable table");
+    lua_setfield(L, -2, "__newindex");
+    lua_setmetatable(L, -2);
     // Add the enum values
     lua_pushnil(L);
     while (lua_next(L, 2) != 0) {

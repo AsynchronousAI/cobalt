@@ -800,6 +800,10 @@ static int newenum(lua_State *L) {
     lua_newtable(L);
     lua_pushvalue(L, -1);
     lua_setglobal(L, name);
+
+    lua_pushstring(L, "Attempt to modify an immutable table");
+    lua_setfield(L, -2, "__newindex");
+    lua_setmetatable(L, -2);
     // Add the enum values
     lua_pushnil(L);
     while (lua_next(L, 2) != 0) {
@@ -809,11 +813,11 @@ static int newenum(lua_State *L) {
     }
     return 1;
 }
+
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"sizeof", luaB_sizeof},
   {"enum", newenum},
-  //{"slice", luaB_slice},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
   {"inputf", luaB_inputf},

@@ -26,7 +26,7 @@ static void PrintFunction(const Proto* f, int full);
 #define luaU_print	PrintFunction
 
 #define PROGNAME	"cobaltc"		/* default program name */
-#define OUTPUT		PROGNAME ".luabyte"	/* default output file */
+#define OUTPUT		PROGNAME ".byte"	/* default output file */
 #define ASMOUTPUT PROGNAME ".lasm"
 
 static int listing=0;			/* list bytecodes? */

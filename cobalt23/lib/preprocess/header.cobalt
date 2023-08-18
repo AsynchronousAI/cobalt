@@ -1,0 +1,4 @@
+function code(){
+    // This funciton can be #included
+    print("Hello World!")
+}

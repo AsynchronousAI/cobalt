@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(cobalt LANGUAGES C VERSION 23)
+project(cobalt LANGUAGES C VERSION 99)
 
 option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" OFF)
 option(LUA_BUILD_AS_CXX "Build cobalt as C++" OFF)
@@ -20,10 +20,10 @@ endif()
 
 if(TOP_LEVEL)
     option(LUA_BUILD_BINARY "Build cobalt binary" ON)
-    option(LUA_BUILD_COMPILER "Build luac compiler" ON)
+    option(LUA_BUILD_COMPILER "Build cobaltc compiler" ON)
 else()
     option(LUA_BUILD_BINARY "Build cobalt binary" OFF)
-    option(LUA_BUILD_COMPILER "Build luac compiler" ON)
+    option(LUA_BUILD_COMPILER "Build cobaltc compiler" ON)
 endif()
 
 add_subdirectory(cobalt23)

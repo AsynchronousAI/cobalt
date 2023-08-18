@@ -1,31 +1,44 @@
-// Cobalt preprocessor
-// process(strcode) -> processed code
-// This is a very basic preprocessor, it only supports #define, #include, #if, #else, #endif, #undef, #error, #warning, #pragma
-// It supports built in macros in #define but not lambdas in #define
-// #elif is not supported, use #else #if instead
-// #ifdef and #ifndef are not supported, use #if (defined()) and #if (!defined()) instead
-// #line is not supported
-/*
-#include "file.cobalt" // Looks for file.cobalt in package.searchers
-// Replaces that line with the contents of file.cobalt
+// Built in preprocessor for cobalt
+// The preprocesser is not apart of the compiler
+// and needs to be built using `make pre` and
+// used before compiling the source code
 
-#define PI 3.14 // Sets PI to 3.14
 
-#if defined("__APPLE__")
-// Maybe put some cross platform Mac code here
-#endif
-#if defined(_WIN32)
-// Maybe put some cross platform Windows code here
-#endif
-
-for (i = 1, PI*100){
-    print(i/100)
-}
+/* Dependencies
+   // Switch
+   // Preloaded libraries (You shouldnt need to import these as they are in the source code)
 */
+
+/* Supports
+    // #define (name) (value <optional>): Sets a macro
+    // #define (lambdaname)(args) (function): Sets a macro to a lambda function
+    // #undef (name): Removes a macro
+    // #ifdef (name): If macro is defined, Condition must be wrapped in ()
+    // #ifndef (name): If macro is not defined, Condition must be wrapped in ()
+    // #elif (name): Else if macro is defined, Condition must be wrapped in ()
+    // #else: Else, no condition
+    // #endif: End if
+    // #error (message): Raises an error
+    // #warning (message): Raises a warning
+    // #include "file.cobalt": Includes a file (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
+    // #line (line) "file.cobalt": Sets the line number and file name for the preprocessor (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
+
+
+    // Everything else that starts with a # will be executed as a cobalt source line
+    // C Macros are supported if GCC is installed, if not, they will be ignored.
+    // cobalt and cobaltversion are included macros
+*/
+
 switch = import("switch") // Switch library for cobalt
 
-function process(str){
+function process(str, itemtype, out){
     // 1: Split lines
+    if (itemtype == "file") {
+        var file = io.open(str)
+        str = file->read("*all")
+        file->close()
+    }
+
     var lines = []
     for (line in str->gmatch("[^\r\n]+")) {
         lines[#lines + 1] = line
@@ -53,27 +66,28 @@ function process(str){
     var env = {
         "cobalt": true, 
         "cobaltversion": "23",
+        "edition": "standard"
     }
     var newlines = lines
     var activeifs = []
     var run = true
-    function table_to_string(tbl){
-        var str = "{"
-        for (k, v in pairs(tbl)) {
+    var incomment = false
+
+    function envload(str){
+        var tbld = "{"
+        for (k, v in pairs(env)) {
             if (type(k) == "number") {
-                str = str .. v .. ","
+                tbld = tbld .. v .. ","
             }else if (type(k) == "string") {
-                str = str .. '"' .. k .. '": ' .. tostring(v) .. ","
+                tbld = tbld .. '"' .. k .. '": ' .. tostring(v) .. ","
             }
         }
-        str = str .. "}"
-        return str
-    }
-    function envload(str){
+        tbld = tbld .. "}"
+
         return loadstring([[
             // Cobalt execution environment
             // Ignore.
-            env = ]]..table_to_string(env)..[[;
+            env = ]]..tbld..[[;
             for (i, v in pairs(env)){
                 _ENV[i] = v
             }
@@ -114,28 +128,110 @@ function process(str){
             print("\27[1;31mStopping preprocessor.\27[0m")
             os.exit()
         }
+
+        // If the second character is a !, ignore the line
+        if (v[2]->sub(2, 2) == "!") {
+            newlines[v[1]] = ""
+            return // Skip this line
+        }
+
         switch(v[2]->match("%S+"), {
             "#define": function(){
                 // split v[2] by spaces
                 var split = v[2]->split(" ")
                 // 1: Get the name
                 var name = split[2]
-                // 2: Get the value
-                var value 
-                var fun, err = envload("return "..split[3] || "false")
-                if (!fun){
-                    errorpreprocessor(err)
+                if (string.sub(name, -1) == ")"){
+                    // Example:
+                    // #define RADTODEG(rad) (rad * 180 / PI)
+                    // should become
+                    // var RADTODEG = function(rad){ return (rad * 180 / PI)}
+
+                    // 1: Get the name
+                    var values = string.split(v[2], " ")
+                    var defname = values[2]->split("(")[1]
+                    var args = values[2]->split("(")[2]->gsub("%)", "")->split(",")
+                    var func = values[3]
+                    for (i = 4, #values) {
+                        func = func.." "..values[i]
+                    }
+                    for (i, v in pairs(args)){
+                        args[i] = v->gsub(" ", "")
+                    }
+
+                    var funcdef = "function("..table.concat(args, ",").."){ return "..func.."; }"
+                    var valdef = "var "..defname.." = "..funcdef
+
+                    // 2: Set values
+                    newlines[v[1]] = valdef
+                    env[name] = funcdef
+
+                    // 3: Clear memory
+                    values, defname, funcdef, valdef, args, func = null
                 }else{
-                    value = fun()
+                    // 2: Get the value
+                    var value 
+                    var fun, err = envload("return "..split[3] || "false")
+                    if (!fun){
+                        errorpreprocessor(err)
+                    }else{
+                        value = fun()
+                    }
+                    // 3: Set the value in the env
+                    env[name] = value
+                    // 4: Remove the line
+                    newlines[v[1]] = "var "..name.." = "..value
+                    return
                 }
-                // 3: Set the value in the env
-                env[name] = value
-                // 4: Remove the line
-                newlines[v[1]] = "var "..name.." = "..value
-                return
+            },
+            "#line": function(){
+                // Example:
+                // #line 1 "file.cobalt"
+                // Will add everything after that line in that file to the newlines[i] table
+                // "file.cobalt" if it is not provided it is the current file
+                // 1 is the line number
+                var split = v[2]->split(" ")
+                var line = split[2]
+                var file = string.sub(split[3], 2, -2)
+                if (!file) {
+                    file = debug.getinfo(1, "S").source->sub(2)
+                }
+                var f = io.open(file)
+                if (!f) {
+                    var script_path = debug.getinfo(1, "S").source->sub(2)
+                    var script_dir = script_path->match("(.*/)")
+                    if (script_dir == null) {
+                        script_dir = "./"
+                    }
+
+                    f = (io.open(script_dir..file))
+                    if (!f) {
+                        print(io.open(script_dir..file))
+                        errorpreprocessor("File '"..file.."' not found")
+                    }
+                }
+                var content = f->read("*all")
+                f->close()
+                // Set i line number to r(content)
+                content = process(content, null, null)
+                // Split content to everything after tonumber(line)
+                split = content->split("\n")
+                var newcontent = ""
+                for (i = tonumber(line), #split) {
+                    newcontent = newcontent..split[i].."\n"
+                }
+                newlines[v[1]] = newcontent
+
+                // Avoid memory leaks
+                f = null
+                content = null
+                newcontent = null
+                split = null
+                file, line = null
             },
             "#include": function(){
                 var file = v[2]->gsub("#include \"", "")
+                var ogfile = file
                 // File should be a string that ends with " and may have stuff after the "
                 // Remove the last " and only keep everything before it
                 for (i = 1, #file) {
@@ -154,16 +250,28 @@ function process(str){
                     }
                 }
                 if (!f) {
-                    errorpreprocessor("File '"..file.."' not found")
+                    var script_path = debug.getinfo(1, "S").source->sub(2)
+                    var script_dir = script_path->match("(.*/)")
+                    if (script_dir == null) {
+                        script_dir = "./"
+                    }
+
+                    f = (io.open(script_dir..file))
+                    if (!f) {
+                        errorpreprocessor("File '"..file.."' not found")
+                    }
                 }
-                file = io.open(f[2])
+                if (type(f)=="string"){
+                    file = io.open(f[2])
+                }else{
+                    file = f
+                }
                 var content = file->read("*all")
                 file->close()
                 
                 // Set i line number to r(content)
     
-                newlines[v[1]] = process(content)
-
+                newlines[v[1]], newincludes = process(content, null, null)
                 // Avoid memory leaks
                 file = null
                 content = null
@@ -192,7 +300,121 @@ function process(str){
                 }
                 // 2: Evaluate the condition
                 var success, result = xpcall(function(){
-                    return (envload("return "..condition) || errorpreprocessor("Failed to check condition"))()
+                    return (envload("return "..condition) || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
+                }, function(err){
+                    errorpreprocessor(err)
+                })
+                if (!success) {
+                    errorpreprocessor(result)
+                }
+                // 3: Remove the line 
+                newlines[v[1]] = ""
+                table.insert(activeifs, result)
+
+                // 4: Remove all code if result is false until #endif or #else
+                run = result
+            },
+            "#ifdef": function(){
+                // Example:
+                // #ifdef (__APPLE__)
+                
+                // 1: Get the condition, Everything in between the ()
+                var condition = v[2]->gsub("#if ", "")
+                /// Get everything in between the ()
+                for (i = 1, #condition) {
+                    var v = condition->sub(i, i)
+                    if (v == "(") {
+                        condition = condition->sub(i + 1, #condition)
+                        break;
+                    }
+                }
+                for (i = #condition, 1, -1) {
+                    var v = condition->sub(i, i)
+                    if (v == ")") {
+                        condition = condition->sub(1, i - 1)
+                        break;
+                    }
+                }
+                // 2: Evaluate the condition
+                var success, result = xpcall(function(){
+                    return (envload("return defined(\""..condition.."\")") || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
+                }, function(err){
+                    errorpreprocessor(err)
+                })
+                if (!success) {
+                    errorpreprocessor(result)
+                }
+                // 3: Remove the line 
+                newlines[v[1]] = ""
+                table.insert(activeifs, result)
+
+                // 4: Remove all code if result is false until #endif or #else
+                run = result
+            },
+            "#ifndef": function(){
+                // Example:
+                // #ifdef (__APPLE__)
+                
+                // 1: Get the condition, Everything in between the ()
+                var condition = v[2]->gsub("#if ", "")
+                /// Get everything in between the ()
+                for (i = 1, #condition) {
+                    var v = condition->sub(i, i)
+                    if (v == "(") {
+                        condition = condition->sub(i + 1, #condition)
+                        break;
+                    }
+                }
+                for (i = #condition, 1, -1) {
+                    var v = condition->sub(i, i)
+                    if (v == ")") {
+                        condition = condition->sub(1, i - 1)
+                        break;
+                    }
+                }
+                // 2: Evaluate the condition
+                var success, result = xpcall(function(){
+                    return (envload("return !defined(\""..condition.."\")") || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
+                }, function(err){
+                    errorpreprocessor(err)
+                })
+                if (!success) {
+                    errorpreprocessor(result)
+                }
+                // 3: Remove the line 
+                newlines[v[1]] = ""
+                table.insert(activeifs, result)
+
+                // 4: Remove all code if result is false until #endif or #else
+                run = result
+            },
+            "#elif": function(){
+                // Example:
+                // #elif (true)
+                if (run) {
+                    newlines[v[1]] = ""
+                    return // Skip this line
+                }
+                // 1: Get the condition, Everything in between the ()
+                var condition = v[2]->gsub("#elif ", "")
+                /// Get everything in between the ()
+                for (i = 1, #condition) {
+                    var v = condition->sub(i, i)
+                    if (v == "(") {
+                        condition = condition->sub(i + 1, #condition)
+                        break;
+                    }
+                }
+                for (i = #condition, 1, -1) {
+                    var v = condition->sub(i, i)
+                    if (v == ")") {
+                        condition = condition->sub(1, i - 1)
+                        break;
+                    }
+                }
+                // 2: Evaluate the condition
+                var success, result = xpcall(function(){
+                    return (envload("return "..condition) || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
                 }, function(err){
                     errorpreprocessor(err)
                 })
@@ -236,22 +458,12 @@ function process(str){
                 warn(warning)
                 newlines[v[1]] = ""
             },
-            "#pragma": function(){
-                var pragma = v[2]->gsub("#pragma ", "")
-                warn("Pragma: "..pragma)
-                newlines[v[1]] = ""
-            },
             "default": function(value){
                 if (!run){
                     newlines[v[1]] = ""
                     return // Skip this line
                 }
-                // If the second character is a !, ignore the line
-                if (v[2]->sub(1, 1) == "!") {
-                    newlines[v[1]] = ""
-                    return // Skip this line
-                }
-                
+
                 // Execute everything past the # as a cobalt line
                 var code = v[2]->sub(2, #v[2])
                 
@@ -282,6 +494,29 @@ function process(str){
         joined = joined..v.."\n"
     }
     newlines = null
+    if (out){
+        print(joined)
+    }
     return joined
 }
+process([[
+    // Preprocessor test
+    #include "header.cobalt"
+
+    #line 1 "header.cobalt"
+
+    #define PI 3.14
+    #define RADTODEG(rad) (rad * 180 / PI)
+
+    #ifdef (_WIN32)
+        print("Windows macro")
+    #elif (defined("__APPLE__"))
+        print("Mac macro")
+    #else
+        print("None of the above")
+    #endif
+    for (i = 1, PI*100){
+        print(i/100)
+    }
+]], null, true)
 return process

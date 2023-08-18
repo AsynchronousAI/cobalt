@@ -1,6 +1,6 @@
 # cobalt23/pre
 Preprocessor for cobalt, it can be compiled using `make pre` command. It is optional but highly
-recommended to use it. Written fully in cobalt and uses jit to compile.
+recommended to use it. Written fully in cobalt and uses the -e option for a CLI interface.
 
 ## Build
 - Make build files: `cmake .`

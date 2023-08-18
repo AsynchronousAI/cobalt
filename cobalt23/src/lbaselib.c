@@ -813,10 +813,24 @@ static int newenum(lua_State *L) {
     }
     return 1;
 }
+static int luaB_readOnly(lua_State *L) {
+    luaL_checktype(L, 1, LUA_TTABLE);
+    lua_newtable(L);
+    lua_pushvalue(L, 1);
+    lua_setfield(L, -2, "__index");
+    lua_pushcclosure(L, readOnly_newindex, 0);
+    lua_setfield(L, -2, "__newindex");
+    lua_setmetatable(L, -2);
+    return 1;
+}
 
+static int readOnly_newindex(lua_State *L) {
+    return luaL_error(L, "attempt to update a read-only table");
+}
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"sizeof", luaB_sizeof},
+  {"const", luaB_readOnly},
   {"enum", newenum},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},

@@ -1,0 +1,340 @@
+var LineScanner = {};
+LineScanner.__index = LineScanner;
+
+function LineScanner::new() {
+   return setmetatable({
+      first = true,
+      comment = false,
+      after_function = false,
+      enabled = true
+   }, this);
+}
+
+// Raw version of string.gsub
+var function replace(s, old, new) {
+   old = old->gsub("%p", "%%%0");
+   new = new->gsub("%%", "%%%%");
+   return (s->gsub(old, new));
+}
+
+var fixups = {
+   { "=", " ?= ?" }, // '=' may be surrounded by spaces
+   { "(", " ?%( ?" }, // '(' may be surrounded by spaces
+   { ")", " ?%) ?" }, // ')' may be surrounded by spaces
+   { "<FULLID>", "x ?[%[%.]? ?[ntfx0']* ?%]?" }, // identifier, possibly indexed once
+   { "<IDS>", "x ?, ?x[x, ]*" }, // at least two comma-separated identifiers
+   { "<FIELDNAME>", "%[? ?[ntfx0']+ ?%]?" }, // field, possibly like ["this"]
+   { "<PARENS>", "[ %(]*" }, // optional opening parentheses
+};
+
+// Utility function to make patterns more readable
+var function fixup(pat) {
+   for( _, fixup_pair in ipairs(fixups) ) {
+      pat = replace(pat, fixup_pair[1], fixup_pair[2]);
+   }
+
+   return pat;
+}
+
+//- Lines that are always excluded from accounting
+var any_hits_exclusions = {
+   "", // Empty line
+   "end[,; %)]*", // Single "end"
+   "else", // Single "else"
+   "repeat", // Single "repeat"
+   "do", // Single "do"
+   "if", // Single "if"
+   "then", // Single "then"
+   "while t do", // "while true do" generates no code
+   "if t then", // "if true then" generates no code
+   "local x", // "local var"
+   fixup ("local x="), // "local var ="
+   fixup ("local <IDS>"), // "local var1, ..., varN"
+   fixup ("local <IDS>="), // "local var1, ..., varN ="
+   "local function x", // "local function f (arg1, ..., argN)"
+};
+
+//- Lines that are only excluded from accounting when they have 0 hits
+var zero_hits_exclusions = {
+   "[ntfx0',= ]+,", // "var1 var2," multi columns table stuff
+   "{ ?} ?,", // Empty table before comma leaves no trace in tables and calls
+   fixup ("<FIELDNAME>=.+[,;]"), // "[123] = 23," "['foo'] = "asd","
+   fixup ("<FIELDNAME>=function"), // "[123] = function(...)"
+   fixup ("<FIELDNAME>=<PARENS>'"), // "[123] = [[", possibly with opening parens
+   "return function", // "return function(arg1, ..., argN)"
+   "function", // "function(arg1, ..., argN)"
+   "[ntfx0]", // Single token expressions leave no trace in tables, function calls and sometimes assignments
+   "''", // Same for strings
+   "{ ?}", // Same for empty tables
+   fixup ("<FULLID>"), // Same for local variables indexed once
+   fixup ("local x=function"), // "local a = function(arg1, ..., argN)"
+   fixup ("local x=<PARENS>'"), // "local a = [[", possibly with opening parens
+   fixup ("local x=(<PARENS>"), // "local a = (", possibly with several parens
+   fixup ("local <IDS>=(<PARENS>"), // "local a, b = (", possibly with several parens
+   fixup ("local x=n"), // "local a = nil; local b = nil" produces no trace for the second statement
+   fixup ("<FULLID>=<PARENS>'"), // "a.b = [[", possibly with opening parens
+   fixup ("<FULLID>=function"), // "a = function(arg1, ..., argN)"
+   "} ?,", // "}," generates no trace if the table ends with a key-value pair
+   "} ?, ?function", // same with "}, function(...)"
+   "break", // "break" generates no trace in Lua 5.2+
+   "{", // "{" opening table
+   "}?[ %)]*", // optional closing paren, possibly with several closing parens
+   "[ntf0']+ ?}[ %)]*", // a constant at the end of a table, possibly with closing parens (for LuaJIT)
+   "goto [%w_]+", // goto statements
+   "::[%w_]+::", // labels
+};
+
+var function excluded(exclusions, line) {
+   for( _, e in ipairs(exclusions) ) {
+      if( line->match("^ *"..e.." *$") ) {
+         return true;
+      }
+   }
+
+   return false;
+}
+
+function LineScanner::find(pattern) {
+   return this.line->find(pattern, this.i);
+}
+
+// Skips string literal with quote stored as self.quote.
+// @return boolean indicating success.
+function LineScanner::skip_string() {
+   // Look for closing quote, possibly after even number of backslashes.
+   var _, quote_i = this->find("^(\\*)%1"..this.quote);
+   if( ! quote_i ) {
+      _, quote_i = this->find("[^\\](\\*)%1"..this.quote);
+   }
+
+   if( quote_i ) {
+      this.i = quote_i + 1;
+      this.quote = null;
+      table.insert(this.simple_line_buffer, "'");
+      return true;
+   } else {
+      return false;
+   }
+}
+
+// Skips long string literal with equal signs stored as self.equals.
+// @return boolean indicating success.
+function LineScanner::skip_long_string() {
+   var _, bracket_i = this->find("%]"..this.equals.."%]");
+
+   if( bracket_i ) {
+      this.i = bracket_i + 1;
+      this.equals = null;
+
+      if( this.comment ) {
+         this.comment = false;
+      } else {
+         table.insert(this.simple_line_buffer, "'");
+      }
+
+      return true;
+   } else {
+      return false;
+   }
+}
+
+// Skips function arguments.
+// @return boolean indicating success.
+function LineScanner::skip_args() {
+   var _, paren_i = this->find("%)");
+
+   if( paren_i ) {
+      this.i = paren_i + 1;
+      this.args = null;
+      return true;
+   } else {
+      return false;
+   }
+}
+
+function LineScanner::skip_whitespace() {
+   var next_i = this->find("%S") || #this.line + 1;
+
+   if( next_i != this.i ) {
+      this.i = next_i;
+      table.insert(this.simple_line_buffer, " ");
+   }
+}
+
+function LineScanner::skip_number() {
+   if( this->find("^0[xX]") ) {
+      this.i = this.i + 2;
+   }
+
+   var _;
+   _, _, this.i = this->find("^[%x%.]*()");
+
+   if( this->find("^[eEpP][%+%-]") ) {
+      // Skip exponent, too.
+      this.i = this.i + 2;
+      _, _, this.i = this->find("^[%x%.]*()");
+   }
+
+   // Skip LuaJIT number suffixes (i, ll, ull).
+   _, _, this.i = this->find("^[iull]*()");
+   table.insert(this.simple_line_buffer, "0");
+}
+
+var keywords = {["nil"] = "n", ["true"] = "t", ["false"] = "f"};
+
+for( _, keyword in ipairs({
+      "and", "break", "do", "else", "elseif", "end", "for", "function", "goto", "if",
+      "in", "local", "not", "or", "repeat", "return", "then", "until", "while"}) ) {
+   keywords[keyword] = keyword;
+}
+
+function LineScanner::skip_name() {
+   // It is guaranteed that the first character matches "%a_".
+   var _, _, name = this->find("^([%w_]*)");
+   this.i = this.i + #name;
+
+   if( keywords[name] ) {
+      name = keywords[name];
+   } else {
+      name = "x";
+   }
+
+   table.insert(this.simple_line_buffer, name);
+
+   if( name == "function" ) {
+      // This flag indicates that the next pair of parentheses (function args) must be skipped.
+      this.after_function = true;
+   }
+}
+
+// Source lines can be explicitly ignored using `enable` and `disable` inline options.
+// An inline option is a simple comment: `-- luacov: enable` or `-- luacov: disable`.
+// Inline option parsing is not whitespace sensitive.
+// All lines starting from a line containing `disable` option and up to a line containing `enable`
+// option (or end of file) are excluded.
+
+function LineScanner::check_inline_options(comment_body) {
+   if( comment_body->find("^%s*luacov:%s*enable%s*$") ) {
+      this.enabled = true;
+   } else if( comment_body->find("^%s*luacov:%s*disable%s*$") ) {
+      this.enabled = false;
+   }
+}
+
+// Consumes and analyzes a line.
+// @return boolean indicating whether line must be excluded.
+// @return boolean indicating whether line must be excluded if not hit.
+function LineScanner::consume(line) {
+   if( this.first ) {
+      this.first = false;
+
+      if( line->match("^#!") ) {
+         // Ignore Unix hash-bang magic line.
+         return true, true;
+      }
+   }
+
+   this.line = line;
+   // As scanner goes through the line, it puts its simplified parts into buffer.
+   // Punctuation is preserved. Whitespace is replaced with single space.
+   // Literal strings are replaced with "''", so that a string literal
+   // containing special characters does not confuse exclusion rules.
+   // Numbers are replaced with "0".
+   // Identifiers are replaced with "x".
+   // Literal keywords (nil, true and false) are replaced with "n", "t" and "f",
+   // other keywords are preserved.
+   // Function declaration arguments are removed.
+   this.simple_line_buffer = {};
+   this.i = 1;
+
+   while( this.i <= #line ) {
+      // One iteration of this loop handles one token, where
+      // string literal start and end are considered distinct tokens.
+      if( this.quote ) {
+         if( ! this->skip_string() ) {
+            // String literal ends on another line.
+            break;
+         }
+      } else if( this.equals ) {
+         if( ! this->skip_long_string() ) {
+            // Long string literal or comment ends on another line.
+            break;
+         }
+      } else if( this.args ) {
+         if( ! this->skip_args() ) {
+            // Function arguments end on another line.
+            break;
+         }
+      } else {
+         this->skip_whitespace();
+
+         if( this->find("^%.%d") ) {
+            this.i = this.i + 1;
+         }
+
+         if( this->find("^%d") ) {
+            this->skip_number();
+         } else if( this->find("^[%a_]") ) {
+            this->skip_name();
+         } else {
+            if( this->find("^%-%-") ) {
+               this.comment = true;
+               this.i = this.i + 2;
+            }
+
+            var _, bracket_i, equals = this->find("^%[(=*)%[");
+            if( equals ) {
+               this.i = bracket_i + 1;
+               this.equals = equals;
+
+               if( ! this.comment ) {
+                  table.insert(this.simple_line_buffer, "'");
+               }
+            } else if( this.comment ) {
+               // Simple comment, check if it contains inline options and skip line.
+               this.comment = false;
+               var comment_body = this.line->sub(this.i);
+               this->check_inline_options(comment_body);
+               break;
+            } else {
+               var char = line->sub(this.i, this.i);
+
+               if( char == "." ) {
+                  // Dot can't be saved as one character because of
+                  // ".." and "..." tokens and the fact that number literals
+                  // can start with one.
+                  var _, _, dots = this->find("^(%.*)");
+                  this.i = this.i + #dots;
+                  table.insert(this.simple_line_buffer, dots);
+               } else {
+                  this.i = this.i + 1;
+
+                  if( char == "'" || char == '"' ) {
+                     table.insert(this.simple_line_buffer, "'");
+                     this.quote = char;
+                  } else if( this.after_function && char == "(" ) {
+                     // This is the opening parenthesis of function declaration args.
+                     this.after_function = false;
+                     this.args = true;
+                  } else {
+                     // Save other punctuation literally.
+                     // This inserts an empty string when at the end of line,
+                     // which is fine.
+                     table.insert(this.simple_line_buffer, char);
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   if( ! this.enabled ) {
+      // Disabled by inline options, always exclude the line.
+      return true, true;
+   }
+
+   var simple_line = table.concat(this.simple_line_buffer);
+   return excluded(any_hits_exclusions, simple_line), excluded(zero_hits_exclusions, simple_line);
+}
+
+return LineScanner;

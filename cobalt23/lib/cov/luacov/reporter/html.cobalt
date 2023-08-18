@@ -1,0 +1,246 @@
+var luacov_reporter = require("luacov.reporter");
+
+var reporter = {};
+
+var HTML_HEADER, HTML_FOOTER, HTML_TOTAL, HTML_FILE_HEADER, HTML_FILE_FOOTER, HTML_LINE_HIT, HTML_LINE_MIS;
+
+var function parse_template(template, values) {
+    var content = template->gsub("{{([a-z_]+)}}", function(key) {
+        return values[key];
+    });
+    return content;
+}
+
+//--------------------------------------------------------------
+//- parse template
+{
+    var dir = string.gsub(debug.getinfo(1).source, "^@(.+/)[^/]+$", "%1");
+    var dir_sep = package.config->sub(1, 1);
+    if( ! dir_sep->find("[/\\]") ) {
+        dir_sep = "/";
+    }
+    var template = require("luacov.reporter.html.template");
+
+    //- Removes a prefix from a string if it's present.
+    // @param str a string.
+    // @param prefix a prefix string.
+    // @return original string if does not start with prefix
+    // or string without prefix.
+    var function unprefix(str, prefix) {
+        if( str->sub(1, #prefix) == prefix ) {
+            return str->sub(#prefix + 1);
+        } else {
+            return str;
+        }
+    }
+
+    // Returns contents of a file or nil + error message.
+    var function read_asset(name) {
+        var f, open_err = io.open(dir .. "html" .. dir_sep .. name, "rb");
+
+        if( ! f ) {
+            error(unprefix(open_err, name .. ": "));
+        }
+
+        var contents, read_err = f->read("*a");
+        f->close();
+
+        if( contents ) {
+            return contents;
+        } else {
+            error(read_err);
+        }
+    }
+
+    var asset_types = {
+        script = template.SCRIPT,
+        style = template.STYLE,
+    };
+
+    var assets_content = {};
+    for( tag, assets in pairs(asset_types) ) {
+        for( _, name in ipairs(assets) ) {
+            var content = read_asset(name);
+            if( (! assets_content[tag]) ) {
+                assets_content[tag] = "";
+            }
+            if( (tag == "script") ) {
+                assets_content[tag] = assets_content[tag] .. "\n   <script type=\"text/javascript\">\n      ";
+            } else {
+                assets_content[tag] = assets_content[tag] .. "\n   <" .. tag .. ">\n      ";
+            }
+            assets_content[tag] = assets_content[tag] .. content->gsub("\n", "\n      ") .. "\n   </" .. tag .. ">\n";
+        }
+    }
+
+    HTML_HEADER = parse_template(template.HTML_HEADER, {
+        style = assets_content.style
+    });
+
+    HTML_FOOTER = parse_template(template.HTML_FOOTER, {
+        script = assets_content.script,
+        timestamp = os.date("%Y-%m-%d %H:%M:%S", os.time())
+    });
+
+    HTML_TOTAL = template.HTML_TOTAL;
+    HTML_FILE_HEADER = template.HTML_FILE_HEADER;
+    HTML_FILE_FOOTER = template.HTML_FILE_FOOTER;
+    HTML_LINE_HIT = template.HTML_LINE_HIT;
+    HTML_LINE_MIS = template.HTML_LINE_MIS;
+}
+//--------------------------------------------------------------
+
+//- Encodes the HTML entities in a string. Helpfull to avoid XSS.
+// @param s (String) String to escape.
+var function escape_html(s) {
+    return (string.gsub(s, "[}{\">/<'&]", {
+        ["&"] = "&amp;",
+        ["<"] = "&lt;",
+        [">"] = "&gt;",
+        ['"'] = "&quot;",
+        ["'"] = "&#39;",
+        ["/"] = "&#47;"
+    }));
+}
+
+var HtmlReporter = setmetatable({}, luacov_reporter.ReporterBase);
+{
+    HtmlReporter.__index = HtmlReporter;
+
+    function HtmlReporter::on_start() {
+        this._summary = {};
+        this->write(HTML_HEADER);
+    }
+
+    var HTML = "";
+    var FILE_HTML;
+
+    var function write_to_html(content) {
+        HTML = HTML .. content;
+    }
+
+    var function write_to_file_html(template, values) {
+        FILE_HTML = FILE_HTML .. parse_template(template, values);
+    }
+
+    var function coverage_to_string(hits, missed) {
+        var total = hits + missed;
+
+        if( total == 0 ) {
+            total = 1;
+        }
+
+        return ("%.2f")->format(hits / total * 100.0);
+    }
+
+    var function coverage_to_number(hits, missed) {
+        return tonumber(coverage_to_string(hits, missed));
+    }
+
+    var function filename_to_id(filename) {
+        return filename->lower()->gsub("(.lua)$", "")->gsub("([^a-z0-9_]+)", function(_key) {
+            return "-";
+        });
+    }
+
+    var function coverage_to_css_class(hits, missed) {
+        var coverageNum = coverage_to_number(hits, missed);
+        var cssClass;
+        if( (coverageNum < 40) ) {
+            cssClass = "danger";
+        } else if( (coverageNum < 60) ) {
+            cssClass = "warning";
+        } else if( (coverageNum < 75) ) {
+            cssClass = "success-low";
+        } else if( (coverageNum < 90) ) {
+            cssClass = "success-medium";
+        } else {
+            cssClass = "success-high";
+        }
+        return cssClass;
+    }
+
+    //luacheck: no self
+    function HtmlReporter::on_new_file(_filename) {
+        FILE_HTML = "";
+    }
+
+    function HtmlReporter::on_file_error(filename, error_type, message) {
+        io.stderr->write(("Couldn't %s %s: %s\n")->format(error_type, filename, message));
+    }
+
+    function HtmlReporter::on_empty_line(_filename, _lineno, line) {
+        if( line == "" ) {
+            FILE_HTML = FILE_HTML .. "\n";
+        } else {
+            FILE_HTML = FILE_HTML .. escape_html(line) .. "\n";
+        }
+    }
+
+    function HtmlReporter::on_mis_line(_filename, lineno, line) {
+        write_to_file_html(HTML_LINE_MIS, {
+            line = escape_html(line),
+            lineno = lineno,
+        });
+    }
+
+    function HtmlReporter::on_hit_line(_filename, lineno, line, hits) {
+        write_to_file_html(HTML_LINE_HIT, {
+            hits = hits,
+            line = escape_html(line),
+            lineno = lineno,
+        });
+    }
+
+    function HtmlReporter::on_end_file(filename, hits, miss) {
+
+        var coverage = coverage_to_string(hits, miss);
+
+        write_to_html(parse_template(HTML_FILE_HEADER, {
+            id = filename_to_id(filename),
+            hits = hits,
+            miss = miss,
+            coverage = coverage,
+            css_class = coverage_to_css_class(hits, miss),
+            filename = filename
+        }));
+
+        write_to_file_html(HTML_FILE_FOOTER, {
+            hits = hits,
+            miss = miss,
+            coverage = coverage,
+            filename = filename,
+        });
+        write_to_html(FILE_HTML);
+        this._summary[filename] = { hits = hits, miss = miss };
+    }
+
+    function HtmlReporter::on_end() {
+        var total_hits, total_missed = 0, 0;
+
+        for( _, filename in ipairs(this->files()) ) {
+            var summary = this._summary[filename];
+            if( summary ) {
+                var hits, missed = summary.hits, summary.miss;
+                total_hits +=   hits;
+                total_missed +=   missed;
+            }
+        }
+
+        this->write(parse_template(HTML_TOTAL, {
+            hits = total_hits,
+            miss = total_missed,
+            css_class = coverage_to_css_class(total_hits, total_missed),
+            coverage = tonumber(coverage_to_string(total_hits, total_missed)),
+        }));
+        this->write(HTML);
+        this->write(HTML_FOOTER);
+    }
+}
+//--------------------------------------------------------------
+
+function reporter.report() {
+    return luacov_reporter.report(HtmlReporter);
+}
+
+return reporter;

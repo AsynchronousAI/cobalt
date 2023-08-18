@@ -5,7 +5,7 @@
 // @class module
 // @name luacov.tick
 // @see luacov.defaults.savestepsize
-var runner = require("luacov.runner");
+var runner = require("cov.src.runner");
 runner.tick = true;
 runner.init();
 return {};

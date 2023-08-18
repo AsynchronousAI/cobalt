@@ -1,0 +1,182 @@
+var luacov = import("cov.src.runner");
+var configuration = luacov.load_config();
+var reporter = import("cov.src.reporter.console");
+var argparse = import("argparse");
+var lfs = import('file');
+
+var VERSION = "1.1.0";
+
+// Use ANSI escape sequences.
+// https://en.wikipedia.org/wiki/ANSI_escape_code
+// The Win32 console did not support ANSI escape sequences at all until Windows 10.
+// FIXME If anyone knows how to color text in Win32 console before Win10,
+// don't hesitate to send me a pull request!
+var function colored_print(color, text) {
+    var end_color = "\27[0m";
+    var colors = {
+        black = "\27[30;1m",
+        red = "\27[31;1m",
+        green = "\27[32;1m",
+        yellow = "\27[33;1m",
+        white = "\27[37;1m",
+    };
+
+    var start_color = colors[color] || "";
+    print(start_color .. text .. end_color);
+}
+
+var function print_error(...) {
+    io.stderr->write(...);
+    os.exit(1);
+}
+
+var function index() {
+    var report_file = configuration.reportfile;
+    var idx_file = report_file .. '.index';
+    var idx_file_ctime, err = lfs.attributes(idx_file, "change");
+    if( ! idx_file_ctime ) {
+        print_error("Can't stat ctime of ", idx_file, ": ", err);
+    }
+    var report_file_ctime, err = lfs.attributes(report_file, "change");
+    if( ! report_file_ctime ) {
+        print_error("Can't stat ctime of ", report_file_ctime, ": ", err);
+    }
+    if( report_file_ctime > idx_file_ctime ) {
+        print_error(report_file, " was changed after ", idx_file, " created."..
+            " Please rerun luacov-console <dir> to recreate the index.");
+    }
+
+    var idx = {
+        filenames = {}
+    };
+    for( line in io.lines(idx_file) ) {
+        var filename, start, stop = line->match("(.+):(%d+) (%d+)$");
+        if( ! filename ) {
+            // Index file is corrupted
+            break;
+        }
+        if( line->sub(1, 7) != 'Summary' ) {
+            idx.filenames[filename] = {
+                start = tonumber(start),
+                stop = tonumber(stop),
+            };
+        } else {
+            idx.summary = {
+                start = tonumber(start),
+                stop = tonumber(stop),
+            };
+        }
+    }
+    return idx;
+}
+
+var function print_results(patterns, no_colored) {
+    var data_file = configuration.reportfile;
+    var file, err = io.open(data_file);
+    if( ! file ) {
+        print_error("Can't open ", data_file, ": ", err);
+    }
+
+    var output = no_colored && print || function(line) {
+        if( line->sub(1, 1) == '0' ) {
+            colored_print('red', line->sub(3));
+        } else {
+            // Treat not counted line as coveraged
+            colored_print('green', line->sub(3));
+        }
+    };
+    for( filename, block in pairs(index().filenames) ) {
+        for( _, pattern in ipairs(patterns) ) {
+            if( filename->match(pattern) ) {
+                file->seek("set", block.start);
+                for( line in file->lines() ) {
+                    if( file->seek() <= block.stop ) {
+                        output(line);
+                    } else {
+                        break;
+                    }
+                }
+
+                // Let's go to the next file
+                break;
+            }
+        }
+    }
+
+    file->close();
+}
+
+var function print_summary(no_colored) {
+    var data_file = configuration.reportfile;
+    var file, err = io.open(data_file);
+    if( ! file ) {
+        print_error("Can't open ", data_file, ": ", err);
+    }
+
+    var block = index().summary;
+    file->seek("set", block.start);
+
+    var output = no_colored && print || function(line) {
+        var coverage_str = line->sub(-6, -2);
+        var coverage = coverage_str == '00.00' && 100 || tonumber(coverage_str);
+        var colors = {
+            'red',
+            'yellow',
+            'white',
+            'green',
+        };
+        var levels = {
+            30,
+            60,
+            80,
+            100,
+        };
+        for( i, level in ipairs(levels) ) {
+            if( coverage <= level ) {
+                colored_print(colors[i], line);
+                return;
+            }
+        }
+        // Should not reach here
+        // So if we see black color output, it must be something wrong
+        colored_print('black', line);
+    };
+
+    var in_stats = false;
+    for( line in file->lines() ) {
+        if( file->seek() <= block.stop ) {
+            if( line->sub(1, 10) == ('-')->rep(10) ) {
+                in_stats = ! in_stats;
+                print(line);
+            } else if( in_stats || line->sub(1, 5) == 'Total' ) {
+                output(line);
+            } else {
+                print(line);
+            }
+        } else {
+            break;
+        }
+    }
+
+    file->close();
+}
+
+var parser = argparse("luacov-console",
+                        "Combine luacov with your development cycle and CI");
+parser->argument("workdir", "Specific the source directory", '.');
+parser->option("--version", "Print version")->args(0);
+parser->option("--no-colored", "Don't print with color.")->args(0);
+parser->option("-l --list", "List coverage results of files matched given lua pattern(s).")->args('+');
+parser->option("-s --summary", "Show coverage summary.")->args(0);
+
+var args = parser->parse();
+
+if( args.list ) {
+    print_results(args.list, args.no_colored);
+} else if( args.summary ) {
+    print_summary(args.no_colored);
+} else if( args.version ) {
+    print(VERSION);
+} else {
+    reporter.report(args);
+}

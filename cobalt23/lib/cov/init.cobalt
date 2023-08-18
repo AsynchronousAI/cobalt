@@ -3,6 +3,6 @@
 // @class module
 // @name luacov
 // @usage lua -lluacov sometest.lua
-var runner = require("luacov.runner");
+var runner = require("cov.src.runner");
 runner.init();
 return runner;

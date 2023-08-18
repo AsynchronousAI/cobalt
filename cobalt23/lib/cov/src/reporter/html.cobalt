@@ -1,4 +1,4 @@
-var luacov_reporter = require("luacov.reporter");
+var luacov_reporter = require("cov.src.reporter");
 
 var reporter = {};
 
@@ -19,7 +19,7 @@ var function parse_template(template, values) {
     if( ! dir_sep->find("[/\\]") ) {
         dir_sep = "/";
     }
-    var template = require("luacov.reporter.html.template");
+    var template = require("cov.src.reporter.html.template");
 
     //- Removes a prefix from a string if it's present.
     // @param str a string.

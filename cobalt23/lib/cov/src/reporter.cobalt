@@ -4,9 +4,9 @@
 // @name luacov.reporter
 var reporter = {};
 
-var LineScanner = require("luacov.linescanner");
-var luacov = require("luacov.runner");
-var util = require("luacov.util");
+var LineScanner = require("cov.src.linescanner");
+var luacov = require("cov.src.runner");
+var util = require("cov.src.util");
 var lfs_ok, lfs = pcall(require, "lfs");
 
 //--------------------------------------------------------------
@@ -67,7 +67,7 @@ var ReporterBase = {}; {
 ReporterBase.__index = ReporterBase;
 
 function ReporterBase::new(conf) {
-   var stats = require("luacov.stats");
+   var stats = require("cov.src.stats");
    var data = stats.load(conf.statsfile);
 
    if( ! data ) {

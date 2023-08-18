@@ -8,9 +8,11 @@ var runner = {};
 //- LuaCov version in `MAJOR.MINOR.PATCH` format.
 runner.version = "0.15.0";
 
-var stats = require("luacov.stats");
-var util = require("luacov.util");
-runner.defaults = require("luacov.defaults");
+coroutine = routines || require("routines");
+
+var stats = require("cov.src.stats");
+var util = require("cov.src.util");
+runner.defaults = require("cov.src.defaults");
 
 var debug = require("debug");
 var raw_os_exit = os.exit;
@@ -114,7 +116,7 @@ var cluacov_ok = pcall(require, "cluacov.version");
 //    extra_processing(line)
 // end
 // @function debug_hook
-runner.debug_hook = require(cluacov_ok && "cluacov.hook" || "luacov.hook").new(runner);
+runner.debug_hook = require(cluacov_ok && "cluacov.hook" || "cov.src.hook").new(runner);
 
 //----------------------------------------------------
 // Runs the reporter specified in configuration.

@@ -28,6 +28,7 @@ Makefile
 /src 
 
 # CMake Ignore (Very large) 
+/cobalt23/pre/cobaltpre
 /cobalt23/raptor/src/host/buildvm_arch.h
 /cobalt23/CMakeLists.txt.user
 /cobalt23/CMakeCache.txt

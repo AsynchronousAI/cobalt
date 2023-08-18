@@ -499,24 +499,4 @@ function process(str, itemtype, out){
     }
     return joined
 }
-process([[
-    // Preprocessor test
-    #include "header.cobalt"
-
-    #line 1 "header.cobalt"
-
-    #define PI 3.14
-    #define RADTODEG(rad) (rad * 180 / PI)
-
-    #ifdef (_WIN32)
-        print("Windows macro")
-    #elif (defined("__APPLE__"))
-        print("Mac macro")
-    #else
-        print("None of the above")
-    #endif
-    for (i = 1, PI*100){
-        print(i/100)
-    }
-]], null, true)
 return process

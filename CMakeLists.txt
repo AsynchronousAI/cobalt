@@ -47,6 +47,12 @@ add_custom_target(lua-cobalt
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building lua-cobalt"
 )
+add_custom_target(pre
+    COMMAND make -w
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/pre
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+    COMMENT "Building preprocessor"
+)
 add_custom_target(jit
     COMMAND make -w
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/jit

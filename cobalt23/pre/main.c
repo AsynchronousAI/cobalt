@@ -1,9 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
-    // Construct the command to run the Cobalt script
-    char *command = "cobalt -e 'import('preprocess')('test.cobalt', 'file', 'out.cobalt')'";
+    if (argc < 2) {
+        printf("Error: no argument provided\n");
+        return 1;
+    }
+
+    // Allocate a buffer for the command
+    char command[256];
+    snprintf(command, sizeof(command), "cobalt -e 'import(\"preprocess\")(\"%s\", \"file\", true)'", argv[1]);
 
     // Execute the command in the terminal
     int status = system(command);

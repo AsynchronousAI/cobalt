@@ -21,8 +21,7 @@
 */
 
 /* TODO:
-- Write to outfile
-- Input and format arguments
+
 */
 
 /* Supports
@@ -37,7 +36,7 @@
     // #error (message): Raises an error
     // #warning (message): Raises a warning
     // #include "file.cobalt": Includes a file (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
-    // #line (line) "file.cobalt": Sets the line number and file name for the preprocessor (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
+    // #line (line) "file.cobalt <optional>": Sets the line number and file name for the preprocessor (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
 
 
     // Everything else that starts with a # will be executed as a cobalt source line
@@ -50,11 +49,14 @@ filesystem = file || import("file") // File library for cobalt
 filex = import("filex") // Extended File library for cobalt
 core = core || import("core") // Core library for cobalt
 
-function process(str, itemtype, out, inenv){
+function process(str, itemtype, out, outfile, ...){
     // 1: Split lines
     var ogstr = str // provided c filename
     if (itemtype == "file") {
         var file = io.open(str)
+        if (!file){
+            error(core.error.strerror(2))
+        }
         str = file->read("*all")
         file->close()
     }
@@ -98,7 +100,15 @@ function process(str, itemtype, out, inenv){
         "edition": "standard",
         "cplusplus": false,
     }
-    inenv = {} // Temporary
+    // inenv will be like: -X="t" -M=2 -Z=true will become {["X"]="t", ["M"]=2, ["Z"]=true}
+    envitems = table.pack(...)
+    inenv = {}
+    for (i, v in pairs(envitems)){
+        var split = v->gsub("-", "")->split("=")
+        inenv[split[1]] = loadstring("return "..split[2])()
+    }
+
+    // 4: Add inenv to env
     for (i, v in pairs(inenv)){
         if (type(v) == "string") v = '"'..v..'"'
         env[i] = v
@@ -533,7 +543,7 @@ function process(str, itemtype, out, inenv){
                 }
             }
         })
-        // Remove line from newlines
+        // Remove line from newlines 
     }
 
     // 4: Join newlines and return
@@ -549,7 +559,10 @@ function process(str, itemtype, out, inenv){
     }
     newlines = null
     if (out){
-        print(joined)
+        // Write to out 
+        var file = io.open(out, "w")
+        file->write(joined)
+        file->close()
     }
     return joined
 }

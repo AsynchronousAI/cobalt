@@ -8,7 +8,14 @@
 
 /* Dependencies
    // Switch (Installed with `make setup`)
-   // Preloaded libraries (You shouldnt need to import these as they are in the source code)
+   // core // Preloaded, needed to get C macros. JIT Ported & Interpreter Core.
+   // Base libraries // JIT & Interpreter designed preloaded libraries
+*/
+
+/* Notes
+- The preprocessor is not apart of the compiler
+- Using C Macros require GCC to be installed (As of the `core` library dependency)
+- C Macros will NOT work on the JIT compiler
 */
 
 /* Supports
@@ -33,7 +40,7 @@
 
 switch = import("switch") // Switch library for cobalt
 
-function process(str, itemtype, out){
+function process(str, itemtype, out, inenv){
     // 1: Split lines
     if (itemtype == "file") {
         var file = io.open(str)
@@ -68,7 +75,12 @@ function process(str, itemtype, out){
     var env = {
         "cobalt": true, 
         "cobaltversion": "23",
-        "edition": "standard"
+        "edition": "standard",
+        "cplusplus": false,
+    }
+    for (i, v in pairs(inenv)){
+        if (type(v) == "string") v = '"'..v..'"'
+        env[i] = v
     }
     var newlines = lines
     var activeifs = []
@@ -85,10 +97,7 @@ function process(str, itemtype, out){
             }
         }
         tbld = tbld .. "}"
-
-        return loadstring([=[
-            // Cobalt execution environment
-            // Ignore.
+        return loadstring([=[// Cobalt execution environment: Ignore.
             env = ]=]..tbld..[=[;
             for (i, v in pairs(env)){
                 _ENV[i] = v
@@ -96,10 +105,14 @@ function process(str, itemtype, out){
             core = import("core")
             function defined(val){
                 // check if it is in env, if it return the value
-                if (env[val] != null) {
+                if (env[val] != null && env[val] != false) {
                     return env[val]
                 }else{
-                    return core.macros(val)
+                    if (jit == null){
+                        return core.macros(val)
+                    }else{
+                        warn(val.." is not defined and C macros are not supported on the JIT compiler")
+                    }
                 }
             }]=]..str)
     }
@@ -353,7 +366,7 @@ function process(str, itemtype, out){
                 }
                 // 2: Evaluate the condition
                 var success, result = xpcall(function(){
-                    return (envload("return defined(\""..condition.."\")") || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
+                    return (envload("return defined(\""..(condition || "null").."\")") || errorpreprocessor("Failed to check condition\n"..(table.pack(envload("return "..(condition || "null"))) || "Failed to error")[2]))()
                 }, function(err){
                     errorpreprocessor(err)
                 })
@@ -518,5 +531,4 @@ function process(str, itemtype, out){
     }
     return joined
 }
-
 return process

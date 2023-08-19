@@ -86,10 +86,10 @@ function process(str, itemtype, out){
         }
         tbld = tbld .. "}"
 
-        return loadstring([[
+        return loadstring([=[
             // Cobalt execution environment
             // Ignore.
-            env = ]]..tbld..[[;
+            env = ]=]..tbld..[=[;
             for (i, v in pairs(env)){
                 _ENV[i] = v
             }
@@ -101,21 +101,20 @@ function process(str, itemtype, out){
                 }else{
                     return core.macros(val)
                 }
-            }]]..str)
+            }]=]..str)
     }
     for (i, v in pairs(lines)) {
         // Check if i is v[1] for one of the preprocess lines
         /// Go through every character, if a /* is found make incomment true, if a */ is found make incomment false
         /// If incomment is true, remove the line
-        if (incomment) {
-            if (v->find("*/")) {
+        for (ii = 1, #v) {
+            var char = v->sub(ii, ii)
+            if (char == "/" && v->sub(ii + 1, ii + 1) == "*") {
+                incomment = true
+            }
+            if (char == "*" && v->sub(ii + 1, ii + 1) == "/") {
                 incomment = false
             }
-            continue;
-        }
-        if (v->find("/*")) {
-            incomment = true
-            continue;
         }
         if (incomment) {
             continue;
@@ -519,4 +518,5 @@ function process(str, itemtype, out){
     }
     return joined
 }
+
 return process

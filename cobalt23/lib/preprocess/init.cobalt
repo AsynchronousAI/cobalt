@@ -560,7 +560,7 @@ function process(str, itemtype, out, outfile, ...){
     newlines = null
     if (out){
         // Write to out 
-        var file = io.open(out, "w")
+        var file = io.open(outfile, "w")
         file->write(joined)
         file->close()
     }

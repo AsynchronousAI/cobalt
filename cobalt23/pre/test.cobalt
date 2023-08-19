@@ -1,0 +1,53 @@
+#warning "Cobalt preprocessor test"
+
+#if defined("__clang__")
+#print("clang") // In a real case scenario, this wont work since C Macros only work if GCC is installed
+#elif defined("__GNUC__")
+#print("gcc")
+#elif defined("_MSC_VER")
+#print("msvc") // EWWW
+#else
+#print "Unknown compiler"
+#endif
+
+#ifdef (__APPLE__)
+print("Upon execution, this should output if you are using a Mac or any other Apple device")
+#elif defined("__linux__")
+print("Upon execution, this should output if you are using a Linux device")
+#elif defined("_WIN32")
+print("Upon execution, this should output if you are using a Windows device")
+#elif defined("TAGRGET_OS_IPHONE")
+print("pro iphone xcode user")
+#elif defined("__ANDROID__")
+print("pro android user")
+#else
+print("idk what you are using")
+#endif
+
+#if (1+1 == 2)
+#print("1+1 is 2")
+#endif
+
+
+function main(){
+    for (i = 1, 10){
+    #ifdef (__APPLE__)
+        print("APPLE MACRO")
+    #elif defined("__linux__")
+        print("LINUX MACRO")
+    #elif defined("_WIN32")
+        print("WINDOWS MACRO")
+    #else
+    print("idk what you are using")
+    #endif
+    }
+
+
+    #ifdef (func)
+    func(function(){
+    #else
+    func = function(){  
+    #endif
+        print("This is a function")
+    }
+}

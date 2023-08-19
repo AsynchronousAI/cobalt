@@ -813,10 +813,14 @@ static int newenum(lua_State *L) {
     }
     return 1;
 }
+static int luaB_abort(lua_State *L){
+  abort();
+}
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"sizeof", luaB_sizeof},
   {"enum", newenum},
+  {"abort", luaB_abort},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
   {"inputf", luaB_inputf},

@@ -716,6 +716,9 @@ LJLIB_CF(sizeof) {
   }
   return 1;
 }
+LJLIB_CF(abort){
+  abort();
+}
 LJLIB_CF(enum) {
     const char *name = luaL_checkstring(L, 1);
     luaL_checktype(L, 2, LUA_TTABLE);

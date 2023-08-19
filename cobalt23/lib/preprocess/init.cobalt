@@ -8,7 +8,9 @@
 
 /* Dependencies
    // Switch (Installed with `make setup`)
+   // Filex (Installed with `make setup`)
    // core // Preloaded, needed to get C macros. JIT Ported & Interpreter Core.
+   // ffi // Preloaded, needed to get C macros. JIT Ported & Interpreter Core.
    // Base libraries // JIT & Interpreter designed preloaded libraries
 */
 
@@ -16,6 +18,11 @@
 - The preprocessor is not apart of the compiler
 - Using C Macros require GCC to be installed (As of the `core` library dependency)
 - C Macros will NOT work on the JIT compiler
+*/
+
+/* TODO:
+- Write to outfile
+- Input and format arguments
 */
 
 /* Supports
@@ -39,9 +46,13 @@
 */
 
 switch = import("switch") // Switch library for cobalt
+filesystem = file || import("file") // File library for cobalt
+filex = import("filex") // Extended File library for cobalt
+core = core || import("core") // Core library for cobalt
 
 function process(str, itemtype, out, inenv){
     // 1: Split lines
+    var ogstr = str // provided c filename
     if (itemtype == "file") {
         var file = io.open(str)
         str = file->read("*all")
@@ -51,6 +62,15 @@ function process(str, itemtype, out, inenv){
     var lines = []
     for (line in str->gmatch("[^\r\n]+")) {
         lines[#lines + 1] = line
+    }
+
+    function getname(){
+        if (ogstr){
+            // cwd/ogstr
+            return filex.join(filesystem.currentdir(), ogstr)
+        }else{
+            return debug.getinfo(2, "S").source->sub(2).source->sub(2)
+        }
     }
     
     // 2: Look for preprocess lines
@@ -78,6 +98,7 @@ function process(str, itemtype, out, inenv){
         "edition": "standard",
         "cplusplus": false,
     }
+    inenv = {} // Temporary
     for (i, v in pairs(inenv)){
         if (type(v) == "string") v = '"'..v..'"'
         env[i] = v
@@ -148,14 +169,14 @@ function process(str, itemtype, out, inenv){
         }
 
         // Get the first word of the line
-        function errorpreprocessor(error){
+        function errorpreprocessor(errorin){
             print("\27[1;31mPreprocessor error:\27[0m")
             print("\27[1;31mError with the '"..v[2].."' preprocessor command.\27[0m\n\n")
-            if (error) {
-                print("\27[1;31m"..error.."\27[0m\n\n")
+            if (errorin) {
+                print("\27[1;31m"..errorin.."\27[0m\n\n")
             }
             print("\27[1;31mStopping preprocessor.\27[0m")
-            os.exit()
+            abort()
         }
 
         // If the second character is a !, ignore the line
@@ -221,13 +242,14 @@ function process(str, itemtype, out, inenv){
                 // 1 is the line number
                 var split = v[2]->split(" ")
                 var line = split[2]
-                var file = string.sub(split[3], 2, -2)
-                if (!file) {
-                    file = debug.getinfo(1, "S").source->sub(2)
+                if (!split[3]) {
+                    file = getname()
+                }else{
+                    file = string.sub(split[3], 2, -2)
                 }
                 var f = io.open(file)
                 if (!f) {
-                    var script_path = debug.getinfo(1, "S").source->sub(2)
+                    var script_path = getname()
                     var script_dir = script_path->match("(.*/)")
                     if (script_dir == null) {
                         script_dir = "./"
@@ -279,7 +301,7 @@ function process(str, itemtype, out, inenv){
                     }
                 }
                 if (!f) {
-                    var script_path = debug.getinfo(1, "S").source->sub(2)
+                    var script_path = getname()
                     var script_dir = script_path->match("(.*/)")
                     if (script_dir == null) {
                         script_dir = "./"
@@ -480,7 +502,7 @@ function process(str, itemtype, out, inenv){
                 var error = v[2]->gsub("#error ", "")
                 print("\27[1;31mRaised error:\27[0m")
                 print("\27[1;31m"..error.."\27[0m\n\n")
-                os.exit()
+                error("Ending preprocessor")
             },
             "#warning": function(){
                 var warning = v[2]->gsub("#warning ", "")

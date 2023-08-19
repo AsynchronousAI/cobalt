@@ -1,0 +1,49 @@
+[1;33mwarning: [0m"Cobalt preprocessor test"
+clang
+gcc
+msvc
+1+1 is 2
+
+
+
+
+
+
+
+
+print("Upon execution, this should output if you are using a Mac or any other Apple device")
+
+print("Upon execution, this should output if you are using a Linux device")
+
+print("Upon execution, this should output if you are using a Windows device")
+
+print("pro iphone xcode user")
+
+print("pro android user")
+
+
+
+
+
+function main(){
+    for (i = 1, 10){
+
+        print("APPLE MACRO")
+
+        print("LINUX MACRO")
+
+        print("WINDOWS MACRO")
+
+
+
+    }
+
+
+
+    func = function(){  
+
+        print("This is a function")
+    }
+}
+
+cobalt -e 'import("preprocess")("test.cobalt", "file", true, "")'

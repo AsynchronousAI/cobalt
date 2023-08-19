@@ -22,12 +22,12 @@
 
 #define LUA_VERSION	"cobalt23"
 #define LUA_RELEASE	LUA_VERSION "."
-#define LUA_COPYRIGHT	LUA_VERSION
+#define LUA_COPYRIGHT	LUA_VERSION " Read COPYRIGHTS.md for full credits."
 #define LUA_AUTHORS	""
 
 
 /* mark for precompiled code ('<esc>Lua') */
-#define LUA_SIGNATURE	"cobalt"
+#define LUA_SIGNATURE	"cobalt23"
 
 /* option for multiple returns in 'lua_pcall' and 'lua_call' */
 #define LUA_MULTRET	(-1)

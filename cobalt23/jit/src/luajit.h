@@ -33,7 +33,7 @@
 #define LUAJIT_VERSION		"cobalt23 JIT"
 #define LUAJIT_VERSION_NUM	10000  /* Version 23 = 01.00.00. */
 #define LUAJIT_VERSION_SYM	luaJIT_version_2_1_0_beta3
-#define LUAJIT_COPYRIGHT	"Copyright (C) 2005-2017 Mike Pall, Domingo Alvarez, cobalt lang team"
+#define LUAJIT_COPYRIGHT	"Read COPYRIGHTS.md for full credits."
 #define LUAJIT_URL		"https://github.com/cobalt-lang/cobalt"
 
 /* Modes for luaJIT_setmode. */

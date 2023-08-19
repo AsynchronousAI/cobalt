@@ -208,11 +208,77 @@ static int dumpmacros(lua_State* L){
   return 1;
 }
 
+// ERRORS:
+#include <errno.h>
+static int error(lua_State* L){
+  // It has 2 optional arguments, error message, and exit code. It uses perror and exits with the exit code
+  const char* message = luaL_optstring(L, 1, NULL);
+  int exit_code = luaL_optinteger(L, 2, 1);
+  printf("%s\n", message);
+  exit(exit_code);
+
+  return 0;
+}
+
+// It is in the Cobalt C errors
+char cobalt_errors[][256] = {
+  // TYPECHECKER
+  "Type error",
+  //// EXPECTIONS
+  "Expected %s, got %s for argument %d",
+  "Expected %s, got %s",
+  "Expected %s, got %s for argument %d of %s",
+  "Expected %s, for variable %s",
+
+  // MEMORY
+  "Failed to allocate memory",
+  "Failed to set memory permissions",
+  "Failed to free memory",
+  "Failed to resize memory",
+
+  // OTHER
+  "Undisclosed error",
+  "error1",
+  "error2",
+  "error3",
+  "error4",
+  "error5",
+  ""
+};
+
+static int cobaltstrerror(lua_State* L){
+  // Uses errno.h and returns the error message
+  int errnum = luaL_checkinteger(L, 1);
+  if (errnum <= sys_nerr) {
+    lua_pushstring(L, strerror(errnum));
+  }else{
+    if (errnum <= sys_nerr+sizeof(cobalt_errors)/256) {
+      lua_pushstring(L, cobalt_errors[errnum-sys_nerr]);
+    }else{
+      lua_pushstring(L, "Unknown error");
+    }
+  }
+  return 1;
+}
+static const errorlen(lua_State* L){
+  if (luaL_optstring(L, 1, NULL) == "C") {
+    lua_pushinteger(L, sys_nerr);
+  }else{
+    lua_pushinteger(L, sys_nerr+sizeof(cobalt_errors)/256);
+  }
+  return 1;
+}
 static const struct luaL_Reg lcinterface_lib[] = {
   {"macros", dumpmacros},
   {NULL, NULL}
 };
 
+static const struct luaL_Reg lcinterface_error_lib[] = {
+  {"cerror", error},
+  {"strerror", cobaltstrerror},
+  {"errorlen", errorlen},
+  {NULL, NULL}
+};
 static const struct luaL_Reg lcinterface_memory_lib[] = {
   {"get", get_hex_memory_address},
   {"fetch", fetch_hex_memory_address},
@@ -229,5 +295,8 @@ LUALIB_API int luaopen_lcinterface(lua_State* L) {
   luaL_newlib(L, lcinterface_lib);
   luaL_newlib(L, lcinterface_memory_lib);
   lua_setfield(L, -2, "memory");
+  luaL_newlib(L, lcinterface_error_lib);
+  lua_setfield(L, -2, "error");
+
   return 1;
 }

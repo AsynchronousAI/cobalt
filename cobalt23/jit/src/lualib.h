@@ -10,7 +10,7 @@
 
 #define LUA_FILEHANDLE	"FILE*"
 
-#define LUA_COLIBNAME	"coroutine"
+#define LUA_COLIBNAME	"thread"
 #define LUA_ASYNCNAME	"async"
 #define LUA_MATHLIBNAME	"math"
 #define LUA_STRLIBNAME	"string"

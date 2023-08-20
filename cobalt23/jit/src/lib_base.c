@@ -904,7 +904,7 @@ LUALIB_API int luaopen_base(lua_State *L)
   lua_pushliteral(L, LUA_VERSION);  /* top-3. */
   newproxy_weaktable(L);  /* top-2. */
   LJ_LIB_REG(L, "_G", base);
-  //LJ_LIB_REG(L, LUA_COLIBNAME, coroutine); Disable coroutine library, use Async instead for real threading
+  LJ_LIB_REG(L, LUA_COLIBNAME, coroutine);
   return 2;
 }
 

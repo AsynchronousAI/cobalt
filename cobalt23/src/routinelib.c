@@ -161,7 +161,7 @@ static const luaL_Reg co_funcs[] = {
 
 
 
-LUAMOD_API int luaopen_coroutine2 (lua_State *L) {
+LUALIB_API int luaopen_coroutine2 (lua_State *L) {
   luaL_newlib(L, co_funcs);
   return 1;
 }

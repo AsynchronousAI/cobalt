@@ -169,22 +169,10 @@ elif os.listdir(CDIR) != []:
 # Go through all cobalt23/lib and compile all directories
 for item in os.listdir(scriptPath + "/cobalt23/lib"):
     if os.path.isdir(scriptPath + "/cobalt23/lib/" + item):
-        if item == "jit" or item == "pre":
-            print("[*] \033[32mFound JIT Library\033[0m")
-            # Duplicate all of the children to the install path
-            for child in os.listdir(scriptPath + "/cobalt23/lib/" + item):
-                # Make sure it is a cobalt file
-                if child.endswith(".cobalt"):
-                    # If the <item> folder doesnt exist, create it
-                    if not os.path.isdir(LDIR + item):
-                        os.mkdir(LDIR + item)
-                    # Copy the file to the install path
-                
-                    if sys.platform == "win32":
-                        os.system("cp " + scriptPath + "/cobalt23/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
-                    else:
-                        os.system("cp " + scriptPath + "/cobalt23/lib/" + item + "/" + child + " " + LDIR + item + "/" + child)
+        if item == "DISABLED":
             continue
+        else:
+            print("[*] \033[32mInstalling " + item + "\033[0m")
         # Otherwise check if a Makefile exists
         if os.path.isfile(scriptPath + "/cobalt23/lib/" + item + "/Makefile"):
             print("[*] \033[32mBuilding Makefile for " + item + "\033[0m")

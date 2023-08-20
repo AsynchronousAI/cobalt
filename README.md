@@ -84,3 +84,6 @@ everything they need to make a great program with a great experience.
 ## [How to build and install](https://cobaltlang.vercel.app/install)
 ## [Credits](/COPYRIGHTS.md)
 ***
+# Add the following to credits
+- template
+- ext

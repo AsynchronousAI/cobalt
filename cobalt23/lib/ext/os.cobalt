@@ -1,0 +1,233 @@
+var os = {};
+for( k,v in pairs(require ('os')) ) { os[k] = v; }
+
+// for io.readproc
+// don't require os from inside io ...
+var io = require ('ext.io');
+
+// table.pack
+var table = require ('ext.table');
+
+// string.trim
+var string = require ('ext.string');
+var asserttype = require ('ext.asserttype');
+var detect_os = require ('ext.detect_os');
+
+os.sep = detect_os() && '\\' || '/';
+
+function os.path(str) {
+	asserttype(str, 'string');
+	return (str->gsub('/', os.sep));
+}
+
+// 5.2 os.execute compat
+if( _VERSION == 'Lua 5.1' ) {
+	var execute = os.execute;
+	function os.execute(cmd) {
+		var results = table.pack(execute(cmd));
+		if( #results > 1 ) { return results->unpack(); }	// >5.1 API
+		var errcode = results[1];
+		var reason = ({
+			[0] = 'exit',
+		})[errcode] || 'unknown';
+		return errcode == 0 && true || null, reason, errcode;
+	}
+}
+
+// TODO should this fail if the dir already exists?  or should it succeed?
+// should it fail if a file is presently there? probably.
+// should makeParents be set by default?  it's on by default in Windows.
+function os.mkdir(dir, makeParents) {
+	/* should I use the lfs option?  it doesn't have a 'makeParent' option so.....
+	local lfs = detect_lfs()
+	if lfs then
+		return lfs.mkdir(dir)
+	end
+	--*/
+	var tonull;
+	if( detect_os() ) {
+		dir = os.path(dir);
+		tonull = ' 2> nul';
+		makeParents = null; // mkdir in Windows always makes parents, and doesn't need a switch
+	} else {
+		tonull = ' 2> /dev/null';
+	}
+	var cmd = 'mkdir'..(makeParents && ' -p' || '')..' '..('%q')->format(dir)..tonull;
+	return os.execute(cmd);
+}
+
+function os.rmdir(dir) {
+	var cmd = 'rmdir "'..os.path(dir)..'"';
+	return os.execute(cmd);
+}
+
+function os.move(from, to) {
+	// [[
+	// alternatively I could write this as readfile/writefile and os.remove
+	var cmd = (detect_os() && 'move' || 'mv') .. ' "'..os.path(from)..'" "'..os.path(to)..'"';
+	return os.execute(cmd);
+	//]]
+	/*
+	local d = path(from):read()
+	path(from):remove()	-- remove first in case to and from match
+	path(to):write(d)
+	--*/
+}
+
+function os.isdir(fn) {
+	var lfs = file || import("file");
+	if( lfs ) {
+		var attr = lfs.attributes(fn);
+		if( ! attr ) { return false; }
+		return attr.mode == 'directory';
+	} else {
+		if( detect_os() ) {
+			return 'yes' ==
+				string.trim(io.readproc(
+					'if exist "'
+					..os.path(fn)
+					..'\\*" (echo yes) else (echo no)'
+				));
+		} else {
+			// for OSX:
+			// TODO you could work around this for directories:
+			// f:read(1) for 5.1,jit,5.2,5.3 returns nil, 'Is a directory', 21
+			var f = io.open(fn,'rb');
+			if( ! f ) { return false; }
+			var result, reason, errcode = f->read(1);
+			f->close();
+			if( result == null
+			&& reason == 'Is a directory'
+			&& errcode == 21
+			) {
+				return true;
+			}
+			return false;
+		}
+	}
+}
+
+function os.listdir(path) {
+	var lfs = file || import("file");
+	if( ! lfs ) {
+		// no lfs?  use a fallback of shell ls or dir (based on OS)
+		var fns;
+		// all I'm using ffi for is reading the OS ...
+//			local detect_ffi = require 'ext.detect_ffi'
+//			local ffi = detect_ffi()	-- no lfs?  are you using luajit?
+//			if not ffi then
+			// if 'dir' exists ...
+			//	local filestr = io.readproc('dir "'..path..'"')
+			//	error('you are here: '..filestr)
+			// if 'ls' exists ...
+
+			var cmd;
+			if( detect_os() ) {
+				cmd = 'dir /b "'..os.path(path)..'"';
+			} else {
+				cmd = 'ls -a '..path->gsub('[|&;<>`\"\' \t\r\n#~=%$%(%)%%%[%*%?]', [=[\%0]=]);
+			}
+			var filestr = io.readproc(cmd);
+			fns = string.split(filestr, '\n');
+			assert(fns->remove() == '');
+/*
+		else
+			-- do a directory listing
+			-- TODO escape?
+			if ffi.os == 'Windows' then
+				-- put your stupid FindFirstFile/FindNextFile code here
+				error('windows sucks...')
+			else
+				fns = {}
+				require 'ffi.req' 'c.dirent'
+				-- https://stackoverflow.com/questions/10678522/how-can-i-get-this-readdir-code-sample-to-search-other-directories
+				local dirp = ffi.C.opendir(path)
+				if dirp == nil then
+					error('failed to open dir '..path)
+				end
+				repeat
+					local dp = ffi.C.readdir(dirp)
+					if dp == nil then break end
+					local name = ffi.string(dp[0].d_name)
+					if name ~= '.' and name ~= '..' then
+						table.insert(fns, name)
+					end
+				until false
+				ffi.C.closedir(dirp)
+			end
+		end
+--*/
+		return coroutine.wrap(function() {
+			for( _,k in ipairs(fns) ) {
+				//local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
+				coroutine.yield(k);//, io.readfile(fn))
+			}
+		});
+	} else {
+		return coroutine.wrap(function() {
+			for( k in lfs.dir(path) ) {
+				if( k != '.' && k != '..' ) {
+					//local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
+					// I shouldn't have io.readfile for performance
+					//  but for convenience it is so handy...
+					coroutine.yield(k);//, io.readfile(fn))
+				}
+			}
+		});
+	}
+}
+
+/* recurse directory
+args:
+	dir = directory to search from
+	callback(filename, isdir) = optional callback to filter each file
+
+should this be in io or os?
+should this be an iterator like os.listdir() is?
+--*/
+function os.rlistdir(dir, callback, fs) {
+	fs = fs || table();
+	for( f in os.listdir(dir) ) {
+		var path = dir..'/'..f;
+		if( os.isdir(path) ) {
+			if( ! callback || callback(path, true) ) {
+				os.rlistdir(path, callback, fs);
+			}
+		} else {
+			if( ! callback || callback(path, false) ) {
+				var fn = path;
+				if( #fn > 2 && fn->sub(1,2) == './' ) { fn = fn->sub(3); }
+				fs->insert(fn);
+			}
+		}
+	}
+	return fs;
+}
+
+function os.fileexists(fn) {
+	assert(fn, "expected filename");
+	var lfs = file || import("file");
+	if( lfs ) {
+		return lfs.attributes(fn) != null;
+	} else {
+		if( detect_os() ) {
+			// Windows reports 'false' to io.open for directories, so I can't use that ...
+			return 'yes' == string.trim(io.readproc('if exist "'..os.path(fn)..'" (echo yes) else (echo no)'));
+		} else {
+			// here's a version that works for OSX ...
+			var f, err = io.open(fn, 'r');
+			if( ! f ) { return false, err; }
+			f->close();
+			return true;
+		}
+	}
+}
+
+// to complement os.getenv
+function os.home() {
+	var home = os.getenv('HOME') || os.getenv('USERPROFILE');
+	if( ! home ) { return false, "failed to find environment variable HOME or USERPROFILE"; }
+	return home;
+}
+
+return os;

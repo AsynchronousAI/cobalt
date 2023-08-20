@@ -98,9 +98,10 @@ if(NOT BUILD_SHARED_LIBS OR NOT LUA_ENABLE_SHARED)
     add_library(Lua::Library ALIAS lua_static)
 endif()
 
-
+set(LUA_SUPPORT_DL ON)
 if(UNIX)
     if(NOT EMSCRIPTEN)
+        
         find_library(LIBM m)
         #TODO: Redo this with find_package
         if(NOT LIBM)
@@ -110,10 +111,11 @@ if(UNIX)
         target_link_libraries(lua_internal INTERFACE m)
         list(APPEND LUA_LINKED_LIBRARIES m)
         if(LUA_SUPPORT_DL)
-            find_library(LIBDL "${CMAKE_DL_LIBS}")
-            if(NOT LIBDL)
-                message(FATAL_ERROR "libdl not found and is required by lua")
-            endif()
+            # I have stopped caring about LIBDL existence
+            #find_library(LIBDL "${CMAKE_DL_LIBS}")
+            #if(NOT LIBDL)
+            #    message(FATAL_ERROR "libdl not found and is required by lua")
+            #endif()
             target_compile_definitions(lua_internal INTERFACE "LUA_USE_DLOPEN")
             target_link_libraries(lua_internal INTERFACE "${CMAKE_DL_LIBS}")
             list(APPEND LUA_LINKED_LIBRARIES "${CMAKE_DL_LIBS}")

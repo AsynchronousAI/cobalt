@@ -187,9 +187,10 @@ for item in os.listdir(scriptPath + "/cobalt23/lib"):
                 continue
             
             if sys.platform == "win32":
-                os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".dll", CDIR + item + ".dll")
+                os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".dll", LDIR + item + ".dll")
             else:
-                os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".so", CDIR + item + ".so")
+                os.rename(scriptPath + "/cobalt23/lib/" + item + "/" + item + ".so", LDIR + item + ".so")
+            print("[*] \033[32mInstalled " + item + "\033[0m")
             continue
         else:   
             # Simply copy the directory to the install path as it is a pure cobalt library

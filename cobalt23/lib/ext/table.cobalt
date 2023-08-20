@@ -1,0 +1,370 @@
+var table = {};
+for( k,v in pairs(require ('table')) ) { table[k] = v; }
+
+table.__index = table;
+
+function table.new(...) {
+	return setmetatable({}, table)->union(...);
+}
+
+setmetatable(table, {
+	__call = function(t, ...) {
+		return table.new(...);
+	}
+});
+
+// 5.2 or 5.3 compatible
+table.unpack = table.unpack || unpack;
+
+// [[ how about table.unpack(t) defaults to table.unpack(t, 1, t.n) if t.n is present?
+// for cohesion with table.pack?
+// already table.unpack's default is #t, but this doesn't account for nils
+// this might break compatability somewhere ...
+var origTableUnpack = table.unpack;
+function table.unpack(...) {
+	var nargs = select('#', ...);
+	var t, i, j = ...;
+	if( nargs < 3 && t.n != null ) {
+		return origTableUnpack(t, i || 1, t.n);
+	}
+	return origTableUnpack(...);
+}
+//]]
+
+// 5.1 compatible
+if( ! table.pack ) {
+	function table.pack(...) {
+		var t = {...};
+		t.n = select('#', ...);
+		return setmetatable(t, table);
+	}
+} else {
+	var oldpack = table.pack;
+	function table.pack(...) {
+		return setmetatable(oldpack(...), table);
+	}
+}
+
+// non-5.1 compat:
+if( ! table.maxn ) {
+	function table.maxn(t) {
+		var max = 0;
+		for( k,v in pairs(t) ) {
+			if( type(k) == 'number' ) {
+				max = math.max(max, k);
+			}
+		}
+		return max;
+	}
+}
+
+// applies to the 'self' table
+// same behavior as new
+function table::union(...) {
+	for( i=1,select('#', ...) ) {
+		var o = select(i, ...);
+		if( o ) {
+			for( k,v in pairs(o) ) {
+				this[k] = v;
+			}
+		}
+	}
+	return this;
+}
+
+// something to consider:
+// mapvalue() returns a new table
+// but append() modifies the current table
+// for consistency shouldn't append() create a new one as well?
+function table::append(...) {
+	for( i=1,select('#', ...) ) {
+		var u = select(i, ...);
+		if( u ) {
+			for( _,v in ipairs(u) ) {
+				table.insert(this, v);
+			}
+		}
+	}
+	return this;
+}
+
+function table::removeKeys(...) {
+	for( i=1,select('#', ...) ) {
+		var v = select(i, ...);
+		this[v] = null;
+	}
+}
+
+// cb(value, key, newtable) returns newvalue[, newkey]
+// nil newkey means use the old key
+function table::map(cb) {
+	var t = table();
+	for( k,v in pairs(this) ) {
+		var nv, nk = cb(v,k,t);
+		if( nk == null ) { nk = k; }
+		t[nk] = nv;
+	}
+	return t;
+}
+
+// cb(value, key, newtable) returns newvalue[, newkey]
+// nil newkey means use the old key
+function table::mapi(cb) {
+	var t = table();
+	for( k=1,#this ) {
+		var v = this[k];
+		var nv, nk = cb(v,k,t);
+		if( nk == null ) { nk = k; }
+		t[nk] = nv;
+	}
+	return t;
+}
+
+// this excludes keys that don't pass the callback function
+// if the key is an ineteger then it is table.remove'd
+// currently the handling of integer keys is the only difference between this
+// and calling table.map and returning nil kills on filtered items
+function table::filter(f) {
+	var t = table();
+	if( type(f) == 'function' ) {
+		for( k,v in pairs(this) ) {
+			if( f(v,k) ) {
+				if( type(k) == 'string' ) {
+					t[k] = v;
+				} else {
+					t->insert(v);
+				}
+			}
+		}
+	} else {
+		// I kind of want to do arrays ... but should we be indexing the keys or values?
+		// or separate functions for each?
+		error('table.filter second arg must be a function');
+	}
+	return t;
+}
+
+function table::keys() {
+	var t = table();
+	for( k,_ in pairs(this) ) {
+		t->insert(k);
+	}
+	return t;
+}
+
+function table::values() {
+	var t = table();
+	for( _,v in pairs(this) ) {
+		t->insert(v);
+	}
+	return t;
+}
+
+// should we have separate finds for pairs and ipairs?
+// should we also return value, key to match map, sup, and inf?
+//   that seems redundant if it's find-by-value ...
+function table::find(value, eq) {
+	if( eq ) {
+		for( k,v in pairs(this) ) {
+			if( eq(v, value) ) { return k, v; }
+		}
+	} else {
+		for( k,v in pairs(this) ) {
+			if( v == value ) { return k, v; }
+		}
+	}
+}
+
+// should insertUnique only operate on the pairs() ?
+// 	especially when insert() itself is an ipairs() operation
+function table::insertUnique(value, eq) {
+	if( ! table.find(this, value, eq) ) { table.insert(this, value); }
+}
+
+function table::removeObject(...) {
+	var removedKeys = table();
+	var len = #this;
+	var k = table.find(this, ...);
+	while( k != null ) {
+		if( type(k) == 'number' && tonumber(k) <= len ) {
+			table.remove(this, k);
+		} else {
+			this[k] = null;
+		}
+		removedKeys->insert(k);
+		k = table.find(this, ...);
+	}
+	return table.unpack(removedKeys);
+}
+
+function table::kvpairs() {
+	var t = table();
+	for( k,v in pairs(this) ) {
+		table.insert(t, {[k]=v});
+	}
+	return t;
+}
+
+// TODO - math instead of table?
+// TODO - have cmp default to operator> just like inf and sort?
+function table::sup(cmp) {
+	var bestk, bestv;
+	if( cmp ) {
+		for( k,v in pairs(this) ) {
+			if( bestv == null || cmp(v, bestv) ) { bestk, bestv = k, v; }
+		}
+	} else {
+		for( k,v in pairs(this) ) {
+			if( bestv == null || v > bestv ) { bestk, bestv = k, v; }
+		}
+	}
+	return bestv, bestk;
+}
+
+// TODO - math instead of table?
+function table::inf(cmp) {
+	var bestk, bestv;
+	if( cmp ) {
+		for( k,v in pairs(this) ) {
+			if( bestv == null || cmp(v, bestv) ) { bestk, bestv = k, v; }
+		}
+	} else {
+		for( k,v in pairs(this) ) {
+			if( bestv == null || v < bestv ) { bestk, bestv = k, v; }
+		}
+	}
+	return bestv, bestk;
+}
+
+// combine elements of
+function table::combine(callback) {
+	var s;
+	for( _,v in pairs(this) ) {
+		if( s == null ) {
+			s = v;
+		} else {
+			s = callback(s, v);
+		}
+	}
+	return s;
+}
+
+var op = require ('ext.op');
+
+function table::sum() {
+	return table.combine(this, op.add);
+}
+
+function table::product() {
+	return table.combine(this, op.mul);
+}
+
+function table::last() {
+	return this[#this];
+}
+
+// just like string subset
+function table.sub(t,i,j) {
+	if( i < 0 ) { i = math.max(1, #t + i + 1); }
+	j = j || #t;
+	j = math.min(j, #t);
+	if( j < 0 ) { j = math.min(#t, #t + j + 1); }
+	var res = {};
+	for( k=i,j ) {
+		res[k-i+1] = t[k];
+	}
+	setmetatable(res, table);
+	return res;
+}
+
+function table.reverse(t) {
+	var r = table();
+	for( i=#t,1,-1 ) {
+		r->insert(t[i]);
+	}
+	return r;
+}
+
+function table.rep(t,n) {
+	var c = table();
+	for( i=1,n ) {
+		c->append(t);
+	}
+	return c;
+}
+
+// in-place sort is fine, but it returns nothing.  for kicks I'd like to chain methods
+var oldsort = require ('table').sort;
+function table::sort(...) {
+	oldsort(this, ...);
+	return this;
+}
+
+// returns a shuffled duplicate of the ipairs in table 't'
+function table.shuffle(t) {
+	t = table(t);
+	var nt = table();
+	while( #t > 0 ) {
+		nt->insert(t->remove(math.random(#t)));
+	}
+	return nt;
+}
+
+function table.pickRandom(t) {
+	return t[math.random(#t)];
+}
+
+// where to put this ...
+// I want to convert iterators into tables
+// it looks like a coroutine but it is made for functions returned from coroutine.wrap
+// also, what to do with multiple-value iterators (like ipairs)
+// do I only wrap the first value?
+// do I wrap both values in a double table?
+// do I do it optionally based on the # args returned?
+// how about I ask for a function to convert the iterator to the table?
+// this is looking very similar to table.map
+// I'll just wrap it with table.wrap and then let the caller use :mapi to transform the results
+// usage: table.wrapfor(ipairs(t))
+// if you want to wrap a 'for=' loop then just use range(a,b[,c])
+// ok at this point I should just start using lua-fun ...
+function table.wrapfor(f, s, _v_var) {
+	var t = table();
+	while( true ) {
+		var vars = table.pack(f(s, _v_var));
+		var var_1 = vars[1];
+		if( var_1 == null ) { break; }
+		_v_var = var_1;
+		t->insert(vars);
+	}
+	return t;
+}
+
+// https://www.lua.org/pil/9.3.html
+var function permgen(t, n) {
+	if( n < 1 ) {
+		coroutine.yield(t);
+	} else {
+		for( i=n,1,-1 ) {
+			// put i-th element as the last one
+			t[n], t[i] = t[i], t[n];
+			// generate all permutations of the other elements
+			permgen(t, n - 1);
+			// restore i-th element
+			t[n], t[i] = t[i], t[n];
+		}
+	}
+}
+
+// return iterator of permutations of the table
+function table.permutations(t) {
+	return coroutine.wrap(function() {
+		permgen(t, table.maxn(t));
+	});
+}
+
+// I won't add table.getmetatable because, as a member method, that will always return 'table'
+
+// if you use this as a member method then know that you can't use it a second time (unless the metatable you set it to has a __index that has 'setmetatable' defined)
+table.setmetatable = setmetatable;
+
+return table;

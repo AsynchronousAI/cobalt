@@ -87,7 +87,7 @@ static int doargs(int argc, char* argv[])
   }
   else if (IS("-"))			/* end of options; use stdin */
    break;
-  else if (IS("-l"))			/* list */
+  else if (IS("-l"))			/* list */ // REFRENCE FOR AST LIBRARY
    ++listing;
   else if (IS("-o"))			/* output file */
   {

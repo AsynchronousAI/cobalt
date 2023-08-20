@@ -652,10 +652,10 @@ LUA_API int lua_resume (lua_State *L, lua_State *from, int nargs) {
   lua_lock(L);
   if (L->status == LUA_OK) {  /* may be starting a coroutine */
     if (L->ci != &L->base_ci)  /* not in base level? */
-      return resume_error(L, "cannot resume non-suspended coroutine", nargs);
+      return resume_error(L, "cannot resume non-suspended thread", nargs);
   }
   else if (L->status != LUA_YIELD)
-    return resume_error(L, "cannot resume dead coroutine", nargs);
+    return resume_error(L, "cannot resume dead thread", nargs);
   L->nCcalls = (from) ? from->nCcalls + 1 : 1;
   if (L->nCcalls >= LUAI_MAXCCALLS)
     return resume_error(L, "C stack overflow", nargs);
@@ -700,7 +700,7 @@ LUA_API int lua_yieldk (lua_State *L, int nresults, lua_KContext ctx,
     if (L != G(L)->mainthread)
       luaG_runerror(L, "attempt to yield across a C-call boundary");
     else
-      luaG_runerror(L, "attempt to yield from outside a coroutine");
+      luaG_runerror(L, "attempt to yield from outside a thread");
   }
   L->status = LUA_YIELD;
   ci->extra = savestack(L, ci->func);  /* save current 'func' */

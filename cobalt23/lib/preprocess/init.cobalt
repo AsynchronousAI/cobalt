@@ -25,6 +25,7 @@
 */
 
 /* Supports
+    // #open (name): Checks if a Macro is defined and opens it so that the program can use it
     // #define (name) (value <optional>): Sets a macro
     // #define (lambdaname)(args) (function): Sets a macro to a lambda function
     // #undef (name): Removes a macro
@@ -50,19 +51,26 @@ filex = import("filex") // Extended File library for cobalt
 core = core || import("core") // Core library for cobalt
 
 function process(str, itemtype, out, outfile, ...){
+    // 0: Init
+    core.macros()
+    
     // 1: Split lines
-    var ogstr = str // provided c filename
+    var nstr
+    var ogstr = out ? str : null
     if (itemtype == "file") {
         var file = io.open(str)
         if (!file){
             error(core.error.strerror(2))
         }
-        str = file->read("*all")
+        nstr = file->read("*all")
         file->close()
+        if (!nstr){
+            error(core.error.strerror(2))
+        }
     }
 
     var lines = []
-    for (line in str->gmatch("[^\r\n]+")) {
+    for (line in nstr->gmatch("[^\r\n]+")) {
         lines[#lines + 1] = line
     }
 
@@ -71,7 +79,7 @@ function process(str, itemtype, out, outfile, ...){
             // cwd/ogstr
             return filex.join(filesystem.currentdir(), ogstr)
         }else{
-            return debug.getinfo(2, "S").source->sub(2).source->sub(2)
+            return debug.getinfo(2, "S").source->sub(2)
         }
     }
     
@@ -104,6 +112,9 @@ function process(str, itemtype, out, outfile, ...){
     envitems = table.pack(...)
     inenv = {}
     for (i, v in pairs(envitems)){
+        if (type(v) == "number"){
+            break;
+        }
         var split = v->gsub("-", "")->split("=")
         inenv[split[1]] = loadstring("return "..split[2])()
     }
@@ -173,7 +184,7 @@ function process(str, itemtype, out, outfile, ...){
         }
         if (!found) {
             if (!run) {
-                newlines[i] = ""
+                newlines[i] = null
             }
             continue;
         }
@@ -186,16 +197,31 @@ function process(str, itemtype, out, outfile, ...){
                 print("\27[1;31m"..errorin.."\27[0m\n\n")
             }
             print("\27[1;31mStopping preprocessor.\27[0m")
-            abort()
+            os.exit()
         }
 
         // If the second character is a !, ignore the line
         if (v[2]->sub(2, 2) == "!") {
-            newlines[v[1]] = ""
+            newlines[v[1]] = null
             return // Skip this line
         }
 
         switch(v[2]->match("%S+"), {
+            "#open": function(){
+                // Example:
+                // #open X
+                // this is assuming X is in the env
+                // var X = <whatever X is in the env>
+                var name = v[2]->gsub("#open ", "")
+                var value = env[name]
+                if (value == null) {
+                    errorpreprocessor("Macro '"..name.."' is not defined")
+                }
+                newlines[v[1]] = "var "..tostring(name).." = "..((type(value) == "string" && (str->sub(1,1) == '"' && str->sub(-1) == '"') || (str->sub(1,1) == "'" && str->sub(-1) == "'")) ? '"'..value..'"' : tostring(value))
+                
+                // Avoid memory leaks
+                name, value = null
+            },
             "#define": function(){
                 // split v[2] by spaces
                 var split = v[2]->split(" ")
@@ -240,7 +266,7 @@ function process(str, itemtype, out, outfile, ...){
                     // 3: Set the value in the env
                     env[name] = value
                     // 4: Remove the line
-                    newlines[v[1]] = "var "..name.." = "..value
+                    newlines[v[1]] = "var "..name.." = "..(type(value) == "string" ? '"'..value..'"' : tostring(value))
                     return
                 }
             },
@@ -250,27 +276,29 @@ function process(str, itemtype, out, outfile, ...){
                 // Will add everything after that line in that file to the newlines[i] table
                 // "file.cobalt" if it is not provided it is the current file
                 // 1 is the line number
+                warn("Using #line is not recommended, Use import() instead")
                 var split = v[2]->split(" ")
                 var line = split[2]
+                var filename
                 if (!split[3]) {
-                    file = getname()
+                    filename = getname()
                 }else{
-                    file = string.sub(split[3], 2, -2)
+                    filename = string.sub(split[3], 2, -2)
                 }
-                var f = io.open(file)
+                print(filename)
+                var f = io.open(filename)
                 if (!f) {
                     var script_path = getname()
                     var script_dir = script_path->match("(.*/)")
                     if (script_dir == null) {
                         script_dir = "./"
                     }
-
-                    f = (io.open(script_dir..file))
+                    f = io.open(script_dir..filename)
                     if (!f) {
-                        print(io.open(script_dir..file))
-                        errorpreprocessor("File '"..file.."' not found")
+                        errorpreprocessor("File '"..script_dir..filename.."' not found")
                     }
                 }
+                
                 var content = f->read("*all")
                 f->close()
                 // Set i line number to r(content)
@@ -291,6 +319,8 @@ function process(str, itemtype, out, outfile, ...){
                 file, line = null
             },
             "#include": function(){
+                warn("Using #include is not recommended, Use import() instead")
+
                 var file = v[2]->gsub("#include \"", "")
                 var ogfile = file
                 // File should be a string that ends with " and may have stuff after the "
@@ -369,7 +399,7 @@ function process(str, itemtype, out, outfile, ...){
                     errorpreprocessor(result)
                 }
                 // 3: Remove the line 
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
                 table.insert(activeifs, result)
 
                 // 4: Remove all code if result is false until #endif or #else
@@ -406,7 +436,7 @@ function process(str, itemtype, out, outfile, ...){
                     errorpreprocessor(result)
                 }
                 // 3: Remove the line 
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
                 table.insert(activeifs, result)
 
                 // 4: Remove all code if result is false until #endif or #else
@@ -443,7 +473,7 @@ function process(str, itemtype, out, outfile, ...){
                     errorpreprocessor(result)
                 }
                 // 3: Remove the line 
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
                 table.insert(activeifs, result)
 
                 // 4: Remove all code if result is false until #endif or #else
@@ -453,7 +483,7 @@ function process(str, itemtype, out, outfile, ...){
                 // Example:
                 // #elif (true)
                 if (run) {
-                    newlines[v[1]] = ""
+                    newlines[v[1]] = null
                     return // Skip this line
                 }
                 // 1: Get the condition, Everything in between the ()
@@ -483,7 +513,7 @@ function process(str, itemtype, out, outfile, ...){
                     errorpreprocessor(result)
                 }
                 // 3: Remove the line 
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
                 table.insert(activeifs, result)
 
                 // 4: Remove all code if result is false until #endif or #else
@@ -491,11 +521,11 @@ function process(str, itemtype, out, outfile, ...){
             },
             "#else": function(){
                 run = !run
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
             },
             "#endif": function(){
                 activeifs[#activeifs] = null
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
                 run = true
             },
             "#undef": function(){
@@ -506,7 +536,7 @@ function process(str, itemtype, out, outfile, ...){
                 // 2: Remove the value in the env
                 env[name] = null
                 // 3: Remove the line
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
             },
             "#error": function(){
                 var error = v[2]->gsub("#error ", "")
@@ -517,14 +547,14 @@ function process(str, itemtype, out, outfile, ...){
             "#warning": function(){
                 var warning = v[2]->gsub("#warning ", "")
                 warn(warning)
-                newlines[v[1]] = ""
+                newlines[v[1]] = null
             },
-            "#pragma": function(){
-                errorpreprocessor("Pragma is not supported")
+            "#config": function(){
+                errorpreprocessor("Config is not supported")
             },
             "default": function(value){
                 if (!run){
-                    newlines[v[1]] = ""
+                    newlines[v[1]] = null
                     return // Skip this line
                 }
 
@@ -553,8 +583,11 @@ function process(str, itemtype, out, outfile, ...){
     lines = null
     preprocess = null
     str = null
-    var joined = ""
+    var joined = "/* Processed with cobalt23 Preprocessor | v1 */\n\n\n"
     for (i, v in pairs(newlines)) {
+        if (v == null) {
+            continue;
+        }
         joined = joined..v.."\n"
     }
     newlines = null

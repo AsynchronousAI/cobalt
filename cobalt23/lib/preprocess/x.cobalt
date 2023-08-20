@@ -1,0 +1,29 @@
+/* Binary signiture */
+#define COBALT_SIGNUTURE "cobalt"
+
+ffi = import("ffi")
+function extern(in, func){
+    // Uses ffi to replicate 
+    // C extern like
+    // extern <in> {
+    //      <func>
+    // }
+    // func is a string
+}
+
+#ifdef (cobalt)
+extern("C", [[
+#endif
+
+
+// ADD C CODE HERE
+
+
+
+#ifdef (cobalt)
+]])
+#endif
+
+#open cobaltversion
+print(cobaltversion)
+#open A

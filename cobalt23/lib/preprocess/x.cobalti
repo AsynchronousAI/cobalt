@@ -1,0 +1,20 @@
+/* Processed with cobalt23 Preprocessor | v1 */
+
+
+/* Binary signiture */
+var COBALT_SIGNUTURE = "cobalt"
+ffi = import("ffi")
+function extern(in, func){
+    // Uses ffi to replicate 
+    // C extern like
+    // extern <in> {
+    //      <func>
+    // }
+    // func is a string
+}
+extern("C", [[
+// ADD C CODE HERE
+]])
+var cobaltversion = 23
+print(cobaltversion)
+var A = "B"

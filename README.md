@@ -1,5 +1,6 @@
 # cobalt23
-A programming language made in C and C++ made to be the *portable, simple, and modern* successor of C.
+A programming language made in C and C++ made to be the *portable, simple, and modern* successor of Lua to provide
+a C like interface and speed.
 
 ## Example code:
 The following code is a snippet that shows off some of the genera features of cobalt.
@@ -65,10 +66,10 @@ match C, C++, and Rust in nearly all cases.
 - Direct memory access
 - Type annotations and checking
 - Real threads
-- Ultra portable
+- portable
 - Real macros
 - Enums
-- Ultra fast
+- Ultrafast
 - Manual memory management
 - Better syntax
 

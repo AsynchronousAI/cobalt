@@ -1,8 +1,0 @@
-prefix=/Users/aaravs/Documents/lux/cobalt23/jit/install
-multilib=lib
-
-Name: cobaltjit
-Description: Just-In-Time Compiler for Lua
-Version: 2.1.0-beta3
-Libs: -L${prefix}/${multilib} -lluajit-5.1
-Cflags: -I${prefix}/include/luajit-2.1

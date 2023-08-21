@@ -15,13 +15,13 @@
 */
 
 /* Notes
-- The preprocessor is not apart of the compiler
-- Using C Macros require GCC to be installed (As of the `core` library dependency)
-- C Macros will NOT work on the JIT compiler
+    - The preprocessor is not apart of the compiler
+    - Using C Macros require GCC to be installed (As of the `core` library dependency)
+    - C Macros will NOT work on the JIT compiler
 */
 
 /* TODO:
-
+    None!
 */
 
 /* Supports

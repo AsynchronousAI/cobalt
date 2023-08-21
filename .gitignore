@@ -10,11 +10,6 @@
 /node_modules
 /cobalt
 /cobaltc
-/cobalt23/jit/src/cobaltjit
-/cobalt23/jit/src/host/buildvm
-/cobalt23/jit/src/host/minicobalt
-/cobalt23/jit/src/host/buildvm_arch.h
-/cobalt23/jit/src/jit/vmdef.cobalt
 # CMake Ignore
 CMakeLists.txt.user
 CMakeCache.txt

@@ -52,7 +52,7 @@ function loadenv(env, str){
   str = [[
     env = ]]..tabletostring(env)..[[
     for (i, v in pairs(env)) {
-      _ENV[i] = v
+      _G[i] = v
     }
 
   ]]..str

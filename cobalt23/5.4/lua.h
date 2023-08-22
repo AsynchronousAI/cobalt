@@ -19,18 +19,19 @@
 #define LUA_VERSION_MAJOR	"5"
 #define LUA_VERSION_MINOR	"4"
 #define LUA_VERSION_RELEASE	"4"
+#define COBALT_VERSION_RELEASE "0"
 
 #define LUA_VERSION_NUM			504
 #define LUA_VERSION_RELEASE_NUM		(LUA_VERSION_NUM * 100 + 4)
 
 #define LUA_VERSION	"cobalt23"
-#define LUA_RELEASE	LUA_VERSION "." LUA_VERSION_RELEASE
-#define LUA_COPYRIGHT	LUA_RELEASE "  Copyright (C) 1994-2022 Lua.org, PUC-Rio"
-#define LUA_AUTHORS	"R. Ierusalimschy, L. H. de Figueiredo, W. Celes, Domingo Alvarez Duarte"
+#define LUA_RELEASE	LUA_VERSION "." COBALT_VERSION_RELEASE
+#define LUA_COPYRIGHT	LUA_RELEASE "  Read full credits in COPYRIGHTS.md"
+#define LUA_AUTHORS	""
 
 
 /* mark for precompiled code ('<esc>Lua') */
-#define LUA_SIGNATURE	"\x1bLua"
+#define LUA_SIGNATURE	"\x1bluacobalt-y23"
 
 /* option for multiple returns in 'lua_pcall' and 'lua_call' */
 #define LUA_MULTRET	(-1)

@@ -1,5 +1,5 @@
 /*
-** $Id: linit.c $
+** $Id: linit.c,v 1.39.1.1 2017/04/19 17:20:42 roberto Exp $
 ** Initialization of libraries for lua.c and other clients
 ** See Copyright Notice in lua.h
 */
@@ -40,26 +40,60 @@
 ** program
 */
 static const luaL_Reg loadedlibs[] = {
-  {LUA_GNAME, luaopen_base},
+  {"_G", luaopen_base},
   {LUA_LOADLIBNAME, luaopen_package},
   {LUA_COLIBNAME, luaopen_coroutine},
   {LUA_TABLIBNAME, luaopen_table},
   {LUA_IOLIBNAME, luaopen_io},
+  {LUA_ASYNCLIBNAME, luaopen_async},
   {LUA_OSLIBNAME, luaopen_os},
   {LUA_STRLIBNAME, luaopen_string},
   {LUA_MATHLIBNAME, luaopen_math},
   {LUA_UTF8LIBNAME, luaopen_utf8},
   {LUA_DBLIBNAME, luaopen_debug},
+  {LUA_COLORLIBNAME, luaopen_color},
+  {LUA_2DLIBNAME, luaopen_2D},
+  {LUA_3DLIBNAME, luaopen_3D},
+  {LUA_TRANSFORMNAME, luaopen_transform},
+  {LUA_CORENAME, luaopen_lcinterface},
+  {LUA_DEVICENAME, luaopen_device},
+  {LUA_FILESYSTEMNAME, luaopen_lfs},
+  //{LUA_COMPLEXNAME, luaopen_complex},
+  {LUA_STRUCTNAME, luaopen_struct},
+  {LUA_SIGNALNAME, luaopen_signal},
+  {LUA_SOCKETNAME, luaopen_chan},
+  {LUA_BITLIBNAME, luaopen_bit32},
+  {LUA_BITOPNAME, luaopen_bit},
   {NULL, NULL}
 };
 
 
-LUALIB_API void luaL_openlibs (lua_State *L) {
+static const luaL_Reg lib_preload[] = {
+
+  { NULL,		NULL }
+};
+
+LUALIB_API void luaL_openlibs(lua_State *L)
+{
   const luaL_Reg *lib;
   /* "require" functions from 'loadedlibs' and set results to global table */
   for (lib = loadedlibs; lib->func; lib++) {
     luaL_requiref(L, lib->name, lib->func, 1);
     lua_pop(L, 1);  /* remove lib */
   }
+  /* // JIT snippet, JIT supports PRELOAD require. Might add to interpreted if needed.
+  const luaL_Reg *lib;
+  for (lib = lj_lib_load; lib->func; lib++) {
+    lua_pushcfunction(L, lib->func);
+    lua_pushstring(L, lib->name);
+    lua_call(L, 1, 0);
+  }
+  luaL_findtable(L, LUA_REGISTRYINDEX, "_PRELOAD",
+		 sizeof(lj_lib_preload)/sizeof(lj_lib_preload[0])-1);
+  for (lib = lj_lib_preload; lib->func; lib++) {
+    lua_pushcfunction(L, lib->func);
+    lua_setfield(L, -2, lib->name);
+  }
+  lua_pop(L, 1);
+  */
 }
-

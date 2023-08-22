@@ -152,6 +152,7 @@ LUALIB_API int luaopen_complex(lua_State *L)
 {
  luaL_newmetatable(L,MYTYPE);
  lua_setglobal(L,MYNAME);
+ #define luaL_register(L,n,f)	luaL_newlib(L,f)
  luaL_register(L,MYNAME,R);
  lua_settable(L,-3);
  lua_pushliteral(L,"__index");

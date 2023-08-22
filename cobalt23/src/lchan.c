@@ -514,6 +514,7 @@ int luaopen_chan(lua_State* L)
     luaL_newmetatable(L, METATABLE_NAME);
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
+    #define luaL_register(L,n,f)	luaL_newlib(L,f)
     luaL_register(L, NULL, chan_meta_fns);
     luaL_register(L, "chan", chan_fns);
     return 1;

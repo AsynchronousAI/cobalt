@@ -4,6 +4,13 @@
   Integrated into the preprocessor.
 */
 
+/* TODO:
+ - Allow custom types
+ - Integration to preprocessor
+ - Test with preprocessor
+ - Fix adding values to env issue
+*/
+
 // ERROR
 function typerror(errorin, line, note){
   print("\27[1;31mTypechecker error:\27[0m")
@@ -25,13 +32,16 @@ function tabletostring(tbl){
   // Converts a table to a string
   var result = "{"
   for (i, v in pairs(tbl)) {
-    v = loadstring("return "..v)()
+    if (!v){
+      v = "null"
+    }
+    v = loadstring("return "..(v || "null"))()
     if (type(v) == "string") {
       result = result..i.." = \""..v.."\","
     } else if (type(v) == "table") {
       result = result..i.." = "..tabletostring(v)..", "
     } else {
-      result = result..i.." = "..v..","
+      result = result..i.." = "..(v || "null")..","
     }
   }
   result = result.."}"
@@ -251,7 +261,7 @@ function check(type, value, vname, knownValues, line) {
       typerror(core.error.strerror(111)->format(type, typeof(value), vname), line);
     }
   } else {
-    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -types` to see all types");
+    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -help -types` to see all types");
   }
 }
 
@@ -272,15 +282,16 @@ function typecheck(code){
       typerror("Check error: "..err)
     }
     knownTypes[def[1]] = value();
-    knownValues[def[1]] = def[3];
+    knownValues[def[1]] = def[2];
     
   }
   for( _, assign in pairs(assigns) ) {
     check(assign[2], assign[3], assign[1], knownValues, assign[4]);
-    knownValues[assign[1]] = assign[3];
+    knownValues[assign[1]] = assign[2];
   }
   for( _, allassign in pairs(allassigns) ) {
     if (knownTypes[allassign[1]]) {
+      print("Type", knownTypes[allassign[1]], "found for", allassign[1], "in", allassign[3], "with value", allassign[2])
       check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
     }
   }
@@ -297,10 +308,6 @@ function all(){
 }
 
 // TESTS
-function getTuple(){
-  return 1,2
-}
-print(type(getTuple()))
 typecheck([[
   // Define
   var precision: int = 100

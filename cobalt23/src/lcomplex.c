@@ -153,8 +153,6 @@ LUALIB_API int luaopen_complex(lua_State *L)
  luaL_newmetatable(L,MYTYPE);
  lua_setglobal(L,MYNAME);
  luaL_register(L,MYNAME,R);
- lua_pushliteral(L,"version");			/** version */
- lua_pushliteral(L,MYVERSION);
  lua_settable(L,-3);
  lua_pushliteral(L,"__index");
  lua_pushvalue(L,-2);

@@ -1,0 +1,319 @@
+/*
+  Cobalt Typechecker. 
+  This is a typechecker for the Cobalt language. It is written in Cobalt.
+  Integrated into the preprocessor.
+*/
+
+// ERROR
+function typerror(errorin, line, note){
+  print("\27[1;31mTypechecker error:\27[0m")
+  if (errorin) {
+      print("\27[1;31m"..errorin.."\27[0m\n\n")
+  }
+  print("\27[1;31mSnippet:\27[0m")
+  print(line)
+  if (note){
+    print("\n\27[1;31mTypechecker provided note:\27[0m")
+    print("\n\27[1;31m"..note.."\27[0m")
+  }
+  print("\n\27[1;31mStopping Typechecker.\27[0m")
+  error("traceback:")
+  os.exit()
+}
+// LOAD
+function tabletostring(tbl){
+  // Converts a table to a string
+  var result = "{"
+  for (i, v in pairs(tbl)) {
+    v = loadstring("return "..v)()
+    if (type(v) == "string") {
+      result = result..i.." = \""..v.."\","
+    } else if (type(v) == "table") {
+      result = result..i.." = "..tabletostring(v)..", "
+    } else {
+      result = result..i.." = "..v..","
+    }
+  }
+  result = result.."}"
+  return result
+}
+function loadenv(env, str){
+  // Uses loadstring, but the enviourment can be provided. env is a table.
+  str = [[
+    env = ]]..tabletostring(env)..[[
+    for (i, v in pairs(env)) {
+      _ENV[i] = v
+    }
+
+  ]]..str
+
+  return loadstring(str);
+}
+
+// TYPES
+types = {
+  "string" = function(item){
+    // Check if item is a string
+    return type(item) == "string"
+  },
+  "pos" = function(item){
+    return math.abs(item) == item
+  },
+  "neg" = function(item){
+    return math.abs(item) != item
+  },
+  "posint" = function(item){
+    return math.abs(item) == item && math.floor(item) == item
+  },
+  "negint" = function(item){
+    return math.abs(item) != item && math.floor(item) == item
+  },
+  "pointer" = function(item){
+    // Check if the item is a string which is parsed like a pointer
+    return type(item) == "string" && item->match("^%s*%*%s*$")
+  },
+  "array" = function(item){
+    // Make sure that all the indexes are integers
+    for (i, v in pairs(item)) {
+      if (type(i) != "number") {
+        return false
+      }
+    }
+  },
+  "matrix" = function(item){
+    // Check if all the values are a table
+    for (i, v in pairs(item)) {
+      if (type(v) != "table") {
+        return false
+      }
+    }
+  },
+  "Vector3" = function(item){
+    // Uses the `Vector3` class and check if tostring(item) == "vec3: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^vec3: ")
+  },
+  "Vector2" = function(item){
+    // Uses the `Vector2` class and check if tostring(item) == "vec2: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^vec2: ")
+  },
+  "Color" = function(item){
+    // Uses the `Color` class and check if tostring(item) == "color: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^color: ")
+  },
+  "Transform" = function(item){
+    // Uses the `Transform` class and check if tostring(item) == "transform: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^transform: ")
+  },
+  "number" = function(item){
+    // Check if item is a number
+    return type(item) == "number"
+  },
+  "boolean" = function(item){
+    // Check if item is a boolean
+    return type(item) == "boolean"
+  },
+  "table" = function(item){
+    // Check if item is a table
+    return type(item) == "table"
+  },
+  "function" = function(item){
+    // Check if item is a function
+    return type(item) == "function"
+  },
+  "userdata" = function(item){
+    // Check if item is a userdata
+    return type(item) == "userdata"
+  },
+  "thread" = function(item){
+    // Check if item is a thread
+    return type(item) == "thread"
+  },
+  "null" = function(item){
+    // Check if item is null
+    return type(item) == "null"
+  },
+  "message" = function(item){
+    // Check if tostring(item) == "message: <pointer>"
+    // messages are used in the Message library for communication between threads
+    return tostring(item) == string.match("^message: ")
+  },
+  "complex" = function(item){
+    // Try to get item.__name, if it is "complex number" then it is a complex number
+    s, e = pcall(function(){ if (!item.__name){error("Force error")} })
+    return s
+  },
+  "directory" = function(item){
+    // For `file` directory type
+    // return tostring(item) == "directory: <pointer>"
+    return tostring(item) == string.match("^directory: ")
+  },
+  "lock" = function(item){
+    // For `file` lock type
+    // return tostring(item) == "lock: <pointer>"
+    return tostring(item) == string.match("^lock: ")
+  },
+  "protected" = function(item){
+    // return getmetatable(item).__metatable != nil
+    return getmetatable(item).__metatable != null
+  },
+  "_LUABOX" = function(item){
+    // Check if tostring(item) == "LUABOX: <pointer>"
+    // this shouldnt be used for average code, LUABOX is internal
+    return tostring(item) == string.match("^LUABOX: ")
+  },
+  "any" = function(item){
+    // Check if item is any type
+    return true
+  },
+  "coroutine" = function(item){
+    // Check if item is a coroutine
+    return type(item) == "coroutine"
+  },
+  "int" = function(item){
+    // Check if item is an integer
+    return math.floor(item) == item
+  },
+  "float" = function(item){
+    // Check if item is a float
+    return math.floor(item) != item
+  },
+  "double" = function(item){
+    // Check if item is a double
+    return math.floor(item) != item
+  },
+};
+alltypes = []
+
+for (i, v in pairs(types)) {
+  table.insert(alltypes, i)
+}
+
+// PARSER
+function deffind(str) {
+    // Takes in code and looks for definitions with annotations
+    var pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*$";
+        pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$";
+    var result = {};
+    for( line in str->gmatch("[^\r\n]+") ) {
+      var vart, key, value = line->match(pattern);
+      if( vart && key && value ) {
+        table.insert(result, {vart, key, value, line});
+      }
+    }
+    return result;
+}
+function assign(str) {
+    // Takes in code looks for assignments with annotations
+    var pattern = "%s*([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*";
+    var result = {};
+    for( line in str->gmatch("[^\r\n]+") ) {
+      var vart, key, value = line->match(pattern);
+      if( vart && key && value ) {
+        // Verify var, key, value are not eligible for def
+        if( ! deffind(line)[1] ) {
+            table.insert(result, {vart, key, value, line});
+        }
+      }
+    }
+    return result;
+}
+function allassign(str){
+  // Used to look for typeless assignments
+  var pattern = "%s*([^%s]+)%s*=%s*([^%s]+)%s*";
+  var result = {};
+  for( line in str->gmatch("[^\r\n]+") ) {
+    var key, value = line->match(pattern);
+    if( key && value ) {
+      if (! deffind(line)[1] && ! assign(line)[1]) {
+        table.insert(result, {key, value, line});
+      }
+    }
+  }
+  return result;
+}
+function clean(str) {
+  // Takes in code and removes comments, strings.
+  return str->gsub('"[^"]-"', '""')->gsub("'[^']-'", '""')->gsub('%[%[.-%]%]', '')->gsub('//.-\n', '')->gsub('/%*.-%*/', '');
+}
+
+// CHECKER
+typeof = type;
+function check(type, value, vname, knownValues, line) {
+  value, err = loadenv(knownValues, "return " .. value)
+  if (!value){
+    typerror("Check error: "..err, line)
+  }
+  value = value();
+  if( types[type] ) {
+    if (types[type](value)) {
+      return true;
+    } else {
+      typerror(core.error.strerror(111)->format(type, typeof(value), vname), line);
+    }
+  } else {
+    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -types` to see all types");
+  }
+}
+
+// MAIN
+function typecheck(code){
+  cleanedCode = clean(code);
+  var defs = deffind(cleanedCode);
+  var assigns = assign(cleanedCode);
+  var allassigns = allassign(cleanedCode);
+
+  var knownTypes = {};
+  var knownValues = {}; 
+
+  for( _, def in pairs(defs) ) {
+    check(def[2], def[3], def[1], knownValues, def[4])
+    value, err = loadenv(knownValues, "return " .. def[3])
+    if (!value){
+      typerror("Check error: "..err)
+    }
+    knownTypes[def[1]] = value();
+    knownValues[def[1]] = def[3];
+    
+  }
+  for( _, assign in pairs(assigns) ) {
+    check(assign[2], assign[3], assign[1], knownValues, assign[4]);
+    knownValues[assign[1]] = assign[3];
+  }
+  for( _, allassign in pairs(allassigns) ) {
+    if (knownTypes[allassign[1]]) {
+      check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
+    }
+  }
+
+
+  return true;
+}
+function all(){
+  // Prints all types
+  print("All valid checkable types:")
+  for (i, v in pairs(alltypes)) {
+    print("  "..v)
+  }
+}
+
+// TESTS
+function getTuple(){
+  return 1,2
+}
+print(type(getTuple()))
+typecheck([[
+  // Define
+  var precision: int = 100
+  var guess: number = 1
+
+  // Iterate the Newton-Raphson method until the desired precision is reached
+  for (i = 1, precision) {
+    guess = 0.5 * (guess + 2 / guess)
+  }
+
+  // Convert the result to a string with the desired precision
+  var result: string = string.format(""..precision.."%.17f", guess);
+
+  // Output
+  print(result)
+]])

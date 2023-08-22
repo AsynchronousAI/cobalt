@@ -50,7 +50,12 @@ filesystem = file || import("file") // File library for cobalt
 filex = import("ext.file") // Extended File library for cobalt
 core = core || import("core") // Core library for cobalt
 
+typechecker = import("type") // Integrated type checker.
+
 function process(str, itemtype, out, outfile, ...){
+    if (outfile == "-type"){
+        typechecker.all() // Print all valid types
+    }
     // 0: Init
     core.macros()
     
@@ -599,4 +604,5 @@ function process(str, itemtype, out, outfile, ...){
     }
     return joined
 }
+
 return process

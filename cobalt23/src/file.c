@@ -98,7 +98,7 @@
 #define strerror(_)     "System unable to describe the error"
 #endif
 
-#define DIR_METATABLE "directory metatable"
+#define DIR_METATABLE "directory"
 typedef struct dir_data {
   int closed;
 #ifdef _WIN32
@@ -109,7 +109,7 @@ typedef struct dir_data {
 #endif
 } dir_data;
 
-#define LOCK_METATABLE "lock metatable"
+#define LOCK_METATABLE "lock"
 
 #ifdef _WIN32
 

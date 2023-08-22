@@ -843,6 +843,7 @@ static const luaL_Reg base_funcs[] = {
   {"rawset", luaB_rawset},
   {"select", luaB_select},
   {"setmetatable", luaB_setmetatable},
+  //{"newmetatable", luaB_newmetatable}, Use __name
   {"tonumber", luaB_tonumber},
   {"tostring", luaB_tostring},
   {"type", luaB_type},

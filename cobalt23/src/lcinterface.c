@@ -228,7 +228,8 @@ char cobalt_errors[][256] = {
   "Expected %s, got %s for argument %d",
   "Expected %s, got %s",
   "Expected %s, got %s for argument %d of %s",
-  "Expected %s, for variable %s",
+  "Expected '%s' got '%s' in variable '%s'",
+  "%s is not a valid type",
 
   // MEMORY
   "Failed to allocate memory",

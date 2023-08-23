@@ -12,9 +12,7 @@
 #include "cobalt.h"
 #include "lauxlib.h"
 
-#define MYNAME		"complex"
-#define MYTYPE		MYNAME " number"
-#define MYVERSION	MYTYPE " library for " LUA_VERSION " / Nov 2009"
+#define MYTYPE		"complex"
 
 #define Z(i)		Pget(L,i)
 #define O(i)		luaL_optnumber(L,i,0)
@@ -42,8 +40,9 @@ static int pushcomplex(lua_State *L, Complex z)
 {
  Complex *p=lua_newuserdata(L,sizeof(Complex));
  *p=z;
- luaL_getmetatable(L,MYTYPE);
+ luaL_newmetatable(L,MYTYPE);
  lua_setmetatable(L,-2);
+
  return 1;
 }
 
@@ -121,6 +120,12 @@ static const luaL_Reg R[] =
 	{ "__mul",	Lmul	},
 	{ "__sub",	Lsub	},
 	{ "__unm",	Lneg	},
+	{ "add",	Ladd	},
+	{ "div",	Ldiv	},
+	{ "eq",	Leq	},
+	{ "mul",	Lmul	},
+	{ "sub",	Lsub	},
+	{ "unm",	Lneg	},
 	{ "abs",	Labs	},
 	{ "acos",	Lacos	},
 	{ "acosh",	Lacosh	},
@@ -150,24 +155,31 @@ static const luaL_Reg R[] =
 
 LUALIB_API int luaopen_complex(lua_State *L)
 {
+ /*
  luaL_newmetatable(L,MYTYPE);
- lua_setglobal(L,MYNAME);
+ lua_setglobal(L,MYTYPE);
  #define luaL_register(L,n,f)	luaL_newlib(L,f)
- luaL_register(L,MYNAME,R);
+ luaL_register(L,MYTYPE,R);
  lua_settable(L,-3);
  lua_pushliteral(L,"__index");
  lua_pushvalue(L,-2);
  lua_settable(L,-3);
- lua_pushliteral(L,"I");			/** I */
+ lua_pushliteral(L,"I");			
  pushcomplex(L,I);
  lua_settable(L,-3);
- lua_pushliteral(L,"__pow");			/** __pow(z,w) */
+ lua_pushliteral(L,"__pow");			
  lua_pushliteral(L,"pow");
  lua_gettable(L,-3);
  lua_settable(L,-3);
- lua_pushliteral(L,"__tostring");		/** __tostring(z) */
+ lua_pushliteral(L,"__tostring");		
  lua_pushliteral(L,"tostring");
  lua_gettable(L,-3);
  lua_settable(L,-3);
+ */
+ luaL_newlib(L, R);
+
+ pushcomplex(L, I);
+ lua_setfield(L, -2, "I");
+
  return 1;
 }

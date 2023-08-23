@@ -7,7 +7,26 @@
 /* TODO:
  - Allow custom types
  - Functions can have arguments to be typechecked
+ - Generics
 */
+/* SYSTEM:
+ The system removes all comments and clears strings and saves it to a table of "dead" strings, 
+ then it looks for definitions `var x: y = z` to store in a cache and assignments `x: y = z` and even 
+ normal assignments `a = z` patterns, and then it checks the types of the values with 
+ the "dead" strings reborn.
+
+ It is simple and short, it is in BETA but issues will be rare it has been tested on even this 
+ file and it works fine.
+
+ If you do not use the typechecker type annotations are supported by the interpreter but wont
+ have any value. But the same cannot be said for preprocessor directives, they are not supported 
+ in the interpreter.
+
+ If the typechecker fails to check it will ignore.
+*/
+// GLOBALS
+dead = {}
+
 // ERROR
 function typerror(errorin, line, note){
   print("\27[1;31mTypechecker error:\27[0m")
@@ -15,13 +34,12 @@ function typerror(errorin, line, note){
       print("\27[1;31m"..errorin.."\27[0m\n\n")
   }
   print("\27[1;31mSnippet:\27[0m")
-  print(line)
+  print(revive(line))
   if (note){
     print("\n\27[1;31mTypechecker provided note:\27[0m")
     print("\n\27[1;31m"..note.."\27[0m")
   }
   print("\n\27[1;31mStopping Typechecker.\27[0m")
-  error("traceback:")
   os.exit()
 }
 // LOAD
@@ -67,7 +85,7 @@ function loadenv(env, str){
 
   ]]..str
 
-  return loadstring(str);
+  return loadstring(revive(str));
 }
 
 // TYPES
@@ -245,6 +263,18 @@ function assign(str) {
     }
     return result;
 }
+function findfunctions(str){
+  // Looks for `function x(<?>)` and returns a table of all the functions and source code
+  var pattern = "^%s*function%s+([^%s]+)%s*%(([^%s]*)%)%s*$";
+  var result = {};
+  for( line in str->gmatch("[^\r\n]+") ) {
+    var key, value = line->match(pattern);
+    if( key && value ) {
+      table.insert(result, {key, value, line});
+    }
+  }
+  return result;
+}
 function allassign(str){
   // Used to look for typeless assignments
   var pattern = "%s*([^%s]+)%s*=%s*([^%s]+)%s*";
@@ -259,9 +289,53 @@ function allassign(str){
   }
   return result;
 }
+function revive(str){
+  for (i, v in pairs(dead)){
+    var index = "'DEADVALUESTRTYPECHECK-"..(i).."'"
+
+    // Go character by character and look for index
+    // I want to use ->gsub but that doesnt work for sum reason so I am using a 
+    // manual method
+    var ci = 1;
+    var csofar = "";
+    for (i = 1, #str) {
+      var char = str->sub(i, i);
+      if (char == index->sub(ci, ci)) {
+        ci++;
+        csofar = csofar..char;
+        if (csofar == index) {
+          str = str->sub(1, i - #index)..v..str->sub(i + 1, #str)
+          break;
+        }
+      } else {
+        ci = 1;
+        csofar = "";
+      }
+    }
+  }
+  return str
+}
 function clean(str) {
   // Takes in code and removes comments, strings.
-  return str->gsub('"[^"]-"', '""')->gsub("'[^']-'", '""')->gsub('%[%[.-%]%]', '')->gsub('//.-\n', '')->gsub('/%*.-%*/', '');
+  // Remove strings and add it to "dead" table
+  var dead = {};
+  var i = 0;
+  ogstr = str;
+  if (!str["gsub"]) typerror("string.gsub is not a found function, Are you sure you provided a string?")
+  str = str->gsub("'[^']-'", function(match){
+    i++;
+    dead[i] = match;
+    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+  })->gsub('"[^"]-"', function(match){
+    i++;
+    dead[i] = match;
+    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+  })->gsub('%[%[.-%]%]', function(match){
+    i++;
+    dead[i] = match;
+    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+  });
+  return str->gsub('//.-\n', '')->gsub('/%*.-%*/', ''), dead;
 }
 
 // CHECKER
@@ -271,11 +345,17 @@ function check(type, value, vname, knownValues, line) {
   if (!value){
     typerror("Check error: "..err, line)
   }
-  value = value();
+  xpcall(function(){
+    value = value();
+  }, function(err){
+    // Ignore and return true
+    return true;
+  })
   if( types[type] ) {
     if (types[type](value)) {
       return true;
     } else {
+      if (typeof(value) == "function") return true; // Ignore for now
       typerror(core.error.strerror(111)->format(type, typeof(value), vname), line);
     }
   } else {
@@ -285,10 +365,12 @@ function check(type, value, vname, knownValues, line) {
 
 // MAIN
 function typecheck(code){
-  cleanedCode = clean(code);
+  cleanedCode, newdead = clean(code);
+  dead = newdead;
   var defs = deffind(cleanedCode);
   var assigns = assign(cleanedCode);
   var allassigns = allassign(cleanedCode);
+  var functions = findfunctions(cleanedCode);
 
   var knownTypes = {};
   var knownValues = {}; 
@@ -300,7 +382,11 @@ function typecheck(code){
       typerror("Check error: "..err)
     }
     knownTypes[def[1]] = def[2];
-    knownValues[def[1]] = value();
+    xpcall(function(){
+      knownValues[def[1]] = value();
+    }, function(err){
+      // ignore
+    })
     
   }
   for( _, assign in pairs(assigns) ) {

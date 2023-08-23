@@ -795,7 +795,7 @@ static int newenum(lua_State *L) {
     if (!lua_isnil(L, -1)) {
         return luaL_error(L, "enum name '%s' is already taken", name);
     }
-    lua_pop(L, 1);
+    lua_pop(L, 1); 
     // Create the enum table
     lua_newtable(L);
     lua_pushvalue(L, -1);

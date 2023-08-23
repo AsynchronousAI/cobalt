@@ -125,7 +125,7 @@ l_noret luaX_syntaxerror (LexState *ls, const char *msg) {
 }
 
 static void lexwarning (LexState *ls, const char *msg, int token) {
-  const char *msg0 = luaG_addinfo(ls->L, "warning", ls->source, ls->linenumber);
+  const char *msg0 = luaG_addinfo(ls->L, "\n\033[1;33mwarning: \033[0m", ls->source, ls->linenumber);
   if (token)
     msg =luaO_pushfstring(ls->L, "%s %s near %s", msg0, msg, txtToken(ls, token));
   lua_writestringerror("%s\n", msg);

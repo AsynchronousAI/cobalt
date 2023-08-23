@@ -53,10 +53,17 @@ core = core || import("core") // Core library for cobalt
 typechecker = import("type") // Integrated type checker.
 
 function process(str, itemtype, out, outfile, ...){
+    // 0: Init
+    /// Silencer:
+    var function ignore_warnings(t, k, v){}
+    setmetatable(_G, { __newindex = ignore_warnings });
+    
+    /// Check mode:
     if (str == "-help" && outfile == "-types"){
         typechecker.all() // Print all valid types
     }
-    // 0: Init
+
+    /// Init macros
     core.macros()
     
     // 1: Split lines

@@ -6,11 +6,8 @@
 
 /* TODO:
  - Allow custom types
- - Integration to preprocessor
- - Test with preprocessor
- - Fix adding values to env issue
+ - Functions can have arguments to be typechecked
 */
-
 // ERROR
 function typerror(errorin, line, note){
   print("\27[1;31mTypechecker error:\27[0m")
@@ -35,7 +32,20 @@ function tabletostring(tbl){
     if (!v){
       v = "null"
     }
-    v = loadstring("return "..(v || "null"))()
+    v = (loadstring("return "..(v || "null")) || loadenv("return "..(v || "null")))
+    xpcall(function(){
+      v = v()
+    }, 
+    function(){
+      v = loadenv("return "..(v || "null"))
+      xpcall(function(){
+        v = v()
+      },
+      function(err){
+        typerror("Error checking value: "..err)
+      })
+    })
+
     if (type(v) == "string") {
       result = result..i.." = \""..v.."\","
     } else if (type(v) == "table") {
@@ -89,6 +99,14 @@ types = {
         return false
       }
     }
+  },
+  "terminating" = function(item){
+    // Checks if the inputted value is a terminating number (0.5, 0.25, 0.125, etc) but not (.333.., .666.., etc)
+    return math.floor(item) != item && math.floor(item * 2) == item * 2
+  },
+  "nonterminating" = function(item){
+    // Checks if the inputted value is a nonterminating number (.333.., .666.., etc)
+    return math.floor(item) != item && math.floor(item * 2) != item * 2
   },
   "matrix" = function(item){
     // Check if all the values are a table
@@ -281,17 +299,16 @@ function typecheck(code){
     if (!value){
       typerror("Check error: "..err)
     }
-    knownTypes[def[1]] = value();
-    knownValues[def[1]] = def[2];
+    knownTypes[def[1]] = def[2];
+    knownValues[def[1]] = value();
     
   }
   for( _, assign in pairs(assigns) ) {
     check(assign[2], assign[3], assign[1], knownValues, assign[4]);
-    knownValues[assign[1]] = assign[2];
+    knownValues[assign[1]] = assign[3];
   }
   for( _, allassign in pairs(allassigns) ) {
     if (knownTypes[allassign[1]]) {
-      print("Type", knownTypes[allassign[1]], "found for", allassign[1], "in", allassign[3], "with value", allassign[2])
       check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
     }
   }
@@ -307,20 +324,7 @@ function all(){
   }
 }
 
-// TESTS
-typecheck([[
-  // Define
-  var precision: int = 100
-  var guess: number = 1
-
-  // Iterate the Newton-Raphson method until the desired precision is reached
-  for (i = 1, precision) {
-    guess = 0.5 * (guess + 2 / guess)
-  }
-
-  // Convert the result to a string with the desired precision
-  var result: string = string.format(""..precision.."%.17f", guess);
-
-  // Output
-  print(result)
-]])
+return {
+  "all": all,
+  "check": typecheck,
+}

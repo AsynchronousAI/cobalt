@@ -54,9 +54,6 @@ typechecker = import("type") // Integrated type checker.
 
 function process(str, itemtype, out, outfile, ...){
     // 0: Init
-    /// Silencer:
-    var function ignore_warnings(t, k, v){}
-    setmetatable(_G, { __newindex = ignore_warnings });
     
     /// Check mode:
     if (str == "-help" && outfile == "-types"){
@@ -66,6 +63,9 @@ function process(str, itemtype, out, outfile, ...){
     /// Init macros
     core.macros()
     
+    // 0: Run typechecker
+    typechecker.check(str)
+
     // 1: Split lines
     var nstr
     var ogstr = out ? str : null
@@ -80,7 +80,7 @@ function process(str, itemtype, out, outfile, ...){
             error(core.error.strerror(2))
         }
     }
-
+    if (!nstr) nstr = str
     var lines = []
     for (line in nstr->gmatch("[^\r\n]+")) {
         lines[#lines + 1] = line
@@ -94,7 +94,7 @@ function process(str, itemtype, out, outfile, ...){
             return debug.getinfo(2, "S").source->sub(2)
         }
     }
-    
+
     // 2: Look for preprocess lines
     var preprocess = []
     for (i, v in pairs(lines)) {
@@ -141,7 +141,7 @@ function process(str, itemtype, out, outfile, ...){
     var run = true
     var incomment = false
 
-    function envload(str){
+    function envload(str2){
         var tbld = "{"
         for (k, v in pairs(env)) {
             if (type(k) == "number") {
@@ -168,7 +168,7 @@ function process(str, itemtype, out, outfile, ...){
                         warn(val.." is not defined and C macros are not supported on the JIT compiler")
                     }
                 }
-            }]=]..str)
+            }]=]..str2)
     }
     for (i, v in pairs(lines)) {
         // Check if i is v[1] for one of the preprocess lines
@@ -609,6 +609,7 @@ function process(str, itemtype, out, outfile, ...){
         file->write(joined)
         file->close()
     }
+    collectgarbage() // Collect garbage
     return joined
 }
 

@@ -1,7 +1,7 @@
 /*
 ** $Id: ltm.h $
 ** Tag methods
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef ltm_h

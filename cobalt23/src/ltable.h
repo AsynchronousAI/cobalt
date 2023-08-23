@@ -1,7 +1,7 @@
 /*
 ** $Id: ltable.h $
 ** Lua tables (hash)
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef ltable_h

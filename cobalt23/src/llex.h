@@ -1,7 +1,7 @@
 /*
 ** $Id: llex.h $
 ** Lexical Analyzer
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef llex_h

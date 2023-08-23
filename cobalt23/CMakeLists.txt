@@ -54,7 +54,7 @@ set(TARGETS_TO_INSTALL lua_internal lua_include)
 set(LUA_LINKED_LIBRARIES)
 
 if(LUA_BUILD_AS_CXX)
-	set_source_files_properties(${LUA_LIB_SRCS} "src/lua.c" "src/luac.c" PROPERTIES LANGUAGE CXX )
+	set_source_files_properties(${LUA_LIB_SRCS} "src/cobalt.c" "src/cobaltc.c" PROPERTIES LANGUAGE CXX )
 endif()
 
 add_library(lua_internal INTERFACE)
@@ -134,7 +134,7 @@ if(LUA_BUILD_BINARY)
     include(CheckIncludeFile)
     CHECK_INCLUDE_FILE("readline/readline.h" HAVE_READLINE_READLINE_H)
 
-    add_executable(cobalt "src/lua.c")
+    add_executable(cobalt "src/cobalt.c")
     # Can not use lua_shared because some symbols are not exported
     target_link_libraries(cobalt PRIVATE lua_static)
     set_target_properties(cobalt PROPERTIES 
@@ -148,7 +148,7 @@ if(LUA_BUILD_BINARY)
 endif()
 
 if(LUA_BUILD_COMPILER)
-    add_executable(cobaltc "src/luac.c")
+    add_executable(cobaltc "src/cobaltc.c")
     target_link_libraries(cobaltc PRIVATE lua_static)
     set_target_properties(cobaltc PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}

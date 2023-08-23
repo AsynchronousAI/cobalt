@@ -21,13 +21,13 @@
 
 #ifdef __cplusplus
 extern "C" {
-# include <lua.h>
+# include <cobalt.h>
 # include <lauxlib.h>
 # include <lualib.h>
 }
 # define EXTERN_C extern "C"
 #else
-# include <lua.h>
+# include <cobalt.h>
 # include <lauxlib.h>
 # include <lualib.h>
 # define EXTERN_C extern

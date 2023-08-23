@@ -9,7 +9,7 @@
 #include <complex.h>
 #define Complex	double complex
 
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 
 #define MYNAME		"complex"

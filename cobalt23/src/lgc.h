@@ -1,7 +1,7 @@
 /*
 ** $Id: lgc.h $
 ** Garbage Collector
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef lgc_h

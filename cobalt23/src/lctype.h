@@ -1,13 +1,13 @@
 /*
 ** $Id: lctype.h $
 ** 'ctype' functions for Lua
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef lctype_h
 #define lctype_h
 
-#include "lua.h"
+#include "cobalt.h"
 
 
 /*

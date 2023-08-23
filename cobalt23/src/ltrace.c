@@ -1,4 +1,4 @@
-/* ctrace.c -- automatically extracted from lua.h (5.4) */
+/* ctrace.c -- automatically extracted from cobalt.h (5.4) */
 
 #include <stdio.h>
 

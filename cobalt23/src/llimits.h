@@ -1,7 +1,7 @@
 /*
 ** $Id: llimits.h $
 ** Limits, basic types, and some other 'installation-dependent' definitions
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef llimits_h
@@ -12,7 +12,7 @@
 #include <stddef.h>
 
 
-#include "lua.h"
+#include "cobalt.h"
 
 
 /*

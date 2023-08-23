@@ -1,7 +1,7 @@
 /*
 ** $Id: ldebug.h $
 ** Auxiliary functions from Debug Interface module
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef ldebug_h

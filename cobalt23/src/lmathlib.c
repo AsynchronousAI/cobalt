@@ -1,7 +1,7 @@
 /*
 ** $Id: lmathlib.c $
 ** Standard mathematical library
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lmathlib_c
@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lauxlib.h"
 #include "lualib.h"
@@ -1155,7 +1155,7 @@ static const luaL_Reg mathlib[] = {
 };
 
 /* RANDOM (lrandom) */
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 
 /* THIS SNIPPET IS FROM Mersenne Twister's random.c */
@@ -1335,7 +1335,7 @@ LUAMOD_API int luaopen_math (lua_State *L) {
   setrandfunc(L);
   lua_pushnumber(L,INFINITY);	lua_setfield(L,-2,"inf");
   lua_pushnumber(L,NAN);		lua_setfield(L,-2,"nan");
-  
+
   luaL_newlib(L, Random);
   lua_setfield(L, -2, "rand");
 

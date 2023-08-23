@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lauxlib.h"
 #include "lualib.h"
@@ -206,7 +206,7 @@ LUAMOD_API int luaopen_coroutine (lua_State *L) {
 }
 
 /* ASYNC: (lua ltthreads expanded) */
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

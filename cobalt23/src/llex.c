@@ -1,7 +1,7 @@
 /*
 ** $Id: llex.c $
 ** Lexical Analyzer
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define llex_c
@@ -13,7 +13,7 @@
 #include <locale.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 
 #include "lctype.h"

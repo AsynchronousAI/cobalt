@@ -1,7 +1,7 @@
 /*
 ** $Id: lstate.c $
 ** Global State
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lstate_c
@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lapi.h"
 #include "ldebug.h"

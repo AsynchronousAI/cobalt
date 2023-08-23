@@ -1,7 +1,7 @@
 /*
 ** $Id: lbaselib.c,v 1.314.1.1 2017/04/19 17:39:34 roberto Exp $
 ** Basic library
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lbaselib_c
@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lauxlib.h"
 #include "lualib.h"

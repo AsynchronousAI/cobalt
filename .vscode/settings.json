@@ -1,12 +1,12 @@
 {
     "files.associations": {
         "lauxlib.h": "c",
-        "lua.hh": "c",
+        "cobalt.hh": "c",
         "cstddef": "cpp",
         "__locale": "c",
         "lj_strscan.h": "c",
         "lj_ctype.h": "c",
-        "lua.h": "c",
+        "cobalt.h": "c",
         "lj_obj.h": "c"
     }
 }

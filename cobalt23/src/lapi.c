@@ -1,7 +1,7 @@
 /*
 ** $Id: lapi.c $
 ** Lua API
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lapi_c
@@ -14,7 +14,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lapi.h"
 #include "ldebug.h"

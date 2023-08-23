@@ -1,5 +1,5 @@
 /*
-** $Id: lua.h $
+** $Id: cobalt.h $
 ** Lua - A Scripting Language
 ** Lua.org, PUC-Rio, Brazil (http://www.lua.org)
 ** See Copyright Notice at the end of this file

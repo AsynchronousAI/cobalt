@@ -1,7 +1,7 @@
 /*
 ** $Id: linit.c,v 1.39.1.1 2017/04/19 17:20:42 roberto Exp $
-** Initialization of libraries for lua.c and other clients
-** See Copyright Notice in lua.h
+** Initialization of libraries for cobalt.c and other clients
+** See Copyright Notice in cobalt.h
 */
 
 
@@ -29,14 +29,14 @@
 
 #include <stddef.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lualib.h"
 #include "lauxlib.h"
 
 
 /*
-** these libs are loaded by lua.c and are readily available to any Lua
+** these libs are loaded by cobalt.c and are readily available to any Lua
 ** program
 */
 static const luaL_Reg loadedlibs[] = {

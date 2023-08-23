@@ -1,7 +1,7 @@
 /*
 ** $Id: lopnames.h $
 ** Opcode names
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #if !defined(lopnames_h)

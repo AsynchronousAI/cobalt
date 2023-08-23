@@ -1,7 +1,7 @@
 /*
 ** $Id: ljumptab.h $
 ** Jump Table for the Lua interpreter
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 

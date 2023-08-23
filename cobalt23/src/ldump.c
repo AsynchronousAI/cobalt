@@ -1,7 +1,7 @@
 /*
 ** $Id: ldump.c $
 ** save precompiled Lua chunks
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define ldump_c
@@ -12,7 +12,7 @@
 
 #include <stddef.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lobject.h"
 #include "lstate.h"

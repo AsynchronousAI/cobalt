@@ -1,7 +1,7 @@
 /*
 ** $Id: lvm.c $
 ** Lua virtual machine
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lvm_c
@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "ldebug.h"
 #include "ldo.h"

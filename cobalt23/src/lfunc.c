@@ -1,7 +1,7 @@
 /*
 ** $Id: lfunc.c $
 ** Auxiliary functions to manipulate prototypes and closures
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lfunc_c
@@ -12,7 +12,7 @@
 
 #include <stddef.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "ldebug.h"
 #include "ldo.h"

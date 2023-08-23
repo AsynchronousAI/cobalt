@@ -1,7 +1,7 @@
 /*
 ** $Id: lparser.h $
 ** Lua Parser
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef lparser_h

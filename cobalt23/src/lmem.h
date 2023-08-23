@@ -1,7 +1,7 @@
 /*
 ** $Id: lmem.h $
 ** Interface to Memory Manager
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef lmem_h
@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 #include "llimits.h"
-#include "lua.h"
+#include "cobalt.h"
 
 
 #define luaM_error(L)	luaD_throw(L, LUA_ERRMEM)

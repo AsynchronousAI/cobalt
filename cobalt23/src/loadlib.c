@@ -1,7 +1,7 @@
 /*
 ** $Id: loadlib.c $
 ** Dynamic library loader for Lua
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 **
 ** This module contains an implementation of loadlib for Unix systems
 ** that have dlfcn, an implementation for Windows, and a stub for other
@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lauxlib.h"
 #include "lualib.h"

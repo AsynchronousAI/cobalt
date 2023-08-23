@@ -1,7 +1,7 @@
 /*
 ** $Id: lobject.h $
 ** Type definitions for Lua objects
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 
@@ -13,7 +13,7 @@
 
 
 #include "llimits.h"
-#include "lua.h"
+#include "cobalt.h"
 
 
 /*

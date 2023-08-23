@@ -1,7 +1,7 @@
 /*
-** $Id: lua.c $
+** $Id: cobalt.c $
 ** Lua stand-alone interpreter
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lua_c
@@ -15,7 +15,7 @@
 
 #include <signal.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lauxlib.h"
 #include "lualib.h"

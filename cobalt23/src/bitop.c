@@ -29,7 +29,7 @@
 #define LUA_BITOP_VERSION	"1.0.2"
 
 #define LUA_LIB
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 #include "luaconf.h"
 

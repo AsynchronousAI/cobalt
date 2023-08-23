@@ -3,7 +3,7 @@
 #include <string.h>
 #include <dlfcn.h>
 
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 #include "lualib.h"
 #include <sys/mman.h>

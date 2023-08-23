@@ -1,4 +1,4 @@
-/* ctrace.h -- automatically extracted from lua.h (5.4) */
+/* ctrace.h -- automatically extracted from cobalt.h (5.4) */
 
 #ifdef __LCC__
 #define __FUNCTION__ __func__
@@ -8,7 +8,7 @@
 #endif
 #endif
 
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 
 #if LUA_VERSION_NUM != 504

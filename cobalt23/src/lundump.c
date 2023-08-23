@@ -1,7 +1,7 @@
 /*
 ** $Id: lundump.c $
 ** load precompiled Lua chunks
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lundump_c
@@ -13,7 +13,7 @@
 #include <limits.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "ldebug.h"
 #include "ldo.h"

@@ -1,7 +1,7 @@
 /*
 ** $Id: ltm.c $
 ** Tag methods
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define ltm_c
@@ -12,7 +12,7 @@
 
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "ldebug.h"
 #include "ldo.h"

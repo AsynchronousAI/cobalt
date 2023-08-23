@@ -70,7 +70,7 @@
 
 #endif
 
-#include "lua.h"
+#include "cobalt.h"
 #include "lauxlib.h"
 #include "lualib.h"
 

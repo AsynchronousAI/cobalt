@@ -1,7 +1,7 @@
 /*
 ** $Id: lauxlib.h $
 ** Auxiliary functions for building Lua libraries
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 
@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 #include "luaconf.h"
-#include "lua.h"
+#include "cobalt.h"
 
 
 /* global table */

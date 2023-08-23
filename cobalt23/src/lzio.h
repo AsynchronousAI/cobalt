@@ -1,14 +1,14 @@
 /*
 ** $Id: lzio.h $
 ** Buffered streams
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 
 #ifndef lzio_h
 #define lzio_h
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lmem.h"
 

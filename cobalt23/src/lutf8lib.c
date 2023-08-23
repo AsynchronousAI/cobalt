@@ -1,7 +1,7 @@
 /*
 ** $Id: lutf8lib.c $
 ** Standard library for UTF-8 manipulation
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lutf8lib_c
@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lauxlib.h"
 #include "lualib.h"

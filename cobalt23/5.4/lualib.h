@@ -1,14 +1,14 @@
 /*
 ** $Id: lualib.h,v 1.45.1.1 2017/04/19 17:20:42 roberto Exp $
 ** Lua standard libraries
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 
 #ifndef lualib_h
 #define lualib_h
 
-#include "lua.h"
+#include "cobalt.h"
 
 
 /* version suffix for environment variable names */

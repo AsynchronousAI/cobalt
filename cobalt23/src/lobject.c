@@ -1,7 +1,7 @@
 /*
 ** $Id: lobject.c $
 ** Some generic functions over Lua objects
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define lobject_c
@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lctype.h"
 #include "ldebug.h"

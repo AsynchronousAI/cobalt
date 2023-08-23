@@ -89,12 +89,12 @@ else:
 print("[*] \033[32mMoving header files...\033[0m")
 # Create alias for the following:
 # lauxlib.h
-# lua.h
+# cobalt.h
 # luaconf.h
 # lualib.h
-# lua.hpp
+# cobalt.hpp
 
-alias = ["lauxlib.h", "lua.h", "luaconf.h", "lualib.h", "lua.hpp"]
+alias = ["lauxlib.h", "cobalt.h", "luaconf.h", "lualib.h", "cobalt.hpp"]
 # They are located in script-dir/cobalt23/src/
 for item in os.listdir(scriptPath + "/cobalt23/src/"):
     if item in alias:

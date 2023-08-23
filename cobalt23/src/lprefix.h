@@ -1,7 +1,7 @@
 /*
 ** $Id: lprefix.h $
 ** Definitions for Lua code that must come before any other header file
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #ifndef lprefix_h

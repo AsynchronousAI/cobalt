@@ -1,7 +1,7 @@
 /*
 ** $Id: ltablib.c $
 ** Library for Table Manipulation
-** See Copyright Notice in lua.h
+** See Copyright Notice in cobalt.h
 */
 
 #define ltablib_c
@@ -14,7 +14,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "lua.h"
+#include "cobalt.h"
 
 #include "lauxlib.h"
 #include "lualib.h"

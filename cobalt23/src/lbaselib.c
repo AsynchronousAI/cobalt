@@ -786,40 +786,12 @@ static int luaB_range(lua_State *L) {
 
   return 1;
 }
-static int newenum(lua_State *L) {
-    const char *name = luaL_checkstring(L, 1);
-    luaL_checktype(L, 2, LUA_TTABLE);
-
-    // Check that the name isnt already taken
-    lua_getglobal(L, name);
-    if (!lua_isnil(L, -1)) {
-        return luaL_error(L, "enum name '%s' is already taken", name);
-    }
-    lua_pop(L, 1); 
-    // Create the enum table
-    lua_newtable(L);
-    lua_pushvalue(L, -1);
-    lua_setglobal(L, name);
-
-    lua_pushstring(L, "Attempt to modify an immutable table");
-    lua_setfield(L, -2, "__newindex");
-    lua_setmetatable(L, -2);
-    // Add the enum values
-    lua_pushnil(L);
-    while (lua_next(L, 2) != 0) {
-        lua_pushvalue(L, -2);
-        lua_insert(L, -2);
-        lua_settable(L, -4);
-    }
-    return 1;
-}
 static int luaB_abort(lua_State *L){
   abort();
 }
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"sizeof", luaB_sizeof},
-  {"enum", newenum},
   {"abort", luaB_abort},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
@@ -858,6 +830,7 @@ static const luaL_Reg base_funcs[] = {
   /* placeholders */
   {"_G", NULL},
   {"_VERSION", NULL},
+  {"global", NULL},
   {"void", NULL},
   {NULL, NULL}
 };
@@ -880,7 +853,13 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   /* set global _VERSION */
   lua_pushliteral(L, "cobalt23.0.0");
   lua_setfield(L, -2, "_VERSION");
-
+  /* set global `global` (equivelent to _G) */
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "global");
+  /* set global `void` */
+  lua_pushcclosure(L, sizeof(void), 0);
+  lua_setfield(L, -2, "void");
+  
 
   return 1;
 }

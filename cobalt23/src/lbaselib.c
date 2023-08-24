@@ -105,14 +105,6 @@ static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
   int i;
   lua_getglobal(L, "tostring");
-  
-  // outpus (<time>) in gray 
-  time_t t = time(NULL);
-  struct tm tm = *localtime(&t);
-  char time_str[80];
-  sprintf(time_str, "%d-%02d-%02d %02d:%02d:%02d", tm.tm_year + 1900, 
-    tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-  printf(L, white(time_str, (const char *[]){"bold"}, 1));
 
   for (i=1; i<=n; i++) {
     const char *s;

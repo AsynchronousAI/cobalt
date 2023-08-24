@@ -7,6 +7,7 @@
         "lj_strscan.h": "c",
         "lj_ctype.h": "c",
         "cobalt.h": "c",
-        "lj_obj.h": "c"
+        "lj_obj.h": "c",
+        "mman.h": "c"
     }
 }

@@ -20,3 +20,7 @@ Currently up to date with Lua `5.4.3`.
 - Enums
 - Records (like teal records)
 - Traceback mode for C by using: `#include <ltrace.c> && #include <ltrace.h>` over `#include <cobalt.h> && #include <cobalt.h>`
+
+## Todo
+- add credits for syslog
+- add system log to examples

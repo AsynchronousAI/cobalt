@@ -8,7 +8,7 @@
  - Allow custom types
  - Functions can have arguments to be typechecked
  - Generics
- - Provide environment to loader.
+ - Fix issue where type can be changed after definiton
 */
 /* SYSTEM:
  The system removes all comments and clears strings and saves it to a table of "dead" strings, 
@@ -78,8 +78,9 @@ function tabletostring(tbl){
 }
 function loadenv(env, str){
   // Uses loadstring, but the enviourment can be provided. env is a table.
+  envstr = tabletostring(env)
   str = [[
-    env = ]]..tabletostring(env)..[[
+    env = ]]..envstr..[[
     for (i, v in pairs(env)) {
       _G[i] = v
     }
@@ -290,6 +291,18 @@ function allassign(str){
   }
   return result;
 }
+function findall(str){
+  // Used to look for %s=%s
+  var pattern = "%s*=%s*";
+  var result = {};
+  for( line in str->gmatch("[^\r\n]+") ) {
+    var key, value = line->match(pattern);
+    if( key && value ) {
+      table.insert(result, {key, value, line});
+    }
+  }
+  return result;
+}
 function revive(str){
   for (i, v in pairs(dead)){
     var index = "'DEADVALUESTRTYPECHECK-"..(i).."'"
@@ -299,13 +312,13 @@ function revive(str){
     // manual method
     var ci = 1;
     var csofar = "";
-    for (i = 1, #str) {
-      var char = str->sub(i, i);
+    for (ii = 1, #str) {
+      var char = str->sub(ii, ii);
       if (char == index->sub(ci, ci)) {
         ci++;
         csofar = csofar..char;
         if (csofar == index) {
-          str = str->sub(1, i - #index)..v..str->sub(i + 1, #str)
+          str = str->sub(1, ii - #index)..v..str->sub(ii + 1, #str)
           break;
         }
       } else {
@@ -357,7 +370,7 @@ function check(type, value, vname, knownValues, line) {
       return true;
     } else {
       if (typeof(value) == "function") return true; // Ignore for now
-      typerror(core.error.strerror(111)->format(type, typeof(value), vname), line);
+      typerror(core.error.strerror(111)->format(type, (tostring(typeof(value)).." (and descendents)"), vname), line);
     }
   } else {
     typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -help -types` to see all types");
@@ -368,39 +381,44 @@ function check(type, value, vname, knownValues, line) {
 function typecheck(code){
   cleanedCode, newdead = clean(code);
   dead = newdead;
-  var defs = deffind(cleanedCode);
-  var assigns = assign(cleanedCode);
-  var allassigns = allassign(cleanedCode);
-  var functions = findfunctions(cleanedCode);
+  for (i, v in pairs(cleanedCode->split("\n"))){
+    cleanedCode = cleanedCode->split("\n")[i] || "";
+    var defs = deffind(cleanedCode);
+    var assigns = assign(cleanedCode);
+    var allassigns = allassign(cleanedCode);
+    var functions = findfunctions(cleanedCode);
+    var all = findall(cleanedCode);
 
-  var knownTypes = {};
-  var knownValues = {}; 
-
-  for( _, def in pairs(defs) ) {
-    check(def[2], def[3], def[1], knownValues, def[4])
-    value, err = loadenv(knownValues, "return " .. def[3])
-    if (!value){
-      typerror("Check error: "..err)
+    var knownTypes = {};
+    var knownValues = {}; 
+    for (_, item in pairs(all)){
+      knownValues[item[1]] = item[2];
     }
-    knownTypes[def[1]] = def[2];
-    xpcall(function(){
-      knownValues[def[1]] = value();
-    }, function(err){
-      // ignore
-    })
-    
-  }
-  for( _, assign in pairs(assigns) ) {
-    check(assign[2], assign[3], assign[1], knownValues, assign[4]);
-    knownValues[assign[1]] = assign[3];
-  }
-  for( _, allassign in pairs(allassigns) ) {
-    if (knownTypes[allassign[1]]) {
-      check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
+    for( _, allassign in pairs(allassigns) ) {
+      if (knownTypes[allassign[1]]) {
+        check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
+      }else if(!knownValues[allassign[1]]) {
+        knownValues[allassign[1]] = allassign[2];
+      }
+    }
+    for( _, def in pairs(defs) ) {
+      check(def[2], def[3], def[1], knownValues, def[4])
+      value, err = loadenv(knownValues, "return " .. def[3])
+      if (!value){
+        typerror("Check error: "..err)
+      }
+      knownTypes[def[1]] = def[2];
+      xpcall(function(){
+        knownValues[def[1]] = value();
+      }, function(err){})
+      
+    }
+    for( _, assign in pairs(assigns) ) {
+      check(assign[2], assign[3], assign[1], knownValues, assign[4]);
+      knownValues[assign[1]] = assign[3];
+      knownTypes[assign[1]] = assign[2];
     }
   }
-
-
   return true;
 }
 function all(){

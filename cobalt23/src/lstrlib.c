@@ -1823,7 +1823,27 @@ static int str_unpack (lua_State *L) {
   lua_pushinteger(L, pos + 1);  /* next position */
   return n + 1;
 }
+static int str_split(lua_State *L) {
+  const char *str = luaL_checkstring(L, 1);
+  const char *splitter = luaL_checkstring(L, 2);
 
+  lua_newtable(L);
+
+  int i = 1;
+  const char *start = str;
+  const char *end = strstr(start, splitter);
+  while (end != NULL) {
+    lua_pushlstring(L, start, end - start);
+    lua_rawseti(L, -2, i++);
+    start = end + strlen(splitter);
+    end = strstr(start, splitter);
+  }
+
+  lua_pushstring(L, start);
+  lua_rawseti(L, -2, i);
+
+  return 1;
+}
 /* }====================================================== */
 
 
@@ -1832,6 +1852,7 @@ static const luaL_Reg strlib[] = {
   {"char", str_char},
   {"dump", str_dump},
   {"find", str_find},
+  {"split", str_split},
   {"format", str_format},
   {"gmatch", gmatch},
   {"gsub", str_gsub},

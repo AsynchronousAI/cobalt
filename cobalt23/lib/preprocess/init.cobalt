@@ -613,4 +613,7 @@ function process(str, itemtype, out, outfile, ...){
     return joined
 }
 
+process([[
+x: pos = -1
+]])
 return process

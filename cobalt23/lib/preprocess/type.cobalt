@@ -8,6 +8,7 @@
  - Allow custom types
  - Functions can have arguments to be typechecked
  - Generics
+ - Provide environment to loader.
 */
 /* SYSTEM:
  The system removes all comments and clears strings and saves it to a table of "dead" strings, 

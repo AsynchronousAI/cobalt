@@ -55,7 +55,7 @@ struct jit;
 #define Dst_REF		(Dst->ctx)
 #define DASM_EXTERN(a,b,c,d) get_extern(a,b,c,d)
 
-#include "dynasm/dasm_proto.h"
+#include "../../asm/dasm_proto.h"
 
 #if defined LUA_FFI_BUILD_AS_DLL
 # define EXPORT __declspec(dllexport)

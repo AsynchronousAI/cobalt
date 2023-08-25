@@ -12401,9 +12401,40 @@ static int lwin_GetTickCount(lua_State* L) {
     return 1;
 }
 
+static int lwin_GetLastError(lua_State* L) {
+	DWORD err = GetLastError();
+	lua_pushinteger(L, err);
+	return 1;
+}
+
+static int lwin_SetLastError(lua_State* L) {
+	DWORD err = luaL_checkinteger(L, 1);
+	SetLastError(err);
+	return 0;
+}
+
+static int lwin_FormatMessage(lua_State* L) {
+	DWORD err = luaL_checkinteger(L, 1);
+	LPVOID lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, err,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, NULL);
+	lua_pushstring(L, lpMsgBuf);
+	LocalFree(lpMsgBuf);
+	return 1;
+}
+
 static const luaL_Reg winlib[] = {
     {"MessageBox", lua_MessageBox},
     {"GetTickCount", lua_GetTickCount},
+	{"GetLastError", lua_GetLastError},
+	{"SetLastError", lua_SetLastError},
+	{"FormatMessage", lua_FormatMessage},
+	
     {NULL, NULL}
 };
 

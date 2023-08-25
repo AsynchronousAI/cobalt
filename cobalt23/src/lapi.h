@@ -1,8 +1,9 @@
 /*
-** $Id: lapi.h $
-** Auxiliary functions from Lua API
-** See Copyright Notice in cobalt.h
+* lapi.h
+* @AsynchronousAI
+* Read copyright notice in cobalt.h
 */
+
 
 #ifndef lapi_h
 #define lapi_h

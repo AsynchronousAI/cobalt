@@ -1,8 +1,10 @@
 /*
-** $Id: lapi.c $
-** Lua API
-** See Copyright Notice in cobalt.h
+* lapi.c
+* @AsynchronousAI
+* cobalt API
+* Read copyright notice in cobalt.h
 */
+
 
 #define lapi_c
 #define LUA_CORE

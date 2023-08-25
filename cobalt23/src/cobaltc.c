@@ -1,8 +1,10 @@
 /*
-** $Id: cobaltc.c $
-** Lua compiler (saves bytecodes to files; also lists bytecodes)
-** See Copyright Notice in cobalt.h
+* cobaltc.c
+* @AsynchronousAI
+* cobalt bytecoder
+* Read copyright notice in cobalt.h
 */
+
 
 #define luac_c
 #define LUA_CORE

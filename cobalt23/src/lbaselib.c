@@ -1,7 +1,7 @@
 /*
-** $Id: lbaselib.c,v 1.314.1.1 2017/04/19 17:39:34 roberto Exp $
-** Basic library
-** See Copyright Notice in cobalt.h
+* lbaselib.c
+* std functions
+* Read copyright notice in cobalt.h
 */
 
 #define lbaselib_c

@@ -1,7 +1,8 @@
 /*
-** $Id: cobalt.c $
-** Lua stand-alone interpreter
-** See Copyright Notice in cobalt.h
+* cobalt.c
+* @AsynchronousAI
+* cobalt interface
+* Read copyright notice in cobalt.h
 */
 
 #define lua_c

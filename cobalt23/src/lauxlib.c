@@ -1,8 +1,9 @@
 /*
-** $Id: lauxlib.c $
-** Auxiliary functions for building Lua libraries
-** See Copyright Notice in cobalt.h
+* lauxlib.h
+* aux
+* Read copyright notice in cobalt.h
 */
+
 
 #define lauxlib_c
 #define LUA_LIB

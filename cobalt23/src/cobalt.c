@@ -19,7 +19,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
-#include "pool.h"
+#include "lpool.h"
 
 #if !defined(LUA_PROGNAME)
 #define LUA_PROGNAME		"cobalt"

@@ -14,7 +14,7 @@
 #include "lualib.h"
 
 
-#include "classes.h"
+#include "lclasses.h"
 
 
 static int vec2_index(lua_State *L) {

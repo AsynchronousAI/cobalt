@@ -17,7 +17,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-#include "system.h"
+#include "lsystem.h"
 
 #include <string.h>
 #if defined(LUA_USE_POSIX) || defined(LUA_USE_DLOPEN)

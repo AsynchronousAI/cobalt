@@ -5,12 +5,17 @@
 #include <stdint.h>
 #include "cobalt.h"
 #include "lauxlib.h"
+
+
 #define CHUNK_COUNT 15
 #define MAX_BLOCK_SIZE 640
 #define CHUNK_SIZE 16 * 1024 //16k for one chunk,from 1k to 16k,the larger the faster(my test)
 #define BOOL int
 #define TRUE 1
 #define FALSE 0
+
+
+// CORE
 struct PoolChunkInfo {
 	size_t blockSize;
 	size_t blockCount;
@@ -56,7 +61,9 @@ struct PoolBlock {//use for free blocks
 };
 struct PoolBlock* FreeBlocks[CHUNK_COUNT];
 
-short int mode = 0;
+#define mode 0 // 0:pool 1:simple (test)
+
+int isInit = 0;
 
 void init_chunk(struct PoolChunk* chunk,int iChunk) {
 	chunk->blockSize = blockSizeMap[iChunk].blockSize;
@@ -85,6 +92,7 @@ void init_chunk(struct PoolChunk* chunk,int iChunk) {
 	}
 }
 void init_pool_alloc() {
+	isInit = 1;
 	memset(Stats,0,sizeof(struct PoolStat) * CHUNK_COUNT);
 	//init size map
 	{
@@ -256,8 +264,12 @@ void* free_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
     }
 }
 
+// INTERFACE
 int alloc_getStat(lua_State* L)
 {
+	if (isInit == 0) {
+		luaL_error(L,"pool alloc not init");
+	}
 	lua_newtable(L);
 	size_t totalCaheMem = 0;
 
@@ -308,22 +320,10 @@ int alloc_getStat(lua_State* L)
 
 	return 1;
 }
-int alloc_off(lua_State* L)
-{
-    mode = 1;
-    lua_pushnil(L);
-    return 1;
-}
-int alloc_on(lua_State* L)
-{
-    mode = 0;
-    lua_pushnil(L);
-    return 1;
-}
+
+
 static const luaL_Reg lib[] = {
-  {"getStat",alloc_getStat },
-  {"off",alloc_off },
-  {"on",alloc_on },
+  {"stats",alloc_getStat },
   {NULL, NULL}
 };
 

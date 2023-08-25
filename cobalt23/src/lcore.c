@@ -14,8 +14,9 @@
 #if defined __unix__ || LUA_USE_POSIX || __APPLE__
 #include <sys/mman.h>
 #include <syslog.h>
-#else
+#elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
 #include <windows.h>
+HANDLE hEventLog = RegisterEventSource(NULL, L"MyApplication");
 #endif
 
 #define MAX_MEMORY 0x10000000
@@ -28,11 +29,13 @@ static int allocate_hex_memory_address(lua_State* L) {
   if (memory_map == NULL) {
     #if defined __unix__ || LUA_USE_POSIX || __APPLE__
     memory_map = mmap(NULL, MAX_MEMORY, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    #else
-    memory_map = VirtualAlloc(NULL, MAX_MEMORY, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    #elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+	memory_map = VirtualAlloc(NULL, MAX_MEMORY, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	#else 
+	luaL_error(L, "Failed to allocate memory (err: PLATFORM_NOT_SUPPORTED)");
     #endif
     if (memory_map == MAP_FAILED) {
-      luaL_error(L, "Failed to allocate memory");
+      luaL_error(L, "Failed to allocate memory (err: MAP_FAILED)");
     }
   }
   #if defined __unix__ || LUA_USE_POSIX || __APPLE__
@@ -41,7 +44,7 @@ static int allocate_hex_memory_address(lua_State* L) {
   void* address = VirtualAlloc(memory_map, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
   #endif
   if (address == MAP_FAILED) {
-    luaL_error(L, "Failed to allocate memory");
+    luaL_error(L, "Failed to allocate memory (err: MAP_FAILED)");
   }
   lua_pushinteger(L, (lua_Integer)address);
   return 1;
@@ -319,8 +322,10 @@ static int lsyslog_open(lua_State *L) {
     persistent_ident = strdup(ident);
     openlog(persistent_ident, LOG_PID, facility);
     return 0;
+	#elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+	// Ignore. Defined above
 	#else
-	lua_error("log is not supported on this platform");
+	lua_error("log.open is not supported on this platform");
 	#endif
 }
 
@@ -331,8 +336,42 @@ static int lsyslog_log(lua_State *L) {
 
     syslog(level, "%s", line);
     return 0;
+	#elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+    if (hEventLog != NULL) {
+        // Log an information event
+		int level = luaL_checkinteger(L, 1);
+        const wchar_t* message = luaL_checkstring(L, 1);
+		WORD newtype;
+		switch (level) {
+			case 0:
+				newtype = EVENTLOG_SUCCESS;
+				break;
+			case 1:
+				newtype = EVENTLOG_ERROR_TYPE;
+				break;
+			case 2:
+				newtype = EVENTLOG_WARNING_TYPE;
+				break;
+			case 3:
+				newtype = EVENTLOG_INFORMATION_TYPE;
+				break;
+			case 4:
+				newtype = EVENTLOG_AUDIT_SUCCESS;
+				break;
+			case 5:
+				newtype = EVENTLOG_AUDIT_FAILURE;
+				break;
+			default:
+				newtype = EVENTLOG_INFORMATION_TYPE;
+				break;
+		}
+	
+        ReportEvent(hEventLog, newtype, 0, 0, NULL, 1, 0, &message, NULL);
+    } else {
+        lua_error("something went wrong!")
+    }
 	#else
-	luaerror("log is not supported on this platform");
+	lua_error("log.push is not supported on this platform");
 	#endif
 }
 
@@ -340,8 +379,14 @@ static int lsyslog_close(lua_State *L) {
 	#if defined __unix__ || LUA_USE_POSIX || __APPLE__
     closelog();
     return 0;
+	#elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+	if (hEventLog != NULL) {
+		DeregisterEventSource(hEventLog);
+	} else {
+		lua_error("something went wrong!")
+	}
 	#else
-	lua_error("log is not supported on this platform");
+	lua_error("log.close is not supported on this platform");
 	#endif
 }
 
@@ -12341,7 +12386,6 @@ LUALIB_API int luaopen_unix(lua_State *L) {
 
 // WINDOWS
 #if defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
-#include <windows.h>
 static int lwin_MessageBox(lua_State* L) {
     const char* text = luaL_checkstring(L, 1);
     const char* caption = luaL_optstring(L, 2, NULL);

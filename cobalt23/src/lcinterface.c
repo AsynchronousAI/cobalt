@@ -40,7 +40,6 @@ static int allocate_hex_memory_address(lua_State* L) {
   lua_pushinteger(L, (lua_Integer)address);
   return 1;
 }
-
 static int free_hex_memory_address(lua_State* L) {
   void* address = (void*)luaL_checkinteger(L, 1);
   int result = munmap(address, MAX_MEMORY);
@@ -49,7 +48,6 @@ static int free_hex_memory_address(lua_State* L) {
   }
   return 0;
 }
-
 static int get_hex_memory_address(lua_State* L) {
   void* address = (void*)luaL_checkinteger(L, 1);
   size_t size = luaL_checkinteger(L, 2);
@@ -62,7 +60,6 @@ static int get_hex_memory_address(lua_State* L) {
   free(buffer);
   return 1;
 }
-
 static int set_hex_memory_address(lua_State* L) {
   void* address = (void*)luaL_checkinteger(L, 1);
   size_t size = luaL_checkinteger(L, 2);
@@ -70,7 +67,6 @@ static int set_hex_memory_address(lua_State* L) {
   memcpy(address, data, size);
   return 0;
 }
-
 static int isfree_hex_memory_address(lua_State* L) {
   void* address = (void*)luaL_checkinteger(L, 1);
   size_t size = luaL_checkinteger(L, 2);
@@ -82,7 +78,6 @@ static int isfree_hex_memory_address(lua_State* L) {
   }
   return 1;
 }
-
 static int fetch_hex_memory_address(lua_State* L) {
   void* address = (void*)luaL_checkinteger(L, 1);
   size_t size = luaL_checkinteger(L, 2);
@@ -92,7 +87,6 @@ static int fetch_hex_memory_address(lua_State* L) {
   }
   return 0;
 }
-
 static int permission_check(lua_State* L) {
   void* address = (void*)luaL_checkinteger(L, 1);
   size_t size = luaL_checkinteger(L, 2);

@@ -7,6 +7,7 @@
 #include "lualib.h"
 #if defined __unix__ || LUA_USE_POSIX || __APPLE__
 #include <sys/mman.h>
+#include <syslog.h>
 #else
 #include <windows.h>
 #endif
@@ -15,6 +16,7 @@
 
 static void* memory_map = NULL;
 
+/* HEAD/PRIMARY */
 static int allocate_hex_memory_address(lua_State* L) {
   size_t size = luaL_checkinteger(L, 1);
   if (memory_map == NULL) {
@@ -302,166 +304,115 @@ static const struct luaL_Reg lcinterface_memory_lib[] = {
   {"realloc", resize_memory},
   {NULL, NULL}
 };
-#if defined __unix__ || LUA_USE_POSIX || __APPLE__
-// Provides Unix specific functions
-/*  Provides the following:
-- open
-- close
-- log
-*/
-// The following snippet is taken and modified from LuaSystemLog and lunix
 
+// LOGS
+static int lsyslog_open(lua_State *L) {
+	#if defined __unix__ || LUA_USE_POSIX || __APPLE__
+    static char *persistent_ident = NULL;
+    const char *ident = luaL_checkstring(L, 1);
+    int facility = luaL_checkinteger(L, 2);
+
+    if (persistent_ident != NULL) {
+        free(persistent_ident);
+    }
+
+    persistent_ident = strdup(ident);
+    openlog(persistent_ident, LOG_PID, facility);
+    return 0;
+	#else
+	lua_error("log is not supported on this platform");
+	#endif
+}
+
+static int lsyslog_log(lua_State *L) {
+	#if defined __unix__ || LUA_USE_POSIX || __APPLE__
+    int level = luaL_checkinteger(L, 1);
+    const char *line = luaL_checkstring(L, 2);
+
+    syslog(level, "%s", line);
+    return 0;
+	#else
+	luaerror("log is not supported on this platform");
+	#endif
+}
+
+static int lsyslog_close(lua_State *L) {
+	#if defined __unix__ || LUA_USE_POSIX || __APPLE__
+    closelog();
+    return 0;
+	#else
+	lua_error("log is not supported on this platform");
+	#endif
+}
+
+
+#define set_field(f,v)          lua_pushliteral(L, v); \
+                                lua_setfield(L, -2, f)
+#define add_constant(c)         lua_pushinteger(L, LOG_##c); \
+                                lua_setfield(L, -2, #c)
+
+LUALIB_API int luaopen_lcinterface(lua_State* L) {
+	luaL_newlib(L, lcinterface_lib);
+
+	const luaL_Reg LOGAPI[] = {
+		{ "open",  lsyslog_open },
+		{ "close", lsyslog_close },
+		{ "push",   lsyslog_log },
+		{ NULL,    NULL }
+	};
+
+	luaL_newlib(L, LOGAPI);
+	lua_setfield(L, -2, "log");
+
+	lua_newtable(L);
+	add_constant(AUTH);
+	add_constant(AUTHPRIV);
+	add_constant(CRON);
+	add_constant(DAEMON);
+	add_constant(FTP);
+	add_constant(KERN);
+	add_constant(LOCAL0);
+	add_constant(LOCAL1);
+	add_constant(LOCAL2);
+	add_constant(LOCAL3);
+	add_constant(LOCAL4);
+	add_constant(LOCAL5);
+	add_constant(LOCAL6);
+	add_constant(LOCAL7);
+	add_constant(LPR);
+	add_constant(MAIL);
+	add_constant(NEWS);
+	add_constant(SYSLOG);
+	add_constant(USER);
+	add_constant(UUCP);
+	lua_setfield(L, -2, "FACILITY");
+
+	lua_newtable(L);
+	add_constant(EMERG);
+	add_constant(ALERT);
+	add_constant(CRIT);
+	add_constant(ERR);
+	add_constant(WARNING);
+	add_constant(NOTICE);
+	add_constant(INFO);
+	add_constant(DEBUG);
+
+
+	lua_setfield(L, -2, "LEVEL");
+	luaL_newlib(L, lcinterface_memory_lib);
+	lua_setfield(L, -2, "memory");
+	luaL_newlib(L, lcinterface_error_lib);
+	lua_setfield(L, -2, "error");
+
+	luaL_setfuncs(L, lcinterface_lib, 0);
+	return 1;
+}
+
+/* UNIX */
+// The following snippet is modified from lunix.
 #define luaL_checkint luaL_checkinteger
 #define luaL_optint luaL_optinteger
-
-#include <syslog.h>
-
-static int lsyslog_open(lua_State *L)
-{
-	const char *ident = luaL_checkstring(L, 1);
-	int facility = luaL_checkinteger(L, 2);
-
-	lua_pushvalue(L,1);
-	lua_setfield(L, LUA_REGISTRYINDEX, "cobaltlog:ident");
-	openlog(ident, LOG_PID, facility);
-	return 0;
-}
-
-static int lsyslog_log(lua_State *L)
-{
-	int level = luaL_checkinteger(L, 1);
-	const char *line = luaL_checkstring(L, 2);
-
-	syslog(level, "%s", line);
-	return 0;
-}
-
-static int lsyslog_close(lua_State *L)
-{
-	closelog();
-	lua_pushnil(L);
-	lua_setfield(L, LUA_REGISTRYINDEX, "cobaltlog:ident");
-	return 0;
-}
-
-/*
-** Assumes the table is on top of the stack.
-*/
-static void set_info (lua_State *L)
-{
-  lua_pushliteral(L, "FACILITY_AUTH");
-	lua_pushnumber(L,  LOG_AUTH);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_AUTHPRIV");
-	lua_pushnumber(L,  LOG_AUTHPRIV);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_CRON");
-	lua_pushnumber(L,  LOG_CRON);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_DAEMON");
-	lua_pushnumber(L,  LOG_DAEMON);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_FTP");
-	lua_pushnumber(L,  LOG_FTP);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_KERN");
-	lua_pushnumber(L,  LOG_KERN);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LPR");
-	lua_pushnumber(L,  LOG_LPR);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_MAIL");
-	lua_pushnumber(L,  LOG_MAIL);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_NEWS");
-	lua_pushnumber(L,  LOG_NEWS);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_SYSLOG");
-	lua_pushnumber(L,  LOG_SYSLOG);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_USER");
-	lua_pushnumber(L,  LOG_USER);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_UUCP");
-	lua_pushnumber(L,  LOG_UUCP);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL0");
-	lua_pushnumber(L,  LOG_LOCAL0);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL1");
-	lua_pushnumber(L,  LOG_LOCAL1);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL2");
-	lua_pushnumber(L,  LOG_LOCAL2);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL3");
-	lua_pushnumber(L,  LOG_LOCAL3);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL4");
-	lua_pushnumber(L,  LOG_LOCAL4);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL5");
-	lua_pushnumber(L,  LOG_LOCAL5);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL6");
-	lua_pushnumber(L,  LOG_LOCAL6);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "FACILITY_LOCAL7");
-	lua_pushnumber(L,  LOG_LOCAL7);
-	lua_settable(L, -3);
-
-	lua_pushliteral(L, "LOG_EMERG");
-	lua_pushnumber(L,  LOG_EMERG);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "LOG_ALERT");
-	lua_pushnumber(L,  LOG_ALERT);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "LOG_CRIT");
-	lua_pushnumber(L,  LOG_CRIT);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "LOG_ERR");
-	lua_pushnumber(L,  LOG_ERR);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "LOG_WARNING");
-	lua_pushnumber(L,  LOG_WARNING);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "LOG_NOTICE");
-	lua_pushnumber(L,  LOG_NOTICE);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "LOG_INFO");
-	lua_pushnumber(L,  LOG_INFO);
-	lua_settable(L, -3);
-	lua_pushliteral(L, "LOG_DEBUG");
-	lua_pushnumber(L,  LOG_DEBUG);
-	lua_settable(L, -3);
-}
-
-
-/* ==========================================================================
- * unix.c - Lua bindings for Unix APIs
- * --------------------------------------------------------------------------
- * Copyright (c) 2014-2017, 2019-2023  William Ahern <william@25thandClement.com>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to permit
- * persons to whom the Software is furnished to do so, subject to the
- * following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
- * NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
- * ==========================================================================
- */
+#if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -520,7 +471,6 @@ static void set_info (lua_State *L)
 
 #define LUA_COMPAT_5_2 1
 #define LUA_COMPAT_5_3 1
-
 
 /*
  * F E A T U R E  D E T E C T I O N
@@ -3514,10 +3464,6 @@ static uint32_t arc4_getword(unixL_Random *R) {
 
 #ifndef UNIX_GETOPT_C
 #define UNIX_GETOPT_C
-
-#include <stdarg.h> /* va_list va_start va_end */
-#include <stdio.h>  /* flockfile(3) funlockfile(3) vfprintf(3) */
-
 
 #define U_GETOPT_R_INITIALIZER { NULL, 1, 1, 0, 0, NULL }
 #define U_GETOPT_R_INIT(k) do { \
@@ -12259,43 +12205,11 @@ static const struct {
 	{ const_ioctl,    countof(const_ioctl) },
 	{ const_locale,   countof(const_locale) },
 	{ const_unistd,   countof(const_unistd) },
-	{NULL, NULL},
 }; /* unix_const[] */
-static const struct luaL_Reg lcinterface_unixlog_lib[] = {
-  {"open", lsyslog_open},
-	{"close", lsyslog_close},
-	{"push", lsyslog_log},
-	{NULL, NULL},
-};
-
-#elif defined _WIN32 || LUA_USE_WINDOWS || LUA_USE_MINGW
-// Provides Windows specific functions
-#include <windows.h>
-// Provides the following functions:
-/*
-- GetModuleHandleA
-- GetProcAddress
-- LoadLibraryA
-- FreeLibrary
-- GetLastError
-- SetLastError
-- VirtualAlloc
-- VirtualFree
-- VirtualProtect
-- VirtualQuery
-
-*/
-static const struct luaL_Reg lcinterface_win_lib[] = {
-  {NULL, NULL}
-};
-
-#endif
 
 
-LUALIB_API int luaopen_lcinterface(lua_State* L) {
-  luaL_newlib(L, lcinterface_lib);
-  #if defined __unix__ || LUA_USE_POSIX || __APPLE__
-  unixL_State *U;
+LUALIB_API int luaopen_unix(lua_State *L) {
+	unixL_State *U;
 	size_t i, j;
 
 	/*
@@ -12374,13 +12288,12 @@ LUALIB_API int luaopen_lcinterface(lua_State* L) {
 	/*
 	 * insert integer constants
 	 */
-  
 	for (i = 0; i < countof(unix_const); i++) {
 		const struct unix_const *const table = unix_const[i].table;
 		const size_t size = unix_const[i].size;
 
 		for (j = 0; j < size; j++) {
-			
+			/* throw error if our macro improperly stringified an identifier */
 			if (*table[j].name >= '0' && *table[j].name <= '9')
 				return luaL_error(L, "%s: bogus constant identifier string conversion (near %s)", table[j].name, (j == 0)? "?" : table[j - 1].name);
 
@@ -12388,7 +12301,7 @@ LUALIB_API int luaopen_lcinterface(lua_State* L) {
 			lua_setfield(L, -2, table[j].name);
 		}
 	}
-  
+
 	/*
 	 * special RLIM values
 	 */
@@ -12421,17 +12334,17 @@ LUALIB_API int luaopen_lcinterface(lua_State* L) {
 	lua_setfield(L, -2, "__newindex");
 	lua_setmetatable(L, -2);
 
-  luaL_newlib(L, lcinterface_unixlog_lib);
-  lua_setfield(L, -2, "log");
-  #elif defined _WIN32 || LUA_USE_WINDOWS || LUA_USE_MINGW
-  // Append windows specific
-  lua_pushstring(L, "core windows functions are not supported yet, core unix is.");
-  lua_setfield("windowsnotice")
-  #endif
+	return 1;
+} /* luaopen_unix() */
 
-  luaL_newlib(L, lcinterface_memory_lib);
-  lua_setfield(L, -2, "memory");
-  luaL_newlib(L, lcinterface_error_lib);
-  lua_setfield(L, -2, "error");
-  return 1;
-}
+#endif /* !defined _WIN32 */
+
+// WINDOWS
+#if defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+
+LUALIB_API int luaopen_win(lua_State *L) {
+	lua_pushstring(L, "Not implemented on Windows");
+	lua_setfield(L, -2, "notice");
+} /* luaopen_unix() */
+
+#endif

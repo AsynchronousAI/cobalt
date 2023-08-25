@@ -86,6 +86,13 @@ LUAMOD_API int (luaopen_lfs) (lua_State *L);
 #define LUA_SOCKETNAME	"msg"
 LUAMOD_API int (luaopen_chan) (lua_State *L);
 
+#if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
+#define LUA_UNIXNAME	"unix"
+LUAMOD_API int (luaopen_unix) (lua_State *L);
+#elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+#define LUA_WINNAME	"win"
+LUAMOD_API int (luaopen_win) (lua_State *L);
+#endif
 /* open all previous libraries */
 LUALIB_API void (luaL_openlibs) (lua_State *L);
 

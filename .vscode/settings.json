@@ -8,6 +8,7 @@
         "lj_ctype.h": "c",
         "cobalt.h": "c",
         "lj_obj.h": "c",
-        "mman.h": "c"
+        "mman.h": "c",
+        "string.h": "c"
     }
 }

@@ -44,7 +44,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_LOADLIBNAME, luaopen_package},
   {LUA_COLIBNAME, luaopen_coroutine},
   {LUA_TABLIBNAME, luaopen_table},
-  {LUA_IOLIBNAME, luaopen_io},
+  {LUA_IOLIBNAME, luaopen_io}, 
   {LUA_ASYNCLIBNAME, luaopen_async},
   {LUA_OSLIBNAME, luaopen_os},
   {LUA_STRLIBNAME, luaopen_string},
@@ -64,6 +64,11 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_SOCKETNAME, luaopen_chan},
   {LUA_BITLIBNAME, luaopen_bit32},
   {LUA_BITOPNAME, luaopen_bit},
+  #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
+  {LUA_UNIXNAME, luaopen_unix},
+  #elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+  {LUA_WINNAME, luaopen_win},
+  #endif
   {NULL, NULL}
 };
 

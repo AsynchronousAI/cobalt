@@ -12335,10 +12335,30 @@ LUALIB_API int luaopen_unix(lua_State *L) {
 
 // WINDOWS
 #if defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+#include <windows.h>
+static int lwin_MessageBox(lua_State* L) {
+    const char* text = luaL_checkstring(L, 1);
+    const char* caption = luaL_optstring(L, 2, NULL);
+    int flags = luaL_optinteger(L, 3, MB_OK);
+    int result = MessageBox(NULL, text, caption, flags);
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+static int lwin_GetTickCount(lua_State* L) {
+    DWORD ticks = GetTickCount();
+    lua_pushinteger(L, ticks);
+    return 1;
+}
+
+static const luaL_Reg winlib[] = {
+    {"MessageBox", lua_MessageBox},
+    {"GetTickCount", lua_GetTickCount},
+    {NULL, NULL}
+};
 
 LUALIB_API int luaopen_win(lua_State *L) {
-	lua_pushstring(L, "Not implemented on Windows");
-	lua_setfield(L, -2, "notice");
-} /* luaopen_unix() */
+	luaL_newlib(L, winlib);
+} /* luaopen_win() */
 
 #endif

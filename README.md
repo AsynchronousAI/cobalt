@@ -20,3 +20,4 @@ Currently up to date with Lua `5.4.3`.
 - Enums
 - Records (like teal records)
 - Traceback mode for C by using: `#include <ltrace.c> && #include <ltrace.h>` over `#include <cobalt.h> && #include <cobalt.h>`
+- Pool allocator (%30 percent faster and optional) which does take up more memory but comes with huge performance benefits.

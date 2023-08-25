@@ -62,6 +62,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_STRUCTNAME, luaopen_struct},
   {LUA_SIGNALNAME, luaopen_signal},
   {LUA_SOCKETNAME, luaopen_chan},
+  {LUA_ALLOCNAME, luaopen_alloc},
   {LUA_BITLIBNAME, luaopen_bit32},
   {LUA_BITOPNAME, luaopen_bit},
   #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__

@@ -11,6 +11,7 @@ set(LUA_LIB_SRCS
     "src/lfunc.c"
     "src/lgc.c"
     "src/llex.c"
+    "src/pool.c"
     "src/lmem.c"
     "src/lobject.c"
     "src/lopcodes.c"

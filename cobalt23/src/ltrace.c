@@ -1,8 +1,8 @@
-/* ctrace.c -- automatically extracted from cobalt.h (5.4) */
+/* ltrace.c -- automatically extracted from cobalt.h (5.4) */
 
 #include <stdio.h>
 
-#include "ctrace.h"
+#include "ltrace.h"
 
 lua_State* Lua_newstate (lua_Alloc f, void* ud,
 	const char* _FILE, int _LINE, const char* _FUNC) {

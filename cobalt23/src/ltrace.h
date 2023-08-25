@@ -1,4 +1,4 @@
-/* ctrace.h -- automatically extracted from cobalt.h (5.4) */
+/* ltrace.h -- automatically extracted from cobalt.h (5.4) */
 
 #ifdef __LCC__
 #define __FUNCTION__ __func__
@@ -10,10 +10,6 @@
 
 #include "cobalt.h"
 #include "lauxlib.h"
-
-#if LUA_VERSION_NUM != 504
-#error this ctrace.h is for Lua 5.4
-#endif
 
 lua_State* Lua_newstate(lua_Alloc f, void* ud,
 	const char* _FILE, int _LINE, const char* _FUNC);

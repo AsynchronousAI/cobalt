@@ -1,8 +1,9 @@
 /*
-** $Id: lvm.c $
-** Lua virtual machine
-** See Copyright Notice in cobalt.h
+* lvm.c
+* input/output from/to Lua files
+* Read copyright notice at cobalt.h
 */
+
 
 #define lvm_c
 #define LUA_CORE

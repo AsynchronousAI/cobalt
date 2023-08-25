@@ -2,7 +2,13 @@
 * lcore.c
 * @AsynchronousAI
 * core, unix, win, and pool allocator core/library for Cobalt
-* Read copyright notice in cobalt.c
+* Read copyright notice in cobalt.h
+*/
+
+/* TODO:
+- expand windows
+- test regex
+- test on windows
 */
 #include <stdlib.h>
 #include <math.h>
@@ -12434,7 +12440,7 @@ static const luaL_Reg winlib[] = {
 	{"GetLastError", lua_GetLastError},
 	{"SetLastError", lua_SetLastError},
 	{"FormatMessage", lua_FormatMessage},
-	
+
     {NULL, NULL}
 };
 

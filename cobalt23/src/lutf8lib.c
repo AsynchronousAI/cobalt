@@ -1,8 +1,9 @@
 /*
-** $Id: lutf8lib.c $
-** Standard library for UTF-8 manipulation
-** See Copyright Notice in cobalt.h
+* lutf8lib.c
+* Standard utf8
+* Read copyright notice at cobalt.h
 */
+
 
 #define lutf8lib_c
 #define LUA_LIB

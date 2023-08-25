@@ -1,8 +1,9 @@
 /*
-** $Id: lzio.c $
-** Buffered streams
-** See Copyright Notice in cobalt.h
+* lzio.c
+* input/output from/to Lua files
+* Read copyright notice at cobalt.h
 */
+
 
 #define lzio_c
 #define LUA_CORE

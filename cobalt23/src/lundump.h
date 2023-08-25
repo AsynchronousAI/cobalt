@@ -1,8 +1,9 @@
 /*
-** $Id: lundump.h $
-** load precompiled Lua chunks
-** See Copyright Notice in cobalt.h
+* lundump.h
+* load chunks
+* Read copyright notice at cobalt.h
 */
+
 
 #ifndef lundump_h
 #define lundump_h

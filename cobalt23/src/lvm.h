@@ -1,7 +1,7 @@
 /*
-** $Id: lvm.h $
-** Lua virtual machine
-** See Copyright Notice in cobalt.h
+* lvm.h
+* vm
+* Read copyright notice at cobalt.h
 */
 
 #ifndef lvm_h

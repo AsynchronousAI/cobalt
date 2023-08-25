@@ -215,13 +215,13 @@ LUAMOD_API int luaopen_coroutine (lua_State *L) {
 #define lua_pushliteral(L, s) lua_pushstring(L, "" s, (sizeof(s)/sizeof(char))-1)
 #endif
 
-#if !defined(LUA_VERSION_NUM)
+#if !defined(COBALTLUA_VERSION_NUM)
 #define lua_pushinteger(L, n) lua_pushnumber(L, (lua_Number)n)
 #define luaL_Reg luaL_reg
 #endif
 
 /* some Lua 5.1 compatibility support. */
-#if !defined(LUA_VERSION_NUM) || (LUA_VERSION_NUM == 501)
+#if !defined(COBALTLUA_VERSION_NUM) || (COBALTLUA_VERSION_NUM == 501)
 /*
 ** Adapted from Lua 5.2.0
 */
@@ -642,7 +642,7 @@ static void obj_type_register_implements(lua_State *L, const reg_impl *impls) {
 #endif
 
 /* For Lua 5.2 don't register modules as globals. */
-#if LUA_VERSION_NUM == 502
+#if COBALTLUA_VERSION_NUM == 502
 #undef REG_MODULES_AS_GLOBALS
 #define REG_MODULES_AS_GLOBALS 0
 #endif
@@ -1448,7 +1448,7 @@ typedef struct Lua_LLThread {
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ******************************************************************************/
-#if !defined(LUA_VERSION_NUM) || (LUA_VERSION_NUM == 501)
+#if !defined(COBALTLUA_VERSION_NUM) || (COBALTLUA_VERSION_NUM == 501)
 /* from Lua 5.1 */
 static int traceback (lua_State *L) {
   if (!lua_isstring(L, 1))  /* 'message' not a string? */

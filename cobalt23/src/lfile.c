@@ -79,7 +79,7 @@
 #define LFS_VERSION "1.8.0"
 #define LFS_LIBNAME "lfs"
 
-#if LUA_VERSION_NUM >= 503      /* Lua 5.3+ */
+#if COBALTLUA_VERSION_NUM >= 503      /* Lua 5.3+ */
 
 #ifndef luaL_optlong
 #define luaL_optlong luaL_optinteger
@@ -87,7 +87,7 @@
 
 #endif
 
-#if LUA_VERSION_NUM >= 502
+#if COBALTLUA_VERSION_NUM >= 502
 #define new_lib(L, l) (luaL_newlib(L, l))
 #else
 #define new_lib(L, l) (lua_newtable(L), luaL_register(L, NULL, l))
@@ -306,7 +306,7 @@ static int get_dir(lua_State * L)
 */
 static FILE *check_file(lua_State * L, int idx, const char *funcname)
 {
-#if LUA_VERSION_NUM != -1 // supported by default
+#if COBALTLUA_VERSION_NUM != -1 // supported by default
   luaL_Stream *fh = (luaL_Stream *) luaL_checkudata(L, idx, "FILE*");
   if (fh->closef == 0 || fh->f == NULL) {
     luaL_error(L, "%s: closed file", funcname);
@@ -707,7 +707,7 @@ static int dir_iter_factory(lua_State * L)
   if (d->dir == NULL)
     luaL_error(L, "cannot open %s: %s", path, strerror(errno));
 #endif
-#if LUA_VERSION_NUM >= 504
+#if COBALTLUA_VERSION_NUM >= 504
   lua_pushnil(L);
   lua_pushvalue(L, -2);
   return 4;
@@ -736,7 +736,7 @@ static int dir_create_meta(lua_State * L)
   lua_pushcfunction(L, dir_close);
   lua_setfield(L, -2, "__gc");
 
-#if LUA_VERSION_NUM >= 504
+#if COBALTLUA_VERSION_NUM >= 504
   lua_pushcfunction(L, dir_close);
   lua_setfield(L, -2, "__close");
 #endif

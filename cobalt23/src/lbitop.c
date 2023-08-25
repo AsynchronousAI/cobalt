@@ -61,7 +61,7 @@ static UBits barg(lua_State *L, int idx)
 {
   BitNum bn;
   UBits b;
-#if LUA_VERSION_NUM < 502
+#if COBALTLUA_VERSION_NUM < 502
   bn.n = lua_tonumber(L, idx);
 #else
   bn.n = luaL_checknumber(L, idx);
@@ -85,7 +85,7 @@ static UBits barg(lua_State *L, int idx)
 #else
 #error "Unknown number type, check LUA_NUMBER_* in luaconf.h"
 #endif
-#if LUA_VERSION_NUM < 502
+#if COBALTLUA_VERSION_NUM < 502
   if (b == 0 && !lua_isnumber(L, idx)) {
     luaL_typerror(L, idx, "number");
   }
@@ -182,7 +182,7 @@ LUAMOD_API int luaopen_bit(lua_State *L)
       msg = "arithmetic right-shift broken";
     luaL_error(L, "bit library self-test failed (%s)", msg);
   }
-#if LUA_VERSION_NUM < 502
+#if COBALTLUA_VERSION_NUM < 502
   luaL_register(L, "bit", bit_funcs);
 #else
   luaL_newlib(L, bit_funcs);

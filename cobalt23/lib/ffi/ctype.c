@@ -94,7 +94,7 @@ struct ctype* push_ctype(lua_State* L, int ct_usr, const struct ctype* ct)
     push_upval(L, &ctype_mt_key);
     lua_setmetatable(L, -2);
 
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
     if (!ct_usr || lua_isnil(L, ct_usr)) {
         push_upval(L, &niluv_key);
         lua_setfenv(L, -2);
@@ -160,7 +160,7 @@ void* push_cdata(lua_State* L, int ct_usr, const struct ctype* ct)
     assert((uintptr_t) (cd + 1) % 8 == 0);
 #endif
 
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
     if (!ct_usr || lua_isnil(L, ct_usr)) {
         push_upval(L, &niluv_key);
         lua_setfenv(L, -2);

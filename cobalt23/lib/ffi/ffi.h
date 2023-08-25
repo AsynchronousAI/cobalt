@@ -75,7 +75,7 @@ static int lua_absindex2(lua_State* L, int idx) {
 /* use our own version of lua_absindex such that lua_absindex(L, 0) == 0 */
 #define lua_absindex(L, idx) lua_absindex2(L, idx)
 
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
 static void lua_callk(lua_State *L, int nargs, int nresults, int ctx, lua_CFunction k)
 {
     lua_call(L, nargs, nresults);
@@ -105,7 +105,7 @@ static char* luaL_prepbuffsize(luaL_Buffer* B, size_t sz) {
     }
     return luaL_prepbuffer(B);
 }
-#elif LUA_VERSION_NUM >= 503
+#elif COBALTLUA_VERSION_NUM >= 503
 static void (lua_remove)(lua_State *L, int idx) {
     lua_remove(L, idx);
 }

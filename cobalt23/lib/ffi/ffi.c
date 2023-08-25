@@ -110,7 +110,7 @@ static void* userdata_toptr(lua_State* L, int idx)
     lua_pop(L, 2);
 
     if (isfile) {
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
         FILE** stream = (FILE**) ptr;
         return *stream;
 #else
@@ -576,7 +576,7 @@ static int is_same_type(lua_State* L, int usr1, int usr2, const struct ctype* t1
         return 0;
     }
 
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
     if (lua_isnil(L, usr1) != lua_isnil(L, usr2)) {
         int ret;
         usr1 = lua_absindex(L, usr1);

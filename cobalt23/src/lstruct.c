@@ -37,11 +37,8 @@
 #include "lauxlib.h"
 
 
-#if (LUA_VERSION_NUM >= 502)
-
 #define luaL_register(L,n,f)	luaL_newlib(L,f)
 
-#endif
 
 
 /* basic integer type */

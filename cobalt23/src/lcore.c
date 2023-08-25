@@ -1061,7 +1061,7 @@ LUALIB_API int luaopen_lcore(lua_State* L) {
  * L U A  C O M P A T A B I L I T Y
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#if LUA_VERSION_NUM < 502
+#if COBALTLUA_VERSION_NUM < 502
 
 #ifndef LUA_FILEHANDLE
 #define LUA_FILEHANDLE "FILE*"
@@ -1135,9 +1135,9 @@ static void compatL_setfuncs(lua_State *L, const luaL_Reg *l, int nup) {
 	(luaL_newlibtable((L), (l)), luaL_setfuncs((L), (l), 0))
 #endif
 
-#endif /* LUA_VERSION_NUM < 502 */
+#endif /* COBALTLUA_VERSION_NUM < 502 */
 
-#if LUA_VERSION_NUM < 503
+#if COBALTLUA_VERSION_NUM < 503
 
 #define lua_isinteger(L, index) 0
 
@@ -1176,7 +1176,7 @@ static int compatL_rawgetp(lua_State *L, int index, const void *p) {
 	return lua_rawget(L, index);
 } /* compatL_rawgetp() */
 
-#endif /* LUA_VERSION_NUM < 503 */
+#endif /* COBALTLUA_VERSION_NUM < 503 */
 
 
 /*
@@ -3792,7 +3792,7 @@ static int unixL_init(lua_State *L, unixL_State *U) {
 	int error;
 
 	luaL_loadstring(L, "return 42");
-#if LUA_VERSION_NUM >= 503
+#if COBALTLUA_VERSION_NUM >= 503
 	lua_dump(L, &unixL_magicf, &M, 1);
 #else
 	lua_dump(L, &unixL_magicf, &M);
@@ -3814,7 +3814,7 @@ static int unixL_init(lua_State *L, unixL_State *U) {
 		lua_pop(L, 1);
 	}
 
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
 	if (!U->lua.jit) {
 		lua_createtable(L, 0, 1);
 		lua_pushcfunction(L, &unixL_closef);
@@ -4206,7 +4206,7 @@ static _Bool unixL_numbertounsigned(lua_Number n, unixL_Unsigned *p) {
 static void unixL_pushinteger(lua_State *L, unixL_Integer i) {
 	lua_Number n;
 
-#if LUA_VERSION_NUM >= 503
+#if COBALTLUA_VERSION_NUM >= 503
 	if (i >= LUA_MININTEGER && i <= LUA_MAXINTEGER) {
 		lua_pushinteger(L, i);
 
@@ -4223,7 +4223,7 @@ static void unixL_pushinteger(lua_State *L, unixL_Integer i) {
 static void unixL_pushunsigned(lua_State *L, unixL_Unsigned i) {
 	lua_Number n;
 
-#if LUA_VERSION_NUM >= 503
+#if COBALTLUA_VERSION_NUM >= 503
 	if (i <= LUA_MAXINTEGER) {
 		lua_pushinteger(L, i);
 
@@ -5337,7 +5337,7 @@ static int unixL_closef(lua_State *L) {
 	if (fh && fh->f) {
 		fclose(fh->f);
 		fh->f = NULL;
-#if LUA_VERSION_NUM >= 502
+#if COBALTLUA_VERSION_NUM >= 502
 		fh->closef = NULL;
 #endif
 	}
@@ -5389,10 +5389,10 @@ static struct luaL_Stream *unixL_prepfile(lua_State *L) {
 		luaL_getmetatable(L, LUA_FILEHANDLE);
 		lua_setmetatable(L, -2);
 
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
 		lua_rawgeti(L, LUA_REGISTRYINDEX, U->lua.opene);
 		lua_setfenv(L, -2);
-#elif LUA_VERSION_NUM >= 502
+#elif COBALTLUA_VERSION_NUM >= 502
 		fh->closef = &unixL_closef;
 #endif
 	}
@@ -8086,7 +8086,7 @@ static _Bool rl_isequal(lua_State *L, int index, lua_Number n) {
 
 	index = lua_absindex(L, index);
 	lua_pushnumber(L, n);
-#if LUA_VERSION_NUM == 501
+#if COBALTLUA_VERSION_NUM == 501
 	eq = lua_equal(L, index, -1);
 #else
 	eq = lua_compare(L, index, -1, LUA_OPEQ);
@@ -9689,14 +9689,14 @@ regcomp_prepregex(lua_State *L, int index, size_t nsub)
 	re->closed = 1; /* starts off closed because not yet compiled */
 	luaL_setmetatable(L, "regex_t");
 
-#if LUA_VERSION_NUM > 502
+#if COBALTLUA_VERSION_NUM > 502
 	lua_pushvalue(L, index);
 	lua_setuservalue(L, -2);
 #else
 	lua_createtable(L, 1, 0);
 	lua_pushvalue(L, index);
 	lua_rawseti(L, -2, 1);
-#if LUA_VERSION_NUM > 501
+#if COBALTLUA_VERSION_NUM > 501
 	lua_setuservalue(L, -2);
 #else
 	lua_setfenv(L, -2);
@@ -9715,7 +9715,7 @@ regex_pusherrstr(lua_State *L, int error, regex_t *preg)
 	luaL_buffinit(L, &errbuf);
 	n = regerror(error, preg, luaL_prepbuffer(&errbuf), LUAL_BUFFERSIZE);
 	if (n > LUAL_BUFFERSIZE) {
-#if LUA_VERSION_NUM >= 502
+#if COBALTLUA_VERSION_NUM >= 502
 		/* NB: regerror might not be idempotent if locale changed */
 		size_t bufsiz = n;
 		n = regerror(error, preg, luaL_prepbuffsize(&errbuf, bufsiz), bufsiz);
@@ -9779,9 +9779,9 @@ regex__tostring(lua_State *L)
 {
 	struct u_regex *re = regex_checkself(L, 1);
 
-#if LUA_VERSION_NUM > 502
+#if COBALTLUA_VERSION_NUM > 502
 	lua_getuservalue(L, 1);
-#elif LUA_VERSION_NUM > 501
+#elif COBALTLUA_VERSION_NUM > 501
 	lua_getuservalue(L, 1);
 	lua_rawgeti(L, -1, 1);
 #else

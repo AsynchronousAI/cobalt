@@ -1,7 +1,16 @@
 /*
 * lcore.c
 * @AsynchronousAI
-* core, unix, win, and pool allocator core/library for Cobalt
+* Interfaces to the system core and language core. Includes the following:
+** core
+** core.log
+** win
+** unix
+** core.memory
+** core.error
+** alloc
+** and the Pool Allocator.
+
 * Read copyright notice in cobalt.h
 */
 
@@ -29,7 +38,7 @@ HANDLE hEventLog = RegisterEventSource(NULL, L"MyApplication");
 
 static void* memory_map = NULL;
 
-/* HEAD/PRIMARY */
+/* MEMORY */
 static int allocate_hex_memory_address(lua_State* L) {
   size_t size = luaL_checkinteger(L, 1);
   if (memory_map == NULL) {
@@ -402,7 +411,7 @@ static int lsyslog_close(lua_State *L) {
 #define add_constant(c)         lua_pushinteger(L, LOG_##c); \
                                 lua_setfield(L, -2, #c)
 
-LUALIB_API int luaopen_lcore(lua_State* L) {
+LUALIB_API int luaopen_core(lua_State* L) {
 	luaL_newlib(L, lcore_lib);
 
 	const luaL_Reg LOGAPI[] = {
@@ -411,6 +420,15 @@ LUALIB_API int luaopen_lcore(lua_State* L) {
 		{ "push",   lsyslog_log },
 		{ NULL,    NULL }
 	};
+
+	#if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__)
+	lua_pushliteral(L, "unix");
+	#elif (defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW)
+	lua_pushliteral(L, "win");
+	#else
+	lua_pushliteral(L, "raw");
+	#endif
+	lua_setfield(L, -2, "build");
 
 	luaL_newlib(L, LOGAPI);
 	lua_setfield(L, -2, "log");
@@ -460,10 +478,10 @@ LUALIB_API int luaopen_lcore(lua_State* L) {
 }
 
 /* UNIX */
-// The following snippet is modified from lunix.
+// The following code is modified from lunix.
 #define luaL_checkint luaL_checkinteger
 #define luaL_optint luaL_optinteger
-#if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
+#if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__)
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -12390,7 +12408,7 @@ LUALIB_API int luaopen_unix(lua_State *L) {
 
 #endif /* !defined _WIN32 */
 
-// WINDOWS
+/* WINDOWS */
 #if defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
 static int lwin_MessageBox(lua_State* L) {
     const char* text = luaL_checkstring(L, 1);
@@ -12450,7 +12468,7 @@ LUALIB_API int luaopen_win(lua_State *L) {
 
 #endif
 
-// pool allocator
+/* ALLOCATOR */
 #include <stddef.h>
 
 #define CHUNK_COUNT 15
@@ -12710,6 +12728,96 @@ void* free_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
     }
 }
 
+typedef struct {
+  lua_Alloc alloc;
+  void*     ud;
+  ptrdiff_t bytes;
+  unsigned char enabled;
+  unsigned char verbose;
+} alloc_state;
+
+
+static char const alloc_id[ 1 ] = { 0 };
+
+static alloc_state* get_alloc_state( lua_State* L ) {
+  alloc_state* state = NULL;
+  lua_pushlightuserdata( L, (void*)alloc_id );
+  lua_rawget( L, LUA_REGISTRYINDEX );
+  state = (alloc_state*)lua_touserdata( L, -1 );
+  lua_pop( L, 1 );
+  return state;
+}
+
+
+static int alloc_enable( lua_State* L ) {
+  alloc_state* state = get_alloc_state( L );
+  if( state != NULL ) {
+    state->verbose = lua_toboolean( L, 1 );
+    state->enabled = 1;
+  }
+  return 0;
+}
+
+
+static int alloc_disable( lua_State* L ) {
+  alloc_state* state = get_alloc_state( L );
+  if( state != NULL ) {
+    state->enabled = 0;
+    lua_pushinteger( L, state->bytes );
+    state->bytes = 0;
+  } else
+    lua_pushinteger( L, 0 );
+  return 1;
+}
+
+
+static int alloc_gc( lua_State* L ) {
+  alloc_state* state = (alloc_state*)lua_touserdata( L, 1 );
+  lua_setallocf( L, state->alloc, state->ud );
+  return 0;
+}
+
+
+static void* alloc_allocate( void* ud, void* ptr, size_t osize, size_t nsize ) {
+  alloc_state* as = (alloc_state*)ud;
+  if( as->enabled ) {
+    if( ptr != NULL ) { /* realloc or free */
+      as->bytes += (ptrdiff_t)nsize - (ptrdiff_t)osize;
+      if( as->verbose ) {
+        if( nsize > osize )
+          fprintf( stderr, "(re-)allocating %zu bytes\n", nsize - osize );
+        else
+          fprintf( stderr, "freeing %zu bytes\n", osize - nsize );
+      }
+    } else { /* alloc */
+      as->bytes += (ptrdiff_t)nsize;
+      if( as->verbose ) {
+        switch( osize ) {
+          case LUA_TSTRING:
+            fprintf( stderr, "allocating %zu bytes for a string\n", nsize );
+            break;
+          case LUA_TTABLE:
+            fprintf( stderr, "allocating %zu bytes for a table\n", nsize );
+            break;
+          case LUA_TFUNCTION:
+            fprintf( stderr, "allocating %zu bytes for a function\n", nsize );
+            break;
+          case LUA_TUSERDATA:
+            fprintf( stderr, "allocating %zu bytes for a userdata\n", nsize );
+            break;
+          case LUA_TTHREAD:
+            fprintf( stderr, "allocating %zu bytes for a thread\n", nsize );
+            break;
+          default:
+            fprintf( stderr, "allocating %zu bytes\n", nsize );
+            break;
+        }
+      }
+    }
+  }
+  return as->alloc( as->ud, ptr, osize, nsize );
+}
+
 // INTERFACE
 int alloc_getStat(lua_State* L)
 {
@@ -12768,14 +12876,34 @@ int alloc_getStat(lua_State* L)
 }
 
 
-static const luaL_Reg lib[] = {
-  {"stats",alloc_getStat },
-  {NULL, NULL}
-};
-
-
 LUAMOD_API int luaopen_alloc (lua_State *L) {
-  luaL_newlib(L, lib);
+  luaL_Reg const funcs[] = {
+    { "enable", alloc_enable },
+    { "disable", alloc_disable },
+	{"stats",alloc_getStat },
+    { NULL, 0 }
+  };
+  lua_pushlightuserdata( L, (void*)alloc_id );
+  lua_rawget( L, LUA_REGISTRYINDEX );
+  if( lua_isnil( L, -1 ) ) {
+    alloc_state* state = (alloc_state*)lua_newuserdata( L, sizeof( alloc_state ) );
+    luaL_Reg const metamethods[] = {
+      { "__gc", alloc_gc },
+      { NULL, 0 }
+    };
+    luaL_newlib( L, metamethods );
+    lua_pushlightuserdata( L, (void*)alloc_id );
+    lua_pushvalue( L, -3 );
+    lua_rawset( L, LUA_REGISTRYINDEX );
+    state->enabled = 0;
+    state->verbose = 0;
+    state->bytes = 0;
+    state->alloc = lua_getallocf( L, &(state->ud) );
+    lua_setallocf( L, alloc_allocate, state );
+    lua_setmetatable( L, -2 );
+  }
+  luaL_newlib( L, funcs );
+  return 1;
   return 1;
 }
 

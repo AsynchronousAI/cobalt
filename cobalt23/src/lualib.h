@@ -57,7 +57,7 @@ LUAMOD_API int (luaopen_3D) (lua_State *L);
 LUAMOD_API int (luaopen_transform) (lua_State *L);
 
 #define LUA_CORENAME	"core"
-LUAMOD_API int (luaopen_lcore) (lua_State *L);
+LUAMOD_API int (luaopen_core) (lua_State *L);
 
 #define LUA_DBLIBNAME	"debug"
 LUAMOD_API int (luaopen_debug) (lua_State *L);

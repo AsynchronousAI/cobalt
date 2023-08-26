@@ -58,7 +58,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_2DLIBNAME, luaopen_2D},
   {LUA_3DLIBNAME, luaopen_3D},
   {LUA_TRANSFORMNAME, luaopen_transform},
-  {LUA_CORENAME, luaopen_lcore},
+  {LUA_CORENAME, luaopen_core},
   {LUA_DEVICENAME, luaopen_device},
   {LUA_FILESYSTEMNAME, luaopen_lfs},
   {LUA_COMPLEXNAME, luaopen_complex},
@@ -69,15 +69,21 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_BITLIBNAME, luaopen_bit32},
   {LUA_BITOPNAME, luaopen_bit},
 
-  /* Cobalt API */
-  
+  {NULL, NULL}
+};
 
+/*
+** these libs are in the source code but must be `require`/`import`-d 
+** into the global table
+*/
+static const luaL_Reg preloadedlibs[] = {
   /* Platform specifics */
   #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
   {LUA_UNIXNAME, luaopen_unix},
   #elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
   {LUA_WINNAME, luaopen_win},
   #endif
+
 
   {NULL, NULL}
 };
@@ -91,4 +97,12 @@ LUALIB_API void luaL_openlibs(lua_State *L)
     luaL_requiref(L, lib->name, lib->func, 1);
     lua_pop(L, 1);  /* remove lib */
   }
+
+  /* add open functions from 'preloadedlibs' into 'package.preload' table */
+  luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
+  for (lib = preloadedlibs; lib->func; lib++) {
+    lua_pushcfunction(L, lib->func);
+    lua_setfield(L, -2, lib->name);
+  }
+  
 }

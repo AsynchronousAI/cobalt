@@ -25,6 +25,7 @@ Currently up to date with Lua `5.4.3`.
 - Added color for `warn`, `error`, `info` to format like:
 > **<span style="color:yellow">warning:</span>** message.
 - `win` & `unix` specific libraries for platform specific code.
+- `ffi` library for interfacing with C.
 
 ## Todo:
 - Read typechecker todo

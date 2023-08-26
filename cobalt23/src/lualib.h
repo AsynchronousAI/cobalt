@@ -89,6 +89,9 @@ LUAMOD_API int (luaopen_chan) (lua_State *L);
 #define LUA_ALLOCNAME	"alloc"
 LUAMOD_API int (luaopen_alloc) (lua_State *L);
 
+#define LUA_FFINAME	"ffi"
+LUAMOD_API int (luaopen_ffi) (lua_State *L);
+
 // Platform specific libraries
 #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
 #define LUA_UNIXNAME	"unix"

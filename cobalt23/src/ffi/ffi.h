@@ -21,15 +21,15 @@
 
 #ifdef __cplusplus
 extern "C" {
-# include <cobalt.h>
-# include <lauxlib.h>
-# include <lualib.h>
+# include "../cobalt.h"
+# include "../lauxlib.h"
+# include "../lualib.h"
 }
 # define EXTERN_C extern "C"
 #else
-# include <cobalt.h>
-# include <lauxlib.h>
-# include <lualib.h>
+# include "../cobalt.h"
+# include "../lauxlib.h"
+# include "../lualib.h"
 # define EXTERN_C extern
 #endif
 
@@ -55,7 +55,7 @@ struct jit;
 #define Dst_REF		(Dst->ctx)
 #define DASM_EXTERN(a,b,c,d) get_extern(a,b,c,d)
 
-#include "../../asm/dasm_proto.h"
+#include "../asm/dasm_proto.h"
 
 #if defined LUA_FFI_BUILD_AS_DLL
 # define EXPORT __declspec(dllexport)

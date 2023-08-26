@@ -37,16 +37,16 @@ static void SetLastError(int err)
 
 
 #ifdef _WIN64
-#include "../../asm/dasm_x86.h"
+#include "../asm/dasm_x86.h"
 #include "call_x64win.h"
 #elif defined __amd64__
-#include "../../asm/dasm_x86.h"
+#include "../asm/dasm_x86.h"
 #include "call_x64.h"
 #elif defined __arm__ || defined __arm || defined __ARM__ || defined __ARM || defined ARM || defined _ARM_ || defined ARMV4I || defined _M_ARM
-#include "../../asm/dasm_arm.h"
+#include "../asm/dasm_arm.h"
 #include "call_arm.h"
 #else
-#include "../../asm/dasm_x86.h"
+#include "../asm/dasm_x86.h"
 #include "call_x86.h"
 #endif
 

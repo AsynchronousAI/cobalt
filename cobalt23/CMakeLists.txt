@@ -47,6 +47,12 @@ set(LUA_LIB_SRCS
     "src/ltablib.c"
     "src/lutf8lib.c"
     "src/linit.c"
+
+    # FFI
+    "src/ffi/call.c"
+    "src/ffi/ctype.c"
+    "src/ffi/ffi.c"
+    "src/ffi/parser.c"
 )
 
 set(TARGETS_TO_INSTALL lua_internal lua_include)

@@ -1,7 +1,7 @@
 /*
-** $Id: linit.c,v 1.39.1.1 2017/04/19 17:20:42 roberto Exp $
-** Initialization of libraries for cobalt.c and other clients
-** See Copyright Notice in cobalt.h
+* linit.c
+* Initialize libraries for Cobalt
+* Read copyright notice at cobalt.h
 */
 
 
@@ -33,21 +33,24 @@
 
 #include "lualib.h"
 #include "lauxlib.h"
-
+#include "llink.c"
 
 /*
 ** these libs are loaded by cobalt.c and are readily available to any Lua
 ** program
 */
 static const luaL_Reg loadedlibs[] = {
+  /* Base */
   {"_G", luaopen_base},
+  
+  /* C API */
   {LUA_LOADLIBNAME, luaopen_package},
   {LUA_COLIBNAME, luaopen_coroutine},
   {LUA_TABLIBNAME, luaopen_table},
   {LUA_IOLIBNAME, luaopen_io}, 
   {LUA_ASYNCLIBNAME, luaopen_async},
   {LUA_OSLIBNAME, luaopen_os},
-  {LUA_STRLIBNAME, luaopen_string},
+  {LUA_STRLIBNAME, luaopen_string}, 
   {LUA_MATHLIBNAME, luaopen_math},
   {LUA_UTF8LIBNAME, luaopen_utf8},
   {LUA_DBLIBNAME, luaopen_debug},
@@ -65,41 +68,27 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_ALLOCNAME, luaopen_alloc},
   {LUA_BITLIBNAME, luaopen_bit32},
   {LUA_BITOPNAME, luaopen_bit},
+
+  /* Cobalt API */
+  
+
+  /* Platform specifics */
   #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
   {LUA_UNIXNAME, luaopen_unix},
   #elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
   {LUA_WINNAME, luaopen_win},
   #endif
+
   {NULL, NULL}
-};
-
-
-static const luaL_Reg lib_preload[] = {
-
-  { NULL,		NULL }
 };
 
 LUALIB_API void luaL_openlibs(lua_State *L)
 {
   const luaL_Reg *lib;
+
   /* "require" functions from 'loadedlibs' and set results to global table */
   for (lib = loadedlibs; lib->func; lib++) {
     luaL_requiref(L, lib->name, lib->func, 1);
     lua_pop(L, 1);  /* remove lib */
   }
-  /* // JIT snippet, JIT supports PRELOAD require. Might add to interpreted if needed.
-  const luaL_Reg *lib;
-  for (lib = lj_lib_load; lib->func; lib++) {
-    lua_pushcfunction(L, lib->func);
-    lua_pushstring(L, lib->name);
-    lua_call(L, 1, 0);
-  }
-  luaL_findtable(L, LUA_REGISTRYINDEX, "_PRELOAD",
-		 sizeof(lj_lib_preload)/sizeof(lj_lib_preload[0])-1);
-  for (lib = lj_lib_preload; lib->func; lib++) {
-    lua_pushcfunction(L, lib->func);
-    lua_setfield(L, -2, lib->name);
-  }
-  lua_pop(L, 1);
-  */
 }

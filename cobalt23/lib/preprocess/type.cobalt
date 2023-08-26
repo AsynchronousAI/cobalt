@@ -10,6 +10,7 @@
  - Generics
  - Fix issue where type can be changed after definiton
 */
+
 /* SYSTEM:
  The system removes all comments and clears strings and saves it to a table of "dead" strings, 
  then it looks for definitions `var x: y = z` to store in a cache and assignments `x: y = z` and even 
@@ -25,6 +26,7 @@
 
  If the typechecker fails to check it will ignore.
 */
+
 // GLOBALS
 dead = {}
 

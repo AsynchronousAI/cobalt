@@ -277,7 +277,7 @@
 		},
 		"keyword": {
 			"name": "keyword.control.lua",
-			"match": "\\b(break|else|for|if|continue|open|config|define|undef|ifndef|ifdef|endif|error|warning|line|include|import|return|then|repeat|while|until|var|in)\\b"
+			"match": "\\b(break|else|elif|for|if|continue|open|config|define|undef|ifndef|ifdef|endif|error|warning|line|include|import|return|then|repeat|while|until|var|in)\\b"
 		},
 		"table-function": {
 			"name": "meta.function.lua",

@@ -17,7 +17,6 @@ CMakeFiles
 cmake_install.cmake
 Makefile
 .DS_Store
-*.S
 # Personal
 /cobalt23/5.1
 # Argon be annoying sometimes

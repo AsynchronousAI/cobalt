@@ -570,6 +570,10 @@ function process(str, itemtype, out, outfile, ...){
             "#config": function(){
                 errorpreprocessor("Config is not supported")
             },
+            "#ext": function(){
+                // Installs an extension
+                errorpreprocessor("Extensions are not supported")
+            },
             "default": function(value){
                 if (!run){
                     newlines[v[1]] = null
@@ -601,7 +605,7 @@ function process(str, itemtype, out, outfile, ...){
     lines = null
     preprocess = null
     str = null
-    var joined = "/* Processed with cobalt23 Preprocessor | v1 */\n\n\n"
+    var joined = "/* Preprocessed with the built in Cobalt preprocessor */\n\n\n"
     for (i, v in pairs(newlines)) {
         if (v == null) {
             continue;

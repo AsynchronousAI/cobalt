@@ -1,0 +1,3 @@
+// Test assembler
+ffi = import('ffi');
+asm = import('asm');

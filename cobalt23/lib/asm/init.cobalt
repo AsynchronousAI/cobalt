@@ -8,13 +8,13 @@
 
 // Application information.
 var _info = {
-  name =	"DynASM",
-  description =	"A dynamic assembler for code generation engines",
-  version =	"1.4.0",
-  vernum =	 10300,
-  release =	"2015-10-18",
+  name =	"cobaltASM",
+  description =	"Cobalt's dynASM fork.",
+  version =	"23",
+  vernum =	 2300,
+  release =	"2023",
   author =	"Mike Pall",
-  url =		"http://luajit.org/dynasm.html",
+  url =		"http://github.com/cobalt-lang/cobalt",
   license =	"MIT",
   copyright =	[=[
 Copyright (C) 2005-2020 Mike Pall. All rights reserved.
@@ -151,7 +151,7 @@ var opt_current;
 
 // Print error and exit with error status.
 var function opterror(...) {
-  stderr->write("dynasm.cobalt: ERROR: ", ...);
+  stderr->write("cobaltASM.cobalt: ERROR: ", ...);
   stderr->write("\n");
   exit(1);
 }
@@ -697,7 +697,7 @@ map_op[".arch_1"] = function(params) {
   var err = loadarch(params[1]);
   if( err ) { wfatal(err); }
   wline(format("#if DASM_VERSION != %d", _info.vernum));
-  wline('#error "Version mismatch between DynASM and included encoding engine"');
+  wline('#error "Version mismatch between cobaltASM and included encoding engine"');
   wline("#endif");
 };
 
@@ -875,9 +875,9 @@ var function doline(line) {
 var function dasmhead(out) {
   out->write(format([=[
 /*
-** This file has been pre-processed with DynASM.
+** This file has been pre-processed with cobalt's dynASM fork.
 ** %s
-** DynASM version %s, DynASM %s version %s
+** cobaltASM version %s, cobaltASM %s version %s
 ** DO NOT EDIT! The original file is in "%s".
 */
 
@@ -971,11 +971,11 @@ var function translate(infile, outfile) {
 
 // Print help text.
 function opt_map.help() {
-  stdout->write("DynASM -- ", _info.description, ".\n");
-  stdout->write("DynASM ", _info.version, " ", _info.release, "  ", _info.url, "\n");
+  stdout->write("asm -- ", _info.description, ".\n");
+  stdout->write("asm ", _info.version, " ", _info.release, "  ", _info.url, "\n");
   stdout->write([=[
 
-Usage: dynasm [OPTION]... INFILE.dasc|-
+Usage: cobaltasm [OPTION]... INFILE.dasc|-
 
   -h, --help           Display this help text.
   -V, --version        Display version and copyright information.

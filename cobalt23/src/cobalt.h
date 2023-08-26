@@ -1,6 +1,6 @@
 /*
 * cobalt.h
-* main handler/linker for Cobalt
+* main handler for Cobalt
 * Read copyright notice in the bottom of the file
 */
 
@@ -21,7 +21,7 @@
 
 #define COBALT_VERSION_NUM			2300
 #define COBALTLUA_VERSION_NUM			504
-#define COBALT_VERSION_RELEASE_NUM		(COBALTLUA_VERSION_NUM * 100 + 4)
+#define COBALT_VERSION_RELEASE_NUM		(COBALT_VERSION_NUM * 100 + 4)
 
 #define LUA_VERSION	"cobalt23"
 #define LUA_RELEASE	LUA_VERSION "." COBALT_VERSION_RELEASE
@@ -30,7 +30,7 @@
 
 
 /* mark for precompiled code ('<esc>Lua') */
-#define LUA_SIGNATURE	"\x1bluacobalt-y23"
+#define LUA_SIGNATURE	"\x1b" LUA_VERSION "\x01\r\n" COBALT_VERSION_MINOR COBALT_VERSION_RELEASE "\r\n\x19"  
 
 /* option for multiple returns in 'lua_pcall' and 'lua_call' */
 #define LUA_MULTRET	(-1)

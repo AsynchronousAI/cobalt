@@ -411,72 +411,6 @@ static int lsyslog_close(lua_State *L) {
 #define add_constant(c)         lua_pushinteger(L, LOG_##c); \
                                 lua_setfield(L, -2, #c)
 
-LUALIB_API int luaopen_core(lua_State* L) {
-	luaL_newlib(L, lcore_lib);
-
-	const luaL_Reg LOGAPI[] = {
-		{ "open",  lsyslog_open },
-		{ "close", lsyslog_close },
-		{ "push",   lsyslog_log },
-		{ NULL,    NULL }
-	};
-
-	#if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__)
-	lua_pushliteral(L, "unix");
-	#elif (defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW)
-	lua_pushliteral(L, "win");
-	#else
-	lua_pushliteral(L, "raw");
-	#endif
-	lua_setfield(L, -2, "build");
-
-	luaL_newlib(L, LOGAPI);
-	lua_setfield(L, -2, "log");
-
-	lua_newtable(L);
-	add_constant(AUTH);
-	add_constant(AUTHPRIV);
-	add_constant(CRON);
-	add_constant(DAEMON);
-	add_constant(FTP);
-	add_constant(KERN);
-	add_constant(LOCAL0);
-	add_constant(LOCAL1);
-	add_constant(LOCAL2);
-	add_constant(LOCAL3);
-	add_constant(LOCAL4);
-	add_constant(LOCAL5);
-	add_constant(LOCAL6);
-	add_constant(LOCAL7);
-	add_constant(LPR);
-	add_constant(MAIL);
-	add_constant(NEWS);
-	add_constant(SYSLOG);
-	add_constant(USER);
-	add_constant(UUCP);
-	lua_setfield(L, -2, "FACILITY");
-
-	lua_newtable(L);
-	add_constant(EMERG);
-	add_constant(ALERT);
-	add_constant(CRIT);
-	add_constant(ERR);
-	add_constant(WARNING);
-	add_constant(NOTICE);
-	add_constant(INFO);
-	add_constant(DEBUG);
-
-
-	lua_setfield(L, -2, "LEVEL");
-	luaL_newlib(L, lcore_memory_lib);
-	lua_setfield(L, -2, "memory");
-	luaL_newlib(L, lcore_error_lib);
-	lua_setfield(L, -2, "error");
-
-	luaL_setfuncs(L, lcore_lib, 0);
-	return 1;
-}
-
 /* UNIX */
 // The following code is modified from lunix.
 #define luaL_checkint luaL_checkinteger
@@ -12875,6 +12809,83 @@ int alloc_getStat(lua_State* L)
 	return 1;
 }
 
+LUALIB_API int luaopen_core(lua_State* L) {
+	luaL_newlib(L, lcore_lib);
+
+	const luaL_Reg LOGAPI[] = {
+		{ "open",  lsyslog_open },
+		{ "close", lsyslog_close },
+		{ "push",   lsyslog_log },
+		{ NULL,    NULL }
+	};
+
+	#if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__)
+	lua_pushliteral(L, "unix");
+	#elif (defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW)
+	lua_pushliteral(L, "win");
+	#else
+	lua_pushliteral(L, "raw");
+	#endif
+	lua_setfield(L, -2, "build");
+
+	luaL_newlib(L, LOGAPI);
+	lua_setfield(L, -2, "log");
+
+	lua_newtable(L);
+	add_constant(AUTH);
+	add_constant(AUTHPRIV);
+	add_constant(CRON);
+	add_constant(DAEMON);
+	add_constant(FTP);
+	add_constant(KERN);
+	add_constant(LOCAL0);
+	add_constant(LOCAL1);
+	add_constant(LOCAL2);
+	add_constant(LOCAL3);
+	add_constant(LOCAL4);
+	add_constant(LOCAL5);
+	add_constant(LOCAL6);
+	add_constant(LOCAL7);
+	add_constant(LPR);
+	add_constant(MAIL);
+	add_constant(NEWS);
+	add_constant(SYSLOG);
+	add_constant(USER);
+	add_constant(UUCP);
+	lua_setfield(L, -2, "FACILITY");
+
+	lua_newtable(L);
+	add_constant(EMERG);
+	add_constant(ALERT);
+	add_constant(CRIT);
+	add_constant(ERR);
+	add_constant(WARNING);
+	add_constant(NOTICE);
+	add_constant(INFO);
+	add_constant(DEBUG);
+
+
+	lua_setfield(L, -2, "LEVEL");
+
+	luaL_Reg const funcs[] = {
+		{ "enable", alloc_enable },
+		{ "disable", alloc_disable },
+		{"stats",alloc_getStat },
+		{ NULL, 0 }
+	};
+
+	luaL_newlib(L, lcore_memory_lib);
+	lua_setfield(L, -2, "memory");
+	luaL_newlib(L, lcore_error_lib);
+	lua_setfield(L, -2, "error");
+
+	luaL_setfuncs(L, lcore_lib, 0);
+
+	
+	return 1;
+}
+
+
 
 LUAMOD_API int luaopen_alloc (lua_State *L) {
   luaL_Reg const funcs[] = {
@@ -12903,7 +12914,6 @@ LUAMOD_API int luaopen_alloc (lua_State *L) {
     lua_setmetatable( L, -2 );
   }
   luaL_newlib( L, funcs );
-  return 1;
   return 1;
 }
 

@@ -25,3 +25,11 @@ Currently up to date with Lua `5.4.3`.
 - Added color for `warn`, `error`, `info` to format like:
 > **<span style="color:yellow">warning:</span>** message.
 - `win` & `unix` specific libraries for platform specific code.
+
+## Todo:
+- Read typechecker todo
+- Add pool allocator for the embeded
+- Update docs to say you need to `import`
+- Update the `gc`
+- Fix importing `.so` files
+- Create a fork to link with lua updates

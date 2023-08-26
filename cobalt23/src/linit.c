@@ -54,20 +54,16 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_MATHLIBNAME, luaopen_math},
   {LUA_UTF8LIBNAME, luaopen_utf8},
   {LUA_DBLIBNAME, luaopen_debug},
-  {LUA_COLORLIBNAME, luaopen_color},
-  {LUA_2DLIBNAME, luaopen_2D},
-  {LUA_3DLIBNAME, luaopen_3D},
-  {LUA_TRANSFORMNAME, luaopen_transform},
   {LUA_CORENAME, luaopen_core},
   {LUA_DEVICENAME, luaopen_device},
   {LUA_FILESYSTEMNAME, luaopen_lfs},
   {LUA_COMPLEXNAME, luaopen_complex},
-  {LUA_STRUCTNAME, luaopen_struct},
   {LUA_SIGNALNAME, luaopen_signal},
   {LUA_SOCKETNAME, luaopen_chan},
-  {LUA_ALLOCNAME, luaopen_alloc},
   {LUA_BITLIBNAME, luaopen_bit32},
   {LUA_BITOPNAME, luaopen_bit},
+  {LUA_ALLOCNAME, luaopen_alloc},
+  
 
   {NULL, NULL}
 };
@@ -83,6 +79,13 @@ static const luaL_Reg preloadedlibs[] = {
   #elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
   {LUA_WINNAME, luaopen_win},
   #endif
+
+  /* C API */
+  {LUA_STRUCTNAME, luaopen_struct},
+  {LUA_COLORLIBNAME, luaopen_color},
+  {LUA_2DLIBNAME, luaopen_2D},
+  {LUA_3DLIBNAME, luaopen_3D},
+  {LUA_TRANSFORMNAME, luaopen_transform},
 
 
   {NULL, NULL}
@@ -104,5 +107,5 @@ LUALIB_API void luaL_openlibs(lua_State *L)
     lua_pushcfunction(L, lib->func);
     lua_setfield(L, -2, lib->name);
   }
-  
+
 }

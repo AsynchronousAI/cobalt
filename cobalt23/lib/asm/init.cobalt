@@ -956,7 +956,7 @@ var function translate(infile, outfile) {
   checkcaptures();
 
   if( g_errcount != 0 ) {
-    info(g_fname, g_errcount, " error",
+    stderr->write(g_fname, ":*: info: ", g_errcount, " error",
       (type(g_errcount) == "number" && g_errcount > 1) && "s" || "",
       " in input file -- no output file generated.\n");
     dumpdef(stderr);

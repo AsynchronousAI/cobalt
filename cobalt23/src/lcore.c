@@ -416,9 +416,6 @@ static int lsyslog_close(lua_State *L) {
 #define luaL_checkint luaL_checkinteger
 #define luaL_optint luaL_optinteger
 #if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__)
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 /*
  * P O R T A B L E  S Y S T E M  I N C L U D E S

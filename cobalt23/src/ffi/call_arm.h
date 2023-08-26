@@ -5,7 +5,7 @@
 ** DO NOT EDIT! The original file is in "call_arm.dasc".
 */
 
-#if DASM_VERSION != 10300
+#if DASM_VERSION != 2300
 #error "Version mismatch between DynASM and included encoding engine"
 #endif
 

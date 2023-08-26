@@ -3,5 +3,6 @@
 /** 5.4 LUA TEST **/
 
 // Constants!!
-var x <const> = 0
+var x = 0
 x = 1
+print(x)

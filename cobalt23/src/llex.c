@@ -124,7 +124,7 @@ l_noret luaX_syntaxerror (LexState *ls, const char *msg) {
   lexerror(ls, msg, ls->t.token);
 }
 static void lexwarning (LexState *ls, const char *msg, int token) {
-#ifdef COBALT_WARNING
+#if defined COBALT_WARNING
   const char *msg0 = luaG_addinfo(ls->L, "\n\033[1;33mwarning: \033[0m", ls->source, ls->linenumber);
   if (token)
     msg =luaO_pushfstring(ls->L, "%s %s near %s", msg0, msg, txtToken(ls, token));
@@ -132,7 +132,6 @@ static void lexwarning (LexState *ls, const char *msg, int token) {
 #endif
 }
 void luaX_syntaxwarning (LexState *ls, const char *msg) {
-  #ifdef COBALT_WARNING
   lexwarning(ls, msg, ls->t.token);
 }
 

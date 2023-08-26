@@ -9,6 +9,7 @@
         "cobalt.h": "c",
         "lj_obj.h": "c",
         "mman.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "typeinfo": "c"
     }
 }

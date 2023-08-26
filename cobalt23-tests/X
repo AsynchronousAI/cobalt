@@ -1,3 +1,17 @@
+/*
+** This file has been pre-processed with cobalt's dynASM fork.
+** http://github.com/cobalt-lang/cobalt
+** cobaltASM version 23, cobaltASM x86 version 1.4.0
+** DO NOT EDIT! The original file is in "test.S".
+*/
+
+#line 1 "test.S"
+//|.arch x86
+#if DASM_VERSION != 2300
+#error "Version mismatch between cobaltASM and included encoding engine"
+#endif
+#line 2 "test.S"
+
 section .data
     message db 'Hello, world!', 0
 

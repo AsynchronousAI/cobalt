@@ -9,4 +9,4 @@
 //----------------------------------------------------------------------------
 
 x64 = true; // Using a global is an ugly, but effective solution.
-return require("dasm_x86");
+return require("asm.dasm_x86");

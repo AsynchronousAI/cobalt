@@ -486,6 +486,11 @@
 
 
 /*
+** Should warnings be enabled
+*/
+#define COBALT_WARNING 1
+
+/*
 @@ LUA_UNSIGNED is the unsigned version of LUA_INTEGER.
 @@ LUAI_UACINT is the result of a 'default argument promotion'
 @@ over a LUA_INTEGER.

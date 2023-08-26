@@ -446,19 +446,19 @@ map_coreop[".macro_*"] = function(mparams) {
 	wcomment("{"..mcom);
       }
       // Loop through all captured statements
-      for( _,stmt in ipairs(lines) ) {
-	// Substitute macro parameters.
-	var st = gsub(stmt, "[%w_]+", subst);
-	st = definesubst(st);
-	st = gsub(st, "%s*%.%.%s*", ""); // Token paste a..b.
-	if( mcom && sub(st, 1, 1) != "|" ) { wcomment(st); }
-	// Emit statement. Use a protected call for better diagnostics.
-	var ok, err = pcall(dostmt, st);
-	if( ! ok ) {
-	  // Add the captured statement to the error.
-	  wprinterr(err, "\n", g_indent, "|  ", stmt,
-		    "\t[MACRO ", name, " (", #mparams, ")]\n");
-	}
+      for( _,stmt2 in ipairs(lines) ) {
+        // Substitute macro parameters.
+        var st = gsub(stmt2, "[%w_]+", subst);
+        st = definesubst(st);
+        st = gsub(st, "%s*%.%.%s*", ""); // Token paste a..b.
+        if( mcom && sub(st, 1, 1) != "|" ) { wcomment(st); }
+        // Emit statement. Use a protected call for better diagnostics.
+        var ok, err = pcall(dostmt, st);
+        if( ! ok ) {
+          // Add the captured statement to the error.
+          wprinterr(err, "\n", g_indent, "|  ", stmt2,
+              "\t[MACRO ", name, " (", #mparams, ")]\n");
+        }
       }
       if( mcom ) { wcomment("}"..mcom); }
       mac_active[opname] = null;
@@ -600,7 +600,7 @@ map_coreop[".section_*"] = function(params) {
     }
     map_sections[#map_sections+1] = name;
     wline(format("#define DASM_SECTION_%s\t%d", upper(name), sn-1));
-    map_op[opname] = function(params) { g_arch.section(sn-1); };
+    map_op[opname] = function(params2) { g_arch.section(sn-1); };
   }
   wline(format("#define DASM_MAXSECTION\t\t%d", #map_sections));
 };
@@ -631,7 +631,7 @@ if( ! require ) {
 var function loadarch(arch) {
   if( ! match(arch, "^[%w_]+$") ) { return "bad arch name"; }
   _G._map_def = map_def;
-  var ok, m_arch = pcall(require, "dasm_"..arch);
+  var ok, m_arch = pcall(require, "asm.dasm_"..arch);
   if( ! ok ) { return "cannot load module: "..m_arch; }
   g_arch = m_arch;
   wflush = m_arch.passcb(wline, werror, wfatal, wwarn);
@@ -956,7 +956,7 @@ var function translate(infile, outfile) {
   checkcaptures();
 
   if( g_errcount != 0 ) {
-    stderr->write(g_fname, ":*: info: ", g_errcount, " error",
+    info(g_fname, g_errcount, " error",
       (type(g_errcount) == "number" && g_errcount > 1) && "s" || "",
       " in input file -- no output file generated.\n");
     dumpdef(stderr);
@@ -1022,11 +1022,11 @@ function opt_map.dumpdef() { g_opt.dumpdef = g_opt.dumpdef + 1; }
 
 // Short aliases for long options.
 var opt_alias = {
-  h = "help", ["?"] = "help", V = "version",
-  o = "outfile", I = "include",
-  c = "ccomment", C = "cppcomment", N = "nocomment", M = "maccomment",
-  L = "nolineno", F = "flushline",
-  P = "dumpdef", A = "dumparch",
+  "h" = "help", ["?"] = "help", "V" = "version",
+  "o" = "outfile", "I" = "include",
+  "c" = "ccomment", "C" = "cppcomment", "N" = "nocomment", "M" = "maccomment",
+  "L" = "nolineno", "F" = "flushline",
+  "P" = "dumpdef", "A" = "dumparch",
 };
 
 // Parse single option.
@@ -1080,16 +1080,16 @@ var function parseargs(args) {
 }
 
 //----------------------------------------------------------------------------
+return function(...){
+  // Add the directory dynasm.cobalt resides in to the Lua module search path.
+  var arg = arg;
+  if( arg && arg[0] ) {
+    prefix = match(arg[0], "^(.*[/\\])");
+    if( package && prefix ) { package.path = prefix.."?.cobalt;"..package.path; }
+  }
 
-// Add the directory dynasm.cobalt resides in to the Lua module search path.
-var arg = arg;
-if( arg && arg[0] ) {
-  prefix = match(arg[0], "^(.*[/\\])");
-  if( package && prefix ) { package.path = prefix.."?.cobalt;"..package.path; }
+  // Start DynASM.
+  parseargs({...});
 }
-
-// Start DynASM.
-parseargs({...});
-
 //----------------------------------------------------------------------------
 

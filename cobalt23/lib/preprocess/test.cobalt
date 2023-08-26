@@ -1,0 +1,6 @@
+#define X 1
+for (i = 1, X){
+    #undef x
+    #define x 2
+    print(x);
+}

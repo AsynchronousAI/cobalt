@@ -1,0 +1,8 @@
+/* Processed with cobalt23 Preprocessor | v1 */
+
+
+var X = 1
+for (i = 1, X){
+var x = 2
+    print(x);
+}

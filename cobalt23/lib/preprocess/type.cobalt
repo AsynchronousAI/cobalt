@@ -184,9 +184,9 @@ types = {
   },
   "char" = function(item){
     // Check if the item is a string and 1 character long
-    return type(item) == "string" && #item == 1
-  }
-  "message" = function(item){
+    return type(item) == "string" && #item == 1;
+  },
+  "msg" = function(item){
     // Check if tostring(item) == "message: <pointer>"
     // messages are used in the Message library for communication between threads
     return tostring(item) == string.match("^message: ")

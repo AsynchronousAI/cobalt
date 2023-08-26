@@ -21,7 +21,7 @@
 */
 
 /* TODO:
-    None!
+    - Actually substitute macros & definitions
 */
 
 /* Supports
@@ -50,7 +50,12 @@ filesystem = file || import("file") // File library for cobalt
 filex = import("ext.file") // Extended File library for cobalt
 core = core || import("core") // Core library for cobalt
 
-typechecker = import("preprocess.type") // Integrated type checker.
+typechecker = null
+xpcall(function(){
+    typechecker = import("type")
+}, function(){
+    typechecker = import("preprocess.type")
+})
 
 function process(str, itemtype, out, outfile, ...){
     // 0: Init
@@ -251,11 +256,11 @@ function process(str, itemtype, out, outfile, ...){
                     var defname = values[2]->split("(")[1]
                     var args = values[2]->split("(")[2]->gsub("%)", "")->split(",")
                     var func = values[3]
-                    for (i = 4, #values) {
-                        func = func.." "..values[i]
+                    for (ii = 4, #values) {
+                        func = func.." "..values[ii]
                     }
-                    for (i, v in pairs(args)){
-                        args[i] = v->gsub(" ", "")
+                    for (ii, vv in pairs(args)){
+                        args[ii] = vv->gsub(" ", "")
                     }
 
                     var funcdef = "function("..table.concat(args, ",").."){ return "..func.."; }"
@@ -319,8 +324,8 @@ function process(str, itemtype, out, outfile, ...){
                 // Split content to everything after tonumber(line)
                 split = content->split("\n")
                 var newcontent = ""
-                for (i = tonumber(line), #split) {
-                    newcontent = newcontent..split[i].."\n"
+                for (ii = tonumber(line), #split) {
+                    newcontent = newcontent..split[ii].."\n"
                 }
                 newlines[v[1]] = newcontent
 
@@ -338,18 +343,18 @@ function process(str, itemtype, out, outfile, ...){
                 var ogfile = file
                 // File should be a string that ends with " and may have stuff after the "
                 // Remove the last " and only keep everything before it
-                for (i = 1, #file) {
-                    var v = file->sub(i, i)
-                    if (v == "\"") {
-                        file = file->sub(1, i - 1)
+                for (ii = 1, #file) {
+                    var vv = file->sub(ii, ii)
+                    if (vv == "\"") {
+                        file = file->sub(1, ii - 1)
                         break;
                     }
                 }
 
                 var f;
-                for (i, v in pairs(package.searchers)){
-                    if (#table.pack(v(file)) == 2 &&  table.pack(v(file))[1] != null) {
-                        f = table.pack(v(file));
+                for (_, vv in pairs(package.searchers)){
+                    if (#table.pack(vv(file)) == 2 &&  table.pack(vv(file))[1] != null) {
+                        f = table.pack(vv(file));
                         break;
                     }
                 }
@@ -388,17 +393,17 @@ function process(str, itemtype, out, outfile, ...){
                 // 1: Get the condition, Everything in between the ()
                 var condition = v[2]->gsub("#if ", "")
                 /// Get everything in between the ()
-                for (i = 1, #condition) {
-                    var v = condition->sub(i, i)
-                    if (v == "(") {
-                        condition = condition->sub(i + 1, #condition)
+                for (ii = 1, #condition) {
+                    var vv = condition->sub(ii, ii)
+                    if (vv == "(") {
+                        condition = condition->sub(ii + 1, #condition)
                         break;
                     }
                 }
-                for (i = #condition, 1, -1) {
-                    var v = condition->sub(i, i)
-                    if (v == ")") {
-                        condition = condition->sub(1, i - 1)
+                for (ii = #condition, 1, -1) {
+                    var vv = condition->sub(ii, ii)
+                    if (vv == ")") {
+                        condition = condition->sub(1, ii - 1)
                         break;
                     }
                 }
@@ -425,17 +430,17 @@ function process(str, itemtype, out, outfile, ...){
                 // 1: Get the condition, Everything in between the ()
                 var condition = v[2]->gsub("#if ", "")
                 /// Get everything in between the ()
-                for (i = 1, #condition) {
-                    var v = condition->sub(i, i)
-                    if (v == "(") {
-                        condition = condition->sub(i + 1, #condition)
+                for (ii = 1, #condition) {
+                    var vv = condition->sub(ii, ii)
+                    if (vv == "(") {
+                        condition = condition->sub(ii + 1, #condition)
                         break;
                     }
                 }
-                for (i = #condition, 1, -1) {
-                    var v = condition->sub(i, i)
-                    if (v == ")") {
-                        condition = condition->sub(1, i - 1)
+                for (ii = #condition, 1, -1) {
+                    var vv = condition->sub(i, i)
+                    if (vv == ")") {
+                        condition = condition->sub(1, ii - 1)
                         break;
                     }
                 }
@@ -462,17 +467,17 @@ function process(str, itemtype, out, outfile, ...){
                 // 1: Get the condition, Everything in between the ()
                 var condition = v[2]->gsub("#if ", "")
                 /// Get everything in between the ()
-                for (i = 1, #condition) {
-                    var v = condition->sub(i, i)
-                    if (v == "(") {
-                        condition = condition->sub(i + 1, #condition)
+                for (ii = 1, #condition) {
+                    var vv = condition->sub(ii, ii)
+                    if (vv == "(") {
+                        condition = condition->sub(ii + 1, #condition)
                         break;
                     }
                 }
-                for (i = #condition, 1, -1) {
-                    var v = condition->sub(i, i)
-                    if (v == ")") {
-                        condition = condition->sub(1, i - 1)
+                for (ii = #condition, 1, -1) {
+                    var vv = condition->sub(ii, ii)
+                    if (vv == ")") {
+                        condition = condition->sub(1, ii - 1)
                         break;
                     }
                 }
@@ -502,17 +507,17 @@ function process(str, itemtype, out, outfile, ...){
                 // 1: Get the condition, Everything in between the ()
                 var condition = v[2]->gsub("#elif ", "")
                 /// Get everything in between the ()
-                for (i = 1, #condition) {
-                    var v = condition->sub(i, i)
-                    if (v == "(") {
-                        condition = condition->sub(i + 1, #condition)
+                for (ii = 1, #condition) {
+                    var vv = condition->sub(ii, ii)
+                    if (vv == "(") {
+                        condition = condition->sub(ii + 1, #condition)
                         break;
                     }
                 }
-                for (i = #condition, 1, -1) {
-                    var v = condition->sub(i, i)
-                    if (v == ")") {
-                        condition = condition->sub(1, i - 1)
+                for (ii = #condition, 1, -1) {
+                    var vv = condition->sub(ii, ii)
+                    if (vv == ")") {
+                        condition = condition->sub(1, ii - 1)
                         break;
                     }
                 }
@@ -614,4 +619,5 @@ function process(str, itemtype, out, outfile, ...){
     return joined
 }
 
+//process("test.cobalt", "file", true, "test2.cobalt")
 return process

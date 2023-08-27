@@ -50,7 +50,7 @@ static void AtExit(void)
 static int AddVersions(lua_State *L)
     {
     lua_pushstring(L, "_VERSION");
-    lua_pushstring(L, "MoonSDL2 "MOONSDL2_VERSION);
+    lua_pushstring(L, "v"MOONSDL2_VERSION);
     lua_settable(L, -3);
 
 
@@ -58,7 +58,7 @@ static int AddVersions(lua_State *L)
         SDL_version ver;
         SDL_GetVersion(&ver);
         if(!((ver.major == 2) && (ver.minor >= 26)))
-            return luaL_error(L, "MoonSDL requires SDL2 >= 2.26.0 (found %d.%d.%d)",
+            return luaL_error(L, "SDL port requires SDL2 >= 2.26.0 (found %d.%d.%d)",
                     ver.major, ver.minor, ver.patch);
         lua_pushstring(L, "_SDL_VERSION");
         lua_pushfstring(L, "SDL %d.%d.%d", ver.major, ver.minor, ver.patch);
@@ -68,7 +68,7 @@ static int AddVersions(lua_State *L)
     do {
         const SDL_version *ver = IMG_Linked_Version();
         if(!((ver->major == 2) && (ver->minor >= 6)))
-            return luaL_error(L, "MoonSDL requires SDL_image >= 2.6.0 (found %d.%d.%d)",
+            return luaL_error(L, "SDL port requires SDL_image >= 2.6.0 (found %d.%d.%d)",
                     ver->major, ver->minor, ver->patch);
         lua_pushstring(L, "_SDL_IMG_VERSION");
         lua_pushfstring(L, "SDL_image %d.%d.%d", ver->major, ver->minor, ver->patch);
@@ -78,7 +78,7 @@ static int AddVersions(lua_State *L)
     do {
         const SDL_version *ver = TTF_Linked_Version();
         if(!((ver->major == 2) && (ver->minor >= 20)))
-            return luaL_error(L, "MoonSDL requires SDL_ttf >= 2.20.0 (found %d.%d.%d)",
+            return luaL_error(L, "SDL port requires SDL_ttf >= 2.20.0 (found %d.%d.%d)",
                     ver->major, ver->minor, ver->patch);
         lua_pushstring(L, "_SDL_TTF_VERSION");
         lua_pushfstring(L, "SDL_ttf %d.%d.%d", ver->major, ver->minor, ver->patch);
@@ -88,7 +88,7 @@ static int AddVersions(lua_State *L)
     do {
         const SDL_version *ver = Mix_Linked_Version();
         if(!((ver->major == 2) && (ver->minor >= 6)))
-            return luaL_error(L, "MoonSDL requires SDL_mixer >= 2.6.0 (found %d.%d.%d)",
+            return luaL_error(L, "SDL port requires SDL_mixer >= 2.6.0 (found %d.%d.%d)",
                     ver->major, ver->minor, ver->patch);
         lua_pushstring(L, "_SDL_MIX_VERSION");
         lua_pushfstring(L, "SDL_mixer %d.%d.%d", ver->major, ver->minor, ver->patch);

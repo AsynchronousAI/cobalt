@@ -40,36 +40,85 @@ if(SDL)
         OUTPUT_VARIABLE SDL2_MIXER_CFLAGS
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+    execute_process(
+        COMMAND pkg-config SDL2 --libs
+        OUTPUT_VARIABLE SDL2_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config SDL2_image --libs
+        OUTPUT_VARIABLE SDL2_IMAGE_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config SDL2_ttf --libs
+        OUTPUT_VARIABLE SDL2_TTF_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config SDL2_mixer --libs
+        OUTPUT_VARIABLE SDL2_MIXER_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT SDL2_LIBS)
+        if (SDLPATH)
+        set(SDL2_LIBS "-L${SDLPATH}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2, manually specify using the -DSDLPATH flag")
+        endif()
+    endif()
+    if (NOT SDL2_IMAGE_LIBS)
+        if (IMAGE)
+        set(SDL2_IMAGE_LIBS "-L${IMAGE}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2_image, manually specify using the -DIMAGE flag")
+        endif()
+    endif()
+    if (NOT SDL2_TTF_LIBS)
+        if (TTF)
+        set(SDL2_TTF_LIBS "-L${TTF}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2_ttf, manually specify using the -DTTF flag")
+        endif()
+    endif()
+    if (NOT SDL2_MIXER_LIBS)
+        if (MIXER)
+        set(SDL2_MIXER_LIBS "-L${MIXER}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2_mixer, manually specify using the -DMIXER flag")
+        endif()
+    endif()
+
     if (NOT SDL2_MIXER_CFLAGS)
         if (MIXER)
         set(SDL2_MIXER_CFLAGS "-I${MIXER}")
         else()
-        message(FATAL_ERROR "Failed to find SDL2_mixer, manually specify using the -DMIXER flage")
+        message(FATAL_ERROR "Failed to find SDL2_mixer, manually specify using the -DMIXER flag")
         endif()
     endif()
     if (NOT SDL2_TTF_CFLAGS)
         if (TTF)
         set(SDL2_TTF_CFLAGS "-I${TTF}")
         else()
-        message(FATAL_ERROR "Failed to find SDL2_ttf, manually specify using the -DTTF flage")
+        message(FATAL_ERROR "Failed to find SDL2_ttf, manually specify using the -DTTF flag")
         endif()
     endif()
     if (NOT SDL2_IMAGE_CFLAGS)
         if (IMAGE)
         set(SDL2_IMAGE_CFLAGS "-I${IMAGE}")
         else()
-        message(FATAL_ERROR "Failed to find SDL2_image, manually specify using the -DIMAGE flage")
+        message(FATAL_ERROR "Failed to find SDL2_image, manually specify using the -DIMAGE flag")
         endif()
     endif()
     if (NOT SDL2_CFLAGS)
         if (SDLPATH)
         set(SDL2_CFLAGS "-I${SDLPATH}")
         else()
-        message(FATAL_ERROR "Failed to find SDL2, manually specify using the -DSDLPATH flage")
+        message(FATAL_ERROR "Failed to find SDL2, manually specify using the -DSDLPATH flag")
         endif()
     endif()
 
-    set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${SDL2_TTF_LIBS} ${SDL2_MIXER_LIBS}")
 endif() 
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
@@ -82,7 +131,7 @@ if (SOCKET)
        if (CURL)
         set(CURL_LIBS "-I${CURL}")
         else()
-        message(FATAL_ERROR "Failed to find libcurl, manually specify using the -DCURL flage")
+        message(FATAL_ERROR "Failed to find libcurl, manually specify using the -DCURL flag")
         endif()
     endif()
 

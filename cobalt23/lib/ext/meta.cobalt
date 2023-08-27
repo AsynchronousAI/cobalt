@@ -1,6 +1,6 @@
 var table = require ('ext.table');
 var string = require ('ext.string');
-var coroutine = require ('ext.coroutine');
+var thread = require ('ext.thread');
 var number = require ('ext.number');
 var op = require ('ext.op');
 
@@ -189,9 +189,9 @@ var functionMeta = {
 			};
 		},
 		dump = string.dump,
-		// coroutine access
-		wrap = coroutine.wrap,
-		co = coroutine.create,
+		// thread access
+		wrap = thread.wrap,
+		co = thread.create,
 	}
 	//]]
 };
@@ -201,7 +201,7 @@ functionMeta.__index.o = functionMeta.__index.compose;
 functionMeta.__index.o_n = functionMeta.__index.compose_n;
 debug.setmetatable(function() { }, functionMeta);
 
-// coroutines
-debug.setmetatable(coroutine.create(function() { }), {__index = coroutine});
+// threads
+debug.setmetatable(thread.create(function() { }), {__index = thread});
 
 // TODO lightuserdata, if you can create it within lua somehow ...

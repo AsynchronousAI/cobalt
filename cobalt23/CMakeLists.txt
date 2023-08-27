@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(FFI_ON ON CACHE BOOL "Enable FFI")
-
 set(LUA_LIB_SRCS 
     "src/lapi.c"
     "src/lcode.c"
@@ -99,6 +97,22 @@ if (SDL)
         "src/sdl/glcontext.c"
         "src/sdl/objects.c"
         "src/sdl/window.c"
+    )
+endif()
+
+# SOCKET
+if (SOCKET)
+    list(APPEND LUA_LIB_SRCS
+        "src/curl/lcurlapi.c"
+        "src/curl/lcurl.c"
+        "src/curl/lcutils.c"
+        "src/curl/lcerror.c"
+        "src/curl/lcmime.c"
+        "src/curl/lchttppost.c"
+        "src/curl/lcmulti.c"
+        "src/curl/lceasy.c"
+        "src/curl/l52util.c"
+        "src/curl/lcshare.c"
     )
 endif()
 

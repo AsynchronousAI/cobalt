@@ -1,5 +1,5 @@
 
-var co = coroutine;
+var co = thread;
 var create, resume, yield = co.create, co.resume, co.yield;
 
 var N = tonumber(arg && arg[1]) || 10;

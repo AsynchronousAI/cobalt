@@ -23,6 +23,7 @@ Makefile
 /src 
 
 # CMake Ignore (Very large) 
+/build
 install_manifest.txt
 /cobalt23/pre/cobaltpre
 /cobalt23/raptor/src/host/buildvm_arch.h

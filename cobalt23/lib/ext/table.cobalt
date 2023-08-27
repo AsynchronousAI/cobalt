@@ -316,7 +316,7 @@ function table.pickRandom(t) {
 
 // where to put this ...
 // I want to convert iterators into tables
-// it looks like a coroutine but it is made for functions returned from coroutine.wrap
+// it looks like a thread but it is made for functions returned from thread.wrap
 // also, what to do with multiple-value iterators (like ipairs)
 // do I only wrap the first value?
 // do I wrap both values in a double table?
@@ -342,7 +342,7 @@ function table.wrapfor(f, s, _v_var) {
 // https://www.lua.org/pil/9.3.html
 var function permgen(t, n) {
 	if( n < 1 ) {
-		coroutine.yield(t);
+		thread.yield(t);
 	} else {
 		for( i=n,1,-1 ) {
 			// put i-th element as the last one
@@ -357,7 +357,7 @@ var function permgen(t, n) {
 
 // return iterator of permutations of the table
 function table.permutations(t) {
-	return coroutine.wrap(function() {
+	return thread.wrap(function() {
 		permgen(t, table.maxn(t));
 	});
 }

@@ -63,13 +63,13 @@ local function extract(q,r,s,t, j)
   return math.floor(y)
 end
 
--- Coroutine which yields successive digits of PI.
-return coroutine.wrap(function()
+-- thread which yields successive digits of PI.
+return thread.wrap(function()
   local q, r, s, t, k = {1}, {}, {}, {1}, 1
   repeat
     local y = extract(q,r,s,t, 3)
     if y == extract(q,r,s,t, 4) then
-      coroutine.yield(y)
+      thread.yield(y)
       compose_r(q,r,s,t,  10, -10*y, 0, 1)
     else
       compose_l(q,r,s,t,   k, 4*k+2, 0, 2*k+1)

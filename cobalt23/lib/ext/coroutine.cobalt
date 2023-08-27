@@ -1,5 +1,5 @@
-var coroutine = {};
-for( k,v in pairs(require ('coroutine')) ) { coroutine[k] = v; }
+var thread = {};
+for( k,v in pairs(require ('thread')) ) { thread[k] = v; }
 
 var function safehandle(thread, res, ...) {
 	if( ! res ) {
@@ -23,11 +23,11 @@ var function safehandle(thread, res, ...) {
 // resumes thread
 // if the thread is dead, return false
 // if the thread is alive and resume failed due to error, prints the stack trace of the thread upon error
-// 	as opposed to assert(coroutine.resume(thread)), which only prints the stack trace of the resume statement
+// 	as opposed to assert(thread.resume(thread)), which only prints the stack trace of the resume statement
 // if the thread is alive and resume succeeded, returns true
-function coroutine.assertresume(thread, ...) {
-	if( coroutine.status(thread) == 'dead' ) { return false, 'dead'; }
-	return safehandle(thread, coroutine.resume(thread, ...));
+function thread.assertresume(thread, ...) {
+	if( thread.status(thread) == 'dead' ) { return false, 'dead'; }
+	return safehandle(thread, thread.resume(thread, ...));
 }
 
-return coroutine;
+return thread;

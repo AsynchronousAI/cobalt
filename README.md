@@ -26,7 +26,8 @@ Currently up to date with Lua `5.4.3`.
 > **<span style="color:yellow">warning:</span>** message.
 - `win` & `unix` specific libraries for platform specific code.
 - `ffi` library for interfacing with C.
-
+- Lowlevel network access using cURL
+- Optional SDL extension for graphics, audio, and input.
 ## Todo:
 - Read typechecker todo
 - Add pool allocator for the embeded
@@ -34,3 +35,4 @@ Currently up to date with Lua `5.4.3`.
 - Create a fork to link with lua updates
 - Update docs to use `make install` > `make setup`
 - Move cobalt libraries to the source code or a lib installer
+- Document cURL

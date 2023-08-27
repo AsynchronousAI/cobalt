@@ -11,7 +11,7 @@
 // copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERmsgTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
@@ -352,9 +352,9 @@ static struct queue_t* _lua_arg_queue(lua_State* L)
     return q;
 }
 
-static const char* _usage_send = "chan:send(string|number|boolean, timeout = -1)";
+static const char* _usage_send = "msg:send(string|number|boolean, timeout = -1)";
 
-static int chan_send(lua_State* L)
+static int msg_send(lua_State* L)
 {
     int type, timeout, ret;
     struct msg_t* msg;
@@ -406,9 +406,9 @@ static int chan_send(lua_State* L)
     return 1;
 }
 
-static const char* _usage_recv = "chan:recv(timeout = -1)";
+static const char* _usage_recv = "msg:recv(timeout = -1)";
 
-static int chan_recv(lua_State* L)
+static int msg_recv(lua_State* L)
 {
     struct queue_t* q = _lua_arg_queue(L);
     int timeout = _lua_arg_integer(L, 2, 1, -1, _usage_recv);
@@ -440,10 +440,10 @@ static int chan_recv(lua_State* L)
     return 1;
 }
 
-static int chan_gc(lua_State* L)
+static int msg_gc(lua_State* L)
 {
     struct queue_t* q = _lua_arg_queue(L);
-    TRACE("chan_gc: %s, refs=%d\n", q->name, q->refs);
+    TRACE("msg_gc: %s, refs=%d\n", q->name, q->refs);
     pthread_mutex_lock(&_queues_lock);
     queue_release(q);
     pthread_mutex_unlock(&_queues_lock);
@@ -452,16 +452,16 @@ static int chan_gc(lua_State* L)
 
 #define METATABLE_NAME  "message"
 
-static chan_pushqueue(lua_State* L, struct queue_t* q)
+static msg_pushqueue(lua_State* L, struct queue_t* q)
 {
     lua_pushlightuserdata(L, q);
     luaL_getmetatable(L, METATABLE_NAME);
     lua_setmetatable(L, -2);
 }
 
-static const char* _usage_new = "chan.new(name, limit = 0)";
+static const char* _usage_new = "msg.new(name, limit = 0)";
 
-static int chan_new(lua_State* L)
+static int msg_new(lua_State* L)
 {
     const char* name = _lua_arg_string(L, 1, NULL, _usage_new);
     int limit = _lua_arg_integer(L, 2, 1, 0, _usage_new);
@@ -470,22 +470,22 @@ static int chan_new(lua_State* L)
     {
         queue_destroy(q);
         lua_pushnil(L);
-        lua_pushstring(L, "chan name duplicated");
+        lua_pushstring(L, "msg name duplicated");
         return 2;
     }
-    chan_pushqueue(L, q);
+    msg_pushqueue(L, q);
     return 1;
 }
 
-static const char* _usage_get = "chan get(name)";
+static const char* _usage_get = "msg get(name)";
 
-static int chan_get(lua_State* L)
+static int msg_get(lua_State* L)
 {
     const char* name = _lua_arg_string(L, 1, NULL, _usage_get);
     struct queue_t* q = queues_get(name);
     if (q)
     {
-        chan_pushqueue(L, q);
+        msg_pushqueue(L, q);
         return 1;
     }
     else
@@ -496,16 +496,16 @@ static int chan_get(lua_State* L)
     }
 };
 
-static const luaL_Reg chan_meta_fns[] = {
-    { "send", chan_send },
-    { "recv", chan_recv },
-    { "__gc", chan_gc },
+static const luaL_Reg msg_meta_fns[] = {
+    { "send", msg_send },
+    { "recv", msg_recv },
+    { "__gc", msg_gc },
     { NULL, NULL }
 };
 
-static const luaL_Reg chan_fns[] = {
-    { "new", chan_new },
-    { "get", chan_get },
+static const luaL_Reg msg_fns[] = {
+    { "new", msg_new },
+    { "get", msg_get },
     { NULL, NULL }
 };
 
@@ -515,7 +515,7 @@ int luaopen_chan(lua_State* L)
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
     #define luaL_register(L,n,f)	luaL_newlib(L,f)
-    luaL_register(L, NULL, chan_meta_fns);
-    luaL_register(L, "chan", chan_fns);
+    luaL_register(L, NULL, msg_meta_fns);
+    luaL_register(L, "msg", msg_fns);
     return 1;
 }

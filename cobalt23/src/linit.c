@@ -96,6 +96,9 @@ static const luaL_Reg preloadedlibs[] = {
   #ifdef COBALT_SDL
   {LUA_SDLNAME, luaopen_moonsdl2},
   #endif
+  #ifdef COBALT_SOCKET
+  {LUA_CURLNAME, luaopen_lcurl},
+  #endif
 
   {NULL, NULL}
 };

@@ -357,7 +357,7 @@ var function match(stream, last, o, s, op, valuetable, ...) {
                 if( outindex > 0 ) {
                     nocapturereleased = false;
                 }
-                str, last = coroutine.yield(1, table.unpack(out, 1, outindex));
+                str, last = thread.yield(1, table.unpack(out, 1, outindex));
                 addstreamdata(str);
             }
         }
@@ -888,7 +888,7 @@ var function lp_match(pat, s, init, valuetable, ...) {
 var function lp_streammatch(pat, init, valuetable, ...) {
     var params = { ... };
     var paramslength = select('#', ...);
-    var fce = coroutine.wrap(function(s, last) {
+    var fce = thread.wrap(function(s, last) {
         return match(true, last, s, init || 1, pat.code, valuetable, table.unpack(params, 1, paramslength));
     });
     return fce;

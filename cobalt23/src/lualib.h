@@ -99,6 +99,10 @@ LUAMOD_API int (luaopen_ffi) (lua_State *L);
 #define LUA_SDLNAME	"sdl"
 LUAMOD_API int (luaopen_moonsdl2) (lua_State *L);
 #endif
+#if defined(COBALT_SOCKET)
+#define LUA_CURLNAME	"cURL"
+LUAMOD_API int (luaopen_lcurl) (lua_State *L);
+#endif
 
 // Platform specific libraries
 #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__

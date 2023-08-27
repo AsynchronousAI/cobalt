@@ -64,10 +64,10 @@
 
 { //- print calls overridden tostring +lua<5.2
   var x = false;
-  var co = coroutine.create(function() { print(1); });
+  var co = thread.create(function() { print(1); });
   debug.setfenv(co, setmetatable({}, { __index = {
     tostring = function() { x = true; } }}));
-  coroutine.resume(co);
+  thread.resume(co);
   assert(x == true);
 }
 

@@ -219,9 +219,9 @@ types = {
     // Check if item is any type
     return true
   },
-  "coroutine" = function(item){
-    // Check if item is a coroutine
-    return type(item) == "coroutine"
+  "thread" = function(item){
+    // Check if item is a thread
+    return type(item) == "thread"
   },
   "int" = function(item){
     // Check if item is an integer

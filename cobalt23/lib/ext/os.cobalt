@@ -157,20 +157,20 @@ function os.listdir(path) {
 			end
 		end
 --*/
-		return coroutine.wrap(function() {
+		return thread.wrap(function() {
 			for( _,k in ipairs(fns) ) {
 				//local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
-				coroutine.yield(k);//, io.readfile(fn))
+				thread.yield(k);//, io.readfile(fn))
 			}
 		});
 	} else {
-		return coroutine.wrap(function() {
+		return thread.wrap(function() {
 			for( k in lfs.dir(path) ) {
 				if( k != '.' && k != '..' ) {
 					//local fn = k:sub(1,1) == '/' and k or (path..'/'..k)
 					// I shouldn't have io.readfile for performance
 					//  but for convenience it is so handy...
-					coroutine.yield(k);//, io.readfile(fn))
+					thread.yield(k);//, io.readfile(fn))
 				}
 			}
 		});

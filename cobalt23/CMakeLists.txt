@@ -142,9 +142,11 @@ if(LUA_ENABLE_SHARED)
         find_package(SDL2_image REQUIRED)
         find_package(SDL2_ttf REQUIRED)
         find_package(SDL2_mixer REQUIRED)
-        target_link_libraries(lua_shared PUBLIC SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer SDL2::SDL2)
+        set(SDL_LIBRARIES SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer SDL2::SDL2)
+    else()
+        set(SDL_LIBRARIES)
     endif()
-    target_link_libraries(lua_shared PRIVATE lua_internal PUBLIC lua_include)
+    target_link_libraries(lua_shared PRIVATE lua_internal PUBLIC lua_include ${SDL_LIBRARIES})
     set_target_properties(lua_shared PROPERTIES
         VERSION "${PACKAGE_VERSION}"
     )

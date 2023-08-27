@@ -33,16 +33,16 @@ if(SDL)
         OUTPUT_VARIABLE SDL2_IMAGE_CFLAGS
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    if (NOT SDL2_TTF_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_ttf")
+    if (NOT SDL2_IMAGE_CFLAGS)
+        message(FATAL_ERROR "Failed to find SDL2_image")
     endif()
     execute_process(
         COMMAND pkg-config SDL2_ttf --cflags
         OUTPUT_VARIABLE SDL2_TTF_CFLAGS
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    if (NOT SDL2_IMAGE_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_image")
+    if (NOT SDL2_TTF_CFLAGS)
+        message(FATAL_ERROR "Failed to find SDL2_ttf")
     endif()
     execute_process(
         COMMAND pkg-config SDL2_mixer --cflags

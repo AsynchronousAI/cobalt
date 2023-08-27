@@ -9,37 +9,23 @@ option(SDL "Install the Cobalt SDL2 bindings library" OFF)
 option(SOCKET "Install the socket library for Cobalt" ON)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-set(SDLPath "/Library/Frameworks/SDL2.framework") # This is for MY configuration on MacOS, you may need to change this
-
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")
 # Based on the SDL and FFI variable provide them as Flags
 if(FFI)
-    message("Using FFI")
+    message("-- Configuring FFI Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_FFI")
 endif()
 if(SDL)
-    message("Using SDL")
+    message("-- Configuring SDL Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_SDL")
-    # Add the path to the SDL framework to the CMAKE_PREFIX_PATH variable
-    list(APPEND CMAKE_PREFIX_PATH ${SDLPath})
 
+    # Requires SDL, SDL_image, SDL_ttf, and SDL_mixer
     # Find the SDL2 library
     find_package(SDL2 REQUIRED)
     include_directories(${SDL2_INCLUDE_DIRS})
-    #
-    # Find the SDL2_image library
-    #find_package(SDL2_image REQUIRED)
-    #include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-
-    # Find the SDL2_ttf library
-    #find_package(SDL2_ttf REQUIRED)
-    #include_directories(${SDL2_TTF_INCLUDE_DIRS})
-
-    # Find the SDL2_mixer library
-    #find_package(SDL2_mixer REQUIRED)
-    #include_directories(${SDL2_MIXER_INCLUDE_DIRS}) 
 endif()
 if (SOCKET)
-    message("Using Socket")
+    message("-- Configuring Socket Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_SOCKET")
 endif()
 

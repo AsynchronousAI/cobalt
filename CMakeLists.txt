@@ -149,6 +149,74 @@ if(LUA_ENABLE_TESTING)
     add_test(NAME lib-base-select COMMAND cobalt -e "_U=true" lib/base/select.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
     add_test(NAME lib-base-tonumber-tostring COMMAND cobalt -e "_U=true" lib/base/tonumber-tostring.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
     
+    # lang
+    # andor.cobalt
+    # assignment.cobalt
+    # compare_nan.cobalt
+    # compare.cobalt
+    # concat.cobalt
+    # coroutine.cobalt
+    # for.cobalt
+    # gc.cobalt
+    # goto.cobalt
+    # length.vobalt
+    # modulo.cobalt
+    # self.cobalt
+    # table.cobalt
+    # tail_recursion.cobalt
+    # constant
+    ## number.cobalt
+    ## table.cobalt
+    # meta
+    ## arith.cobalt
+    ## call.cobalt
+    ## cat.cobalt
+    ## comp.cobalt
+    ## debuginfo.cobalt
+    ## eq.cobalt
+    ## framegap.cobalt
+    ## index.cobalt
+    ## len.cobalt
+    ## newindex.cobalt
+    ## nomm.cobalt
+    # upvalue
+    ## closure.cobalt
+
+    add_test(NAME lang-andor COMMAND cobalt -e "_U=true" lang/andor.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-assignment COMMAND cobalt -e "_U=true" lang/assignment.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-compare_nan COMMAND cobalt -e "_U=true" lang/compare_nan.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-compare COMMAND cobalt -e "_U=true" lang/compare.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-concat COMMAND cobalt -e "_U=true" lang/concat.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-coroutine COMMAND cobalt -e "_U=true" lang/coroutine.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-for COMMAND cobalt -e "_U=true" lang/for.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-gc COMMAND cobalt -e "_U=true" lang/gc.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-goto COMMAND cobalt -e "_U=true" lang/goto.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-length COMMAND cobalt -e "_U=true" lang/length.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-modulo COMMAND cobalt -e "_U=true" lang/modulo.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-self COMMAND cobalt -e "_U=true" lang/self.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-table COMMAND cobalt -e "_U=true" lang/table.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-tail_recursion COMMAND cobalt -e "_U=true" lang/tail_recursion.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-constant-number COMMAND cobalt -e "_U=true" lang/constant/number.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-constant-table COMMAND cobalt -e "_U=true" lang/constant/table.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-arith COMMAND cobalt -e "_U=true" lang/meta/arith.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-call COMMAND cobalt -e "_U=true" lang/meta/call.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-cat COMMAND cobalt -e "_U=true" lang/meta/cat.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-comp COMMAND cobalt -e "_U=true" lang/meta/comp.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-debuginfo COMMAND cobalt -e "_U=true" lang/meta/debuginfo.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-eq COMMAND cobalt -e "_U=true" lang/meta/eq.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-framegap COMMAND cobalt -e "_U=true" lang/meta/framegap.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-index COMMAND cobalt -e "_U=true" lang/meta/index.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-len COMMAND cobalt -e "_U=true" lang/meta/len.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-newindex COMMAND cobalt -e "_U=true" lang/meta/newindex.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-meta-nomm COMMAND cobalt -e "_U=true" lang/meta/nomm.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lang-upvalue-closure COMMAND cobalt -e "_U=true" lang/upvalue/closure.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+
+    # common
+    ## expect_error.cobalt
+    ## test_runner_canary.cobalt
+
+    add_test(NAME common-expect_error COMMAND cobalt -e "_U=true" common/expect_error.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME common-test_runner_canary COMMAND cobalt -e "_U=true" common/test_runner_canary.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
 endif()
 
 #if (INSTALL)

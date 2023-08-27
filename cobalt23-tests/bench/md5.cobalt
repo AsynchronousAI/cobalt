@@ -116,6 +116,7 @@ var function transform(x, a1, b1, c1, d1) {
 
 // Note: this is copying the original string and NOT particularly fast.
 // A library for struct unpacking would make this task much easier.
+// import("struct"); :P
 var function md5(msg) {
   var len = #msg;
   msg = msg.."\128"..rep("\0", 63 - band(len + 8, 63))

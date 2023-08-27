@@ -17,7 +17,7 @@ var classmeta = {
 		local results = table.pack(self:new(...))
 		local obj = results[1]
 		self.instances[obj] = true
-		return results:unpack()
+		return results:table.unpack()
 --*/
 	},
 };

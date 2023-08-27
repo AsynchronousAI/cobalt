@@ -172,7 +172,7 @@ var function wcall(func, args) {
 // Delete duplicate action list chunks. A tad slow, but so what.
 var function dedupechunk(offset) {
   var al, as = actlist, actstr;
-  var chunk = char(unpack(al, offset+1, #al));
+  var chunk = char(table.unpack(al, offset+1, #al));
   var orig = find(as, chunk, 1, true);
   if( orig ) {
     actargs[1] = orig-1; // Replace with original offset.

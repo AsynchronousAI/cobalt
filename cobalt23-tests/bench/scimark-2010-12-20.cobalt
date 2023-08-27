@@ -382,8 +382,8 @@ while( arg && arg[1] ) {
     printf("---------------------------------------\n");
     for( _,name in ipairs(benchmarks) ) {
       printf("%-7s %-13s %s\n", name,
-	     fmtparams(unpack(benchmarks.small[name])),
-	     fmtparams(unpack(benchmarks.large[name])));
+	     fmtparams(table.unpack(benchmarks.small[name])),
+	     fmtparams(table.unpack(benchmarks.large[name])));
     }
     printf("\n");
     os.exit(1);
@@ -393,7 +393,7 @@ while( arg && arg[1] ) {
 var params = benchmarks[SIZE_SELECT];
 var sum = 0;
 for( _,name in ipairs(benchmarks) ) {
-  sum +=   measure(MIN_TIME, name, unpack(params[name]));
+  sum +=   measure(MIN_TIME, name, table.unpack(params[name]));
 }
 printf("\nSciMark %8.2f  [%s problem sizes]\n", sum / #benchmarks, SIZE_SELECT);
 io.flush();

@@ -19,5 +19,5 @@ for( y=0,N-1 ) {
     if( b >= 256 ) { ++p    ; buf[p] = 511 - b; b = 1; }
   }
   if( b != 1 ) { ++p    ; buf[p] = (ba-b)*bb; }
-  write(char(unpack(buf, 1, p)));
+  write(char(table.unpack(buf, 1, p)));
 }

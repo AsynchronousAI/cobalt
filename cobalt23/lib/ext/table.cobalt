@@ -25,9 +25,9 @@ function table.unpack(...) {
 	var nargs = select('#', ...);
 	var t, i, j = ...;
 	if( nargs < 3 && t.n != null ) {
-		return origTableUnpack(t, i || 1, t.n);
+		return origTabletable.unpack(t, i || 1, t.n);
 	}
-	return origTableUnpack(...);
+	return origTabletable.unpack(...);
 }
 //]]
 

@@ -273,7 +273,7 @@ var function foldcap(cs, out, valuetable) {
     while( cs.ocap[cs.cap].kind != Cclose ) {
         var xsubout = { outindex = 0; out = {} };
         n = pushcapture(cs, xsubout, valuetable); // get next capture's values
-        acumulator = fce(acumulator, unpack(xsubout.out, 1, xsubout.outindex)); // call folding function
+        acumulator = fce(acumulator, table.unpack(xsubout.out, 1, xsubout.outindex)); // call folding function
     }
     cs.cap = cs.cap + 1; // skip close entry
     out.outindex = out.outindex + 1;
@@ -293,7 +293,7 @@ var function functioncap(cs, out, valuetable) {
     var fce = valuetable[cs.ocap[cs.cap].idx]; //  push function
     var subout = { outindex = 0, out = {} };
     var n = pushnestedvalues(cs, false, subout, valuetable); // push nested captures
-    var count, ret = retcount(fce(unpack(subout.out, 1, n))); // call function
+    var count, ret = retcount(fce(table.unpack(subout.out, 1, n))); // call function
     for( i = 1, count ) {
         out.outindex = out.outindex + 1;
         out.out[out.outindex] = ret[i];
@@ -338,7 +338,7 @@ var function runtimecap(cs, close, s, out, valuetable) {
     var fce = valuetable[cs.ocap[cs.cap].idx]; // push function to be called
     var subout = { outindex = 0, out = {} };
     var n = pushnestedvalues(cs, false, subout, valuetable); // push nested captures
-    var count, ret = retcount(fce(cs.s || cs.stream, s, unpack(subout.out, 1, n))); // call dynamic function
+    var count, ret = retcount(fce(cs.s || cs.stream, s, table.unpack(subout.out, 1, n))); // call dynamic function
     for( i = 1, count ) {
         out.outindex = out.outindex + 1;
         out.out[out.outindex] = ret[i];
@@ -586,7 +586,7 @@ var function getcaptures(capture, s, stream, r, valuetable, ...) {
         }
     }
     assert(out.outindex < 7998, "(too many captures)");
-    return unpack(out.out, 1, out.outindex);
+    return table.unpack(out.out, 1, out.outindex);
 }
 
 var function getcapturesruntime(capture, s, stream, notdelete, min, max, captop, valuetable, ...) {

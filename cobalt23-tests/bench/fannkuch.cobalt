@@ -6,7 +6,7 @@ var function fannkuch(n) {
     // Print max. 30 permutations.
     if( check < 30 ) {
       if( ! p[n] ) { return maxflips; }	// Catch n = 0, 1, 2.
-      io.write(unpack(p)); io.write("\n");
+      io.write(table.unpack(p)); io.write("\n");
       ++check    ;
     }
     // Copy and flip.

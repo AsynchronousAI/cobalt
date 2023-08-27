@@ -29,5 +29,5 @@ for( y=0,N-1 ) {
     if( band(N, 1) != 0 ) { b = shr(b, 1); }
     ++p    ; buf[p] = shl(b, 8-band(N, 7));
   }
-  write(char(unpack(buf, 1, p)));
+  write(char(table.unpack(buf, 1, p)));
 }

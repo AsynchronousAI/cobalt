@@ -36,3 +36,22 @@ Currently up to date with Lua `5.4.3`.
 - Update docs to use `make install` > `make setup`
 - Move cobalt libraries to the source code or a lib installer
 - Document cURL
+## Examples:
+```js
+// CURL
+curl = import("cURL") // Install built in cURL library
+rqst = curl.easy() // Create a new cURL request
+rqst->setopt(curl.OPT_URL, "http://example.com") // Set the URL
+data = rqst->perform() // Perform the request
+```
+```js
+// POOL ALLOCATOR
+alloc.stats() // Returns a table of allocator stats
+alloc.enable()
+
+var bytes = alloc.disable()
+
+print(bytes) // How many bytes have been allocated since the allocator tracking was enabled
+
+alloc.enable(true) // verbose mode, will print out every allocation and free
+```

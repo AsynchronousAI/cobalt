@@ -1,23 +1,47 @@
 cmake_minimum_required(VERSION 3.1)
 project(cobalt LANGUAGES C VERSION 99)
 
-option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" OFF)
+option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" ON)
 option(LUA_BUILD_AS_CXX "Build cobalt as C++" OFF)
 option(LUA_ENABLE_SHARED "Build dynamic liblua" ON)
-
+option(FFI "Install the C FFI library for Cobalt" ON)
+option(SDL "Install the Cobalt SDL2 bindings library" OFF)
+option(SOCKET "Install the socket library for Cobalt" ON)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-set(FFI ON)
+set(SDLPath "/Library/Frameworks/SDL2.framework") # This is for MY configuration on MacOS, you may need to change this
 
 # Based on the SDL and FFI variable provide them as Flags
-if(FFI AND SDL)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI -DCOBALT_SDL")
-elseif(FFI)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI")
-elseif(SDL)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SDL")
+if(FFI)
+    message("Using FFI")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_FFI")
 endif()
+if(SDL)
+    message("Using SDL")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_SDL")
+    # Add the path to the SDL framework to the CMAKE_PREFIX_PATH variable
+    list(APPEND CMAKE_PREFIX_PATH ${SDLPath})
 
+    # Find the SDL2 library
+    find_package(SDL2 REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIRS})
+    #
+    # Find the SDL2_image library
+    #find_package(SDL2_image REQUIRED)
+    #include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+
+    # Find the SDL2_ttf library
+    #find_package(SDL2_ttf REQUIRED)
+    #include_directories(${SDL2_TTF_INCLUDE_DIRS})
+
+    # Find the SDL2_mixer library
+    #find_package(SDL2_mixer REQUIRED)
+    #include_directories(${SDL2_MIXER_INCLUDE_DIRS}) 
+endif()
+if (SOCKET)
+    message("Using Socket")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_SOCKET")
+endif()
 
 enable_language(CXX)
 if(LUA_ENABLE_TESTING)

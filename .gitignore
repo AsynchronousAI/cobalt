@@ -37,6 +37,7 @@ Makefile
 /cobalt23/src/Makefile
 *cmake_install.cmake
 *.dylib
+/Testing
 *Config.cmake
 *CTestTestfile.cmake
 

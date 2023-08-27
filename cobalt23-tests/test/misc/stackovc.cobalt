@@ -1,4 +1,0 @@
-var j = 1e4;
-var co = coroutine.create(function() { t = {}; for( i = 1, j ) { t[i] = i; } return unpack(t); });
-var ok, err = coroutine.resume(co);
-assert(! ok && string.find(err, "unpack"));

@@ -13,11 +13,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23
 # Based on the SDL and FFI variable provide them as Flags
 if(FFI)
     message("-- Configuring FFI Library")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_FFI")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI")
 endif()
 if(SDL)
     message("-- Configuring SDL Library")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_SDL")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SDL")
 
     # Requires SDL, SDL_image, SDL_ttf, and SDL_mixer
     # Find the SDL2 library
@@ -26,9 +26,8 @@ if(SDL)
 endif()
 if (SOCKET)
     message("-- Configuring Socket Library")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -DCOBALT_SOCKET")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SOCKET")
 endif()
-
 enable_language(CXX)
 if(LUA_ENABLE_TESTING)
     enable_testing()
@@ -76,7 +75,80 @@ add_custom_target(mini
     COMMENT "Building minicobalt"
 )
 if(LUA_ENABLE_TESTING)
-    add_test(NAME lua-testsuite COMMAND cobalt -e "_U=true" all.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt-${CMAKE_PROJECT_VERSION}-tests)
+    add_test(NAME spectralnorm COMMAND cobalt -e "_U=true" spectralnorm.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME computations COMMAND cobalt -e "_U=true" computations.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+
+    # ALL TESTS:
+    # lib
+    ## bit.cobalt
+    ## table
+    ### concat.cobalt
+    ### insert.cobalt
+    ### misc.cobalt
+    ### new .cobalt
+    ### pack.cobalt
+    ### remove.cobalt
+    ### sort.cobalt
+    ## string
+    ### format
+    #### num.cobalt
+    ### byte.cobalt
+    ### char.cobalt
+    ### dump.cobalt
+    ### len.cobalt
+    ### lower_upper.cobalt
+    ### metatable.cobalt
+    ### multiple_functions.cobalt
+    ### rep.cobalt
+    ### reverse.cobalt
+    ### sub.cobalt
+    ## math
+    ### abs.cobalt
+    ### constants.cobalt
+    ### random.cobalt
+    ## base
+    ### assert.cobalt
+    ### error.cobalt
+    ### getfenv.cobalt
+    ### getsetmetatable.cobalt
+    ### ipairs.cobalt
+    ### next.cobalt
+    ### pairs.cobalt
+    ### select.cobalt
+    ### tonumber_tostring.cobalt
+
+    add_test(NAME lib-bit COMMAND cobalt -e "_U=true" lib/bit.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-table-concat COMMAND cobalt -e "_U=true" lib/table/concat.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-table-insert COMMAND cobalt -e "_U=true" lib/table/insert.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-table-misc COMMAND cobalt -e "_U=true" lib/table/misc.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-table-new COMMAND cobalt -e "_U=true" lib/table/new.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-table-pack COMMAND cobalt -e "_U=true" lib/table/pack.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-table-remove COMMAND cobalt -e "_U=true" lib/table/remove.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-table-sort COMMAND cobalt -e "_U=true" lib/table/sort.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-format-num COMMAND cobalt -e "_U=true" lib/string/format/num.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-byte COMMAND cobalt -e "_U=true" lib/string/byte.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-char COMMAND cobalt -e "_U=true" lib/string/char.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-dump COMMAND cobalt -e "_U=true" lib/string/dump.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-len COMMAND cobalt -e "_U=true" lib/string/len.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-lower-upper COMMAND cobalt -e "_U=true" lib/string/lower-upper.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-metatable COMMAND cobalt -e "_U=true" lib/string/metatable.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-multiple-functions COMMAND cobalt -e "_U=true" lib/string/multiple_functions.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-rep COMMAND cobalt -e "_U=true" lib/string/rep.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-reverse COMMAND cobalt -e "_U=true" lib/string/reverse.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-string-sub COMMAND cobalt -e "_U=true" lib/string/sub.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-math-abs COMMAND cobalt -e "_U=true" lib/math/abs.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-math-constants COMMAND cobalt -e "_U=true" lib/math/constants.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-math-random COMMAND cobalt -e "_U=true" lib/math/random.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-assert COMMAND cobalt -e "_U=true" lib/base/assert.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-error COMMAND cobalt -e "_U=true" lib/base/error.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-getfenv COMMAND cobalt -e "_U=true" lib/base/getfenv.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-getsetmetatable COMMAND cobalt -e "_U=true" lib/base/getsetmetatable.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-ipairs COMMAND cobalt -e "_U=true" lib/base/ipairs.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-next COMMAND cobalt -e "_U=true" lib/base/next.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-pairs COMMAND cobalt -e "_U=true" lib/base/pairs.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-select COMMAND cobalt -e "_U=true" lib/base/select.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    add_test(NAME lib-base-tonumber-tostring COMMAND cobalt -e "_U=true" lib/base/tonumber-tostring.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
+    
 endif()
 
 #if (INSTALL)

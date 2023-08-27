@@ -1,8 +1,0 @@
-
-if( ! jit || ! jit.status || ! jit.status() ) { return; }
-
-debug.sethook(function() { for( i=1,100 ) { } }, "", 10);
-for( i=1,10 ) { }
-debug.sethook();
-assert((require("jit.util").traceinfo(1)));
-

@@ -33,4 +33,4 @@ Currently up to date with Lua `5.4.3`.
 - Update docs to say you need to `import` some libs
 - Create a fork to link with lua updates
 - Update docs to use `make install` > `make setup`
-- Move cobalt libraries to the source code
+- Move cobalt libraries to the source code or a lib installer

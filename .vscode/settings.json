@@ -12,6 +12,7 @@
         "string.h": "c",
         "typeinfo": "c",
         "dasm_proto.h": "c",
-        "gen.C": "cpp"
+        "gen.C": "cpp",
+        "sdl_image.h": "c"
     }
 }

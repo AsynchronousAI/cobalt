@@ -137,6 +137,13 @@ target_link_libraries(lua_internal INTERFACE lua_include)
 
 if(LUA_ENABLE_SHARED)
     add_library(lua_shared SHARED ${LUA_LIB_SRCS})
+    if (SDL)
+        find_package(SDL2 REQUIRED)
+        find_package(SDL2_image REQUIRED)
+        find_package(SDL2_ttf REQUIRED)
+        find_package(SDL2_mixer REQUIRED)
+        target_link_libraries(lua_shared PUBLIC SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer SDL2::SDL2)
+    endif()
     target_link_libraries(lua_shared PRIVATE lua_internal PUBLIC lua_include)
     set_target_properties(lua_shared PROPERTIES
         VERSION "${PACKAGE_VERSION}"

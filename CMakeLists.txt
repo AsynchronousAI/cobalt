@@ -190,14 +190,14 @@ endif()
 #if (INSTALL)
 add_custom_target(setup
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-    COMMENT "Installing binaries"
+    COMMENT "Installing Libraries"
 )
 add_custom_target(setuppy
     COMMAND py ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-    COMMENT "Installing binaries"
+    COMMENT "Installing Libraries"
 )
 add_custom_target(setup-py
     COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-    COMMENT "Installing binaries"
+    COMMENT "Installing Libraries"
 )
 #endif()

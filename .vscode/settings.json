@@ -14,5 +14,6 @@
         "dasm_proto.h": "c",
         "gen.C": "cpp",
         "sdl_image.h": "c"
-    }
+    },
+    "terminal.integrated.scrollback": 1000000
 }

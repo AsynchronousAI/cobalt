@@ -32,7 +32,22 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include "moonsdl2.h"
+
+#ifndef moonsdl2DEFINED
+#define moonsdl2DEFINED
+
+#include "../cobalt.h"
+#include "../lualib.h"
+#include "../lauxlib.h"
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+
+#define MOONSDL2_VERSION      "0.1"
+
+#endif
 
 #define TOSTR_(x) #x
 #define TOSTR(x) TOSTR_(x)

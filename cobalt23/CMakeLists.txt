@@ -98,6 +98,16 @@ if (SDL)
         "src/sdl/objects.c"
         "src/sdl/window.c"
     )
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED)
+    find_package(SDL2_ttf REQUIRED)
+    find_package(SDL2_mixer REQUIRED)
+
+    list(APPEND LUA_LINKED_LIBRARIES SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
+
+    set(SDL_LIBRARIES SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer SDL2::SDL2)
+else()
+    set(SDL_LIBRARIES)
 endif()
 
 # SOCKET
@@ -133,19 +143,10 @@ target_include_directories(lua_include INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(lua_internal INTERFACE lua_include)
+target_link_libraries(lua_internal INTERFACE lua_include ${SDL_LIBRARIES})
 
 if(LUA_ENABLE_SHARED)
     add_library(lua_shared SHARED ${LUA_LIB_SRCS})
-    if (SDL)
-        find_package(SDL2 REQUIRED)
-        find_package(SDL2_image REQUIRED)
-        find_package(SDL2_ttf REQUIRED)
-        find_package(SDL2_mixer REQUIRED)
-        set(SDL_LIBRARIES SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer SDL2::SDL2)
-    else()
-        set(SDL_LIBRARIES)
-    endif()
     target_link_libraries(lua_shared PRIVATE lua_internal PUBLIC lua_include ${SDL_LIBRARIES})
     set_target_properties(lua_shared PROPERTIES
         VERSION "${PACKAGE_VERSION}"
@@ -172,8 +173,6 @@ list(APPEND TARGETS_TO_INSTALL lua_static)
 if(NOT BUILD_SHARED_LIBS OR NOT LUA_ENABLE_SHARED)
     add_library(Lua::Library ALIAS lua_static)
 endif()
-
-set(LUA_SUPPORT_DL ON)
 if(UNIX)
     if(NOT EMSCRIPTEN)
         

@@ -3,7 +3,7 @@ project(cobalt LANGUAGES C VERSION 99)
 
 option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" ON)
 option(LUA_BUILD_AS_CXX "Build cobalt as C++" OFF)
-option(LUA_ENABLE_SHARED "Build dynamic liblua" ON)
+option(LUA_ENABLE_SHARED "Build dynamic liblua" OFF)
 option(FFI "Install the C FFI library for Cobalt" ON)
 option(SDL "Install the Cobalt SDL2 bindings library" OFF)
 option(SOCKET "Install the socket library for Cobalt" ON)
@@ -53,7 +53,43 @@ if(SDL)
         message(FATAL_ERROR "Failed to find SDL2_mixer")
     endif()
 
-    set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS}")
+    # LIBS
+    execute_process(
+        COMMAND pkg-config sdl2 --libs
+        OUTPUT_VARIABLE SDL2_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT SDL2_LIBS)
+        message(FATAL_ERROR "Failed to find SDL2")
+    endif()
+
+    execute_process(
+        COMMAND pkg-config SDL2_image --libs
+        OUTPUT_VARIABLE SDL2_IMAGE_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT SDL2_IMAGE_LIBS)
+        message(FATAL_ERROR "Failed to find SDL2_image")
+    endif()
+
+    execute_process(
+        COMMAND pkg-config SDL2_ttf --libs
+        OUTPUT_VARIABLE SDL2_TTF_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT SDL2_TTF_LIBS)
+        message(FATAL_ERROR "Failed to find SDL2_ttf")
+    endif()
+
+    execute_process(
+        COMMAND pkg-config SDL2_mixer --libs
+        OUTPUT_VARIABLE SDL2_MIXER_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT SDL2_MIXER_LIBS)
+        message(FATAL_ERROR "Failed to find SDL2_mixer")
+    endif()
+    set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${SDL2_TTF_LIBS} ${SDL2_MIXER_LIBS}")
 endif() 
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
@@ -66,7 +102,7 @@ if (SOCKET)
        if (CURL)
         set(CURL_LIBS "-I${CURL}")
         else()
-        message(FATAL_ERROR "Failed to find libcurl, manually specify using the -DCURL flag")
+        message(FATAL_ERROR "Failed to find libcurl, disable cobalt cURL support by doing:\n\t\t-DSOCKET=OFF")
         endif()
     endif()
 

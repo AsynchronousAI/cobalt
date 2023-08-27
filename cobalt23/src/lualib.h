@@ -89,8 +89,16 @@ LUAMOD_API int (luaopen_chan) (lua_State *L);
 #define LUA_ALLOCNAME	"alloc"
 LUAMOD_API int (luaopen_alloc) (lua_State *L);
 
+#if defined(COBALT_FFI)
 #define LUA_FFINAME	"ffi"
 LUAMOD_API int (luaopen_ffi) (lua_State *L);
+#endif
+
+// Bindings
+#if defined(COBALT_SDL)
+#define LUA_SDLNAME	"sdl"
+LUAMOD_API int (luaopen_moonsdl2) (lua_State *L);
+#endif
 
 // Platform specific libraries
 #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__

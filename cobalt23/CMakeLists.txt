@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 
+set(FFI_ON ON CACHE BOOL "Enable FFI")
 
 set(LUA_LIB_SRCS 
     "src/lapi.c"
@@ -47,13 +48,59 @@ set(LUA_LIB_SRCS
     "src/ltablib.c"
     "src/lutf8lib.c"
     "src/linit.c"
-
-    # FFI
-    "src/ffi/call.c"
-    "src/ffi/ctype.c"
-    "src/ffi/ffi.c"
-    "src/ffi/parser.c"
 )
+
+
+# FFI
+if (FFI)
+    list(APPEND LUA_LIB_SRCS
+        "src/ffi/call.c"
+        "src/ffi/ctype.c"
+        "src/ffi/ffi.c"
+        "src/ffi/parser.c"
+    )
+endif()
+
+# SDL
+if (SDL)
+    list(APPEND LUA_LIB_SRCS
+        "src/sdl/log.c"
+        "src/sdl/hints.c"
+        "src/sdl/palette.c"
+        "src/sdl/display.c"
+        "src/sdl/enums.c"
+        "src/sdl/mouse.c"
+        "src/sdl/mixer.c"
+        "src/sdl/timer.c"
+        "src/sdl/keyboard.c"
+        "src/sdl/datastructs.c"
+        "src/sdl/gamecontroller.c"
+        "src/sdl/texture.c"
+        "src/sdl/font.c"
+        "src/sdl/tracing.c"
+        "src/sdl/animation.c"
+        "src/sdl/utils.c"
+        "src/sdl/music.c"
+        "src/sdl/main.c"
+        "src/sdl/messagebox.c"
+        "src/sdl/surface.c"
+        "src/sdl/chunk.c"
+        "src/sdl/pxlfmt.c"
+        "src/sdl/sensor.c"
+        "src/sdl/renderer.c"
+        "src/sdl/flags.c"
+        "src/sdl/joystick.c"
+        "src/sdl/touch.c"
+        "src/sdl/events.c"
+        "src/sdl/udata.c"
+        "src/sdl/haptic.c"
+        "src/sdl/misc.c"
+        "src/sdl/cursor.c"
+        "src/sdl/glcontext.c"
+        "src/sdl/objects.c"
+        "src/sdl/window.c"
+    )
+endif()
 
 set(TARGETS_TO_INSTALL lua_internal lua_include)
 

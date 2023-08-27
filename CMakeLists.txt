@@ -4,9 +4,21 @@ project(cobalt LANGUAGES C VERSION 99)
 option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" OFF)
 option(LUA_BUILD_AS_CXX "Build cobalt as C++" OFF)
 option(LUA_ENABLE_SHARED "Build dynamic liblua" ON)
-option(LUA_ENABLE_TESTING "Build and run tests" ON)
-option(INSTALL "Install binaries to system" OFF)
+
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+set(FFI ON)
+
+# Based on the SDL and FFI variable provide them as Flags
+if(FFI AND SDL)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI -DCOBALT_SDL")
+elseif(FFI)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI")
+elseif(SDL)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SDL")
+endif()
+
+
 enable_language(CXX)
 if(LUA_ENABLE_TESTING)
     enable_testing()

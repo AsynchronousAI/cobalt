@@ -85,9 +85,17 @@ static const luaL_Reg preloadedlibs[] = {
   {LUA_COLORLIBNAME, luaopen_color},
   {LUA_2DLIBNAME, luaopen_2D},
   {LUA_3DLIBNAME, luaopen_3D},
-  {LUA_TRANSFORMNAME, luaopen_transform},
-  {LUA_FFINAME, luaopen_ffi},
+  {LUA_TRANSFORMNAME, luaopen_transform},\
 
+  // FFI
+  #ifdef COBALT_FFI
+  {LUA_FFINAME, luaopen_ffi},
+  #endif
+  
+  // Bindings
+  #ifdef COBALT_SDL
+  {LUA_SDLNAME, luaopen_moonsdl2},
+  #endif
 
   {NULL, NULL}
 };

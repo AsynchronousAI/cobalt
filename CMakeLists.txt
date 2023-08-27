@@ -25,11 +25,51 @@ if(SDL)
         OUTPUT_VARIABLE SDL2_CFLAGS
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+    execute_process(
+        COMMAND pkg-config SDL2_image --cflags
+        OUTPUT_VARIABLE SDL2_IMAGE_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config SDL2_ttf --cflags
+        OUTPUT_VARIABLE SDL2_TTF_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config SDL2_mixer --cflags
+        OUTPUT_VARIABLE SDL2_MIXER_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT SDL2_MIXER_CFLAGS)
+        if (MIXER)
+        set(SDL2_MIXER_CFLAGS "-I${MIXER}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2_mixer, manually specify using the -DMIXER flage")
+        endif()
+    endif()
+    if (NOT SDL2_TTF_CFLAGS)
+        if (TTF)
+        set(SDL2_TTF_CFLAGS "-I${TTF}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2_ttf, manually specify using the -DTTF flage")
+        endif()
+    endif()
+    if (NOT SDL2_IMAGE_CFLAGS)
+        if (IMAGE)
+        set(SDL2_IMAGE_CFLAGS "-I${IMAGE}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2_image, manually specify using the -DIMAGE flage")
+        endif()
+    endif()
     if (NOT SDL2_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2")
+        if (SDLPATH)
+        set(SDL2_CFLAGS "-I${SDLPATH}")
+        else()
+        message(FATAL_ERROR "Failed to find SDL2, manually specify using the -DSDLPATH flage")
+        endif()
     endif()
 
-    set(CMAKE_C_FLAGS "-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer ${SDL2_CFLAGS} ${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS}")
 endif() 
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
@@ -39,10 +79,14 @@ if (SOCKET)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     if (NOT CURL_LIBS)
-        message(FATAL_ERROR "Failed to find libcurl")
+       if (CURL)
+        set(CURL_LIBS "-I${CURL}")
+        else()
+        message(FATAL_ERROR "Failed to find libcurl, manually specify using the -DCURL flage")
+        endif()
     endif()
 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CURL_CFLAGS} ${CURL_LIBS} -DCOBALT_SOCKET -lcurl")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CURL_CFLAGS} ${CURL_LIBS} -DCOBALT_SOCKET")
 endif()
 # Provide platform to language
 if (LINUX)

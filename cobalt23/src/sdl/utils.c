@@ -119,8 +119,9 @@ void Free(lua_State *L, void *ptr)
  | Time utilities                                                               |
  *------------------------------------------------------------------------------*/
 
-#if defined(LINUX)
-
+#if defined(LINUX) || defined(__APPLE__) || defined(__unix__) || defined(__unix) || defined(LUA_USE_POSIX)
+#include <unistd.h>
+#include <sys/time.h>
 #if 0
 static double tstosec(const struct timespec *ts)
     {

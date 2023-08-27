@@ -19,7 +19,7 @@
 #include <assert.h>
 #include <string.h>
 
-#define LCURL_PREFIX "LcURL"
+#define LCURL_PREFIX "cURL"
 
 #define LCURL_LUA_REGISTRY lua_upvalueindex(1)
 

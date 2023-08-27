@@ -13,7 +13,7 @@
 #include <assert.h>
 #include "lcutils.h"
 
-#define LCURL_ERROR_NAME LCURL_PREFIX" Error"
+#define LCURL_ERROR_NAME LCURL_PREFIX" err"
 static const char *LCURL_ERROR = LCURL_ERROR_NAME;
 
 #define LCURL_ERROR_EASY_NAME  "CURL-EASY"

@@ -20,25 +20,54 @@ endif()
 if(SDL)
     message("-- Configuring SDL Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SDL")
+    execute_process(
+        COMMAND pkg-config sdl2 --cflags
+        OUTPUT_VARIABLE SDL2_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config sdl2_image --cflags
+        OUTPUT_VARIABLE SDL2_IMAGE_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config sdl2_ttf --cflags
+        OUTPUT_VARIABLE SDL2_TTF_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    execute_process(
+        COMMAND pkg-config sdl2_mixer --cflags
+        OUTPUT_VARIABLE SDL2_MIXER_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 
-    if (NOT SDL2PATH)
-        message(FATAL_ERROR "To use SDL please provide the SDL2 include path like (macOS): -DSDL2PATH=/Library/Frameworks/SDL2.framework")
-    elseif(NOT SDL2IMAGEPATH)
-        message(FATAL_ERROR "To use SDL please provide the SDL2_image include path like (macOS): -DSDL2IMAGEPATH=/Library/Frameworks/SDL2_image.framework")
-    elseif(NOT SDL2MIXERPATH)
-        message(FATAL_ERROR "To use SDL please provide the SDL2_mixer include path like (macOS): -DSDL2MIXERPATH=/Library/Frameworks/SDL2_mixer.framework")
-    elseif(NOT SDL2TTFPATH)
-        message(FATAL_ERROR "To use SDL please provide the SDL2_ttf include path like (macOS): -DSDL2TTFPATH=/Library/Frameworks/SDL2_ttf.framework")
+    if (NOT SDL2_CFLAGS)
+        message(FATAL_ERROR "Failed to find SDL2")
+    endif()
+    if (NOT SDL2_IMAGE_CFLAGS)
+        message(FATAL_ERROR "Failed to find SDL2_image")
+    endif()
+    if (NOT SDL2_TTF_CFLAGS)
+        message(FATAL_ERROR "Failed to find SDL2_ttf")
+    endif()
+    if (NOT SDL2_MIXER_CFLAGS)
+        message(FATAL_ERROR "Failed to find SDL2_mixer")
     endif()
 
-    set(CMAKE_C_FLAGS "-I${SDL2PATH} ${CMAKE_C_FLAGS} -I${SDL2IMAGEPATH} -I${SDL2MIXERPATH} -I${SDL2TTFPATH} -L${SDL2PATH} -L${SDL2IMAGEPATH} -L${SDL2MIXERPATH} -L${SDL2TTFPATH} -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf")
-endif()
+    set(CMAKE_C_FLAGS "-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer ${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS}")
+endif() 
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
-    if (NOT CURLPATH)
-        message(FATAL_ERROR "To use cURL please provide the cURL include path like (macOS): -DCURLPATH=/usr/include/curl")
+    execute_process(
+        COMMAND pkg-config libcurl --libs
+        OUTPUT_VARIABLE CURL_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT CURL_LIBS)
+        message(FATAL_ERROR "Failed to find libcurl")
     endif()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SOCKET -I${CURLPATH} -L${CURLPATH} -lcurl")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CURL_CFLAGS} ${CURL_LIBS} -DCOBALT_SOCKET -lcurl")
 endif()
 enable_language(CXX)
 if(LUA_ENABLE_TESTING)

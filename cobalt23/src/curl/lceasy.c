@@ -21,7 +21,7 @@
 
 static const char *LCURL_ERROR_TAG = "LCURL_ERROR_TAG";
 
-#define LCURL_EASY_NAME LCURL_PREFIX" Easy"
+#define LCURL_EASY_NAME LCURL_PREFIX" easy"
 static const char *LCURL_EASY = LCURL_EASY_NAME;
 
 #if LCURL_CURL_VER_GE(7,21,5)

@@ -25,7 +25,7 @@
 #include "lcutils.h"
 #include "lchttppost.h"
 
-#define LCURL_MULTI_NAME LCURL_PREFIX" Multi"
+#define LCURL_MULTI_NAME LCURL_PREFIX" multi"
 static const char *LCURL_MULTI = LCURL_MULTI_NAME;
 
 #if defined(DEBUG) || defined(_DEBUG)

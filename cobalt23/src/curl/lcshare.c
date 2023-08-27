@@ -14,7 +14,7 @@
 #include "lcutils.h"
 #include "lchttppost.h"
 
-#define LCURL_SHARE_NAME LCURL_PREFIX" Share"
+#define LCURL_SHARE_NAME LCURL_PREFIX" share"
 static const char *LCURL_SHARE = LCURL_SHARE_NAME;
 
 //{

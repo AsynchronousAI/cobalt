@@ -13,7 +13,7 @@
 #include "lcerror.h"
 #include "lcutils.h"
 
-#define LCURL_HTTPPOST_NAME LCURL_PREFIX" HTTPPost"
+#define LCURL_HTTPPOST_NAME LCURL_PREFIX" HTTP"
 static const char *LCURL_HTTPPOST = LCURL_HTTPPOST_NAME;
 
 

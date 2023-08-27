@@ -207,7 +207,7 @@ install(TARGETS ${TARGETS_TO_INSTALL}
         EXPORT LuaTargets
 )
 
-install(DIRECTORY include/ TYPE INCLUDE)
+install(DIRECTORY src/ TYPE INCLUDE)
 
 include(CMakePackageConfigHelpers)
 

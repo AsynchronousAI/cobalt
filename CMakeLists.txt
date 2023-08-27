@@ -8,6 +8,7 @@ option(FFI "Install the C FFI library for Cobalt" ON)
 option(SDL "Install the Cobalt SDL2 bindings library" OFF)
 option(SOCKET "Install the socket library for Cobalt" ON)
 option(LUA_ENABLE_TESTING "Enable testing for Cobalt" ON)
+option(INSTALL "Install Cobalt" ON)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")

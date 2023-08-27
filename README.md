@@ -30,7 +30,7 @@ Currently up to date with Lua `5.4.3`.
 ## Todo:
 - Read typechecker todo
 - Add pool allocator for the embeded
-- Update docs to say you need to `import`
-- Update the `gc`
-- Fix importing `.so` files
+- Update docs to say you need to `import` some libs
 - Create a fork to link with lua updates
+- Update docs to use `make install` > `make setup`
+- Move cobalt libraries to the source code

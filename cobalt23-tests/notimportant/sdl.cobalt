@@ -1,0 +1,26 @@
+var sdl = import("sdl");
+
+sdl.init();
+
+var window = sdl.create_window("Hello, triangle!", null, null, 800, 600, sdl.WINDOW_SHOWN);
+
+var renderer = sdl.create_renderer(window, null, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC);
+
+var vertices = 
+    { //   position           color         
+        { { 400, 150 }, { 255, 0, 0, 255 } },
+        { { 200, 450 }, { 0, 0, 255, 255 } },
+        { { 600, 450 }, { 0, 255, 0, 255 } },
+    };
+
+var quit = false;
+while( ! quit ) {
+   e = sdl.poll_event();
+   if( e ) {
+      if( e.type == 'quit' ) { quit = true; }
+   }
+   renderer->set_draw_color({0, 0, 0, 255});
+   renderer->clear();
+   renderer->render_geometry(null, vertices, null);
+   renderer->present();
+}

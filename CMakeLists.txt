@@ -25,36 +25,11 @@ if(SDL)
         OUTPUT_VARIABLE SDL2_CFLAGS
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    execute_process(
-        COMMAND pkg-config sdl2_image --cflags
-        OUTPUT_VARIABLE SDL2_IMAGE_CFLAGS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    execute_process(
-        COMMAND pkg-config sdl2_ttf --cflags
-        OUTPUT_VARIABLE SDL2_TTF_CFLAGS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    execute_process(
-        COMMAND pkg-config sdl2_mixer --cflags
-        OUTPUT_VARIABLE SDL2_MIXER_CFLAGS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-
     if (NOT SDL2_CFLAGS)
         message(FATAL_ERROR "Failed to find SDL2")
     endif()
-    if (NOT SDL2_IMAGE_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_image")
-    endif()
-    if (NOT SDL2_TTF_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_ttf")
-    endif()
-    if (NOT SDL2_MIXER_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_mixer")
-    endif()
 
-    set(CMAKE_C_FLAGS "-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer ${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer ${SDL2_CFLAGS} ${CMAKE_C_FLAGS}")
 endif() 
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
@@ -69,6 +44,15 @@ if (SOCKET)
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CURL_CFLAGS} ${CURL_LIBS} -DCOBALT_SOCKET -lcurl")
 endif()
+# Provide platform to language
+if (LINUX)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLINUX")
+endif()
+if (MINGW)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMINGW")
+endif()
+
+
 enable_language(CXX)
 if(LUA_ENABLE_TESTING)
     enable_testing()

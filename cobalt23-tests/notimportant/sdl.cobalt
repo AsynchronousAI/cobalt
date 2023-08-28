@@ -1,8 +1,17 @@
+/*
+SDL Example.
+
+Will open a new window with a triangle, the top point of the triangle will follow the mouse.
+
+The output will print what type of triage it is if it changes.
+*/
+
 var sdl = import("sdl");
+var Vector2 = import("Vector2");
 
 sdl.init();
-
-var window = sdl.create_window("Hello, triangle!", null, null, 800, 600, sdl.WINDOW_SHOWN);
+scale = Vector2.new(800, 600);
+var window = sdl.create_window("Hello, triangle!", null, null, scale.X, scale.Y, sdl.WINDOW_SHOWN);
 
 var renderer = sdl.create_renderer(window, null, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC);
 
@@ -12,8 +21,8 @@ var vertices =
         { { 200, 450 }, { 0, 0, 255, 255 } },
         { { 600, 450 }, { 0, 255, 0, 255 } },
     };
-
-var quit = false;
+var ogvertices = vertices;
+var lastx, lasty, last = 0,0,0
 while( ! quit ) {
    e = sdl.poll_event();
    if( e ) {
@@ -21,6 +30,52 @@ while( ! quit ) {
    }
    renderer->set_draw_color({0, 0, 0, 255});
    renderer->clear();
+   mouse = {sdl.get_mouse_state()}
+   x, y = mouse[1], mouse[2];
+
+   // Tween the colors and positions of the vertices
+   vertices[1][1][1] = x
+   vertices[1][1][2] = y
+   
    renderer->render_geometry(null, vertices, null);
+
    renderer->present();
+
+
+   // POST FRAME RENDER
+   if(lastx != x || lasty != y) {
+       lastx, lasty = x, Y
+        
+        v1,v2,v3 = vertices[1], vertices[2], vertices[3]
+        v1x, v1y, v2x, v2y, v3x, v3y = v1[1][1], v1[1][2], v2[1][1], v2[1][2], v3[1][1], v3[1][2]
+        distanceBetween12 = math.sqrt(math.pow(v1x - v2x, 2) + math.pow(v1y - v2y, 2))
+        distanceBetween23 = math.sqrt(math.pow(v2x - v3x, 2) + math.pow(v2y - v3y, 2))
+        distanceBetween31 = math.sqrt(math.pow(v3x - v1x, 2) + math.pow(v3y - v1y, 2))
+        // Round distances by 10
+        distanceBetween12 = math.floor(distanceBetween12 / 50 + 0.5) * 50
+        distanceBetween23 = math.floor(distanceBetween23 / 50 + 0.5) * 50
+        distanceBetween31 = math.floor(distanceBetween31 / 50 + 0.5) * 50
+
+
+        // Check what typeof triangle it is
+        /*
+        - Scalene: All sides have different lengths.
+        - Right: One side is a right angle (90 degrees).
+        - Isosceles: Two sides have the same length. (and the third is different)
+        - Equilateral: All sides are equal.
+        */
+        if (distanceBetween12==distanceBetween23 && distanceBetween23==distanceBetween31){
+            if (last!=1) print("Equilateral")
+            last = 1
+        } else if (distanceBetween12==distanceBetween23 || distanceBetween23==distanceBetween31 || distanceBetween31==distanceBetween12){
+            if (last!=2) print("Isoceles")
+            last = 2
+        } else if (distanceBetween12*distanceBetween12 + distanceBetween23*distanceBetween23 == distanceBetween31*distanceBetween31){
+            if (last!=3) print("Right")
+            last = 3
+        } else {
+            if (last!=4) print("Scalene")
+            last = 4
+        }
+   }
 }

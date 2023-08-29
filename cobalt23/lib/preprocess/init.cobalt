@@ -53,8 +53,23 @@ core = core || import("core") // Core library for cobalt
 typechecker = null
 xpcall(function(){
     typechecker = import("type")
-}, function(){
-    typechecker = import("preprocess.type")
+}, function(err){
+    xpcall(function(){
+        typechecker = import("preprocess.type")
+    }, function(){
+        error(err)
+    })
+})
+
+ext = null
+xpcall(function(){
+    ext = import("langext")
+}, function(err){
+    xpcall(function(){
+        ext = import("preprocess.langext")
+    }, function(){
+        error(err)
+    })
 })
 
 function process(str, itemtype, out, outfile, ...){
@@ -70,9 +85,6 @@ function process(str, itemtype, out, outfile, ...){
 
     /// Init macros
     core.macros()
-    
-    // 0: Run typechecker
-    typechecker.check(str)
 
     // 1: Split lines
     var nstr
@@ -88,7 +100,13 @@ function process(str, itemtype, out, outfile, ...){
             error(core.error.strerror(2))
         }
     }
+    // 0: Run typechecker and language extensions
+    
     if (!nstr) nstr = str
+    typechecker.check(nstr)
+    nstr = ext(nstr)
+
+    // 0.5: Split lines
     var lines = []
     for (line in nstr->gmatch("[^\r\n]+")) {
         lines[#lines + 1] = line
@@ -625,5 +643,5 @@ function process(str, itemtype, out, outfile, ...){
     return joined
 }
 
-//process("test.cobalt", "file", true, "test2.cobalt")
+process("test.cobalt", "file", true, "test2.cobalt")
 return process

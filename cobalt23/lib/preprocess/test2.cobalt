@@ -1,8 +1,5 @@
-/* Processed with cobalt23 Preprocessor | v1 */
+/* Preprocessed with the built in Cobalt preprocessor */
 
 
-var X = 1
-for (i = 1, X){
-var x = 2
-    print(x);
-}
+var x: int = 5
+var y = string.format("Hello %s", x)

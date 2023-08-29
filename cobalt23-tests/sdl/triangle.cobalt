@@ -11,7 +11,7 @@ var Vector2 = import("Vector2");
 
 sdl.init();
 scale = Vector2.new(800, 600);
-var window = sdl.create_window("Hello, triangle!", null, null, scale.X, scale.Y, sdl.WINDOW_SHOWN);
+var window = sdl.create_window("Triangle checker", null, null, scale.X, scale.Y, sdl.WINDOW_SHOWN);
 
 var renderer = sdl.create_renderer(window, null, sdl.RENDERER_ACCELERATED|sdl.RENDERER_PRESENTVSYNC);
 

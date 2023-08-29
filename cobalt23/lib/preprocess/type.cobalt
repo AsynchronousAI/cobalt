@@ -225,15 +225,15 @@ types = {
   },
   "int": function(item){
     // Check if item is an integer
-    return math.floor(item) == item
+    return type(item) == "number" && math.floor(item) == item
   },
   "float": function(item){
     // Check if item is a float
-    return math.floor(item) != item
+    return type(item) == "number" && math.floor(item) != item
   },
   "double": function(item){
     // Check if item is a double
-    return math.floor(item) != item
+    return type(item) == "number" && math.floor(item) != item
   },
 };
 alltypes = []
@@ -376,10 +376,10 @@ function check(type, value, vname, knownValues, line) {
       return true;
     } else {
       if (typeof(value) == "function") return true; // Ignore for now
-      typerror(core.error.strerror(111)->format(type, (tostring(typeof(value)).." (and descendents)"), vname), line);
+      typerror(core.error.strerror(111)->format(type, (tostring(typeof(value)).." (and it's descendents)"), vname), line);
     }
   } else {
-    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -help -types` to see all types");
+    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -types` to see all types");
   }
 }
 
@@ -397,16 +397,6 @@ function typecheck(code){
 
     var knownTypes = {};
     var knownValues = {}; 
-    for (_, item in pairs(all)){
-      knownValues[item[1]] = item[2];
-    }
-    for( _, allassign in pairs(allassigns) ) {
-      if (knownTypes[allassign[1]]) {
-        check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
-      }else if(!knownValues[allassign[1]]) {
-        knownValues[allassign[1]] = allassign[2];
-      }
-    }
     for( _, def in pairs(defs) ) {
       check(def[2], def[3], def[1], knownValues, def[4])
       value, err = loadenv(knownValues, "return " .. def[3])
@@ -418,6 +408,13 @@ function typecheck(code){
         knownValues[def[1]] = value();
       }, function(err){})
       
+    }
+    for( _, allassign in pairs(allassigns) ) {
+      if (knownTypes[allassign[1]]) {
+        check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
+      }else if(!knownValues[allassign[1]]) {
+        knownValues[allassign[1]] = allassign[2];
+      }
     }
     for( _, assign in pairs(assigns) ) {
       check(assign[2], assign[3], assign[1], knownValues, assign[4]);
@@ -438,4 +435,6 @@ function all(){
 return {
   "all": all,
   "check": typecheck,
+  "clean": clean,
+  "revive": revive,
 }

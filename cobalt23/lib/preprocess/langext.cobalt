@@ -1,0 +1,79 @@
+/*
+  Cobalt Language Extension.
+  This provides extensions to the standard Cobalt language. like
+  `f"Hello {name}"`.
+*/
+
+/* TODO:
+
+*/
+
+/* SYSTEM:
+ This uses the typechecker's dead & alive system to 
+ kill all non syntax statements and will look for a 
+ f"x {string} {string2}" and replace it with string.format("x %s", string, string2).
+*/
+
+typechecker = null
+xpcall(function(){
+    typechecker = import("type")
+}, function(){
+    typechecker = import("preprocess.type")
+})
+
+return function(str){
+  cleanedCode, dead = typechecker.clean(str)
+  
+  // go through line by line and find all f"{}" strings
+  lines = cleanedCode->split("\n")
+
+  for (i, v in pairs(lines)){
+    // use gmatch to find all f"{}" strings
+    v =  typechecker.revive(v, dead)
+    for (match in v->gmatch("f\"(.-)\"")){
+      // replace the f"{}" with string.format("{}", ...)
+      v = v->gsub("f\"(.-)\"", "string.format(\""..match.."\"")
+
+      // find all {} in the string
+      for (_ in v->gmatch("{(.-)}")){
+        // For each {} add a , and the value
+        v = v..", ".._
+        // also replace the {} with %s
+        v = v->gsub("{(.-)}", "%%s")
+      }
+
+      // add the closing bracket
+      v = v..")"
+    }
+
+    for (match in v->gmatch("f'(.-)'")){
+      // replace the f'{}' with string.format("{}", ...)
+      v = v->gsub("f'(.-)'", "string.format(\""..match.."\"")
+
+      // find all {} in the string
+      for (_ in v->gmatch("{(.-)}")){
+        // For each {} add a , and the value
+        v = v..", ".._
+        // also replace the {} with %s
+        v = v->gsub("{(.-)}", "%%s")
+      }
+
+      // add the closing bracket
+      v = v..")"
+    }
+
+    for (match in v->gmatch("f[[(.*)]]")){
+      print("\27[1;31mPreprocessor error:\27[0m")
+      print("\27[1;31mError with the 'f[[' preprocessor command.\27[0m\n\n")
+      if (errorin) {
+          print("\27[1;31mMultiline formatted strings are not supported.\27[0m\n\n")
+      }
+      print("\27[1;31mStopping preprocessor.\27[0m")
+      os.exit()
+    }
+    lines[i] = v
+  }
+
+
+  return table.concat(lines,"\n")
+}

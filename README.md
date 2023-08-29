@@ -14,7 +14,6 @@ Currently up to date with Lua `5.4.3`.
 - Arrays
 - Major performance improvements
 - Standard library with libraries written for cobalt or ported from C or Lua.
-- Interpreter `ffi` based on `luaffifb`
 - Time methods: `wait` (second), `swait` (second), `mwait` (millisecond), `umwait` (microsecond).
 - Switch statements (with built in `switch` library)
 - Enums
@@ -28,6 +27,7 @@ Currently up to date with Lua `5.4.3`.
 - `ffi` library for interfacing with C.
 - Lowlevel network access using cURL
 - Optional SDL extension for graphics, audio, and input.
+- `f"{x}"` preprocessor statements.
 ## Todo:
 - Read typechecker todo
 - Add pool allocator for the embeded

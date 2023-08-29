@@ -16,6 +16,7 @@
 /cobalt23/lemon
 /cobaltmini
 /testcompiled.c
+/cobalt23-tests/music.mp3
 # CMake Ignore
 CMakeLists.txt.user
 CMakeCache.txt

@@ -135,11 +135,15 @@ if(TOP_LEVEL)
     option(LUA_BUILD_COMPILER "Build cobaltc compiler" ON)
     option(LUA_BUILD_AOT "Build cobaltaot compiler" ON)
     option(LUA_BUILD_PRE "Build cobalt preprocessor/typechecker" ON)
+    option(LUA_BUILD_C_LUA "Build lua-cobalt transpiler" ON)
+    option(LUA_BUILD_MINI "Build the miniture version of cobalt" ON)
 else()
     option(LUA_BUILD_BINARY "Build cobalt binary" OFF)
     option(LUA_BUILD_COMPILER "Build cobaltc compiler" ON)
     option(LUA_BUILD_AOT "Build cobaltaot compiler" OFF)
     option(LUA_BUILD_PRE "Build cobalt preprocessor/typechecker" ON)
+    option(LUA_BUILD_C_LUA "Build lua-cobalt transpiler" OFF)
+    option(LUA_BUILD_MINI "Build the miniture version of cobalt" OFF)
 endif()
 
 add_subdirectory(cobalt23)
@@ -151,7 +155,7 @@ add_custom_target(cleanlua
     COMMENT "Clearing cobalt23"
 )
 # BUILD
-add_custom_target(lua-cobalt
+add_custom_target(lua
     COMMAND make -w
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/lua-cobalt
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile

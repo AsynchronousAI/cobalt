@@ -13,6 +13,8 @@
 /cobaltaot
 /test.cobalt
 /cobaltpre
+/cobalt23/lemon
+/cobaltmini
 /testcompiled.c
 # CMake Ignore
 CMakeLists.txt.user

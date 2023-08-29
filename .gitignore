@@ -24,8 +24,10 @@ CMakeFiles
 cmake_install.cmake
 Makefile
 .DS_Store
+
 # Personal
 /cobalt23/5.1
+
 # Argon be annoying sometimes
 /src 
 
@@ -52,5 +54,3 @@ install_manifest.txt
 
 # Allow 
 !/cobalt23/lua-cobalt/Makefile
-!/cobalt23/jit/Makefile
-!/cobalt23/jit/src/Makefile

@@ -1080,16 +1080,21 @@ var function parseargs(args) {
 }
 
 //----------------------------------------------------------------------------
-return function(...){
-  // Add the directory dynasm.cobalt resides in to the Lua module search path.
-  var arg = arg;
-  if( arg && arg[0] ) {
-    prefix = match(arg[0], "^(.*[/\\])");
-    if( package && prefix ) { package.path = prefix.."?.cobalt;"..package.path; }
-  }
+if (!arg){
+  return function(...){
+    // Add the directory dynasm.cobalt resides in to the Lua module search path.
+    var arg = arg;
+    if( arg && arg[0] ) {
+      prefix = match(arg[0], "^(.*[/\\])");
+      if( package && prefix ) { package.path = prefix.."?.cobalt;"..package.path; }
+    }
 
-  // Start DynASM.
-  parseargs({...});
+    // Start DynASM.
+    parseargs({...});
+  }
+}else{
+   // Start DynASM.
+   parseargs({...});
 }
 //----------------------------------------------------------------------------
 

@@ -260,31 +260,6 @@ if(LUA_BUILD_MINI)
     list(APPEND TARGETS_TO_INSTALL cobaltmini)
 endif()
 
-if(NOT TRUE)#LUA_BUILD_C_LUA)
-    set(parser_fn "lua-parser")
-
-    add_executable(lua-cobalt ${parser_fn}.c)
-
-    add_custom_command(
-        OUTPUT ${parser_fn}.c
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/lua-cobalt
-        COMMAND lemon ${CMAKE_CURRENT_SOURCE_DIR}/${parser_fn}.ly
-        COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/${parser_fn}.re2c.c >> ${CMAKE_CURRENT_BINARY_DIR}/${parser_fn}.c
-        DEPENDS lemon ${parser_fn}.ly ${parser_fn}.re2c.c
-    )
-
-    add_custom_command(
-        OUTPUT ${parser_fn}.re2c.c
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/lua-cobalt
-        COMMAND re2c -Wundefined-control-flow ${CMAKE_CURRENT_SOURCE_DIR}/${parser_fn}.re2c -o ${CMAKE_CURRENT_BINARY_DIR}/${parser_fn}.re2c.c
-        DEPENDS ${parser_fn}.re2c
-    )
-
-    add_executable(lemon lua-cobalt/lemon.c)
-
-    list(APPEND TARGETS_TO_INSTALL lua-cobalt)
-endif()
-
 install(TARGETS ${TARGETS_TO_INSTALL}
         EXPORT LuaTargets
 )

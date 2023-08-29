@@ -225,6 +225,23 @@ if(LUA_BUILD_COMPILER)
     list(APPEND TARGETS_TO_INSTALL cobaltc)
 endif()
 
+if(LUA_BUILD_AOT)
+    include(CheckIncludeFile)
+    CHECK_INCLUDE_FILE("readline/readline.h" HAVE_READLINE_READLINE_H)
+
+    add_executable(cobaltaot "src/cobaltaot.c")
+    # Can not use lua_shared because some symbols are not exported
+    target_link_libraries(cobaltaot PRIVATE lua_static)
+    set_target_properties(cobaltaot PROPERTIES 
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+    )
+    if (HAVE_READLINE_READLINE_H)
+        target_compile_definitions(cobaltaot PRIVATE "LUA_USE_READLINE")
+        target_link_libraries(cobaltaot PUBLIC readline)
+    endif()
+    list(APPEND TARGETS_TO_INSTALL cobaltaot)
+endif()
+
 install(TARGETS ${TARGETS_TO_INSTALL}
         EXPORT LuaTargets
 )

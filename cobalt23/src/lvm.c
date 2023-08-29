@@ -1,9 +1,8 @@
 /*
-* lvm.c
-* input/output from/to Lua files
-* Read copyright notice at cobalt.h
+** $Id: lvm.c $
+** Lua virtual machine
+** See Copyright Notice in lua.h
 */
-
 
 #define lvm_c
 #define LUA_CORE
@@ -30,6 +29,11 @@
 #include "ltable.h"
 #include "ltm.h"
 #include "lvm.h"
+
+/*
+** We use ifdefs to clearly mark the parts that we had to change
+*/
+#define AOT 1
 
 
 /*
@@ -101,6 +105,7 @@ static int l_strton (const TValue *obj, TValue *result) {
 ** Try to convert a value to a float. The float case is already handled
 ** by the macro 'tonumber'.
 */
+#ifndef AOT_IS_MODULE
 int luaV_tonumber_ (const TValue *obj, lua_Number *n) {
   TValue v;
   if (ttisinteger(obj)) {
@@ -114,11 +119,13 @@ int luaV_tonumber_ (const TValue *obj, lua_Number *n) {
   else
     return 0;  /* conversion failed */
 }
+#endif
 
 
 /*
 ** try to convert a float to an integer, rounding according to 'mode'.
 */
+#ifndef AOT_IS_MODULE
 int luaV_flttointeger (lua_Number n, lua_Integer *p, F2Imod mode) {
   lua_Number f = l_floor(n);
   if (n != f) {  /* not an integral value? */
@@ -128,6 +135,7 @@ int luaV_flttointeger (lua_Number n, lua_Integer *p, F2Imod mode) {
   }
   return lua_numbertointeger(f, p);
 }
+#endif
 
 
 /*
@@ -135,6 +143,7 @@ int luaV_flttointeger (lua_Number n, lua_Integer *p, F2Imod mode) {
 ** without string coercion.
 ** ("Fast track" handled by macro 'tointegerns'.)
 */
+#ifndef AOT_IS_MODULE
 int luaV_tointegerns (const TValue *obj, lua_Integer *p, F2Imod mode) {
   if (ttisfloat(obj))
     return luaV_flttointeger(fltvalue(obj), p, mode);
@@ -145,17 +154,20 @@ int luaV_tointegerns (const TValue *obj, lua_Integer *p, F2Imod mode) {
   else
     return 0;
 }
+#endif
 
 
 /*
 ** try to convert a value to an integer.
 */
+#ifndef AOT_IS_MODULE
 int luaV_tointeger (const TValue *obj, lua_Integer *p, F2Imod mode) {
   TValue v;
   if (l_strton(obj, &v))  /* does 'obj' point to a numerical string? */
     obj = &v;  /* change it to point to its corresponding number */
   return luaV_tointegerns(obj, p, mode);
 }
+#endif
 
 
 /*
@@ -285,6 +297,7 @@ static int floatforloop (StkId ra) {
 ** if 'slot' is NULL, 't' is not a table; otherwise, 'slot' points to
 ** t[k] entry (which must be empty).
 */
+#ifndef AOT_IS_MODULE
 void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
                       const TValue *slot) {
   int loop;  /* counter to avoid infinite loops */
@@ -319,6 +332,7 @@ void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
   }
   luaG_runerror(L, "'__index' chain too long; possible loop");
 }
+#endif
 
 
 /*
@@ -328,6 +342,7 @@ void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
 ** is no such entry.  (The value at 'slot' must be empty, otherwise
 ** 'luaV_fastget' would have done the job.)
 */
+#ifndef AOT_IS_MODULE
 void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
                      TValue *val, const TValue *slot) {
   int loop;  /* counter to avoid infinite loops */
@@ -364,6 +379,7 @@ void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
   }
   luaG_runerror(L, "'__newindex' chain too long; possible loop");
 }
+#endif
 
 
 /*
@@ -407,7 +423,7 @@ static int l_strcmp (const TString *ls, const TString *rs) {
 ** from float to int.)
 ** When 'f' is NaN, comparisons must result in false.
 */
-l_sinline int LTintfloat (lua_Integer i, lua_Number f) {
+static int LTintfloat (lua_Integer i, lua_Number f) {
   if (l_intfitsf(i))
     return luai_numlt(cast_num(i), f);  /* compare them as floats */
   else {  /* i < f <=> i < ceil(f) */
@@ -424,7 +440,7 @@ l_sinline int LTintfloat (lua_Integer i, lua_Number f) {
 ** Check whether integer 'i' is less than or equal to float 'f'.
 ** See comments on previous function.
 */
-l_sinline int LEintfloat (lua_Integer i, lua_Number f) {
+static int LEintfloat (lua_Integer i, lua_Number f) {
   if (l_intfitsf(i))
     return luai_numle(cast_num(i), f);  /* compare them as floats */
   else {  /* i <= f <=> i <= floor(f) */
@@ -441,7 +457,7 @@ l_sinline int LEintfloat (lua_Integer i, lua_Number f) {
 ** Check whether float 'f' is less than integer 'i'.
 ** See comments on previous function.
 */
-l_sinline int LTfloatint (lua_Number f, lua_Integer i) {
+static int LTfloatint (lua_Number f, lua_Integer i) {
   if (l_intfitsf(i))
     return luai_numlt(f, cast_num(i));  /* compare them as floats */
   else {  /* f < i <=> floor(f) < i */
@@ -458,7 +474,7 @@ l_sinline int LTfloatint (lua_Number f, lua_Integer i) {
 ** Check whether float 'f' is less than or equal to integer 'i'.
 ** See comments on previous function.
 */
-l_sinline int LEfloatint (lua_Number f, lua_Integer i) {
+static int LEfloatint (lua_Number f, lua_Integer i) {
   if (l_intfitsf(i))
     return luai_numle(f, cast_num(i));  /* compare them as floats */
   else {  /* f <= i <=> ceil(f) <= i */
@@ -474,7 +490,7 @@ l_sinline int LEfloatint (lua_Number f, lua_Integer i) {
 /*
 ** Return 'l < r', for numbers.
 */
-l_sinline int LTnum (const TValue *l, const TValue *r) {
+static int LTnum (const TValue *l, const TValue *r) {
   lua_assert(ttisnumber(l) && ttisnumber(r));
   if (ttisinteger(l)) {
     lua_Integer li = ivalue(l);
@@ -496,7 +512,7 @@ l_sinline int LTnum (const TValue *l, const TValue *r) {
 /*
 ** Return 'l <= r', for numbers.
 */
-l_sinline int LEnum (const TValue *l, const TValue *r) {
+static int LEnum (const TValue *l, const TValue *r) {
   lua_assert(ttisnumber(l) && ttisnumber(r));
   if (ttisinteger(l)) {
     lua_Integer li = ivalue(l);
@@ -530,11 +546,13 @@ static int lessthanothers (lua_State *L, const TValue *l, const TValue *r) {
 /*
 ** Main operation less than; return 'l < r'.
 */
+#ifndef AOT_IS_MODULE
 int luaV_lessthan (lua_State *L, const TValue *l, const TValue *r) {
   if (ttisnumber(l) && ttisnumber(r))  /* both operands are numbers? */
     return LTnum(l, r);
   else return lessthanothers(L, l, r);
 }
+#endif
 
 
 /*
@@ -552,17 +570,20 @@ static int lessequalothers (lua_State *L, const TValue *l, const TValue *r) {
 /*
 ** Main operation less than or equal to; return 'l <= r'.
 */
+#ifndef AOT_IS_MODULE
 int luaV_lessequal (lua_State *L, const TValue *l, const TValue *r) {
   if (ttisnumber(l) && ttisnumber(r))  /* both operands are numbers? */
     return LEnum(l, r);
   else return lessequalothers(L, l, r);
 }
+#endif
 
 
 /*
 ** Main operation for equality of Lua values; return 't1 == t2'.
 ** L == NULL means raw equality (no metamethods)
 */
+#ifndef AOT_IS_MODULE
 int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
   const TValue *tm;
   if (ttypetag(t1) != ttypetag(t2)) {  /* not the same variant? */
@@ -613,6 +634,7 @@ int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
     return !l_isfalse(s2v(L->top));
   }
 }
+#endif
 
 
 /* macro used by 'luaV_concat' to ensure that element at 'o' is a string */
@@ -636,6 +658,7 @@ static void copy2buff (StkId top, int n, char *buff) {
 ** Main operation for concatenation: concat 'total' values in the stack,
 ** from 'L->top - total' up to 'L->top - 1'.
 */
+#ifndef AOT_IS_MODULE
 void luaV_concat (lua_State *L, int total) {
   if (total == 1)
     return;  /* "all" values already concatenated */
@@ -676,11 +699,13 @@ void luaV_concat (lua_State *L, int total) {
     L->top -= n-1;  /* popped 'n' strings and pushed one */
   } while (total > 1);  /* repeat until only 1 result left */
 }
+#endif
 
 
 /*
 ** Main operation 'ra = #rb'.
 */
+#ifndef AOT_IS_MODULE
 void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
   const TValue *tm;
   switch (ttypetag(rb)) {
@@ -708,6 +733,7 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
   }
   luaT_callTMres(L, tm, rb, rb, ra);
 }
+#endif
 
 
 /*
@@ -716,6 +742,7 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
 ** 'floor(q) == trunc(q)' when 'q >= 0' or when 'q' is integer,
 ** otherwise 'floor(q) == trunc(q) - 1'.
 */
+#ifndef AOT_IS_MODULE
 lua_Integer luaV_idiv (lua_State *L, lua_Integer m, lua_Integer n) {
   if (l_unlikely(l_castS2U(n) + 1u <= 1u)) {  /* special cases: -1 or 0 */
     if (n == 0)
@@ -729,6 +756,7 @@ lua_Integer luaV_idiv (lua_State *L, lua_Integer m, lua_Integer n) {
     return q;
   }
 }
+#endif
 
 
 /*
@@ -736,6 +764,7 @@ lua_Integer luaV_idiv (lua_State *L, lua_Integer m, lua_Integer n) {
 ** negative operands follows C99 behavior. See previous comment
 ** about luaV_idiv.)
 */
+#ifndef AOT_IS_MODULE
 lua_Integer luaV_mod (lua_State *L, lua_Integer m, lua_Integer n) {
   if (l_unlikely(l_castS2U(n) + 1u <= 1u)) {  /* special cases: -1 or 0 */
     if (n == 0)
@@ -749,16 +778,19 @@ lua_Integer luaV_mod (lua_State *L, lua_Integer m, lua_Integer n) {
     return r;
   }
 }
+#endif
 
 
 /*
 ** Float modulus
 */
+#ifndef AOT_IS_MODULE
 lua_Number luaV_modf (lua_State *L, lua_Number m, lua_Number n) {
   lua_Number r;
   luai_nummod(L, m, n, r);
   return r;
 }
+#endif
 
 
 /* number of bits in an integer */
@@ -767,9 +799,9 @@ lua_Number luaV_modf (lua_State *L, lua_Number m, lua_Number n) {
 /*
 ** Shift left operation. (Shift right just negates 'y'.)
 */
-#define luaV_shiftr(x,y)	luaV_shiftl(x,intop(-, 0, y))
+#define luaV_shiftr(x,y)	luaV_shiftl(x,-(y))
 
-
+#ifndef AOT_IS_MODULE
 lua_Integer luaV_shiftl (lua_Integer x, lua_Integer y) {
   if (y < 0) {  /* shift right? */
     if (y <= -NBITS) return 0;
@@ -780,6 +812,7 @@ lua_Integer luaV_shiftl (lua_Integer x, lua_Integer y) {
     else return intop(<<, x, y);
   }
 }
+#endif
 
 
 /*
@@ -807,6 +840,7 @@ static void pushclosure (lua_State *L, Proto *p, UpVal **encup, StkId base,
 /*
 ** finish execution of an opcode interrupted by a yield
 */
+#ifndef AOT_IS_MODULE
 void luaV_finishOp (lua_State *L) {
   CallInfo *ci = L->ci;
   StkId base = ci->func + 1;
@@ -849,17 +883,8 @@ void luaV_finishOp (lua_State *L) {
       luaV_concat(L, total);  /* concat them (may yield again) */
       break;
     }
-    case OP_CLOSE: {  /* yielded closing variables */
+    case OP_CLOSE:  case OP_RETURN: {  /* yielded closing variables */
       ci->u.l.savedpc--;  /* repeat instruction to close other vars. */
-      break;
-    }
-    case OP_RETURN: {  /* yielded closing variables */
-      StkId ra = base + GETARG_A(inst);
-      /* adjust top to signal correct number of returns, in case the
-         return is "up to top" ('isIT') */
-      L->top = ra + ci->u2.nres;
-      /* repeat instruction to close other vars. and complete the return */
-      ci->u.l.savedpc--;
       break;
     }
     default: {
@@ -871,6 +896,7 @@ void luaV_finishOp (lua_State *L) {
     }
   }
 }
+#endif
 
 
 
@@ -1110,7 +1136,7 @@ void luaV_finishOp (lua_State *L) {
 #define ProtectNT(exp)  (savepc(L), (exp), updatetrap(ci))
 
 /*
-** Protect code that can only raise errors. (That is, it cannot change
+** Protect code that can only raise errors. (That is, it cannnot change
 ** the stack or hooks.)
 */
 #define halfProtect(exp)  (savestate(L,ci), (exp))
@@ -1136,8 +1162,8 @@ void luaV_finishOp (lua_State *L) {
 #define vmcase(l)	case l:
 #define vmbreak		break
 
-
-void luaV_execute (lua_State *L, CallInfo *ci) {
+static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
+{
   LClosure *cl;
   TValue *k;
   StkId base;
@@ -1150,6 +1176,11 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
   trap = L->hookmask;
  returning:  /* trap already set */
   cl = clLvalue(s2v(ci->func));
+#if AOT
+  if (cl->p->aot_implementation) {
+      return ci;
+  }
+#endif
   k = cl->p->k;
   pc = ci->u.l.savedpc;
   if (l_unlikely(trap)) {
@@ -1167,10 +1198,8 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
     Instruction i;  /* instruction being executed */
     StkId ra;  /* instruction's A register */
     vmfetch();
-    #if 0
-      /* low-level line tracing for debugging Lua */
-      printf("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
-    #endif
+// low-level line tracing for debugging Lua
+// printf("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
     lua_assert(base == ci->func + 1);
     lua_assert(base <= L->top && L->top < L->stack_last);
     /* invalidate top for instructions not expecting it */
@@ -1638,13 +1667,13 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
           updatetrap(ci);  /* C call; nothing else to be done */
         else {  /* Lua call: run function in this same C frame */
           ci = newci;
+          ci->callstatus = 0;  /* call re-uses 'luaV_execute' */
           goto startfunc;
         }
         vmbreak;
       }
       vmcase(OP_TAILCALL) {
         int b = GETARG_B(i);  /* number of arguments + 1 (function) */
-        int n;  /* number of results when calling a C function */
         int nparams1 = GETARG_C(i);
         /* delta is virtual 'func' - real 'func' (vararg functions) */
         int delta = (nparams1) ? ci->u.l.nextraargs + nparams1 : 0;
@@ -1658,14 +1687,24 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
           lua_assert(L->tbclist < base);  /* no pending tbc variables */
           lua_assert(base == ci->func + 1);
         }
-        if ((n = luaD_pretailcall(L, ci, ra, b, delta)) < 0)  /* Lua function? */
-          goto startfunc;  /* execute the callee */
-        else {  /* C function? */
+        while (!ttisfunction(s2v(ra))) {  /* not a function? */
+          luaD_tryfuncTM(L, ra);  /* try '__call' metamethod */
+          b++;  /* there is now one extra argument */
+          checkstackGCp(L, 1, ra);
+        }
+        if (!ttisLclosure(s2v(ra))) {  /* C function? */
+          luaD_precall(L, ra, LUA_MULTRET);  /* call it */
+          updatetrap(ci);
+          updatestack(ci);  /* stack may have been relocated */
           ci->func -= delta;  /* restore 'func' (if vararg) */
-          luaD_poscall(L, ci, n);  /* finish caller */
+          luaD_poscall(L, ci, cast_int(L->top - ra));  /* finish caller */
           updatetrap(ci);  /* 'luaD_poscall' can change hooks */
           goto ret;  /* caller returns after the tail call */
         }
+        ci->func -= delta;  /* restore 'func' (if vararg) */
+        luaD_pretailcall(L, ci, ra, b, 0);  /* prepare call frame */
+
+        goto startfunc;  /* execute the callee */
       }
       vmcase(OP_RETURN) {
         int n = GETARG_B(i) - 1;  /* number of results */
@@ -1674,7 +1713,6 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
           n = cast_int(L->top - ra);  /* get what is available */
         savepc(ci);
         if (TESTARG_k(i)) {  /* may there be open upvalues? */
-          ci->u2.nres = n;  /* save number of returns */
           if (L->top < ci->top)
             L->top = ci->top;
           luaF_close(L, base, CLOSEKTOP, 1);
@@ -1725,7 +1763,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         }
        ret:  /* return from a Lua function */
         if (ci->callstatus & CIST_FRESH)
-          return;  /* end this frame */
+          return NULL;  /* end this frame */
         else {
           ci = ci->previous;
           goto returning;  /* continue running caller in this frame */
@@ -1837,5 +1875,18 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
     }
   }
 }
+
+#ifndef AOT_IS_MODULE
+void luaV_execute (lua_State *L, CallInfo *ci) {
+    do {
+        LClosure *cl = clLvalue(s2v(ci->func));
+        if (cl->p->aot_implementation) {
+            ci = cl->p->aot_implementation(L, ci);
+        } else {
+            ci = luaV_execute_(L, ci);
+        }
+    } while (ci);
+}
+#endif
 
 /* }================================================================== */

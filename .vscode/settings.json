@@ -13,7 +13,8 @@
         "typeinfo": "c",
         "dasm_proto.h": "c",
         "gen.C": "cpp",
-        "sdl_image.h": "c"
+        "sdl_image.h": "c",
+        "lmem.h": "c"
     },
     "terminal.integrated.scrollback": 1000000
 }

@@ -10,6 +10,9 @@
 /node_modules
 /cobalt
 /cobaltc
+/cobaltaot
+/test.cobalt
+/testcompiled.c
 # CMake Ignore
 CMakeLists.txt.user
 CMakeCache.txt

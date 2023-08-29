@@ -6,6 +6,7 @@
 **
 ** The author of this program disclaims copyright.
 */
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>

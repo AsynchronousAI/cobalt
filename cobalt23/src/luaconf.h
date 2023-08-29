@@ -318,6 +318,7 @@
     defined(__ELF__)		/* { */
 #define LUAI_FUNC	__attribute__((visibility("internal"))) extern
 #else				/* }{ */
+/* AOT: export all internal APIs */
 #define LUAI_FUNC	extern
 #endif				/* } */
 

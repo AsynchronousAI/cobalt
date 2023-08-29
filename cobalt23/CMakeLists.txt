@@ -242,6 +242,15 @@ if(LUA_BUILD_AOT)
     list(APPEND TARGETS_TO_INSTALL cobaltaot)
 endif()
 
+if(LUA_BUILD_PRE)
+    add_executable(cobaltpre "pre/main.c")
+    target_link_libraries(cobaltpre PRIVATE lua_static)
+    set_target_properties(cobaltpre PROPERTIES 
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+    )
+    list(APPEND TARGETS_TO_INSTALL cobaltpre)
+endif()
+
 install(TARGETS ${TARGETS_TO_INSTALL}
         EXPORT LuaTargets
 )

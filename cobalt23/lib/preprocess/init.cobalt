@@ -61,9 +61,11 @@ function process(str, itemtype, out, outfile, ...){
     // 0: Init
     
     /// Check mode:
-    if (str == "-help" && outfile == "-types"){
+    if (outfile == "-types"){
         typechecker.all() // Print all valid types
         return;
+    }if ({...} == {}){
+        error("No arguments or invalid flags provided.")
     }
 
     /// Init macros

@@ -94,27 +94,27 @@ function loadenv(env, str){
 
 // TYPES
 types = {
-  "string" = function(item){
+  "string": function(item){
     // Check if item is a string
     return type(item) == "string"
   },
-  "pos" = function(item){
+  "pos": function(item){
     return math.abs(item) == item
   },
-  "neg" = function(item){
+  "neg": function(item){
     return math.abs(item) != item
   },
-  "posint" = function(item){
+  "posint": function(item){
     return math.abs(item) == item && math.floor(item) == item
   },
-  "negint" = function(item){
+  "negint": function(item){
     return math.abs(item) != item && math.floor(item) == item
   },
-  "pointer" = function(item){
+  "pointer": function(item){
     // Check if the item is a string which is parsed like a pointer
     return type(item) == "string" && item->match("^%s*%*%s*$")
   },
-  "array" = function(item){
+  "array": function(item){
     // Make sure that all the indexes are integers
     for (i, v in pairs(item)) {
       if (type(i) != "number") {
@@ -122,15 +122,15 @@ types = {
       }
     }
   },
-  "terminating" = function(item){
+  "terminating": function(item){
     // Checks if the inputted value is a terminating number (0.5, 0.25, 0.125, etc) but not (.333.., .666.., etc)
     return math.floor(item) != item && math.floor(item * 2) == item * 2
   },
-  "nonterminating" = function(item){
+  "nonterminating": function(item){
     // Checks if the inputted value is a nonterminating number (.333.., .666.., etc)
     return math.floor(item) != item && math.floor(item * 2) != item * 2
   },
-  "matrix" = function(item){
+  "matrix": function(item){
     // Check if all the values are a table
     for (i, v in pairs(item)) {
       if (type(v) != "table") {
@@ -138,100 +138,100 @@ types = {
       }
     }
   },
-  "Vector3" = function(item){
+  "Vector3": function(item){
     // Uses the `Vector3` class and check if tostring(item) == "vec3: <pointer>"
     return type(item) == "userdata" && string.match(tostring(item), "^vec3: ")
   },
-  "Vector2" = function(item){
+  "Vector2": function(item){
     // Uses the `Vector2` class and check if tostring(item) == "vec2: <pointer>"
     return type(item) == "userdata" && string.match(tostring(item), "^vec2: ")
   },
-  "Color" = function(item){
+  "Color": function(item){
     // Uses the `Color` class and check if tostring(item) == "color: <pointer>"
     return type(item) == "userdata" && string.match(tostring(item), "^color: ")
   },
-  "Transform" = function(item){
+  "Transform": function(item){
     // Uses the `Transform` class and check if tostring(item) == "transform: <pointer>"
     return type(item) == "userdata" && string.match(tostring(item), "^transform: ")
   },
-  "number" = function(item){
+  "number": function(item){
     // Check if item is a number
     return type(item) == "number"
   },
-  "boolean" = function(item){
+  "boolean": function(item){
     // Check if item is a boolean
     return type(item) == "boolean"
   },
-  "table" = function(item){
+  "table": function(item){
     // Check if item is a table
     return type(item) == "table"
   },
-  "function" = function(item){
+  "function": function(item){
     // Check if item is a function
     return type(item) == "function"
   },
-  "userdata" = function(item){
+  "userdata": function(item){
     // Check if item is a userdata
     return type(item) == "userdata"
   },
-  "thread" = function(item){
+  "thread": function(item){
     // Check if item is a thread
     return type(item) == "thread"
   },
-  "null" = function(item){
+  "null": function(item){
     // Check if item is null
     return type(item) == "null"
   },
-  "char" = function(item){
+  "char": function(item){
     // Check if the item is a string and 1 character long
     return type(item) == "string" && #item == 1;
   },
-  "msg" = function(item){
+  "msg": function(item){
     // Check if tostring(item) == "message: <pointer>"
     // messages are used in the Message library for communication between threads
     return tostring(item) == string.match("^message: ")
   },
-  "complex" = function(item){
+  "complex": function(item){
     // Try to get item.__name, if it is "complex number" then it is a complex number
     s, e = pcall(function(){ if (!item.__name){error("Force error")} })
     return s
   },
-  "directory" = function(item){
+  "directory": function(item){
     // For `file` directory type
     // return tostring(item) == "directory: <pointer>"
     return tostring(item) == string.match("^directory: ")
   },
-  "lock" = function(item){
+  "lock": function(item){
     // For `file` lock type
     // return tostring(item) == "lock: <pointer>"
     return tostring(item) == string.match("^lock: ")
   },
-  "protected" = function(item){
+  "protected": function(item){
     // return getmetatable(item).__metatable != nil
     return getmetatable(item).__metatable != null
   },
-  "_LUABOX" = function(item){
+  "_LUABOX": function(item){
     // Check if tostring(item) == "LUABOX: <pointer>"
     // this shouldnt be used for average code, LUABOX is internal
     return tostring(item) == string.match("^LUABOX: ")
   },
-  "any" = function(item){
+  "any": function(item){
     // Check if item is any type
     return true
   },
-  "thread" = function(item){
+  "thread": function(item){
     // Check if item is a thread
     return type(item) == "thread"
   },
-  "int" = function(item){
+  "int": function(item){
     // Check if item is an integer
     return math.floor(item) == item
   },
-  "float" = function(item){
+  "float": function(item){
     // Check if item is a float
     return math.floor(item) != item
   },
-  "double" = function(item){
+  "double": function(item){
     // Check if item is a double
     return math.floor(item) != item
   },

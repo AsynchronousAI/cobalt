@@ -86,6 +86,7 @@ static const luaL_Reg preloadedlibs[] = {
   {LUA_2DLIBNAME, luaopen_2D},
   {LUA_3DLIBNAME, luaopen_3D},
   {LUA_TRANSFORMNAME, luaopen_transform},
+  {LUA_JSONAME, luaopen_cjson_safe},
 
   // FFI
   #ifdef COBALT_FFI

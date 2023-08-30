@@ -89,6 +89,9 @@ LUAMOD_API int (luaopen_chan) (lua_State *L);
 #define LUA_ALLOCNAME	"alloc"
 LUAMOD_API int (luaopen_alloc) (lua_State *L);
 
+#define LUA_JSONAME	"json"
+LUAMOD_API int (luaopen_cjson_safe) (lua_State *L);
+
 #if defined(COBALT_FFI)
 #define LUA_FFINAME	"ffi"
 LUAMOD_API int (luaopen_ffi) (lua_State *L);

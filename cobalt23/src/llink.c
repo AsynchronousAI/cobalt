@@ -2,6 +2,8 @@
 * llink.c
 * Link Cobalt libraries to the C API
 * Read copyright notice at cobalt.h
+
+* Removed and replaced with the AOT compiler.
 */ 
 
 #include "cobalt.h"

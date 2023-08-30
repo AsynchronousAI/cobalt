@@ -5,7 +5,7 @@
 // This luac-derived code is incompatible with lua_assert because it calls the
 // GETARG macros even for opcodes where it is not appropriate to do so.
 
-#define aot_USE_GOTOS
+#define AOT_USE_GOTOS
 
 #undef LUAI_ASSERT
 
@@ -29,8 +29,6 @@
 //
 // Command-line arguments and main function
 // ----------------------------------------
-//
-// This part should not depend much on the Lua version
 //
 
 static const char *program_name    = "cobaltaot";
@@ -162,9 +160,9 @@ int main(int argc, char **argv)
     output_file = fopen(output_filename, "w");
     if (output_file == NULL) { fatal_error(strerror(errno)); }
 
-    #if defined(aot_USE_GOTOS)
+    #if defined(AOT_USE_GOTOS)
     println("#include \"aot_header.c\"");
-    #elif defined(aot_USE_SWITCHES)
+    #elif defined(AOT_USE_SWITCHES)
     println("#include \"trampoline_header.c\"");
     #endif
     printnl();
@@ -172,11 +170,11 @@ int main(int argc, char **argv)
     printnl();
     print_source_code();
     printnl();
-    println("#define aot_LUAOPEN_NAME luaopen_%s", module_name);
+    println("#define AOT_LUAOPEN_NAME %s", module_name);
     printnl();
-    #if defined(aot_USE_GOTOS)
+    #if defined(AOT_USE_GOTOS)
     println("#include \"aot_footer.c\"");
-    #elif defined(aot_USE_SWITCHES)
+    #elif defined(AOT_USE_SWITCHES)
     println("#include \"trampoline_footer.c\"");
     #endif
 
@@ -702,12 +700,12 @@ void aot_PrintOpcodeComment(Proto *f, int pc)
     print("\n");
 }
 
-#if defined(aot_USE_GOTOS)
+#if defined(AOT_USE_GOTOS)
 #include "aot_gotos.c"
-#elif defined(aot_USE_SWITCHES)
+#elif defined(AOT_USE_SWITCHES)
 #include "aot_switches.c"
 #else
-#error "Must define aot_USE_GOTOS or aot_USE_SWITCHES"
+#error "Must define AOT_USE_GOTOS or AOT_USE_SWITCHES"
 #endif
 
 static

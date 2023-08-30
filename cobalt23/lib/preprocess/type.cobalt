@@ -355,7 +355,7 @@ function clean(str) {
     dead[i] = match;
     return "'DEADVALUESTRTYPECHECK-"..(i).."'";
   });
-  return str->gsub('//.-\n', '')->gsub('/%*.-%*/', ''), dead;
+  return str->gsub('//.-\n', '\n')->gsub('/%*.-%*/', '\n'), dead;
 }
 
 // CHECKER

@@ -1,11 +1,19 @@
 /*
   Cobalt Language Extension.
-  This provides extensions to the standard Cobalt language. like
-  `f"Hello {name}"`.
+  This provides extensions to the standard Cobalt language. 
+*/
+
+/* EXTENDS:
+- f"{x}" = string.format("%s", x)
+- $table = pairs(table)
+- @table = ipairs(table)
+- x~y = _G.x = y, return y
+- removes comments
 */
 
 /* TODO:
-
+- Fix the nested string bug
+- Strings that are optimized to be ", ' should not lose power
 */
 
 /* SYSTEM:
@@ -21,39 +29,56 @@ xpcall(function(){
     typechecker = import("preprocess.type")
 })
 
+function gsub(str, pattern, replace){
+  // Raw GSUB function
+  var result = ""
+  var pattern_len = #pattern
+  var i = 1
+  while (i <= #str) {
+      if (str->sub(i, i + pattern_len - 1) == pattern) {
+          result = result .. replace
+          i = i + pattern_len
+        }else{
+          result = result .. str->sub(i, i)
+          i = i + 1
+        }
+    }
+  return result
+}
+
 return function(str){
   cleanedCode, dead = typechecker.clean(str)
   
-  // go through line by line and find all f"{}" strings
   lines = cleanedCode->split("\n")
 
+
   for (i, v in pairs(lines)){
-    // use gmatch to find all f"{}" strings
-    v =  typechecker.revive(v, dead)
-    for (match in v->gmatch("f\"(.-)\"")){
-      // replace the f"{}" with string.format("{}", ...)
-      v = v->gsub("f\"(.-)\"", "string.format(\""..match.."\"")
+    vclean =  typechecker.revive(v, dead)
 
-      // find all {} in the string
-      for (_ in v->gmatch("{(.-)}")){
-        // For each {} add a , and the value
-        v = v..", ".._
-        // also replace the {} with %s
-        v = v->gsub("{(.-)}", "%%s")
-      }
-
-      // add the closing bracket
-      v = v..")"
+    // Replace $table with pairs(table), and $$table with ipairs(table). Make sure the $$ doesnt render as $
+    for (match in vclean->gmatch("@[a-zA-Z0-9_]+")){
+      v = v->gsub(match, "ipairs("..(match->sub(2))..")")
     }
+    for (match in vclean->gmatch("$[a-zA-Z0-9_]+")){
+      v = v->gsub(match, "pairs("..match->sub(2)..")")
+    }
+
+    // x~y (y is anything until whitespace (not inside a string)) will add to the start _G.x=y; and then will replace the x~y with x
+    for (match in v->gmatch("[a-zA-Z0-9_]+~[^%s]+")){
+      v = "_G[\""..match->sub(1, match->find("~")-1).."\"] = "..match->sub(match->find("~")+1).."; "..v
+    
+      // replace match with the first part of the match. But do not use gsub
+      v = gsub(v, match, match->sub(1, match->find("~")-1))
+    }
+
 
     for (match in v->gmatch("f'(.-)'")){
       // replace the f'{}' with string.format("{}", ...)
-      v = v->gsub("f'(.-)'", "string.format(\""..match.."\"")
-
+      v = typechecker.revive(v->gsub("f'(.-)'", "string.format('"..match.."'"), dead)
       // find all {} in the string
-      for (_ in v->gmatch("{(.-)}")){
+      for (it in v->gmatch("{(.-)}")){
         // For each {} add a , and the value
-        v = v..", ".._
+        v = v..", "..it
         // also replace the {} with %s
         v = v->gsub("{(.-)}", "%%s")
       }
@@ -71,7 +96,8 @@ return function(str){
       print("\27[1;31mStopping preprocessor.\27[0m")
       os.exit()
     }
-    lines[i] = v
+
+    lines[i] = typechecker.revive(v)
   }
 
 

@@ -1,2 +1,13 @@
+#ifndef DEBUGMODE
+print("Debug mode is on")
+#endif
+#define PI 3.14159265358979323846
 var x: int = 5
-var y = f"Hello {x}"
+var y = f"Hello {x}" // f"Hello {x}" is a string interpolation
+var iterator = $x // $x is equal to pairs(x)
+var iterator = @x // @x is equal to ipairs(x)
+if ( x~math.random(1,10) > 10){ // Walrus operator
+    print(x, "is greater than 10")
+}else{
+    print(x, "is less than 10")
+}

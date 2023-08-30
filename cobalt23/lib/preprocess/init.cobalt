@@ -50,6 +50,7 @@ filesystem = file || import("file") // File library for cobalt
 filex = import("ext.file") // Extended File library for cobalt
 core = core || import("core") // Core library for cobalt
 
+macros = function(){} // core.macros
 typechecker = null
 xpcall(function(){
     typechecker = import("type")
@@ -84,7 +85,7 @@ function process(str, itemtype, out, outfile, ...){
     }
 
     /// Init macros
-    core.macros()
+    macros()
 
     // 1: Split lines
     var nstr
@@ -189,7 +190,7 @@ function process(str, itemtype, out, outfile, ...){
                     return env[val]
                 }else{
                     if (jit == null){
-                        return core.macros(val)
+                        return macros(val)
                     }else{
                         warn(val.." is not defined and C macros are not supported on the JIT compiler")
                     }

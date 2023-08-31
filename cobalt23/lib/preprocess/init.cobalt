@@ -577,7 +577,7 @@ ext = function(str){
       */
       arg1 = match->sub(1, match->find("~")-1)
       arg2 = match->sub(match->find("~")+1)
-      v = gsub(v, match, "global(\""..arg1.."\", "..arg2..")")
+      v = gsub(v, match, "_.global(\""..arg1.."\", "..arg2..")")
     }
 
     // table [x, y, z] = tbl

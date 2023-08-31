@@ -781,18 +781,6 @@ static int luaB_range(lua_State *L) {
 static int luaB_abort(lua_State *L){
   abort();
 }
-static int luaB_global(lua_State *L){
-  // takes in a string (key) and a value. sets the global variable with the key to the value and returns the value
-  int nargs = lua_gettop(L);
-  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
-  luaL_argcheck(L, nargs <= 2, 2, "expected at most 2 arguments");
-  const char *key = luaL_checkstring(L, 1);
-  if (nargs == 2) {
-    lua_setglobal(L, key);
-  }
-  lua_getglobal(L, key);
-  return 1;
-}
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"sizeof", luaB_sizeof},
@@ -808,7 +796,6 @@ static const luaL_Reg base_funcs[] = {
   {"loadstring", luaB_load},
   {"next", luaB_next},
   {"pairs", luaB_pairs},
-  {"global", luaB_global},
   {"pcall", luaB_pcall},
   {"try", luaB_pcall},
   {"print", luaB_print},

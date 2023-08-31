@@ -42,6 +42,7 @@
 static const luaL_Reg loadedlibs[] = {
   /* Base */
   {"_G", luaopen_base},
+  {"_", luaopen_under},
   
   /* C API */
   {LUA_LOADLIBNAME, luaopen_package},

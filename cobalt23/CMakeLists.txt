@@ -8,6 +8,7 @@ set(LUA_LIB_SRCS
     "src/ljson.c"
     "src/lfpconv.c"
     "src/lstrbuf.c"
+    "src/lulib.c"
     "src/ldo.c"
     "src/ldump.c"
     "src/lfunc.c"

@@ -6,60 +6,41 @@
 // The preprocessor replaces preprocessor directives with
 // cobalt code depending on system and other factors
 
-/* Dependencies
-   // switch (Installed with `make setup`)
-   // filex (Installed with `make setup`)
-   // core // Preloaded, needed to get C macros. JIT Ported & Interpreter Core.
-   // ffi // Preloaded, needed to get C macros. JIT Ported & Interpreter Core.
-   // base libraries // JIT & Interpreter designed preloaded libraries
-*/
 
-/* Notes
-    - The preprocessor is not apart of the compiler
-    - Using C Macros require GCC to be installed (As of the `core` library dependency)
-    - C Macros will NOT work on the JIT compiler
-*/
-
-/* TODO:
-    - Actually substitute macros & definitions
-*/
-
-/* Supports
-   // Enabled:
-    // #open (name): Checks if a Macro is defined and opens it so that the program can use it
-    // #define (name) (value <optional>): Sets a macro
-    // #define (lambdaname)(args) (function): Sets a macro to a lambda function
-    // #undef (name): Removes a macro
-    // #ifdef (name): If macro is defined, Condition must be wrapped in ()
-    // #ifndef (name): If macro is not defined, Condition must be wrapped in ()
-    // #elif (name): Else if macro is defined, Condition must be wrapped in ()
-    // #else: Else, no condition
-    // #endif: End if
-    // #error (message): Raises an error
-    // #warning (message): Raises a warning
-
-   // Disabled:
-    // #include "file.cobalt": Includes a file (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
-    // #line (line) "file.cobalt <optional>": Sets the line number and file name for the preprocessor (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
-
-
-    // Everything else that starts with a # will be executed as a cobalt source line
-    // C Macros are supported if GCC is installed, if not, they will be ignored.
-    // cobalt and cobaltversion are included macros
-*/
-
-switch = import("switch") // Switch library for cobalt
-filesystem = file || import("file") // File library for cobalt
+// INIT
+filesystem = file // File library for cobalt
 filex = import("ext.file") // Extended File library for cobalt
-core = core || import("core") // Core library for cobalt
 
 macros = function(){} // core.macros
 
-/*
-  Cobalt Typechecker. 
-  This is a typechecker for the Cobalt language. It is written in Cobalt.
-  Integrated into the preprocessor.
-*/
+function switch(value, cases){
+    if (type(cases) != "table"){
+        error("Switch expects a table as the second argument")
+    }
+    
+    if(cases[value]){
+        if (type(cases[value]) == "string"){
+            print(cases[value])
+            return
+        } else {
+            cases[value](value)
+            return
+        }
+    }
+    if(cases["default"]){
+        if (type(cases["default"]) == "string"){
+            print(cases["default"])
+            return
+        } else {
+            cases["default"](value)
+            return
+        }
+    }
+    warn("Switch cannot find a case for " .. tostring(value) .. " and no default case was provided")
+}
+
+
+// SECTION 1: TYPECHECKER
 
 /* TODO:
  - Allow custom types
@@ -169,7 +150,7 @@ types = {
   },
   "pointer": function(item){
     // Check if the item is a string which is parsed like a pointer
-    return type(item) == "string" && item->match("^%s*%*%s*$")
+    return type(item) == "string" && (string.sub(item, 1, 1) == "&" || string.sub(item, 1, 2) == "0x")
   },
   "array": function(item){
     // Make sure that all the indexes are integers
@@ -178,14 +159,6 @@ types = {
         return false
       }
     }
-  },
-  "terminating": function(item){
-    // Checks if the inputted value is a terminating number (0.5, 0.25, 0.125, etc) but not (.333.., .666.., etc)
-    return math.floor(item) != item && math.floor(item * 2) == item * 2
-  },
-  "nonterminating": function(item){
-    // Checks if the inputted value is a nonterminating number (.333.., .666.., etc)
-    return math.floor(item) != item && math.floor(item * 2) != item * 2
   },
   "matrix": function(item){
     // Check if all the values are a table
@@ -496,10 +469,7 @@ typechecker = {
   "revive": revive,
 }
 
-/*
-  Cobalt Language Extension.
-  This provides extensions to the standard Cobalt language. 
-*/
+// SECTION 2: Language extensions
 
 /* EXTENDS:
 - f"{x}" = string.format("%s", x)
@@ -508,11 +478,12 @@ typechecker = {
 - x~y = _G.x = y, return y
 - removes comments
 - var [x, y, z] = tbl (x, y, z are the keys of tbl)
+- var x <pre> = y (will calculate y on preprocessor)
 */
 
 /* TODO:
-- Fix the nested string bug
-- Strings that are optimized to be ", ' should not lose power
+  - Fix the nested string bug
+  - Strings that are optimized to be ", ' should not lose power
 */
 
 /* SYSTEM:
@@ -559,6 +530,28 @@ ext = function(str){
 
   for (i, v in pairs(lines)){
     vclean =  typechecker.revive(v, dead)
+    // look for var %s <pre> = %s 
+    var pattern = "var%s+([^%s]+)%s+<pre>%s*=%s*(.-)%s*$"
+    for (match, match2 in vclean->gmatch(pattern)){
+      newval = ""
+      xpcall(function(){
+        newval = loadstring("return "..match2)()
+      }, function(err){
+        errorpreprocessor("Error rendering <pre> value: "..err, v)
+      })
+
+      // Format newval
+      if (type(newval) == "string") newval = '"'..newval..'"'
+      if (type(newval) == "table") newval = tabletostring(newval)
+      if (type(newval) == "function") newval = errorpreprocessor("Functions are not supported in <pre> values", v)
+      if (type(newval) == "userdata") newval = errorpreprocessor("Userdata is not supported in <pre> values", v)
+      if (type(newval) == "thread") newval = errorpreprocessor("Threads are not supported in <pre> values", v)
+      if (type(newval) == "null") newval = "null"
+      
+
+
+      v = v->gsub("var%s+([^%s]+)%s+<pre>%s*=%s*(.-)%s*$", "var "..match.." = "..newval)
+    }
     // Replace $table with pairs(table), and $$table with ipairs(table). Make sure the $$ doesnt render as $
     for (match in vclean->gmatch("@[a-zA-Z0-9_]+")){
       v = v->gsub(match, "ipairs("..(match->sub(2))..")")
@@ -623,11 +616,53 @@ ext = function(str){
   return table.concat(lines,"\n")
 }
 
+// SECTION 3: Interface & Preprocessor directives
+
+/* Dependencies
+   // filex (Installed with `make setup`)
+   // core
+   // ffi
+   // base libraries
+*/
+
+/* Notes
+    - The preprocessor is not apart of the compiler
+    - Using C Macros require GCC to be installed (As of the `core` library dependency)
+*/
+
+/* TODO:
+    - Actually substitute macros & definitions
+*/
+
+/* Supports
+   // Enabled:
+    // #open (name): Checks if a Macro is defined and opens it so that the program can use it
+    // #define (name) (value <optional>): Sets a macro
+    // #define (lambdaname)(args) (function): Sets a macro to a lambda function
+    // #undef (name): Removes a macro
+    // #ifdef (name): If macro is defined, Condition must be wrapped in ()
+    // #ifndef (name): If macro is not defined, Condition must be wrapped in ()
+    // #elif (name): Else if macro is defined, Condition must be wrapped in ()
+    // #else: Else, no condition
+    // #endif: End if
+    // #error (message): Raises an error
+    // #warning (message): Raises a warning
+
+   // Disabled:
+    // #include "file.cobalt": Includes a file (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
+    // #line (line) "file.cobalt <optional>": Sets the line number and file name for the preprocessor (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
+
+
+    // Everything else that starts with a # will be executed as a cobalt source line
+    // C Macros are supported if GCC is installed, if not, they will be ignored.
+    // cobalt and cobaltversion are included macros
+*/
+
 function process(str, itemtype, out, outfile, ...){
     // 0: Init
     
     /// Check mode:
-    if (outfile == "-types"){
+    if (outfile == "-types" || (str == "-types" && !outfile) ){
         typechecker.all() // Print all valid types
         return;
     }if ({...} == {}){
@@ -738,12 +773,6 @@ function process(str, itemtype, out, outfile, ...){
                 // check if it is in env, if it return the value
                 if (env[val] != null && env[val] != false) {
                     return env[val]
-                }else{
-                    if (jit == null){
-                        return macros(val)
-                    }else{
-                        warn(val.." is not defined and C macros are not supported on the JIT compiler")
-                    }
                 }
             }]=]..str2)
     }

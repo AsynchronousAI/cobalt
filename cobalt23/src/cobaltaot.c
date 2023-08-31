@@ -334,7 +334,7 @@ void PrintConstant(const Proto* f, int i)
     const TValue* o=&f->k[i];
     switch (ttypetag(o)) {
         case LUA_VNIL:
-            print("nil");
+            print("null");
             break;
         case LUA_VFALSE:
             print("false");

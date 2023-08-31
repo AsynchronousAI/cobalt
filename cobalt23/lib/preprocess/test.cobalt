@@ -11,3 +11,5 @@ if ( x~math.random(1,10) > 10){ // Walrus operator
 }else{
     print(x, "is less than 10")
 }
+
+var x <pre> = string.gsub("x1x", "1", "2") // <pre> is a preprocessor

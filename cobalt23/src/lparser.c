@@ -2012,6 +2012,11 @@ static int getlocalattribute (LexState *ls) {
       return RDKCONST;  /* read-only variable */
     else if (strcmp(attr, "close") == 0)
       return RDKTOCLOSE;  /* to-be-closed variable */
+    else if (strcmp(attr, "ref") == 0)
+      luaK_semerror(ls,
+        luaO_pushfstring(ls->L, "refrence values are not supported"));
+    else if (strcmp(attr, "pre") == 0)
+      return VDKREG;
     else
       luaK_semerror(ls,
         luaO_pushfstring(ls->L, "unknown attribute '%s'", attr));

@@ -7,11 +7,9 @@ var x: int = 5
 var y = string.format("Hello %s" , x)
 var iterator = pairs(x) 
 var iterator = ipairs(x) 
-if ( global("x", math.random(1,10)) > 10){ 
+if ( _.global("x", math.random(1,10)) > 10){ 
     print(x, "is greater than 10")
 }else{
     print(x, "is less than 10")
 }
-export "hi" {
-    
-}
+var x = "x2x"

@@ -459,11 +459,17 @@ static int test2 (RN *rn, const char *set) {
 
 
 /*
-** Read a sequence of (hex)digits
+** Read a sequence of (hex/bin/oct)digits
 */
-static int readdigits (RN *rn, int hex) {
+int isbdigit(int c) {
+  return (c == '0' || c == '1');
+}
+int isodigit(int c) {
+  return (c >= '0' && c <= '7');
+}
+static int readdigits (RN *rn, int hex, int bin, int oct) {
   int count = 0;
-  while ((hex ? isxdigit(rn->c) : isdigit(rn->c)) && nextc(rn))
+  while ((hex ? isxdigit(rn->c) : ( bin ? isbdigit(rn->c) : (oct ? isodigit(rn->c) : isdigit(rn->c)))) && nextc(rn))
     count++;
   return count;
 }
@@ -478,6 +484,8 @@ static int read_number (lua_State *L, FILE *f) {
   RN rn;
   int count = 0;
   int hex = 0;
+  int bin = 0;
+  int oct = 0;
   char decp[2];
   rn.f = f; rn.n = 0;
   decp[0] = lua_getlocaledecpoint();  /* get decimal point from locale */
@@ -488,13 +496,19 @@ static int read_number (lua_State *L, FILE *f) {
   if (test2(&rn, "00")) {
     if (test2(&rn, "xX")) hex = 1;  /* numeral is hexadecimal */
     else count = 1;  /* count initial '0' as a valid digit */
+
+    if (test2(&rn, "bB")) bin = 1;  /* numeral is binary */
+    else count = 1;  /* count initial '0' as a valid digit */
+
+    if (test2(&rn, "oO")) oct = 1;  /* numeral is ocatal */
+    else count = 1;  /* count initial '0' as a valid digit */
   }
-  count += readdigits(&rn, hex);  /* integral part */
+  count += readdigits(&rn, hex, bin, oct);  /* integral part */
   if (test2(&rn, decp))  /* decimal point? */
-    count += readdigits(&rn, hex);  /* fractional part */
-  if (count > 0 && test2(&rn, (hex ? "pP" : "eE"))) {  /* exponent mark? */
+    count += readdigits(&rn, hex, bin, oct);  /* fractional part */
+  if (count > 0 && test2(&rn, ((hex | bin | oct) ? "pP" : "eE"))) {  /* exponent mark? */
     test2(&rn, "-+");  /* exponent sign */
-    readdigits(&rn, 0);  /* exponent digits */
+    readdigits(&rn, 0, 0, 0);  /* exponent digits */
   }
   ungetc(rn.c, rn.f);  /* unread look-ahead char */
   l_unlockfile(rn.f);

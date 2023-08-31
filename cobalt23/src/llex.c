@@ -247,6 +247,10 @@ static int read_numeral (LexState *ls, SemInfo *seminfo) {
   save_and_next(ls);
   if (first == '0' && check_next2(ls, "xX"))  /* hexadecimal? */
     expo = "Pp";
+  if (first == '0' && check_next2(ls, "bB"))  /* binary? */
+    expo = "Pp";
+  if (first == '0' && check_next2(ls, "oO"))  /* octal? */
+    expo = "Pp";
   for (;;) {
     if(ls->current == '_')
       next(ls); /* ignore underscores */

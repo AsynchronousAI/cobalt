@@ -60,6 +60,8 @@
 #define lisspace(c)	testprop(c, MASK(SPACEBIT))
 #define lisprint(c)	testprop(c, MASK(PRINTBIT))
 #define lisxdigit(c)	testprop(c, MASK(XDIGITBIT))
+#define lisbdigit(c) ((c) == '0' || (c) == '1')
+#define lisodigit(c) ((c) >= '0' && (c) <= '7')
 
 
 /*

@@ -287,6 +287,22 @@ static const char *l_str2int (const char *s, lua_Integer *result) {
       empty = 0;
     }
   }
+  if (s[0] == '0' &&
+      (s[1] == 'b' || s[1] == 'B')) {  /* bin? */
+    s += 2;  /* skip '0x' */
+    for (; lisbdigit(cast_uchar(*s)); s++) {
+      a = a * 2 + (*s - '0');
+      empty = 0;
+    }
+  }
+  if (s[0] == '0' &&
+      (s[1] == 'o' || s[1] == 'O')) {  /* oct? */
+    s += 2;  /* skip '0x' */
+    for (; lisodigit(cast_uchar(*s)); s++) {
+      a = a * 8 + (*s - '0');
+      empty = 0;
+    }
+  }
   else {  /* decimal */
     for (; lisdigit(cast_uchar(*s)); s++) {
       int d = *s - '0';

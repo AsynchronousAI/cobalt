@@ -68,7 +68,6 @@ return function(str){
 
   for (i, v in pairs(lines)){
     vclean =  typechecker.revive(v, dead)
-
     // Replace $table with pairs(table), and $$table with ipairs(table). Make sure the $$ doesnt render as $
     for (match in vclean->gmatch("@[a-zA-Z0-9_]+")){
       v = v->gsub(match, "ipairs("..(match->sub(2))..")")

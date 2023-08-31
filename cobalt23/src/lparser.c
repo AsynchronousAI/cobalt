@@ -2096,8 +2096,6 @@ static void funcstat (LexState *ls, int line) {
   luaK_storevar(ls->fs, &v, &b);
   luaK_fixline(ls->fs, line);  /* definition "happens" in the first line */
 }
-
-
 static void exprstat (LexState *ls) {
   /* stat -> func | compound | assignment */
   FuncState *fs = ls->fs;
@@ -2114,7 +2112,7 @@ static void exprstat (LexState *ls) {
       case TK_CDIV: case TK_CMOD:
         assign_compound(ls, &v, ls->t.token);
         break;
-      case ',': case '=': //case TK_CCONCAT:
+      case ',': case '=':
         restassign(ls, &v, 1);
         break;
       case ';': //done:
@@ -2122,7 +2120,7 @@ static void exprstat (LexState *ls) {
         break;
       default:
         luaX_syntaxerror(ls, lua_pushfstring(ls->L,
-                         "'++', '--', +=', '-=', '*=', '/=', '%%=', '..=' or '=' expected"));
+                         "'++', '--', +=', '-=', '*=', '/=', '%%=' or '=' expected"));
         break;
     }
   }

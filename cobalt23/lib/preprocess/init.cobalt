@@ -547,7 +547,7 @@ ext = function(str){
       if (type(newval) == "userdata") newval = errorpreprocessor("Userdata is not supported in <pre> values", v)
       if (type(newval) == "thread") newval = errorpreprocessor("Threads are not supported in <pre> values", v)
       if (type(newval) == "null") newval = "null"
-      
+
 
 
       v = v->gsub("var%s+([^%s]+)%s+<pre>%s*=%s*(.-)%s*$", "var "..match.." = "..newval)
@@ -1223,5 +1223,5 @@ function process(str, itemtype, out, outfile, ...){
     return joined
 }
 
-process("test.cobalt", "file", true, "test2.cobalt")
+//process("test.cobalt", "file", true, "test2.cobalt")
 return process

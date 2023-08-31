@@ -9,6 +9,7 @@
 - @table = ipairs(table)
 - x~y = _G.x = y, return y
 - removes comments
+- var [x, y, z] = tbl (x, y, z are the keys of tbl)
 */
 
 /* TODO:
@@ -46,6 +47,19 @@ function gsub(str, pattern, replace){
   return result
 }
 
+function find(str, pattern, init){
+  init = init || 1
+  var pattern_len = #pattern
+  var i = init
+  while (i <= #str) {
+      if (str->sub(i, i + pattern_len - 1) == pattern) {
+          return i, i + pattern_len - 1
+      }
+      i = i + 1
+  }
+  return null
+}
+
 return function(str){
   cleanedCode, dead = typechecker.clean(str)
   
@@ -65,12 +79,27 @@ return function(str){
 
     // x~y (y is anything until whitespace (not inside a string)) will add to the start _G.x=y; and then will replace the x~y with x
     for (match in v->gmatch("[a-zA-Z0-9_]+~[^%s]+")){
+      /*
       v = "_G[\""..match->sub(1, match->find("~")-1).."\"] = "..match->sub(match->find("~")+1).."; "..v
     
       // replace match with the first part of the match. But do not use gsub
       v = gsub(v, match, match->sub(1, match->find("~")-1))
+      */
+      arg1 = match->sub(1, match->find("~")-1)
+      arg2 = match->sub(match->find("~")+1)
+      v = gsub(v, match, "global(\""..arg1.."\", "..arg2..")")
     }
 
+    // table [x, y, z] = tbl
+    /*
+    for (match in v->gmatch("([a-zA-Z0-9_]+)%s*%[(.-)%]%s*=")){
+      print(v)
+      // replace the match with the first part of the match
+      v = gsub(v, match, match->sub(1, find(match, "[")-1))
+      // replace the match with the table.insert(tbl, x, y, z)
+      v = gsub(v, match, "table.insert("..match->sub(find(match, "=")+1)..", "..match->sub(find(match, "[")+1, find(match, "]")-1)..")")
+    }
+    */
 
     for (match in v->gmatch("f'(.-)'")){
       // replace the f'{}' with string.format("{}", ...)

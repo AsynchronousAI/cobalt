@@ -11,3 +11,9 @@ if ( x~math.random(1,10) > 10){ // Walrus operator
 }else{
     print(x, "is less than 10")
 }
+var table = {
+    "key" : "value",
+    "key2" : "value2"
+}
+
+var [key, key2] = table // Destructuring

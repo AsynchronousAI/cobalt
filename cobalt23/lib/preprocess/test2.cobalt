@@ -12,3 +12,8 @@ _G["x"] = math.random(1,10); if ( x > 10){
 }else{
     print(x, "is less than 10")
 }
+var table = {
+    "key" : "value",
+    "key2" : "value2"
+}
+var [key, key2] = table // Destructuring

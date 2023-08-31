@@ -1,17 +1,17 @@
 // Built in preprocessor for cobalt
 // The preprocesser is not apart of the compiler
-// and needs to be built using `make pre` and
+// and needs to be built using `cmake . && make` and
 // used before compiling the source code
 
 // The preprocessor replaces preprocessor directives with
 // cobalt code depending on system and other factors
 
 /* Dependencies
-   // Switch (Installed with `make setup`)
-   // Filex (Installed with `make setup`)
+   // switch (Installed with `make setup`)
+   // filex (Installed with `make setup`)
    // core // Preloaded, needed to get C macros. JIT Ported & Interpreter Core.
    // ffi // Preloaded, needed to get C macros. JIT Ported & Interpreter Core.
-   // Base libraries // JIT & Interpreter designed preloaded libraries
+   // base libraries // JIT & Interpreter designed preloaded libraries
 */
 
 /* Notes
@@ -25,6 +25,7 @@
 */
 
 /* Supports
+   // Enabled:
     // #open (name): Checks if a Macro is defined and opens it so that the program can use it
     // #define (name) (value <optional>): Sets a macro
     // #define (lambdaname)(args) (function): Sets a macro to a lambda function
@@ -36,6 +37,8 @@
     // #endif: End if
     // #error (message): Raises an error
     // #warning (message): Raises a warning
+
+   // Disabled:
     // #include "file.cobalt": Includes a file (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
     // #line (line) "file.cobalt <optional>": Sets the line number and file name for the preprocessor (Cyclic dependencies will leave the preprocessor in an infinite loop) (Name must be in "")
 
@@ -51,27 +54,574 @@ filex = import("ext.file") // Extended File library for cobalt
 core = core || import("core") // Core library for cobalt
 
 macros = function(){} // core.macros
-typechecker = null
-xpcall(function(){
-    typechecker = import("type")
-}, function(err){
-    xpcall(function(){
-        typechecker = import("preprocess.type")
-    }, function(){
-        error(err)
-    })
-})
 
-ext = null
-xpcall(function(){
-    ext = import("langext")
-}, function(err){
+/*
+  Cobalt Typechecker. 
+  This is a typechecker for the Cobalt language. It is written in Cobalt.
+  Integrated into the preprocessor.
+*/
+
+/* TODO:
+ - Allow custom types
+ - Functions can have arguments to be typechecked
+ - Generics
+ - Fix issue where type can be changed after definiton
+*/
+
+/* SYSTEM:
+ The system removes all comments and clears strings and saves it to a table of "dead" strings, 
+ then it looks for definitions `var x: y = z` to store in a cache and assignments `x: y = z` and even 
+ normal assignments `a = z` patterns, and then it checks the types of the values with 
+ the "dead" strings reborn.
+
+ It is simple and short, it is in BETA but issues will be rare it has been tested on even this 
+ file and it works fine.
+
+ If you do not use the typechecker type annotations are supported by the interpreter but wont
+ have any value. But the same cannot be said for preprocessor directives, they are not supported 
+ in the interpreter.
+
+ If the typechecker fails to check it will ignore.
+*/
+
+// GLOBALS
+dead = {}
+
+// ERROR
+function typerror(errorin, line, note){
+  print("\27[1;31mTypechecker error:\27[0m")
+  if (errorin) {
+      print("\27[1;31m"..errorin.."\27[0m\n\n")
+  }
+  print("\27[1;31mSnippet:\27[0m")
+  print(revive(line))
+  if (note){
+    print("\n\27[1;31mTypechecker provided note:\27[0m")
+    print("\n\27[1;31m"..note.."\27[0m")
+  }
+  print("\n\27[1;31mStopping Typechecker.\27[0m")
+  os.exit()
+}
+// LOAD
+function tabletostring(tbl){
+  // Converts a table to a string
+  var result = "{"
+  for (i, v in pairs(tbl)) {
+    if (!v){
+      v = "null"
+    }
+    v = (loadstring("return "..(v || "null")) || loadenv("return "..(v || "null")))
     xpcall(function(){
-        ext = import("preprocess.langext")
-    }, function(){
-        error(err)
+      v = v()
+    }, 
+    function(){
+      v = loadenv("return "..(v || "null"))
+      xpcall(function(){
+        v = v()
+      },
+      function(err){
+        typerror("Error checking value: "..err)
+      })
     })
-})
+
+    if (type(v) == "string") {
+      result = result..i.." = \""..v.."\","
+    } else if (type(v) == "table") {
+      result = result..i.." = "..tabletostring(v)..", "
+    } else {
+      result = result..i.." = "..(v || "null")..","
+    }
+  }
+  result = result.."}"
+  return result
+}
+function loadenv(env, str){
+  // Uses loadstring, but the enviourment can be provided. env is a table.
+  envstr = tabletostring(env)
+  str = [[
+    env = ]]..envstr..[[
+    for (i, v in pairs(env)) {
+      _G[i] = v
+    }
+
+  ]]..str
+
+  return loadstring(revive(str));
+}
+
+// TYPES
+types = {
+  "string": function(item){
+    // Check if item is a string
+    return type(item) == "string"
+  },
+  "pos": function(item){
+    return math.abs(item) == item
+  },
+  "neg": function(item){
+    return math.abs(item) != item
+  },
+  "posint": function(item){
+    return math.abs(item) == item && math.floor(item) == item
+  },
+  "negint": function(item){
+    return math.abs(item) != item && math.floor(item) == item
+  },
+  "pointer": function(item){
+    // Check if the item is a string which is parsed like a pointer
+    return type(item) == "string" && item->match("^%s*%*%s*$")
+  },
+  "array": function(item){
+    // Make sure that all the indexes are integers
+    for (i, v in pairs(item)) {
+      if (type(i) != "number") {
+        return false
+      }
+    }
+  },
+  "terminating": function(item){
+    // Checks if the inputted value is a terminating number (0.5, 0.25, 0.125, etc) but not (.333.., .666.., etc)
+    return math.floor(item) != item && math.floor(item * 2) == item * 2
+  },
+  "nonterminating": function(item){
+    // Checks if the inputted value is a nonterminating number (.333.., .666.., etc)
+    return math.floor(item) != item && math.floor(item * 2) != item * 2
+  },
+  "matrix": function(item){
+    // Check if all the values are a table
+    for (i, v in pairs(item)) {
+      if (type(v) != "table") {
+        return false
+      }
+    }
+  },
+  "Vector3": function(item){
+    // Uses the `Vector3` class and check if tostring(item) == "vec3: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^vec3: ")
+  },
+  "Vector2": function(item){
+    // Uses the `Vector2` class and check if tostring(item) == "vec2: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^vec2: ")
+  },
+  "Color": function(item){
+    // Uses the `Color` class and check if tostring(item) == "color: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^color: ")
+  },
+  "Transform": function(item){
+    // Uses the `Transform` class and check if tostring(item) == "transform: <pointer>"
+    return type(item) == "userdata" && string.match(tostring(item), "^transform: ")
+  },
+  "number": function(item){
+    // Check if item is a number
+    return type(item) == "number"
+  },
+  "boolean": function(item){
+    // Check if item is a boolean
+    return type(item) == "boolean"
+  },
+  "table": function(item){
+    // Check if item is a table
+    return type(item) == "table"
+  },
+  "function": function(item){
+    // Check if item is a function
+    return type(item) == "function"
+  },
+  "userdata": function(item){
+    // Check if item is a userdata
+    return type(item) == "userdata"
+  },
+  "thread": function(item){
+    // Check if item is a thread
+    return type(item) == "thread"
+  },
+  "null": function(item){
+    // Check if item is null
+    return type(item) == "null"
+  },
+  "char": function(item){
+    // Check if the item is a string and 1 character long
+    return type(item) == "string" && #item == 1;
+  },
+  "msg": function(item){
+    // Check if tostring(item) == "message: <pointer>"
+    // messages are used in the Message library for communication between threads
+    return tostring(item) == string.match("^message: ")
+  },
+  "complex": function(item){
+    // Try to get item.__name, if it is "complex number" then it is a complex number
+    s, e = pcall(function(){ if (!item.__name){error("Force error")} })
+    return s
+  },
+  "directory": function(item){
+    // For `file` directory type
+    // return tostring(item) == "directory: <pointer>"
+    return tostring(item) == string.match("^directory: ")
+  },
+  "lock": function(item){
+    // For `file` lock type
+    // return tostring(item) == "lock: <pointer>"
+    return tostring(item) == string.match("^lock: ")
+  },
+  "protected": function(item){
+    // return getmetatable(item).__metatable != nil
+    return getmetatable(item).__metatable != null
+  },
+  "_LUABOX": function(item){
+    // Check if tostring(item) == "LUABOX: <pointer>"
+    // this shouldnt be used for average code, LUABOX is internal
+    return tostring(item) == string.match("^LUABOX: ")
+  },
+  "any": function(item){
+    // Check if item is any type
+    return true
+  },
+  "thread": function(item){
+    // Check if item is a thread
+    return type(item) == "thread"
+  },
+  "int": function(item){
+    // Check if item is an integer
+    return type(item) == "number" && math.floor(item) == item
+  },
+  "float": function(item){
+    // Check if item is a float
+    return type(item) == "number" && math.floor(item) != item
+  },
+  "double": function(item){
+    // Check if item is a double
+    return type(item) == "number" && math.floor(item) != item
+  },
+};
+alltypes = []
+
+for (i, v in pairs(types)) {
+  table.insert(alltypes, i)
+}
+
+// PARSER
+function deffind(str) {
+    // Takes in code and looks for definitions with annotations
+    var pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*$";
+        pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$";
+    var result = {};
+    for( line in str->gmatch("[^\r\n]+") ) {
+      var vart, key, value = line->match(pattern);
+      if( vart && key && value ) {
+        table.insert(result, {vart, key, value, line});
+      }
+    }
+    return result;
+}
+function assign(str) {
+    // Takes in code looks for assignments with annotations
+    var pattern = "%s*([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*";
+    var result = {};
+    for( line in str->gmatch("[^\r\n]+") ) {
+      var vart, key, value = line->match(pattern);
+      if( vart && key && value ) {
+        // Verify var, key, value are not eligible for def
+        if( ! deffind(line)[1] ) {
+            table.insert(result, {vart, key, value, line});
+        }
+      }
+    }
+    return result;
+}
+function findfunctions(str){
+  // Looks for `function x(<?>)` and returns a table of all the functions and source code
+  var pattern = "^%s*function%s+([^%s]+)%s*%(([^%s]*)%)%s*$";
+  var result = {};
+  for( line in str->gmatch("[^\r\n]+") ) {
+    var key, value = line->match(pattern);
+    if( key && value ) {
+      table.insert(result, {key, value, line});
+    }
+  }
+  return result;
+}
+function allassign(str){
+  // Used to look for typeless assignments
+  var pattern = "%s*([^%s]+)%s*=%s*([^%s]+)%s*";
+  var result = {};
+  for( line in str->gmatch("[^\r\n]+") ) {
+    var key, value = line->match(pattern);
+    if( key && value ) {
+      if (! deffind(line)[1] && ! assign(line)[1]) {
+        table.insert(result, {key, value, line});
+      }
+    }
+  }
+  return result;
+}
+function findall(str){
+  // Used to look for %s=%s
+  var pattern = "%s*=%s*";
+  var result = {};
+  for( line in str->gmatch("[^\r\n]+") ) {
+    var key, value = line->match(pattern);
+    if( key && value ) {
+      table.insert(result, {key, value, line});
+    }
+  }
+  return result;
+}
+function revive(str){
+  for (i, v in pairs(dead)){
+    var index = "'DEADVALUESTRTYPECHECK-"..(i).."'"
+
+    // Go character by character and look for index
+    // I want to use ->gsub but that doesnt work for sum reason so I am using a 
+    // manual method
+    var ci = 1;
+    var csofar = "";
+    for (ii = 1, #str) {
+      var char = str->sub(ii, ii);
+      if (char == index->sub(ci, ci)) {
+        ci++;
+        csofar = csofar..char;
+        if (csofar == index) {
+          str = str->sub(1, ii - #index)..v..str->sub(ii + 1, #str)
+          break;
+        }
+      } else {
+        ci = 1;
+        csofar = "";
+      }
+    }
+  }
+  return str
+}
+function clean(str) {
+  // Takes in code and removes comments, strings.
+  // Remove strings and add it to "dead" table
+  var dead = {};
+  var i = 0;
+  ogstr = str;
+  if (!str["gsub"]) typerror("string.gsub is not a found function, Are you sure you provided a string?")
+  str = str->gsub("'[^']-'", function(match){
+    i++;
+    dead[i] = match;
+    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+  })->gsub('"[^"]-"', function(match){
+    i++;
+    dead[i] = match;
+    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+  })->gsub('%[%[.-%]%]', function(match){
+    i++;
+    dead[i] = match;
+    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+  });
+  return str->gsub('//.-\n', '\n')->gsub('/%*.-%*/', '\n'), dead;
+}
+
+// CHECKER
+typeof = type;
+function check(type, value, vname, knownValues, line) {
+  value, err = loadenv(knownValues, "return " .. value)
+  if (!value){
+    typerror("Check error: "..err, line)
+  }
+  xpcall(function(){
+    value = value();
+  }, function(err){
+    // Ignore and return true
+    return true;
+  })
+  if( types[type] ) {
+    if (types[type](value)) {
+      return true;
+    } else {
+      if (typeof(value) == "function") return true; // Ignore for now
+      typerror(core.error.strerror(111)->format(type, (tostring(typeof(value)).." (and it's descendents)"), vname), line);
+    }
+  } else {
+    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -types` to see all types");
+  }
+}
+
+// MAIN
+function typecheck(code){
+  cleanedCode, newdead = clean(code);
+  dead = newdead;
+  for (i, v in pairs(cleanedCode->split("\n"))){
+    cleanedCode = cleanedCode->split("\n")[i] || "";
+    var defs = deffind(cleanedCode);
+    var assigns = assign(cleanedCode);
+    var allassigns = allassign(cleanedCode);
+    var functions = findfunctions(cleanedCode);
+    var all = findall(cleanedCode);
+
+    var knownTypes = {};
+    var knownValues = {}; 
+    for( _, def in pairs(defs) ) {
+      check(def[2], def[3], def[1], knownValues, def[4])
+      value, err = loadenv(knownValues, "return " .. def[3])
+      if (!value){
+        typerror("Check error: "..err)
+      }
+      knownTypes[def[1]] = def[2];
+      xpcall(function(){
+        knownValues[def[1]] = value();
+      }, function(err){})
+      
+    }
+    for( _, allassign in pairs(allassigns) ) {
+      if (knownTypes[allassign[1]]) {
+        check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
+      }else if(!knownValues[allassign[1]]) {
+        knownValues[allassign[1]] = allassign[2];
+      }
+    }
+    for( _, assign in pairs(assigns) ) {
+      check(assign[2], assign[3], assign[1], knownValues, assign[4]);
+      knownValues[assign[1]] = assign[3];
+      knownTypes[assign[1]] = assign[2];
+    }
+  }
+  return true;
+}
+function all(){
+  // Prints all types
+  print("All valid checkable types:")
+  for (i, v in pairs(alltypes)) {
+    print("  "..v)
+  }
+}
+
+typechecker = {
+  "all": all,
+  "check": typecheck,
+  "clean": clean,
+  "revive": revive,
+}
+
+/*
+  Cobalt Language Extension.
+  This provides extensions to the standard Cobalt language. 
+*/
+
+/* EXTENDS:
+- f"{x}" = string.format("%s", x)
+- $table = pairs(table)
+- @table = ipairs(table)
+- x~y = _G.x = y, return y
+- removes comments
+- var [x, y, z] = tbl (x, y, z are the keys of tbl)
+*/
+
+/* TODO:
+- Fix the nested string bug
+- Strings that are optimized to be ", ' should not lose power
+*/
+
+/* SYSTEM:
+ This uses the typechecker's dead & alive system to 
+ kill all non syntax statements and will look for a 
+ f"x {string} {string2}" and replace it with string.format("x %s", string, string2).
+*/
+
+function gsub(str, pattern, replace){
+  // Raw GSUB function
+  var result = ""
+  var pattern_len = #pattern
+  var i = 1
+  while (i <= #str) {
+      if (str->sub(i, i + pattern_len - 1) == pattern) {
+          result = result .. replace
+          i = i + pattern_len
+        }else{
+          result = result .. str->sub(i, i)
+          i = i + 1
+        }
+    }
+  return result
+}
+
+function find(str, pattern, init){
+  init = init || 1
+  var pattern_len = #pattern
+  var i = init
+  while (i <= #str) {
+      if (str->sub(i, i + pattern_len - 1) == pattern) {
+          return i, i + pattern_len - 1
+      }
+      i = i + 1
+  }
+  return null
+}
+
+ext = function(str){
+  cleanedCode, dead = typechecker.clean(str)
+  
+  lines = cleanedCode->split("\n")
+
+
+  for (i, v in pairs(lines)){
+    vclean =  typechecker.revive(v, dead)
+    // Replace $table with pairs(table), and $$table with ipairs(table). Make sure the $$ doesnt render as $
+    for (match in vclean->gmatch("@[a-zA-Z0-9_]+")){
+      v = v->gsub(match, "ipairs("..(match->sub(2))..")")
+    }
+    for (match in vclean->gmatch("$[a-zA-Z0-9_]+")){
+      v = v->gsub(match, "pairs("..match->sub(2)..")")
+    }
+
+    // x~y (y is anything until whitespace (not inside a string)) will add to the start _G.x=y; and then will replace the x~y with x
+    for (match in v->gmatch("[a-zA-Z0-9_]+~[^%s]+")){
+      /*
+      v = "_G[\""..match->sub(1, match->find("~")-1).."\"] = "..match->sub(match->find("~")+1).."; "..v
+    
+      // replace match with the first part of the match. But do not use gsub
+      v = gsub(v, match, match->sub(1, match->find("~")-1))
+      */
+      arg1 = match->sub(1, match->find("~")-1)
+      arg2 = match->sub(match->find("~")+1)
+      v = gsub(v, match, "global(\""..arg1.."\", "..arg2..")")
+    }
+
+    // table [x, y, z] = tbl
+    /*
+    for (match in v->gmatch("([a-zA-Z0-9_]+)%s*%[(.-)%]%s*=")){
+      print(v)
+      // replace the match with the first part of the match
+      v = gsub(v, match, match->sub(1, find(match, "[")-1))
+      // replace the match with the table.insert(tbl, x, y, z)
+      v = gsub(v, match, "table.insert("..match->sub(find(match, "=")+1)..", "..match->sub(find(match, "[")+1, find(match, "]")-1)..")")
+    }
+    */
+
+    for (match in v->gmatch("f'(.-)'")){
+      // replace the f'{}' with string.format("{}", ...)
+      v = typechecker.revive(v->gsub("f'(.-)'", "string.format('"..match.."'"), dead)
+      // find all {} in the string
+      for (it in v->gmatch("{(.-)}")){
+        // For each {} add a , and the value
+        v = v..", "..it
+        // also replace the {} with %s
+        v = v->gsub("{(.-)}", "%%s")
+      }
+
+      // add the closing bracket
+      v = v..")"
+    }
+
+    for (match in v->gmatch("f[[(.*)]]")){
+      print("\27[1;31mPreprocessor error:\27[0m")
+      print("\27[1;31mError with the 'f[[' preprocessor command.\27[0m\n\n")
+      if (errorin) {
+          print("\27[1;31mMultiline formatted strings are not supported.\27[0m\n\n")
+      }
+      print("\27[1;31mStopping preprocessor.\27[0m")
+      os.exit()
+    }
+
+    lines[i] = typechecker.revive(v)
+  }
+
+
+  return table.concat(lines,"\n")
+}
 
 function process(str, itemtype, out, outfile, ...){
     // 0: Init
@@ -309,7 +859,7 @@ function process(str, itemtype, out, outfile, ...){
                     return
                 }
             },
-            "#line": function(){
+            "##line": function(){
                 // Example:
                 // #line 1 "file.cobalt"
                 // Will add everything after that line in that file to the newlines[i] table
@@ -357,7 +907,7 @@ function process(str, itemtype, out, outfile, ...){
                 split = null
                 file, line = null
             },
-            "#include": function(){
+            "##include": function(){
                 warn("Using #include is not recommended, Use import() instead")
 
                 var file = v[2]->gsub("#include \"", "")

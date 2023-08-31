@@ -6,6 +6,7 @@
 // The preprocessor replaces preprocessor directives with
 // cobalt code depending on system and other factors
 
+// Not used directly, rather compiled to C and included in source.
 
 // INIT
 filesystem = file // File library for cobalt

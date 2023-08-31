@@ -1,4 +1,8 @@
 # Tool for installing cobalt Binaries to the system
+
+# Removed because libraries have been rewritten in C and installation is now done in CMake
+
+""""
 import os
 import sys
 
@@ -111,7 +115,7 @@ for item in os.listdir(scriptPath + "/cobalt23/src/"):
         
 # Create library path
 print("[*] \033[32mCreating library path\033[0m")
-"""C Refrence:
+""C Refrence:
 // VDIR is "cobalt"
 
 // Unix
@@ -124,7 +128,7 @@ print("[*] \033[32mCreating library path\033[0m")
 #define LUA_LDIR	"!\\lua\\"
 #define LUA_CDIR	"!\\"
 #define LUA_SHRDIR	"!\\..\\share\\lua\\" LUA_VDIR "\\"
-"""
+""
 
 if sys.platform == "win32":
     print("[*] \033[32mRunning windows operations...\033[0m")
@@ -199,3 +203,4 @@ for item in os.listdir(scriptPath + "/cobalt23/lib"):
         # Make sure it is a cobalt file
         if item.endswith(".cobalt"):
             os.system("cp " + scriptPath + "/cobalt23/lib/" + item + " " + LDIR + item)
+"""

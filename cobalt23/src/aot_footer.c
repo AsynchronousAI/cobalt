@@ -12,8 +12,11 @@ void bind_magic(Proto *f)
         bind_magic(f->p[i]);
     }
 }
+#ifndef EXTERNAL
+#define EXTERNAL /* nothing */
+#endif
 
-int AOT_LUAOPEN_NAME(lua_State *L) {
+EXTERNAL int AOT_LUAOPEN_NAME(lua_State *L) {
 
     int ok = luaL_loadstring(L, AOT_MODULE_SOURCE_CODE);
     switch (ok) {

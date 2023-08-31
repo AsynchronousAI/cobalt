@@ -18,6 +18,9 @@
 LUAMOD_API int (luaopen_base) (lua_State *L);
 LUAMOD_API int (luaopen_under) (lua_State *L);
 
+#define LUA_PREPROCESSORNAME	"preprocess"
+LUAMOD_API int (luaopen_preprocess) (lua_State *L);
+
 #define LUA_ASYNCLIBNAME	"async"
 LUAMOD_API int (luaopen_async) (lua_State *L);
 

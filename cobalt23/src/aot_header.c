@@ -6,6 +6,7 @@
 // functions that are already exported by liblua.a
 #define AOT_IS_MODULE 1
 #include "lvm.c"
+#include "lualib.h"
 
 //
 // These operations normally use `pc++` to skip metamethod calls in the

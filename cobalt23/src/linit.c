@@ -81,6 +81,9 @@ static const luaL_Reg preloadedlibs[] = {
   {LUA_WINNAME, luaopen_win},
   #endif
 
+  /* Cobalt AOT */
+  {LUA_PREPROCESSORNAME, luaopen_preprocess},
+
   /* C API */
   {LUA_STRUCTNAME, luaopen_struct},
   {LUA_COLORLIBNAME, luaopen_color},

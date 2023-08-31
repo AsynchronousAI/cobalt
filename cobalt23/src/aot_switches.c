@@ -678,7 +678,7 @@ void create_function(Proto *f)
                 println_goto_ret(); // (!)
                 println("        }");
                 println("        ci->func -= delta;  /* restore 'func' (if vararg) */");
-                println("        luaD_pretailcall(L, ci, ra, b);  /* prepare call frame */");
+                println("        luaD_pretailcall(L, ci, ra, b, 0);  /* prepare call frame */");
                 println("        return ci;");
                 // FALLTHROUGH
                 break;

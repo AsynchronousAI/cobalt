@@ -13,6 +13,13 @@ option(INSTALL "Install Cobalt" ON)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w -O3")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")
 # Based on the SDL and FFI variable provide them as Flags
+if (CROSS)
+    message("-- Configuring Crossplatform CPU Build")
+else()
+    message("-- Configuring Native CPU Build")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+endif()
+
 if(FFI)
     message("-- Configuring FFI Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI")

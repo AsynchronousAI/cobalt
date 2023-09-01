@@ -22,10 +22,10 @@ endif()
 
 if (NOOPT)
     message("-- Configuring No Optimization Build")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 else()
     message("-- Configuring Optimized Build")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -flto")
 endif()
 
 

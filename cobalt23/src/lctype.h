@@ -94,6 +94,8 @@ LUAI_DDEC(const lu_byte luai_ctype_[UCHAR_MAX + 2];)
 #define lisspace(c)	(isspace(c))
 #define lisprint(c)	(isprint(c))
 #define lisxdigit(c)	(isxdigit(c))
+#define lisbdigit(c)	((c) == '0' || (c) == '1')
+#define lisodigit(c)	((c) >= '0' && (c) <= '7')
 
 #define ltolower(c)	(tolower(c))
 

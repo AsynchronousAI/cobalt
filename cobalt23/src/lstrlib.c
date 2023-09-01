@@ -424,6 +424,9 @@ static const char *classend (MatchState *ms, const char *p) {
 }
 
 
+#define isbdigit(c)	((c) == '0' || (c) == '1')
+#define isodigit(c)	((c) >= '0' && (c) <= '7')
+
 static int match_class (int c, int cl) {
   int res;
   switch (tolower(cl)) {
@@ -437,6 +440,8 @@ static int match_class (int c, int cl) {
     case 'u' : res = isupper(c); break;
     case 'w' : res = isalnum(c); break;
     case 'x' : res = isxdigit(c); break;
+    case 'b': res = isbdigit(c); break;
+    case 'o': res = isodigit(c); break;
     case 'z' : res = (c == 0); break;  /* deprecated option */
     default: return (cl == c);
   }
@@ -1304,7 +1309,10 @@ static int str_format (lua_State *L) {
         case 'u':
           flags = L_FMTFLAGSU;
           goto intcase;
-        case 'o': case 'x': case 'X':
+        case 'b': case 'B': /* binary */
+          flags = L_FMTFLAGSI "01";
+          goto intcase;
+        case 'o': case 'O': case 'x': case 'X':
           flags = L_FMTFLAGSX;
          intcase: {
           lua_Integer n = luaL_checkinteger(L, arg);

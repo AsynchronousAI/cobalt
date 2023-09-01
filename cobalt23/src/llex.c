@@ -351,6 +351,17 @@ static int gethexa (LexState *ls) {
   esccheck (ls, lisxdigit(ls->current), "hexadecimal digit expected");
   return luaO_hexavalue(ls->current);
 }
+static int getbin (LexState *ls) {
+  save_and_next(ls);
+  esccheck (ls, lisbdigit(ls->current), "binary digit expected");
+  return ls->current - '0';
+}
+static int getoct (LexState *ls) {
+  save_and_next(ls);
+  esccheck (ls, lisodigit(ls->current), "octal digit expected");
+  return ls->current - '0';
+}
+
 
 
 static int readhexaesc (LexState *ls) {
@@ -360,6 +371,21 @@ static int readhexaesc (LexState *ls) {
   return r;
 }
 
+
+static int readbinaesc (LexState *ls) {
+  int r = getbin(ls);
+  r = (r << 4) + getbin(ls);
+  luaZ_buffremove(ls->buff, 2);  /* remove saved chars from buffer */
+  return r;
+}
+
+
+static int readoctaesc (LexState *ls) {
+  int r = getoct(ls);
+  r = (r << 4) + getoct(ls);
+  luaZ_buffremove(ls->buff, 2);  /* remove saved chars from buffer */
+  return r;
+}
 
 static unsigned long readutf8esc (LexState *ls) {
   unsigned long r;
@@ -423,6 +449,8 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
           case 't': c = '\t'; goto read_save;
           case 'v': c = '\v'; goto read_save;
           case 'x': c = readhexaesc(ls); goto read_save;
+          case 'B': c = readbinaesc(ls); goto read_save;
+          case 'o': c = readoctaesc(ls); goto read_save;
           case 'u': utf8esc(ls);  goto no_save;
           case '\n': case '\r':
             inclinenumber(ls); c = '\n'; goto only_save;

@@ -16,6 +16,10 @@
 		"general": {
 			"patterns": [
 				{
+					"match": "::",
+					"name": "punctuation.separator.key-value.json"
+				},
+				{
 					"include": "#line-comment"
 				},
 				{
@@ -299,7 +303,7 @@
 		},
 		"table-function-name": {
 			"name": "meta.function.lua",
-			"begin": "\\b(function)\\s+(([_[:alpha:]][_[:alnum:]]*(?:\\.[_[:alpha:]][_[:alnum:]]*)*)(?:(\\.)([_[:alpha:]][_[:alnum:]]*)|(:)([_[:alpha:]][_[:alnum:]]*)))(?=\\()",
+			"begin": "\\b(function)\\s+(([_[:alpha:]][_[:alnum:]]*(?:(?::|\\.)[_[:alpha:]][_[:alnum:]]*)*)(?:(\\.)([_[:alpha:]][_[:alnum:]]*)|(:{1,2})([_[:alpha:]][_[:alnum:]]*)))(?=\\()",
 			"beginCaptures": {
 				"1": {
 					"name": "storage.type.function.property.lua"

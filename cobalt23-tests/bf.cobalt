@@ -1,3 +1,8 @@
+/* 
+Brainfuck interpreter, compatible with minicobalt.
+*/
+
+
 function cleanbf(bf){
     // Remove all none:
     /*
@@ -63,3 +68,5 @@ function interpret(bf) {
         ++i    ;
     }
 }
+
+interpret("++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.")

@@ -1,8 +1,7 @@
-/*
-** $Id: lualib.h,v 1.45.1.1 2017/04/19 17:20:42 roberto Exp $
-** Lua standard libraries
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 
 #ifndef lualib_h

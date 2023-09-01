@@ -1,3 +1,7 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define l2Dlib_c
 #define LUA_LIB

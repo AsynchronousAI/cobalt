@@ -1,6 +1,7 @@
-//
-// Most of what we need is copied verbatim from lvm.c
-//
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 // Get access to static" functions from lvm.c, but be careful to not re-define the
 // functions that are already exported by liblua.a

@@ -1,6 +1,7 @@
-// cobalt.hpp
-// Lua header files for C++
-// <<extern "C">> not supplied automatically because Lua also compiles as C++
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 extern "C" {
 #include "cobalt.h"

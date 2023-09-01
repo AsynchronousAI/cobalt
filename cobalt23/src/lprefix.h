@@ -1,8 +1,7 @@
-/*
-** $Id: lprefix.h $
-** Definitions for Lua code that must come before any other header file
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #ifndef lprefix_h
 #define lprefix_h

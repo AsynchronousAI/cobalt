@@ -1,8 +1,9 @@
-/*
-Taken from ljsJIT/luaJIT's miniljs/minilua. This is a compressed
-version of the interpreter. This is not based on lua 5.4 but
-5.1 instead.
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
+
 #ifdef _MSC_VER
 typedef unsigned __int64 U64;
 #else

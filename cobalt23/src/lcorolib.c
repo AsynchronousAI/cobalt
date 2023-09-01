@@ -1,4 +1,7 @@
-// This file included coroutines and async source code. 
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 /* COROUTINE: */
 #define lcorolib_c

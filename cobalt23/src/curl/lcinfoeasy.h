@@ -1,3 +1,8 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 OPT_ENTRY( effective_url,           EFFECTIVE_URL,           STR, 0)
 OPT_ENTRY( response_code,           RESPONSE_CODE,           LNG, 0)
 OPT_ENTRY( http_connectcode,        HTTP_CONNECTCODE,        LNG, 0)

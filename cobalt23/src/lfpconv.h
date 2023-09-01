@@ -1,9 +1,8 @@
-/* Lua CJSON floating point conversion routines */
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
-/* Buffer required to store the largest string representation of a double.
- *
- * Longest double printed with %.14g is 21 characters long:
- * -1.7976931348623e+308 */
 # define FPCONV_G_FMT_BUFSIZE   32
 
 #ifdef USE_INTERNAL_FPCONV

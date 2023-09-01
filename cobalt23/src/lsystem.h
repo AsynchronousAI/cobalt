@@ -1,16 +1,9 @@
-  
-/// Provide a simple interface to get the following information:
-  // CPU Name
-  // GPU Name
-  // RAM Size
-  // RAM Speed
-  // RAM Usage
-  // CPU Usage
-  // GPU Usage
-/// Used in device.info() and io
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
-// Path: src/system.c
-// @AsynchronousAI - 2023
+
 
 #include <stdio.h>
 #include <stdlib.h>

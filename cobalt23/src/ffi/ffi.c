@@ -1,11 +1,8 @@
-/* vim: ts=4 sw=4 sts=4 et tw=78
- * Portions copyright (c) 2015-present, Facebook, Inc. All rights reserved.
- * Portions copyright (c) 2011 James R. McKaskill.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 #include "ffi.h"
 #include <math.h>
 #include <inttypes.h>

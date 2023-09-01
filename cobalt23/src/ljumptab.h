@@ -1,8 +1,7 @@
-/*
-** $Id: ljumptab.h $
-** Jump Table for the Lua interpreter
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 
 #undef vmdispatch

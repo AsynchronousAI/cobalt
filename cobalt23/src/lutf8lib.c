@@ -1,8 +1,7 @@
-/*
-* lutf8lib.c
-* Standard utf8
-* Read copyright notice at cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 
 #define lutf8lib_c

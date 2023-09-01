@@ -1,8 +1,7 @@
-/*
-** $Id: lmathlib.c $
-** Standard mathematical library
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define lmathlib_c
 #define LUA_LIB

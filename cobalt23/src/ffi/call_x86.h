@@ -1,9 +1,7 @@
-/*
-** This file has been pre-processed with DynASM.
-** http://luajit.org/dynasm.html
-** DynASM version 1.3.0, DynASM x86 version 1.3.0
-** DO NOT EDIT! The original file is in "call_x86.dasc".
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #if DASM_VERSION != 2300
 #error "Version mismatch between DynASM and included encoding engine"

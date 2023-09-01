@@ -1,4 +1,9 @@
-/* Bitmasks for CURLOPT_HTTPAUTH and CURLOPT_PROXYAUTH options */
+
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 FLG_ENTRY(AUTH_NONE                       )
 FLG_ENTRY(AUTH_BASIC                      )
 FLG_ENTRY(AUTH_DIGEST                     )

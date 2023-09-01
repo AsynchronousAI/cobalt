@@ -1,10 +1,7 @@
-//
-// The compiler part of the compiler
-// ---------------------------------
-// Based on lvm.c with the following changes:
-//   - Constants are put into macros (AOT_PC, AOT_NEXT_JUMP, etc)
-//   - Jumps go into a trampoline
-//
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 static
 void println_goto_ret()

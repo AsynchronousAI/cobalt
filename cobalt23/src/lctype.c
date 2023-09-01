@@ -1,8 +1,7 @@
-/*
-** $Id: lctype.c $
-** 'ctype' functions for Lua
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define lctype_c
 #define LUA_CORE

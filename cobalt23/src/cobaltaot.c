@@ -1,6 +1,7 @@
-/*
- * Cobalt bytecode-to-C compiler
- */
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 // This luac-derived code is incompatible with lua_assert because it calls the
 // GETARG macros even for opcodes where it is not appropriate to do so.

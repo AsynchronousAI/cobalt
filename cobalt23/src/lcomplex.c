@@ -1,10 +1,7 @@
-/*
-* lcomplex.c
-* C99 complex nummbers for Lua
-* Luiz Henrique de Figueiredo <lhf@tecgraf.puc-rio.br>
-* 02 Nov 2009 23:15:43
-* This code is hereby placed in the public domain.
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #include <complex.h>
 #define Complex	double complex

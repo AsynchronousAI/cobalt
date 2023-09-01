@@ -1,8 +1,7 @@
-/*
-** $Id: lobject.c $
-** Some generic functions over Lua objects
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define lobject_c
 #define LUA_CORE

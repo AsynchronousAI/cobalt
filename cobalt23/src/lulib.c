@@ -1,9 +1,7 @@
-/*
-* lulib.c
-* @AsynchronousAI
-* Hidden standard Cobalt
-* accessed using `_item` in Cobalt
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define lulib_c
 #define LUA_LIB

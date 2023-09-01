@@ -1,12 +1,7 @@
-/*
-** LuaFileSystem
-** File system manipulation library
-**
-** Copyright (C) 2003-2010 Kepler Project.
-** Copyright (C) 2010-2022 The LuaFileSystem authors.
-** (http://lunarmodules.github.io/luafilesystem)
-** Rewritten by AsynchronousAI
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 /* Define 'chdir' for systems that do not implement it */
 #ifdef NO_CHDIR

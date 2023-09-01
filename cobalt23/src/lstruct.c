@@ -1,29 +1,7 @@
-/*
-** {======================================================
-** Library for packing/unpacking structures.
-** $Id: struct.c,v 1.4 2012/07/04 18:54:29 roberto Exp $
-** See Copyright Notice at the end of this file
-** =======================================================
-*/
-/*
-** Valid formats:
-** > - big endian
-** < - little endian
-** ![num] - alignment
-** x - pading
-** b/B - signed/unsigned byte
-** h/H - signed/unsigned short
-** l/L - signed/unsigned long
-** T   - size_t
-** i/In - signed/unsigned integer with size `n' (default is size of int)
-** cn - sequence of `n' chars (from/to a string); when packing, n==0 means
-        the whole string; when unpacking, n==0 means use the previous
-        read number as the string length
-** s - zero-terminated string
-** f - float
-** d - double
-** ' ' - ignored
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 
 #include <assert.h>

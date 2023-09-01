@@ -1,8 +1,7 @@
-/*
-* linit.c
-* Initialize libraries for Cobalt
-* Read copyright notice at cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 
 #define linit_c
@@ -33,7 +32,6 @@
 
 #include "lualib.h"
 #include "lauxlib.h"
-#include "llink.c"
 
 /*
 ** these libs are loaded by cobalt.c and are readily available to any Lua

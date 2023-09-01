@@ -1,7 +1,7 @@
-/* Before version 7.17.0, strings were not copied.
-   Instead the user was forced keep them available
-   until libcurl no longer needed them.
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #ifndef LCURL_STORE_STRING
 #  if LCURL_CURL_VER_GE(7,17,0)

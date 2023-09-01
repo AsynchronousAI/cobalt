@@ -1,8 +1,7 @@
-/*
-** $Id: ldblib.c $
-** Interface from Lua to its debug API
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define ldblib_c
 #define LUA_LIB

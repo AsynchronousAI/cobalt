@@ -1,8 +1,7 @@
-/*
-* cobalt.h
-* main handler for Cobalt
-* Read copyright notice in the bottom of the file
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read the bottom of this file for license information                  //
+// ============================================================================== */
 
 
 #ifndef lua_h

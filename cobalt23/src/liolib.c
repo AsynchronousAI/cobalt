@@ -1,8 +1,7 @@
-/*
-** $Id: liolib.c $
-** Standard I/O (and system) library
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define liolib_c
 #define LUA_LIB

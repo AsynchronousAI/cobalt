@@ -1,18 +1,7 @@
-/*
-* lcore.c
-* @AsynchronousAI
-* Interfaces to the system core and language core. Includes the following:
-** core
-** core.log
-** win
-** unix
-** core.memory
-** core.error
-** alloc
-** and the Pool Allocator.
-
-* Read copyright notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 /* TODO:
 - expand windows

@@ -1,8 +1,7 @@
-/*
-** $Id: ldo.h $
-** Stack and Call structure of Lua
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #ifndef ldo_h
 #define ldo_h

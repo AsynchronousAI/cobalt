@@ -1,4 +1,7 @@
-/* ltrace.h -- automatically extracted from cobalt.h (5.4) */
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #ifdef __LCC__
 #define __FUNCTION__ __func__

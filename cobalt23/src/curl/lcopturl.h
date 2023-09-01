@@ -1,3 +1,8 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 ENTRY_PART(fragment,      UPART_FRAGMENT , CURLUE_NO_FRAGMENT     )
 ENTRY_PART(host,          UPART_HOST     , CURLUE_NO_HOST         )
 ENTRY_PART(options,       UPART_OPTIONS  , CURLUE_NO_OPTIONS      )

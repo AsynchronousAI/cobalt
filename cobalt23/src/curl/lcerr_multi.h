@@ -1,3 +1,8 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 ERR_ENTRY ( OK                 )
 ERR_ENTRY ( CALL_MULTI_PERFORM )
 ERR_ENTRY ( BAD_HANDLE         )

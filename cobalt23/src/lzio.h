@@ -1,8 +1,7 @@
-/*
-* lzio.h
-* input/output from/to Lua files
-* Read copyright notice at cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 
 #ifndef lzio_h

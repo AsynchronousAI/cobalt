@@ -1,8 +1,7 @@
-/*
-** $Id: lopnames.h $
-** Opcode names
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #if !defined(lopnames_h)
 #define lopnames_h

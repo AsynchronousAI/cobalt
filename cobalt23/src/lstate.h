@@ -1,8 +1,7 @@
-/*
-** $Id: lstate.h $
-** Global State
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #ifndef lstate_h
 #define lstate_h

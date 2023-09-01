@@ -1,3 +1,8 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 #ifndef OPT_ENTRY
 #  define OPT_ENTRY(a,b,c,d)
 #  define OPT_ENTRY_IS_NULL

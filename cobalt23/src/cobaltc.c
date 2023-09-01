@@ -1,9 +1,7 @@
-/*
-* cobaltc.c
-* @AsynchronousAI
-* cobalt bytecoder
-* Read copyright notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 
 #define luac_c

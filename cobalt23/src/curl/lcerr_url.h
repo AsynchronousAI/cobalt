@@ -1,3 +1,8 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 #if LCURL_CURL_VER_GE(7,61,0)
 ERR_ENTRY ( BAD_HANDLE        )
 ERR_ENTRY ( BAD_PARTPOINTER   )

@@ -1,8 +1,7 @@
-/*
-** $Id: lstrlib.c $
-** Standard library for string operations and pattern-matching
-** See Copyright Notice in cobalt.h
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define lstrlib_c
 #define LUA_LIB

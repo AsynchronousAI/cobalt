@@ -230,7 +230,6 @@ typedef StackValue *StkId;
 #define ttisfalse(o)		checktag((o), LUA_VFALSE)
 #define ttistrue(o)		checktag((o), LUA_VTRUE)
 
-
 #define l_isfalse(o)	(ttisfalse(o) || ttisnil(o))
 
 

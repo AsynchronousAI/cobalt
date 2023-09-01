@@ -1,3 +1,7 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 OPT_ENTRY(pipelining,                  PIPELINING,                    LNG,     0 )
 OPT_ENTRY(maxconnects,                 MAXCONNECTS,                   LNG,     0 )

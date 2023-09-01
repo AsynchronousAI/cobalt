@@ -1,6 +1,7 @@
-//
-// Most of what we need is copied verbatim from lvm.c
-//
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #include "lvm.c"
 

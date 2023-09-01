@@ -1,12 +1,7 @@
-/*
-** $Id: loadlib.c $
-** Dynamic library loader for Lua
-** See Copyright Notice in cobalt.h
-**
-** This module contains an implementation of loadlib for Unix systems
-** that have dlfcn, an implementation for Windows, and a stub for other
-** systems.
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #define loadlib_c
 #define LUA_LIB

@@ -1,8 +1,7 @@
-/*
-** DynASM encoding engine prototypes.
-** Copyright (C) 2005-2020 Mike Pall. All rights reserved.
-** Released under the MIT license. See dynasm.cobalt for full copyright notice.
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #ifndef _DASM_PROTO_H
 #define _DASM_PROTO_H

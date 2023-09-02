@@ -360,6 +360,16 @@ types = {
     // Check if item is null
     return type(item) == "null"
   },
+  "void": function(item){
+    // Check if item is void, which is no
+    s = 0
+    xpcall(function(){
+      type(item)// should error
+    }, function(){
+      s = 1
+    })
+    if (s) return true
+  },
   "char": function(item){
     // Check if the item is a string and 1 character long
     return type(item) == "string" && #item == 1;
@@ -517,12 +527,24 @@ function typecheck(src){
 
   for (i, v in pairs(lines)){
     v = clean(v)
-    var typedvars /* var %s: %s = %s*/ = string.gmatch(v, "var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$")
     var typedsets /* %s: %s = %s */ = string.gmatch(v, "([a-zA-Z0-9_]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$")
     var returnfunc /* function %s(%s, %s, %s): %s */ = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
     var argfunc /* function %s(%s: %s, %s: %s, %s: %s) */ = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
     var bothfunc /* function %s(%s: %s, %s: %s, %s: %s): %s */ = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
-    /* Unfinished, lpreprocess.c (this AOT compiled) is older and uses another method */
+      
+      /* need to fix function regex */
+    for (i, v in (typedsets)){
+      print(i, v,1)
+    }
+    for (i, v in (returnfunc)){
+      print(i, v,2)
+    }
+    for (i, v in (argfunc)){
+      print(i, v,3)
+    }
+    for (i, v in (bothfunc)){
+      print(i, v,4)
+    }
   }
 }
 typechecker = {
@@ -624,6 +646,9 @@ ext = function(str){
       v = v->gsub(match, "pairs("..match->sub(2)..")")
     }
     for (match in vclean->gmatch("&[a-zA-Z0-9_]+")){
+      // check that the character before this match is not another &
+      if (v->sub(find(v, match)-1, find(v, match)-1) == "&") continue
+      
       v = v->gsub(match, "table.unpack("..match->sub(2)..")")
     }
 

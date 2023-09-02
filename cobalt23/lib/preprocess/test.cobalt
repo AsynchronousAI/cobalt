@@ -1,5 +1,7 @@
 var z: number = "Rug roh raggy!"
 
-function x(){
-    
+function bar(x: number, y: string, z: boolean): void {
+
 }
+
+print(1&&1)

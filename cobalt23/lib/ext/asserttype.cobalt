@@ -1,6 +1,0 @@
-var function asserttype(x, t) {
-	var xt = type(x);
-	assert(xt == t, "expected "..t.." found "..xt);
-	return x;
-}
-return asserttype;

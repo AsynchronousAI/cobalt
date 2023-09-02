@@ -9,7 +9,7 @@ TODO rename to 'ops'?
 // test if we hae lua 5.3 bitwise operators
 // orrr I could just try each op and bail out on error
 // and honestly I should be defaulting to the 'bit' library anyways, esp in the case of luajit where it is translated to an asm opcode
-var lua53 = _VERSION >= 'Lua 5.3';
+var lua53 = _.VERSION >= 'Lua 5.3';
 
 var symbolscode = [=[
 

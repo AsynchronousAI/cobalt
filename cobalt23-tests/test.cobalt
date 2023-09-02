@@ -11,7 +11,7 @@ var function default_tags() {
   var tags = {};
   
   // Lua version and features
-  tags.lua = tonumber(_VERSION->match("%d+%.%d+"));
+  tags.lua = tonumber(_.VERSION->match("%d+%.%d+"));
   if( table.pack ) {
     tags["compat5.2"] = true;
   }

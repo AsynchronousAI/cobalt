@@ -21,7 +21,7 @@ function os.path(str) {
 }
 
 // 5.2 os.execute compat
-if( _VERSION == 'Lua 5.1' ) {
+if( _.VERSION == 'Lua 5.1' ) {
 	var execute = os.execute;
 	function os.execute(cmd) {
 		var results = table.pack(execute(cmd));

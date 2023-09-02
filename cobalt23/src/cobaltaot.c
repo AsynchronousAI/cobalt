@@ -35,6 +35,8 @@ static char *output_filename = NULL;
 static char *provided_input_filename = NULL;
 static char *module_name     = NULL;
 
+int aotswitches = 0;
+
 static FILE * output_file = NULL;
 static int nfunctions = 0;
 static TString **tmname;
@@ -42,7 +44,7 @@ static TString **tmname;
 static
 void usage()
 {
-    fprintf(stderr, "usage: %s [options] [filename]\nAvailable options are:\n  -o name  output to file 'name'\n  -p       do not run the preprocessor on the input\n  -i name  preprocess to file 'name'\n  -m name  generate code with `name` function as main function\n", program_name);
+    fprintf(stderr, "usage: %s [options] [filename]\nAvailable options are:\n  -o name  output to file 'name'\n  -p       do not run the preprocessor on the input\n  -i name  preprocess to file 'name'\n  -m name  generate code with `name` function as main function\n  -s       use switches instead of gotos in generated code\n  -D name  provide name to the preprocessor\n", program_name);
 }
 
 static
@@ -111,6 +113,10 @@ static void doargs(int argc, char **argv)
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -i"); }
                 provided_input_filename = argv[i];
+            } else if (0 == strcmp(arg, "-D")) {
+                fatal("inputting preprocessor definitions not supported yet. use cobaltpre to input preprocessor definitions.");
+            } else if (0 == strcmp(arg, "-s")) {
+                aotswitches = 1;
             } else {
                 fprintf(stderr, "unknown option %s\n", arg);
                 exit(1);
@@ -191,11 +197,11 @@ int main(int argc, char **argv)
     output_file = fopen(output_filename, "w");
     if (output_file == NULL) { fatal_error(strerror(errno)); }
 
-    #if defined(AOT_USE_GOTOS)
-    println("#include \"aot_header.c\"");
-    #elif defined(AOT_USE_SWITCHES)
-    println("#include \"trampoline_header.c\"");
-    #endif
+    if (aotswitches) {
+        println("#include \"trampoline_header.c\"");
+    }else{
+        println("#include \"aot_header.c\"");
+    }
     printnl();
     print_functions(proto);
     printnl();
@@ -203,11 +209,11 @@ int main(int argc, char **argv)
     printnl();
     println("#define AOT_LUAOPEN_NAME %s", module_name);
     printnl();
-    #if defined(AOT_USE_GOTOS)
+    if (!aotswitches) {
     println("#include \"aot_footer.c\"");
-    #elif defined(AOT_USE_SWITCHES)
+    }else{
     println("#include \"trampoline_footer.c\"");
-    #endif
+    }
 
 }
 
@@ -731,19 +737,18 @@ void aot_PrintOpcodeComment(Proto *f, int pc)
     print("\n");
 }
 
-#if defined(AOT_USE_GOTOS)
 #include "aot_gotos.c"
-#elif defined(AOT_USE_SWITCHES)
 #include "aot_switches.c"
-#else
-#error "Must define AOT_USE_GOTOS or AOT_USE_SWITCHES"
-#endif
 
 static
 void create_functions(Proto *p)
 {
     // aot_footer.c should use the same traversal order as this.
-    create_function(p);
+    if (aotswitches == 0){
+        create_function(p);
+    }else{
+        create_function_switches(p);
+    }
     for (int i = 0; i < p->sizep; i++) {
         create_functions(p->p[i]);
     }

@@ -71,6 +71,7 @@ static void usage(const char* message)
   "  -s       strip debug information\n"
   "  -v       show version information\n"
   "  -i       preprocess file\n"
+  "  -D name  provide name to the preprocessor\n"
   "  --       stop handling options\n"
   "  -        stop handling options and process stdin\n"
   ,progname,Output);
@@ -111,6 +112,10 @@ static int doargs(int argc, char* argv[])
    if (process==NULL || *process==0 || (*process=='-' && process[1]!=0))
     usage("'-i' needs argument");
    if (IS("-")) process=NULL;
+  }
+  else if (IS("-D"))
+  {
+	fatal("inputting preprocessor definitions not supported yet. use cobaltpre to input preprocessor definitions.");
   }
   else if (IS("-r"))			/* parse only */
    dumping=0;

@@ -4,7 +4,7 @@
 // ============================================================================== */
 
 static
-void println_goto_ret()
+void println_goto_ret_s()
 {
     // This is the piece of code that is after the "ret" label.
     // It should be used in the places that do "goto ret;"
@@ -17,7 +17,7 @@ void println_goto_ret()
 }
 
 static
-void create_function(Proto *f)
+void create_function_switches(Proto *f)
 {
     int func_id = nfunctions++;
 
@@ -672,7 +672,7 @@ void create_function(Proto *f)
                 println("          ci->func -= delta;  /* restore 'func' (if vararg) */");
                 println("          luaD_poscall(L, ci, cast_int(L->top - ra));  /* finish caller */");
                 println("          updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
-                println_goto_ret(); // (!)
+                println_goto_ret_s(); // (!)
                 println("        }");
                 println("        ci->func -= delta;  /* restore 'func' (if vararg) */");
                 println("        luaD_pretailcall(L, ci, ra, b, 0);  /* prepare call frame */");
@@ -698,7 +698,7 @@ void create_function(Proto *f)
                 println("        L->top = ra + n;  /* set call for 'luaD_poscall' */");
                 println("        luaD_poscall(L, ci, n);");
                 println("        updatetrap(ci);  /* 'luaD_poscall' can change hooks */");
-                println_goto_ret(); // (!)
+                println_goto_ret_s(); // (!)
                 // FALLTHROUGH
                 break;
             }
@@ -716,7 +716,7 @@ void create_function(Proto *f)
                 println("          for (nres = ci->nresults; l_unlikely(nres > 0); nres--)");
                 println("            setnilvalue(s2v(L->top++));  /* all results are nil */");
                 println("        }");
-                println_goto_ret(); // (!)
+                println_goto_ret_s(); // (!)
                 // FALLTHROUGH
                 break;
             }
@@ -739,7 +739,7 @@ void create_function(Proto *f)
                 println("              setnilvalue(s2v(L->top++));");
                 println("          }");
                 println("        }");
-                println_goto_ret(); // (!)
+                println_goto_ret_s(); // (!)
                 // FALLTHROUGH
                 break;
             }

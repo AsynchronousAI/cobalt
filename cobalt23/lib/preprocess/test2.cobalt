@@ -3,13 +3,15 @@
 
 print("Debug mode is on")
 var PI = 3.1415926535898
-var x: int = 5
+x: int = 5
 var y = string.format("Hello %s" , x)
 var iterator = pairs(x) 
-var iterator = ipairs(x) 
+iterator = ipairs(x) 
 if ( _.global("x", math.random(1,10)) > 10){ 
     print(x, "is greater than 10")
 }else{
     print(x, "is less than 10")
 }
 var x = "Hello, world!"
+var tbl = {1,2,3,4,5,6,7,8,9,10}
+print(table.unpack(tbl))

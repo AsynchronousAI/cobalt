@@ -52,7 +52,7 @@ set(LUA_LIB_SRCS
     "src/linit.c"
 
     # AOT Cobalt compiled
-    "src/lib/preprocess.c"
+    "src/lpreprocess.c"
 )
 
 

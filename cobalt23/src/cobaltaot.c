@@ -32,6 +32,7 @@
 static const char *program_name    = "cobaltaot";
 static char *input_filename  = NULL;
 static char *output_filename = NULL;
+static char *provided_input_filename = NULL;
 static char *module_name     = NULL;
 
 static FILE * output_file = NULL;
@@ -41,7 +42,7 @@ static TString **tmname;
 static
 void usage()
 {
-    fprintf(stderr, "usage: %s [options] [filename]\nAvailable options are:\n  -o name  output to file 'name'\n  -p       do not run the preprocessor on the input\n", program_name);
+    fprintf(stderr, "usage: %s [options] [filename]\nAvailable options are:\n  -o name  output to file 'name'\n  -p       do not run the preprocessor on the input\n  -i name  preprocess to file 'name'\n  -m name  generate code with `name` function as main function\n", program_name);
 }
 
 static
@@ -106,6 +107,10 @@ static void doargs(int argc, char **argv)
                 output_filename = argv[i];
             } else if (0 == strcmp(arg, "-p")) {
                 preprocessor = 0;
+            } else if (0 == strcmp(arg, "-i")) {
+                i++;
+                if (i >= argc) { fatal_error("missing argument for -i"); }
+                provided_input_filename = argv[i];
             } else {
                 fprintf(stderr, "unknown option %s\n", arg);
                 exit(1);
@@ -151,8 +156,12 @@ int main(int argc, char **argv)
     char command[256];
     // set process to input_filename+.ii
     char process[256];
-    strcpy(process, input_filename);
-    strcat(process, ".cii");
+    if (provided_input_filename == NULL){
+        strcpy(process, input_filename);
+        strcat(process, ".cii");
+    }else{
+        strcpy(process, provided_input_filename);
+    }
 
 	snprintf(command, sizeof(command), "cobalt -e 'import(\"preprocess\")(\"%s\", \"file\", true, \"%s\")'", input_filename,  process);
 	//printf(command);

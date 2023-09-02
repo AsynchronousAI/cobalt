@@ -44,7 +44,7 @@ static TString **tmname;
 static
 void usage()
 {
-    fprintf(stderr, "usage: %s [options] [filename]\nAvailable options are:\n  -o name  output to file 'name'\n  -p       do not run the preprocessor on the input\n  -i name  preprocess to file 'name'\n  -m name  generate code with `name` function as main function\n  -s       use switches instead of gotos in generated code\n  -D name  provide name to the preprocessor\n", program_name);
+    fprintf(stderr, "usage: %s [options] [filename]\nAvailable options are:\n  -o name  output to file 'name'\n  -p       do not run the preprocessor on the input\n  -i name  preprocess to file 'name'\n  -m name  generate code with `name` function as main function\n  -s       use switches instead of gotos in generated code\n  -D name  provide 'name' to the preprocessor\n", program_name);
 }
 
 static
@@ -114,7 +114,7 @@ static void doargs(int argc, char **argv)
                 if (i >= argc) { fatal_error("missing argument for -i"); }
                 provided_input_filename = argv[i];
             } else if (0 == strcmp(arg, "-D")) {
-                fatal("inputting preprocessor definitions not supported yet. use cobaltpre to input preprocessor definitions.");
+                fatal_error("inputting preprocessor definitions not supported yet. use cobaltpre to input preprocessor definitions.");
             } else if (0 == strcmp(arg, "-s")) {
                 aotswitches = 1;
             } else {

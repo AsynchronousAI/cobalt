@@ -260,18 +260,3 @@ if(LUA_ENABLE_TESTING)
     add_test(NAME bench-nsieve COMMAND cobalt ${TESTARGS} -e "_U=true" bench/nsieve.cobalt WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23-tests)
 
 endif()
-
-#if (INSTALL)
-add_custom_target(setup
-    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-    COMMENT "Installing Libraries"
-)
-add_custom_target(setuppy
-    COMMAND py ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-    COMMENT "Installing Libraries"
-)
-add_custom_target(setup-py
-    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/install.py
-    COMMENT "Installing Libraries"
-)
-#endif()

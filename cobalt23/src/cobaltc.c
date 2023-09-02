@@ -71,7 +71,7 @@ static void usage(const char* message)
   "  -s       strip debug information\n"
   "  -v       show version information\n"
   "  -i       preprocess file\n"
-  "  -D name  provide name to the preprocessor\n"
+  "  -D name  provide 'name' to the preprocessor\n"
   "  --       stop handling options\n"
   "  -        stop handling options and process stdin\n"
   ,progname,Output);

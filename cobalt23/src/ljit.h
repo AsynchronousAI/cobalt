@@ -3,111 +3,76 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
-#define VM_CASE(name) vmcase(OP_##name) // just a macro to make the code more readable
-#include <stdio.h>
 
-// Interpreter Executer
-static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
-{
-  LClosure *cl;
-  TValue *k;
-  StkId base;
-  const Instruction *pc;
-  int trap;
-#if LUA_USE_JUMPTABLE
-#include "ljumptab.h"
-#endif
- startfunc:
-  trap = L->hookmask;
- returning:  /* trap already set */
-  cl = clLvalue(s2v(ci->func));
-#if AOT
-  if (cl->p->aot_implementation) {
-      return ci;
-  }
-#endif
-  k = cl->p->k;
-  pc = ci->u.l.savedpc;
-  if (l_unlikely(trap)) {
-    if (pc == cl->p->code) {  /* first instruction (not resuming)? */
-      if (cl->p->is_vararg)
-        trap = 0;  /* hooks will start after VARARGPREP instruction */
-      else  /* check 'call' hook */
-        luaD_hookcall(L, ci);
-    }
-    ci->u.l.trap = 1;  /* assume trap is on, for now */
-  }
-  base = ci->func + 1;
-  /* main loop of interpreter */
-  for (;;) {
-    Instruction i;  /* instruction being executed */
-    StkId ra;  /* instruction's A register */
-    vmfetch();
-    // low-level line tracing for debugging Cobalt
-    //printf("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
-    lua_assert(base == ci->func + 1);
-    lua_assert(base <= L->top && L->top < L->stack_last);
-    /* invalidate top for instructions not expecting it */
-    lua_assert(isIT(i) || (cast_void(L->top = base), 1));
-    #ifndef JIT // Interpreted mode
+/* 
+= JIT Executer for Cobalt =
+
+This is more of a huge snippet than a full file. It's a modified
+version of the lexecute.h file from Cobalt but rather renders
+assembly code live and executes it line by line "trace compiling". It makes
+use of the DynASM fork (placed in /asm) which is also used by the 
+built in C FFI to generate assembly code from your Cobalt code.
+*/
+
+
     vmdispatch (GET_OPCODE(i)) {
-      VM_CASE(MOVE) {
+      VM_CASE(MOVE) { printf("MOVE\n");
         setobjs2s(L, ra, RB(i));
         vmbreak;
       }
-      VM_CASE(LOADI) {
+      VM_CASE(LOADI) { printf("LOADI\n");
         lua_Integer b = GETARG_sBx(i);
         setivalue(s2v(ra), b);
         vmbreak;
       }
-      VM_CASE(LOADF) {
+      VM_CASE(LOADF) { printf("LOADF\n");
         int b = GETARG_sBx(i);
         setfltvalue(s2v(ra), cast_num(b));
         vmbreak;
       }
-      VM_CASE(LOADK) {
+      VM_CASE(LOADK) { printf("LOADK\n");
         TValue *rb = k + GETARG_Bx(i);
         setobj2s(L, ra, rb);
         vmbreak;
       }
-      VM_CASE(LOADKX) {
+      VM_CASE(LOADKX) { printf("LOADKX\n");
         TValue *rb;
         rb = k + GETARG_Ax(*pc); pc++;
         setobj2s(L, ra, rb);
         vmbreak;
       }
-      VM_CASE(LOADFALSE) {
+      VM_CASE(LOADFALSE) { printf("LOADFALSE\n");
         setbfvalue(s2v(ra));
         vmbreak;
       }
-      VM_CASE(LFALSESKIP) {
+      VM_CASE(LFALSESKIP) { printf("LFALSESKIP\n");
         setbfvalue(s2v(ra));
         pc++;  /* skip next instruction */
         vmbreak;
       }
-      VM_CASE(LOADTRUE) {
+      VM_CASE(LOADTRUE) { printf("LOADTRUE\n");
         setbtvalue(s2v(ra));
         vmbreak;
       }
-      VM_CASE(LOADNIL) {
+      VM_CASE(LOADNIL) { printf("LOADNIL\n");
         int b = GETARG_B(i);
         do {
           setnilvalue(s2v(ra++));
         } while (b--);
         vmbreak;
       }
-      VM_CASE(GETUPVAL) {
+      VM_CASE(GETUPVAL) { printf("GETUPVAL\n");
         int b = GETARG_B(i);
         setobj2s(L, ra, cl->upvals[b]->v);
         vmbreak;
       }
-      VM_CASE(SETUPVAL) {
+      VM_CASE(SETUPVAL) { printf("SETUPVAL\n");
         UpVal *uv = cl->upvals[GETARG_B(i)];
         setobj(L, uv->v, s2v(ra));
         luaC_barrier(L, uv, s2v(ra));
         vmbreak;
       }
-      VM_CASE(GETTABUP) {
+      VM_CASE(GETTABUP) { printf("GETTABUP\n");
         const TValue *slot;
         TValue *upval = cl->upvals[GETARG_B(i)]->v;
         TValue *rc = KC(i);
@@ -119,7 +84,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
           Protect(luaV_finishget(L, upval, rc, ra, slot));
         vmbreak;
       }
-      VM_CASE(GETTABLE) {
+      VM_CASE(GETTABLE) { printf("GETTABLE\n");
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = vRC(i);
@@ -133,7 +98,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
           Protect(luaV_finishget(L, rb, rc, ra, slot));
         vmbreak;
       }
-      VM_CASE(GETI) {
+      VM_CASE(GETI) { printf("GETI\n");
         const TValue *slot;
         TValue *rb = vRB(i);
         int c = GETARG_C(i);
@@ -147,7 +112,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         }
         vmbreak;
       }
-      VM_CASE(GETFIELD) {
+      VM_CASE(GETFIELD) { printf("GETFIELD\n");
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = KC(i);
@@ -159,7 +124,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
           Protect(luaV_finishget(L, rb, rc, ra, slot));
         vmbreak;
       }
-      VM_CASE(SETTABUP) {
+      VM_CASE(SETTABUP) { printf("SETTABUP\n");
         const TValue *slot;
         TValue *upval = cl->upvals[GETARG_A(i)]->v;
         TValue *rb = KB(i);
@@ -172,7 +137,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
           Protect(luaV_finishset(L, upval, rb, rc, slot));
         vmbreak;
       }
-      VM_CASE(SETTABLE) {
+      VM_CASE(SETTABLE) { printf("SETTABLE\n");
         const TValue *slot;
         TValue *rb = vRB(i);  /* key (table is in 'ra') */
         TValue *rc = RKC(i);  /* value */
@@ -186,7 +151,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
           Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
         vmbreak;
       }
-      VM_CASE(SETI) {
+      VM_CASE(SETI) { printf("SETI\n");
         const TValue *slot;
         int c = GETARG_B(i);
         TValue *rc = RKC(i);
@@ -200,7 +165,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         }
         vmbreak;
       }
-      VM_CASE(SETFIELD) {
+      VM_CASE(SETFIELD) { printf("SETFIELD\n");
         const TValue *slot;
         TValue *rb = KB(i);
         TValue *rc = RKC(i);
@@ -212,7 +177,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
           Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
         vmbreak;
       }
-      VM_CASE(NEWTABLE) {
+      VM_CASE(NEWTABLE) { printf("NEWTABLE\n");
         int b = GETARG_B(i);  /* log2(hash size) + 1 */
         int c = GETARG_C(i);  /* array size */
         Table *t;
@@ -230,7 +195,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         checkGC(L, ra + 1);
         vmbreak;
       }
-      VM_CASE(SELF) {
+      VM_CASE(SELF) { printf("SELF\n");
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = RKC(i);
@@ -518,7 +483,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         }
         vmbreak;
       }
-      VM_CASE(TAILCALL) {
+      VM_CASE(TAILCALL) { printf("TAILCALL\n");
         int b = GETARG_B(i);  /* number of arguments + 1 (function) */
         int nparams1 = GETARG_C(i);
         /* delta is virtual 'func' - real 'func' (vararg functions) */
@@ -552,7 +517,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
 
         goto startfunc;  /* execute the callee */
       }
-      VM_CASE(RETURN) {
+      VM_CASE(RETURN) { printf("RETURN\n");
         int n = GETARG_B(i) - 1;  /* number of results */
         int nparams1 = GETARG_C(i);
         if (n < 0)  /* not fixed? */
@@ -572,7 +537,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         updatetrap(ci);  /* 'luaD_poscall' can change hooks */
         goto ret;
       }
-      VM_CASE(RETURN0) {
+      VM_CASE(RETURN0) { printf("RETURN0\n");
         if (l_unlikely(L->hookmask)) {
           L->top = ra;
           savepc(ci);
@@ -588,7 +553,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         }
         goto ret;
       }
-      VM_CASE(RETURN1) {
+      VM_CASE(RETURN1) { printf("RETURN1\n");
         if (l_unlikely(L->hookmask)) {
           L->top = ra + 1;
           savepc(ci);
@@ -615,7 +580,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
           goto returning;  /* continue running caller in this frame */
         }
       }
-      VM_CASE(FORLOOP) {
+      VM_CASE(FORLOOP) { printf("FORLOOP\n");
         if (ttisinteger(s2v(ra + 2))) {  /* integer loop? */
           lua_Unsigned count = l_castS2U(ivalue(s2v(ra + 1)));
           if (count > 0) {  /* still more iterations? */
@@ -633,13 +598,13 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         updatetrap(ci);  /* allows a signal to break the loop */
         vmbreak;
       }
-      VM_CASE(FORPREP) {
+      VM_CASE(FORPREP) { printf("FORPREP\n");
         savestate(L, ci);  /* in case of errors */
         if (forprep(L, ra))
           pc += GETARG_Bx(i) + 1;  /* skip the loop */
         vmbreak;
       }
-      VM_CASE(TFORPREP) {
+      VM_CASE(TFORPREP) { printf("TFORPREP\n");
         /* create to-be-closed upvalue (if needed) */
         halfProtect(luaF_newtbcupval(L, ra + 3));
         pc += GETARG_Bx(i);
@@ -647,7 +612,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         lua_assert(GET_OPCODE(i) == OP_TFORCALL && ra == RA(i));
         goto l_tforcall;
       }
-      VM_CASE(TFORCALL) {
+      VM_CASE(TFORCALL) { printf("TFORCALL\n");
        l_tforcall:
         /* 'ra' has the iterator function, 'ra + 1' has the state,
            'ra + 2' has the control variable, and 'ra + 3' has the
@@ -663,7 +628,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         lua_assert(GET_OPCODE(i) == OP_TFORLOOP && ra == RA(i));
         goto l_tforloop;
       }
-      VM_CASE(TFORLOOP) {
+      VM_CASE(TFORLOOP) { printf("TFORLOOP\n");
         l_tforloop:
         if (!ttisnil(s2v(ra + 4))) {  /* continue loop? */
           setobjs2s(L, ra + 2, ra + 4);  /* save control variable */
@@ -671,7 +636,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         }
         vmbreak;
       }
-      VM_CASE(SETLIST) {
+      VM_CASE(SETLIST) { printf("SETLIST\n");
         int n = GETARG_B(i);
         unsigned int last = GETARG_C(i);
         Table *h = hvalue(s2v(ra));
@@ -680,7 +645,7 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         else
           L->top = ci->top;  /* correct top in case of emergency GC */
         last += n;
-        if (TESTARG_k(i)) {
+        if (TESTARG_k(i)) { 
           last += GETARG_Ax(*pc) * (MAXARG_C + 1);
           pc++;
         }
@@ -694,18 +659,18 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         }
         vmbreak;
       }
-      VM_CASE(CLOSURE) {
+      VM_CASE(CLOSURE) { printf("CLOSURE\n");
         Proto *p = cl->p->p[GETARG_Bx(i)];
         halfProtect(pushclosure(L, p, cl->upvals, base, ra));
         checkGC(L, ra + 1);
         vmbreak;
       }
-      VM_CASE(VARARG) {
+      VM_CASE(VARARG) { printf("VARARG\n");
         int n = GETARG_C(i) - 1;  /* required results */
         Protect(luaT_getvarargs(L, ci, ra, n));
         vmbreak;
       }
-      VM_CASE(VARARGPREP) {
+      VM_CASE(VARARGPREP) { printf("VARARGPREP\n");
         ProtectNT(luaT_adjustvarargs(L, GETARG_A(i), ci, cl->p));
         if (l_unlikely(trap)) {  /* previous "Protect" updated trap */
           luaD_hookcall(L, ci);
@@ -714,27 +679,8 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
         updatebase(ci);  /* function has new base after adjustment */
         vmbreak;
       }
-      VM_CASE(EXTRAARG) {
+      VM_CASE(EXTRAARG) { printf("EXTRAARG\n");
         lua_assert(0);
         vmbreak;
       }
     }
-    #else // JIT mode (Not finished yet)
-    #include "ljit.h"
-    #endif
-  }
-}
-
-// AOT Wrapper
-#ifndef AOT_IS_MODULE
-void luaV_execute (lua_State *L, CallInfo *ci) {
-    do {
-        LClosure *cl = clLvalue(s2v(ci->func));
-        if (cl->p->aot_implementation) {
-            ci = cl->p->aot_implementation(L, ci);
-        } else {
-            ci = luaV_execute_(L, ci);
-        }
-    } while (ci);
-}
-#endif

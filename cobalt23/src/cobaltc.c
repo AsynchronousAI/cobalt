@@ -62,7 +62,8 @@ static void usage(const char* message)
   "Available options are:\n"
   "  -l       list (use -l -l for full listing)\n"
   "  -o name  output to file 'name' (default is \"%s\")\n"
-  "  -p       parse only\n"
+  "  -r       parse only\n"
+  "  -p       run the preprocessor on the input\n"
   "  -s       strip debug information\n"
   "  -v       show version information\n"
   "  --       stop handling options\n"
@@ -99,8 +100,10 @@ static int doargs(int argc, char* argv[])
     usage("'-o' needs argument");
    if (IS("-")) output=NULL;
   }
-  else if (IS("-p"))			/* parse only */
+  else if (IS("-r"))			/* parse only */
    dumping=0;
+  else if (IS("-p")) 				  /* run preprocessor */
+   fatal("preprocessor not supported");
   else if (IS("-s"))			/* strip debug information */
    stripping=1;
   else if (IS("-v"))			/* show version */

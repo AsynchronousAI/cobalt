@@ -65950,6 +65950,8 @@ static const char AOT_MODULE_SOURCE_CODE[] = {
   110,  32, 112, 114, 111,  99, 101, 115, 115,   0
 };
 
-#define AOT_LUAOPEN_NAME preprocess
+#define EXTERNAL LUALIB_API // added by developer to use in linit.c
+
+#define AOT_LUAOPEN_NAME luaopen_preprocess // changed by developer to follow the module naming pattern
 
 #include "aot_footer.c"

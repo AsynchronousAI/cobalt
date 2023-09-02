@@ -9,6 +9,7 @@
 // Not used directly, rather compiled to C and included in source.
 
 // INIT
+
 filesystem = file // File library for cobalt
 var lfs = {};
 var windows = package.config->sub(1,1) == "\\";
@@ -230,6 +231,7 @@ function typerror(errorin, line, note){
   print("\n\27[1;31mStopping Typechecker.\27[0m")
   os.exit()
 }
+
 // LOAD
 function tabletostring(tbl){
   // Converts a table to a string
@@ -265,16 +267,15 @@ function tabletostring(tbl){
 }
 function loadenv(env, str){
   // Uses loadstring, but the enviourment can be provided. env is a table.
-  envstr = tabletostring(env)
   str = [[
-    env = ]]..envstr..[[
-    for (i, v in pairs(env)) {
-      _G[i] = v
-    }
+    return function(env){
+      for (i, v in pairs(env)) {
+        _G[i] = v
+      }
+  ]]..str.."\n    }"
+  print(str)
 
-  ]]..str
-
-  return loadstring(revive(str));
+  return loadstring(revive(str))(env);
 }
 
 // TYPES
@@ -420,71 +421,48 @@ for (i, v in pairs(types)) {
 }
 
 // PARSER
-function deffind(str) {
-    // Takes in code and looks for definitions with annotations
-    var pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*$";
-        pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$";
-    var result = {};
-    for( line in str->gmatch("[^\r\n]+") ) {
-      var vart, key, value = line->match(pattern);
-      if( vart && key && value ) {
-        table.insert(result, {vart, key, value, line});
-      }
-    }
-    return result;
-}
-function assign(str) {
-    // Takes in code looks for assignments with annotations
-    var pattern = "%s*([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*";
-    var result = {};
-    for( line in str->gmatch("[^\r\n]+") ) {
-      var vart, key, value = line->match(pattern);
-      if( vart && key && value ) {
-        // Verify var, key, value are not eligible for def
-        if( ! deffind(line)[1] ) {
-            table.insert(result, {vart, key, value, line});
-        }
-      }
-    }
-    return result;
-}
-function findfunctions(str){
-  // Looks for `function x(<?>)` and returns a table of all the functions and source code
-  var pattern = "^%s*function%s+([^%s]+)%s*%(([^%s]*)%)%s*$";
-  var result = {};
-  for( line in str->gmatch("[^\r\n]+") ) {
-    var key, value = line->match(pattern);
-    if( key && value ) {
-      table.insert(result, {key, value, line});
-    }
+
+// CHECKER
+typeof = type;
+function check(type, value, vname, knownValues, line) {
+  value, err = loadenv(knownValues, "return " .. value)
+  if (!value){
+    typerror("Check error: "..err, line)
   }
-  return result;
-}
-function allassign(str){
-  // Used to look for typeless assignments
-  var pattern = "%s*([^%s]+)%s*=%s*([^%s]+)%s*";
-  var result = {};
-  for( line in str->gmatch("[^\r\n]+") ) {
-    var key, value = line->match(pattern);
-    if( key && value ) {
-      if (! deffind(line)[1] && ! assign(line)[1]) {
-        table.insert(result, {key, value, line});
-      }
+  xpcall(function(){
+    value = value();
+  }, function(err){
+    // Ignore and return true
+    return true;
+  })
+  if( types[type] ) {
+    if (types[type](value)) {
+      return true;
+    } else {
+      if (typeof(value) == "function") return true; // Ignore for now
+      typerror(core.error.strerror(111)->format(type, (tostring(typeof(value)).." (and it's descendents)"), vname), line);
     }
+  } else {
+    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -types` to see all types");
   }
-  return result;
 }
-function findall(str){
-  // Used to look for %s=%s
-  var pattern = "%s*=%s*";
-  var result = {};
-  for( line in str->gmatch("[^\r\n]+") ) {
-    var key, value = line->match(pattern);
-    if( key && value ) {
-      table.insert(result, {key, value, line});
-    }
+
+// MAIN
+function typecheck(code){
+  cleanedCode, newdead = clean(code);
+  dead = newdead;
+  for (i, v in pairs(cleanedCode->split("\n"))){
+    cleanedCode = cleanedCode->split("\n")[i] || "";
+
   }
-  return result;
+  return true;
+}
+function all(){
+  // Prints all types
+  print("All valid checkable types:")
+  for (i, v in pairs(alltypes)) {
+    print("  "..v)
+  }
 }
 function revive(str){
   for (i, v in pairs(dead)){
@@ -534,81 +512,19 @@ function clean(str) {
   });
   return str->gsub('//.-\n', '\n')->gsub('/%*.-%*/', '\n'), dead;
 }
+function typecheck(src){
+  lines = src->split("\n")
 
-// CHECKER
-typeof = type;
-function check(type, value, vname, knownValues, line) {
-  value, err = loadenv(knownValues, "return " .. value)
-  if (!value){
-    typerror("Check error: "..err, line)
-  }
-  xpcall(function(){
-    value = value();
-  }, function(err){
-    // Ignore and return true
-    return true;
-  })
-  if( types[type] ) {
-    if (types[type](value)) {
-      return true;
-    } else {
-      if (typeof(value) == "function") return true; // Ignore for now
-      typerror(core.error.strerror(111)->format(type, (tostring(typeof(value)).." (and it's descendents)"), vname), line);
-    }
-  } else {
-    typerror(core.error.strerror(112)->format(type), line, "Use `cobaltpre -types` to see all types");
+  for (i, v in pairs(lines)){
+    v = clean(v)
+    var typedvars /* var %s: %s = %s*/ = string.gmatch(v, "var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$")
+    var typedsets /* %s: %s = %s */ = string.gmatch(v, "([a-zA-Z0-9_]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$")
+    var returnfunc /* function %s(%s, %s, %s): %s */ = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
+    var argfunc /* function %s(%s: %s, %s: %s, %s: %s) */ = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
+    var bothfunc /* function %s(%s: %s, %s: %s, %s: %s): %s */ = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
+    /* Unfinished, lpreprocess.c (this AOT compiled) is older and uses another method */
   }
 }
-
-// MAIN
-function typecheck(code){
-  cleanedCode, newdead = clean(code);
-  dead = newdead;
-  for (i, v in pairs(cleanedCode->split("\n"))){
-    cleanedCode = cleanedCode->split("\n")[i] || "";
-    var defs = deffind(cleanedCode);
-    var assigns = assign(cleanedCode);
-    var allassigns = allassign(cleanedCode);
-    var functions = findfunctions(cleanedCode);
-    var all = findall(cleanedCode);
-
-    var knownTypes = {};
-    var knownValues = {}; 
-    for( _, def in pairs(defs) ) {
-      check(def[2], def[3], def[1], knownValues, def[4])
-      value, err = loadenv(knownValues, "return " .. def[3])
-      if (!value){
-        typerror("Check error: "..err)
-      }
-      knownTypes[def[1]] = def[2];
-      xpcall(function(){
-        knownValues[def[1]] = value();
-      }, function(err){})
-      
-    }
-    for( _, allassign in pairs(allassigns) ) {
-      if (knownTypes[allassign[1]]) {
-        check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
-      }else if(!knownValues[allassign[1]]) {
-        knownValues[allassign[1]] = allassign[2];
-      }
-    }
-    for( _, assign in pairs(assigns) ) {
-      check(assign[2], assign[3], assign[1], knownValues, assign[4]);
-      knownValues[assign[1]] = assign[3];
-      knownTypes[assign[1]] = assign[2];
-    }
-  }
-  return true;
-}
-function all(){
-  // Prints all types
-  print("All valid checkable types:")
-  for (i, v in pairs(alltypes)) {
-    print("  "..v)
-  }
-}
-
 typechecker = {
   "all": all,
   "check": typecheck,
@@ -1374,5 +1290,5 @@ function process(str, itemtype, out, outfile, ...){
     return joined
 }
 
-//process("test.cobalt", "file", true, "test2.cobalt")
+process("test.cobalt", "file", true, "test2.cobalt")
 return process

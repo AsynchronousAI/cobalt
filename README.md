@@ -8,3 +8,7 @@ Cobalt is a Lua 5.4.3 (up to date with 5.4.6) fork including a:
 - AOT compiler 
 - JIT compiler
 - bytecode optimizer
+- lpeg-labels built in
+- `$`, `@`, `&` symbols for pairs, ipairs, table.unpack
+- more operators
+- tenary operator

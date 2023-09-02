@@ -1,18 +1,5 @@
-#ifndef  DEBUGMODE
-print("Debug mode is on")
- #endif
-#define PI 3.14159265358979323846
+var z: number = "Rug roh raggy!"
 
-x: int = 5
-var y = f"Hello {x}" // f"Hello {x}" is a string interpolation
-var iterator = $x // $x is equal to pairs(x)
-iterator = @x // @x is equal to ipairs(x)
-if ( x~math.random(1,10) > 10){ // Walrus operator
-    print(x, "is greater than 10")
-}else{
-    print(x, "is less than 10")
+function x(){
+    
 }
-
-var x <pre> = ("Hello, ".."world".."!") 
-var tbl = {1,2,3,4,5,6,7,8,9,10}
-print(&tbl)

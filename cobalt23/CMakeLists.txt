@@ -50,6 +50,12 @@ set(LUA_LIB_SRCS
     "src/ltablib.c"
     "src/lutf8lib.c"
     "src/linit.c"
+    "src/lplcap.c"
+    "src/lplcode.c"
+    "src/lplprint.c"
+    "src/lpltree.c"
+    "src/lplvm.c"
+    
 
     # AOT Cobalt compiled
     "src/lpreprocess.c"

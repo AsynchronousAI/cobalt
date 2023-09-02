@@ -637,7 +637,7 @@ static int pmain (lua_State *L) {
       init_pool_alloc();
   }
   if (args & has_r) {
-      lua_error(L, "preprocessor not implemented into interpreter yet.");
+      lua_error("preprocessor not implemented into interpreter yet.");
   }
   luaL_openlibs(L);  /* open standard libraries */
   createargtable(L, argv, argc, script);  /* create table 'arg' */

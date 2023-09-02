@@ -829,7 +829,7 @@ function process(str, itemtype, out, outfile, ...){
     if (itemtype == "file") {
         var file = io.open(str)
         if (!file){
-            error(core.error.strerror(2))
+            error(core.error.strerror(2).." "..str)
         }
         nstr = file->read("*all")
         file->close()
@@ -1374,5 +1374,5 @@ function process(str, itemtype, out, outfile, ...){
     return joined
 }
 
-process("test.cobalt", "file", true, "test2.cobalt")
+//process("test.cobalt", "file", true, "test2.cobalt")
 return process

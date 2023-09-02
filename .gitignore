@@ -15,6 +15,8 @@
 /cobaltpre
 /cobalt23/lemon
 /cobaltmini
+/cobaltc.byte
+/cobaltc.cii
 /testcompiled.c
 /cobalt23-tests/music.mp3
 # CMake Ignore

@@ -30,12 +30,16 @@ static void PrintFunction(const Proto* f, int full);
 
 #define PROGNAME	"cobaltc"		/* default program name */
 #define OUTPUT		PROGNAME ".byte"	/* default output file */
+#define PROCESS		PROGNAME ".cii"	/* default preprocess file */
 
 static int listing=0;			/* list bytecodes? */
 static int dumping=1;			/* dump bytecodes? */
 static int stripping=0;			/* strip debug information? */
+static int preprocess=1;			/* strip debug information? */
 static char Output[]={ OUTPUT };	/* default output file name */
+static char Process[]={ PROCESS };
 static const char* output=Output;	/* actual output file name */
+static const char* process=Process;
 static const char* progname=PROGNAME;	/* actual program name */
 static TString **tmname;
 
@@ -63,9 +67,10 @@ static void usage(const char* message)
   "  -l       list (use -l -l for full listing)\n"
   "  -o name  output to file 'name' (default is \"%s\")\n"
   "  -r       parse only\n"
-  "  -p       run the preprocessor on the input\n"
+  "  -p       do not run the preprocessor on the input\n"
   "  -s       strip debug information\n"
   "  -v       show version information\n"
+  "  -i       preprocess file\n"
   "  --       stop handling options\n"
   "  -        stop handling options and process stdin\n"
   ,progname,Output);
@@ -100,10 +105,17 @@ static int doargs(int argc, char* argv[])
     usage("'-o' needs argument");
    if (IS("-")) output=NULL;
   }
+  else if (IS("-i"))			/* preprocess file */
+  {
+   process=argv[++i];
+   if (process==NULL || *process==0 || (*process=='-' && process[1]!=0))
+    usage("'-i' needs argument");
+   if (IS("-")) process=NULL;
+  }
   else if (IS("-r"))			/* parse only */
    dumping=0;
-  else if (IS("-p")) 				  /* run preprocessor */
-   fatal("preprocessor not supported");
+  else if (IS("-p")) 				  /* don't run preprocessor */
+   preprocess=0;
   else if (IS("-s"))			/* strip debug information */
    stripping=1;
   else if (IS("-v"))			/* show version */
@@ -124,7 +136,7 @@ static int doargs(int argc, char* argv[])
  return i;
 }
 
-#define FUNCTION "(function()end)();"
+#define FUNCTION "(function(){})();"
 
 static const char* reader(lua_State* L, void* ud, size_t* size)
 {
@@ -142,6 +154,7 @@ static const char* reader(lua_State* L, void* ud, size_t* size)
 }
 
 #define toproto(L,i) getproto(s2v(L->top+(i)))
+#define fromproto(L,i) (L->top+(i))
 
 static const Proto* combine(lua_State* L, int n)
 {
@@ -178,10 +191,33 @@ static int pmain(lua_State* L)
  int i;
  tmname=G(L)->tmname;
  if (!lua_checkstack(L,argc)) fatal("too many input files");
+ const char* filename;
  for (i=0; i<argc; i++)
  {
-  const char* filename=IS("-") ? NULL : argv[i];
-  if (luaL_loadfile(L,filename)!=LUA_OK) fatal(lua_tostring(L,-1));
+  filename=IS("-") ? NULL : argv[i];
+  if (preprocess)
+  {
+	// using popen() to run the preprocessor run:
+	/*
+	- cobalt -e "cobalt -e 'import("preprocess")("<INPUT>", "file", true, "<PROCESS>")'"
+	*/
+	char command[256];
+	snprintf(command, sizeof(command), "cobalt -e 'import(\"preprocess\")(\"%s\", \"file\", true, \"%s\")'", filename,  process);
+	//printf(command);
+	FILE *fp;
+	char path[1035];
+	fp = popen(command, "r");
+	if (fp == NULL) {
+		printf("Failed to run preprocessor\n" );
+		exit(1);
+	}
+	while (fgets(path, sizeof(path)-1, fp) != NULL) {
+		printf("%s", path);
+	}
+	pclose(fp);
+ }
+ 
+  if (luaL_loadfile(L, process)!=LUA_OK) fatal(lua_tostring(L,-1));
  }
  f=combine(L,argc);
  if (listing) luaU_print(f,listing>1);

@@ -95,6 +95,7 @@ static void print_usage (const char *badoption) {
   "  -v        show version information\n"
   "  -E        ignore environment variables\n"
   "  -W        turn warnings on\n"
+  "  -r        run preprocessor (not reccomended on runtime, try with bytecoder or AST)\n"
   "  -p        use cobalt without pool allocator\n"
   "  --        stop handling options\n"
   "  -         stop handling options and execute stdin\n"
@@ -265,7 +266,7 @@ static int handle_script (lua_State *L, char **argv) {
 #define has_e		8	/* -e */
 #define has_E		16	/* -E */
 #define has_p    32	/* -p */
-
+#define has_r    64	/* -r */
 
 /*
 ** Traverses all arguments from 'argv', returning a mask with those
@@ -297,6 +298,11 @@ static int collectargs (char **argv, int *first) {
         if (argv[i][2] != '\0')  /* extra characters? */
           return has_error;  /* invalid option */
         args |= has_p;
+        break;
+      case 'r':
+        if (argv[i][2] != '\0')  /* extra characters? */
+          return has_error;  /* invalid option */
+        args |= has_r;
         break;
       case 'W':
         if (argv[i][2] != '\0')  /* extra characters? */
@@ -629,6 +635,9 @@ static int pmain (lua_State *L) {
   }
   if (!(args & has_p)) {
       init_pool_alloc();
+  }
+  if (args & has_r) {
+      lua_error(L, "preprocessor not implemented into interpreter yet.");
   }
   luaL_openlibs(L);  /* open standard libraries */
   createargtable(L, argv, argc, script);  /* create table 'arg' */

@@ -294,8 +294,9 @@ static int get_device_specs(lua_State* L) {
 
   lua_newtable(L);
   lua_pushstring(L, "CPU");
-  lua_pushstring(L, "Unavailable");//getCPUName());
+  lua_pushstring(L, getCPUName());
   lua_settable(L, -3);
+  return 1;
 }
 
 static const struct luaL_Reg device_lib[] = {

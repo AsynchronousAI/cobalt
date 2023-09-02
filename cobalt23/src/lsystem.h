@@ -8,49 +8,73 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
+
 #ifdef _WIN32
 #include <windows.h>
-#elif CTL_KERN || defined(LUA_USE_POSIX)
-#include <sys/types.h> // for u_int
-#include <sys/_types/_u_char.h> // for u_char
+#define W
 
-#include <sys/sysctl.h>
+#elif defined(LUA_USE_POSIX) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
+#include <sys/utsname.h>
+#define U
 #else
-#define DISABLED
+#define D
 #endif
 
-#include "cobalt.h"
-#include "lauxlib.h"
+static const char* getCPUName() {
+  #ifdef W
+  char cpuName[256];
+  DWORD bufferSize = sizeof(cpuName);
+  DWORD type = REG_SZ;
+  HKEY hKey;
 
-static char* getCPUName(){
-  // return the CPU name
-  #ifdef DISABLED
-    //luaL_error("Data not available on this platform");
-    return "CPU Name";
-  #endif
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+    if (RegQueryValueEx(hKey, "ProcessorNameString", NULL, &type, (LPBYTE)cpuName, &bufferSize) == ERROR_SUCCESS) {
+      RegCloseKey(hKey);
+      return cpuName;
+    }
+    RegCloseKey(hKey);
+  }
 
-  #ifdef _WIN32
-    // Windows
-    char* cpuName = (char*)malloc(sizeof(char) * 256);
-    DWORD bufSize = sizeof(cpuName);
-    GetComputerNameA(cpuName, &bufSize);
-    return cpuName;
-  #elif __APPLE__ && !defined(LUA_USE_POSIX)
-    // Apple device, not a mac
-    char* cpuName = (char*)malloc(sizeof(char) * 256);
-    size_t bufSize = sizeof(cpuName);
-    sysctlbyname("hw.machine", cpuName, &bufSize, NULL, 0);
-    return cpuName;
-  #elif defined(LUA_USE_POSIX) || __unix__ || __unix
-    // Mac, Linux, Unix, etc.
-    char* cpuName = (char*)malloc(sizeof(char) * 256);
-    size_t bufSize = sizeof(cpuName);
-    sysctlbyname("machdep.cpu.brand_string", cpuName, &bufSize, NULL, 0);
-    return cpuName;
-  #else
-    //luaL_error("Data not available on this platform");
-    return "CPU Name";
+  return "Unknown Windows CPU";
+  #elif defined(U)
+  struct utsname buf;
+  if (uname(&buf) == 0) {
+    return buf.machine;
+  }
+  return "Unknown Unix CPU";
+  #else 
+  return "Unknown CPU";
   #endif
 }
-*/
+
+static const char* getGPUName(){
+  #ifdef W
+  char gpuName[256];
+  DWORD bufferSize = sizeof(gpuName);
+  HDEVINFO deviceInfoSet = SetupDiGetClassDevs(&GUID_DEVCLASS_DISPLAY, NULL, NULL, DIGCF_PRESENT);
+  if (deviceInfoSet != INVALID_HANDLE_VALUE) {
+    SP_DEVINFO_DATA deviceInfoData;
+    deviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+    for (DWORD i = 0; SetupDiEnumDeviceInfo(deviceInfoSet, i, &deviceInfoData); i++) {
+      DWORD dataType;
+      if (SetupDiGetDeviceRegistryProperty(deviceInfoSet, &deviceInfoData, SPDRP_HARDWAREID, &dataType, (BYTE*)gpuName, bufferSize, &bufferSize)) {
+        if (strstr(gpuName, "VEN_") && strstr(gpuName, "DEV_")) {
+          char* vendorID = strstr(gpuName, "VEN_") + 4;
+          char* deviceID = strstr(gpuName, "DEV_") + 4;
+          *strstr(vendorID, "&") = '\0';
+          *strstr(deviceID, "&") = '\0';
+          sprintf(gpuName, "%s %s", vendorID, deviceID);
+          SetupDiDestroyDeviceInfoList(deviceInfoSet);
+          return gpuName;
+        }
+      }
+    }
+    SetupDiDestroyDeviceInfoList(deviceInfoSet);
+  }
+  return "Unknown Windows GPU";
+  #elif defined(U)
+  return "Unknown Unix GPU";
+  #else
+  return "Unknown GPU";
+  #endif
+}

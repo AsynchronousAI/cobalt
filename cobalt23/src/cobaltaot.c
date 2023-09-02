@@ -3,9 +3,6 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
-// This luac-derived code is incompatible with lua_assert because it calls the
-// GETARG macros even for opcodes where it is not appropriate to do so.
-
 #define AOT_USE_GOTOS
 
 #undef LUAI_ASSERT
@@ -44,7 +41,7 @@ static TString **tmname;
 static
 void usage()
 {
-    fprintf(stderr, "usage: %s input.cobalt -o output.c\n", program_name);
+    fprintf(stderr, "usage: %s [options] [filename]\nAvailable options are:\n  -o name  output to file 'name'\n  -p       do not run the preprocessor on the input\n", program_name);
 }
 
 static
@@ -85,9 +82,10 @@ void printnl()
 
 static void doargs(int argc, char **argv)
 {
-    // I wonder if I should just use getopt instead of parsing options by hand
+
     program_name = argv[0];
 
+    int preprocessor = 1;
     int do_opts = 1;
     int npos = 0;
     for (int i = 1; i < argc; i++) {
@@ -106,6 +104,8 @@ static void doargs(int argc, char **argv)
                 i++;
                 if (i >= argc) { fatal_error("missing argument for -o"); }
                 output_filename = argv[i];
+            } else if (0 == strcmp(arg, "-p")) {
+                preprocessor = 0;
             } else {
                 fprintf(stderr, "unknown option %s\n", arg);
                 exit(1);
@@ -147,10 +147,31 @@ int main(int argc, char **argv)
     check_module_name(module_name);
     replace_dots(module_name);
 
+    // Run preprocessor
+    char command[256];
+    // set process to input_filename+.ii
+    char process[256];
+    strcpy(process, input_filename);
+    strcat(process, ".cii");
+
+	snprintf(command, sizeof(command), "cobalt -e 'import(\"preprocess\")(\"%s\", \"file\", true, \"%s\")'", input_filename,  process);
+	//printf(command);
+	FILE *fp;
+	char path[1035];
+	fp = popen(command, "r");
+	if (fp == NULL) {
+		printf("Failed to run preprocessor\n" );
+		exit(1);
+	}
+	while (fgets(path, sizeof(path)-1, fp) != NULL) {
+		printf("%s", path);
+	}
+	pclose(fp);
+
     // Read the input
 
     lua_State *L = luaL_newstate();
-    if (luaL_loadfile(L, input_filename) != LUA_OK) {
+    if (luaL_loadfile(L, process) != LUA_OK) {
         fatal_error(lua_tostring(L,-1));
     }
     Proto *proto = getproto(s2v(L->top-1));

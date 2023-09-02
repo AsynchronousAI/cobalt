@@ -17,8 +17,10 @@
 /cobaltmini
 /cobaltc.byte
 /cobaltc.cii
-/testcompiled.c
+/test.cobalt.cii
+/test.c
 /cobalt23-tests/music.mp3
+
 # CMake Ignore
 CMakeLists.txt.user
 CMakeCache.txt

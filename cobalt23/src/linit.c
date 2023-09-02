@@ -44,24 +44,18 @@ static const luaL_Reg loadedlibs[] = {
   
   /* C API */
   {LUA_LOADLIBNAME, luaopen_package},
-  {LUA_COLIBNAME, luaopen_coroutine},
   {LUA_TABLIBNAME, luaopen_table},
   {LUA_IOLIBNAME, luaopen_io}, 
-  {LUA_ASYNCLIBNAME, luaopen_async},
   {LUA_OSLIBNAME, luaopen_os},
   {LUA_STRLIBNAME, luaopen_string}, 
   {LUA_MATHLIBNAME, luaopen_math},
-  {LUA_UTF8LIBNAME, luaopen_utf8},
   {LUA_DBLIBNAME, luaopen_debug},
   {LUA_CORENAME, luaopen_core},
   {LUA_DEVICENAME, luaopen_device},
   {LUA_FILESYSTEMNAME, luaopen_lfs},
-  {LUA_COMPLEXNAME, luaopen_complex},
   {LUA_SIGNALNAME, luaopen_signal},
-  {LUA_SOCKETNAME, luaopen_chan},
-  {LUA_BITLIBNAME, luaopen_bit32},
-  {LUA_BITOPNAME, luaopen_bit},
   {LUA_ALLOCNAME, luaopen_alloc},
+  {LUA_JITNAME, luaopen_jit},
   
 
   {NULL, NULL}
@@ -89,6 +83,13 @@ static const luaL_Reg preloadedlibs[] = {
   {LUA_3DLIBNAME, luaopen_3D},
   {LUA_TRANSFORMNAME, luaopen_transform},
   {LUA_JSONAME, luaopen_cjson_safe},
+  {LUA_COLIBNAME, luaopen_coroutine},
+  {LUA_ASYNCLIBNAME, luaopen_async},
+  {LUA_UTF8LIBNAME, luaopen_utf8},
+  {LUA_BITLIBNAME, luaopen_bit32},
+  {LUA_BITOPNAME, luaopen_bit},
+  {LUA_SOCKETNAME, luaopen_chan},
+  {LUA_COMPLEXNAME, luaopen_complex},
 
   // FFI
   #ifdef COBALT_FFI

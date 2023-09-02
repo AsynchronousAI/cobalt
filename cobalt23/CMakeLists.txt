@@ -131,6 +131,15 @@ if (SOCKET)
         "src/curl/l52util.c"
         "src/curl/lcshare.c"
     )
+    find_package(CURL REQUIRED)
+    list(APPEND LUA_LINKED_LIBRARIES CURL::libcurl)
+endif()
+
+# JIT
+## Check if libjit is installed
+if (JIT)
+    find_package(JIT REQUIRED)
+    list(APPEND LUA_LINKED_LIBRARIES JIT::jit)
 endif()
 
 set(TARGETS_TO_INSTALL lua_internal lua_include)

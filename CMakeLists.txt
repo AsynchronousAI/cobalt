@@ -28,8 +28,6 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -flto")
 endif()
 
-
-
 if(FFI)
     message("-- Configuring FFI Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI")
@@ -125,6 +123,15 @@ if (SOCKET)
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CURL_CFLAGS} ${CURL_LIBS} -DCOBALT_SOCKET")
 endif()
+
+if (JIT)
+    message("-- JIT: On")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DJIT=ON")
+else()
+    message("-- JIT: Off")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+endif()
+
 # Provide platform to language
 if (LINUX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLINUX")

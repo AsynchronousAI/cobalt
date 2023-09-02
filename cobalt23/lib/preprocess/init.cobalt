@@ -480,6 +480,7 @@ typechecker = {
 - removes comments
 - var [x, y, z] = tbl (x, y, z are the keys of tbl)
 - var x <pre> = y (will calculate y on preprocessor)
+- &x = unpack(x)
 */
 
 /* TODO:
@@ -559,6 +560,9 @@ ext = function(str){
     }
     for (match in vclean->gmatch("$[a-zA-Z0-9_]+")){
       v = v->gsub(match, "pairs("..match->sub(2)..")")
+    }
+    for (match in vclean->gmatch("&[a-zA-Z0-9_]+")){
+      v = v->gsub(match, "unpack("..match->sub(2)..")")
     }
 
     // x~y (y is anything until whitespace (not inside a string)) will add to the start _G.x=y; and then will replace the x~y with x

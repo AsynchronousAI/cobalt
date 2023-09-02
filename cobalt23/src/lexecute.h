@@ -47,6 +47,9 @@ static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci)
     ci->u.l.trap = 1;  /* assume trap is on, for now */
   }
   base = ci->func + 1;
+  #ifdef JIT
+  /* JIT initialization */
+  #endif
   /* main loop of interpreter */
   for (;;) {
     Instruction i;  /* instruction being executed */

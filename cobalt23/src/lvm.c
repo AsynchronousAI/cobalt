@@ -1194,9 +1194,20 @@ static int off(lua_State *L) {
   return 0;
 }
 
+static int auto(lua_State *L) {
+  #ifdef JIT
+  #include "lautoj.h"
+  #else
+  luaL_error(L, "This Cobalt binary was not compiled with JIT support.");
+  #endif
+
+  return 0;
+}
+
 static const luaL_Reg jit_lib[] = {
   {"on", on},
   {"off", off},
+  {"auto", auto},
   {NULL, NULL}
 };
 LUAMOD_API int luaopen_jit (lua_State *L) {

@@ -1,7 +1,5 @@
 /* Preprocessed with the built in Cobalt preprocessor */
 
 
-var z: number = "Rug roh raggy!"
-function bar(x: number, y: string, z: boolean): void {
-}
+var z: int = "DEADVALUESTRTYPECHECK-1"
 print(1&&1)

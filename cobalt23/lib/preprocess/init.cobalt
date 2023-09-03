@@ -9,7 +9,9 @@
 // Not used directly, rather compiled to C and included in source.
 
 // INIT
-
+/*
+NOT THE SAME VERSION AS IN C. THIS MAY HAVE BUGS
+*/
 filesystem = file // File library for cobalt
 var lfs = {};
 var windows = package.config->sub(1,1) == "\\";

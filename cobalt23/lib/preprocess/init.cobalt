@@ -476,7 +476,15 @@ function all(){
 }
 function revive(str){
   for (i, v in pairs(dead)){
+    if (v[2] == 0){
     var index = "'DEADVALUESTRTYPECHECK-"..(i).."'"
+    }else if (v[2] == 1){
+    var index = "\"DEADVALUESTRTYPECHECK-"..(i).."\""
+    }else if (v[2] == 2){
+    var index = "[[DEADVALUESTRTYPECHECK-"..(i).."]]"
+    }
+
+    v = v[2]
 
     // Go character by character and look for index
     // I want to use ->gsub but that doesnt work for sum reason so I am using a 
@@ -509,16 +517,16 @@ function clean(str) {
   if (!str["gsub"]) typerror("string.gsub is not a found function, Are you sure you provided a string?")
   str = str->gsub("'[^']-'", function(match){
     i++;
-    dead[i] = match;
+    dead[i] = {1, match};
     return "'DEADVALUESTRTYPECHECK-"..(i).."'";
   })->gsub('"[^"]-"', function(match){
     i++;
-    dead[i] = match;
-    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+    dead[i] = {2, match};
+    return "\"DEADVALUESTRTYPECHECK-"..(i).."\"";
   })->gsub('%[%[.-%]%]', function(match){
     i++;
-    dead[i] = match;
-    return "'DEADVALUESTRTYPECHECK-"..(i).."'";
+    dead[i] = {3, match};
+    return "[[DEADVALUESTRTYPECHECK-"..(i).."]]";
   });
   return str->gsub('//.-\n', '\n')->gsub('/%*.-%*/', '\n'), dead;
 }
@@ -569,7 +577,6 @@ typechecker = {
 
 /* TODO:
   - Fix the nested string bug
-  - Strings that are optimized to be ", ' should not lose power
 */
 
 /* SYSTEM:

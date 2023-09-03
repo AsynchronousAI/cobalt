@@ -1161,6 +1161,10 @@ void luaV_finishOp (lua_State *L) {
 #define vmcase(l)	case l:
 #define vmbreak		break
 
+#ifndef AOT_IS_MODULE
+int jit = 0;
+#endif 
+
 #include "lexecute.h"
 
 #ifndef AOT_IS_MODULE
@@ -1171,7 +1175,6 @@ JIT Library
 
 #include "lauxlib.h"
 #include "lualib.h"
-
 
 
 static int on(lua_State *L) {

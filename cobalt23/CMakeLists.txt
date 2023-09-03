@@ -55,7 +55,7 @@ set(LUA_LIB_SRCS
     "src/lplprint.c"
     "src/lpltree.c"
     "src/lplvm.c"
-    
+
 
     # AOT Cobalt compiled
     "src/lpreprocess.c"
@@ -144,8 +144,7 @@ endif()
 # JIT
 ## Check if libjit is installed
 if (JIT)
-    find_package(JIT REQUIRED)
-    list(APPEND LUA_LINKED_LIBRARIES JIT::jit)
+    
 endif()
 
 set(TARGETS_TO_INSTALL lua_internal lua_include)

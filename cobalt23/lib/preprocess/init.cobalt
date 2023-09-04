@@ -502,72 +502,6 @@ function revive(str){
   }
   return str
 }
-function deffind(str) {
-  // Takes in code and looks for definitions with annotations
-  var pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*$";
-      pattern = "^%s*var%s+([^%s]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$";
-  var result = {};
-  for( line in str->gmatch("[^\r\n]+") ) {
-    var vart, key, value = line->match(pattern);
-    if( vart && key && value ) {
-      table.insert(result, {vart, key, value, line});
-    }
-  }
-  return result;
-}
-function assign(str) {
-  // Takes in code looks for assignments with annotations
-  var pattern = "%s*([^%s]+)%s*:%s*([^%s]+)%s*=%s*([^%s]+)%s*";
-  var result = {};
-  for( line in str->gmatch("[^\r\n]+") ) {
-    var vart, key, value = line->match(pattern);
-    if( vart && key && value ) {
-      // Verify var, key, value are not eligible for def
-      if( ! deffind(line)[1] ) {
-          table.insert(result, {vart, key, value, line});
-      }
-    }
-  }
-  return result;
-}
-function findfunctions(str){
-// Looks for `function x(<?>)` and returns a table of all the functions and source code
-var pattern = "^%s*function%s+([^%s]+)%s*%(([^%s]*)%)%s*$";
-var result = {};
-for( line in str->gmatch("[^\r\n]+") ) {
-  var key, value = line->match(pattern);
-  if( key && value ) {
-    table.insert(result, {key, value, line});
-  }
-}
-return result;
-}
-function allassign(str){
-// Used to look for typeless assignments
-var pattern = "%s*([^%s]+)%s*=%s*([^%s]+)%s*";
-var result = {};
-for( line in str->gmatch("[^\r\n]+") ) {
-  var key, value = line->match(pattern);
-  if( key && value ) {
-    if (! deffind(line)[1] && ! assign(line)[1]) {
-      table.insert(result, {key, value, line});
-    }
-  }
-}
-return result;
-}
-function findall(str){
-// Used to look for %s=%s
-var pattern = "%s*=%s*";
-var result = {};
-for( line in str->gmatch("[^\r\n]+") ) {
-  var key, value = line->match(pattern);
-  if( key && value ) {
-    table.insert(result, {key, value, line});
-  }
-}
-return result;
-}
 function clean(str) {
   // Takes in code and removes comments, strings.
   // Remove strings and add it to "dead" table
@@ -590,76 +524,9 @@ function clean(str) {
   });
   return str->gsub('//.-\n', '\n')->gsub('/%*.-%*/', '\n'), dead;
 }
-function typecheck(code){
-  cleanedCode, newdead = clean(code);
-  dead = newdead;
-  for (i, v in pairs(cleanedCode->split("\n"))){
-    cleanedCode = cleanedCode->split("\n")[i] || "";
-    var defs = deffind(cleanedCode);
-    var assigns = assign(cleanedCode);
-    var allassigns = allassign(cleanedCode);
-    var functions = findfunctions(cleanedCode);
-    var all = findall(cleanedCode);
 
-    var knownTypes = {};
-    var knownValues = {}; 
-    for( _, def in pairs(defs) ) {
-      check(def[2], def[3], def[1], knownValues, def[4])
-      value, err = loadenv(knownValues, "return " .. def[3])
-      if (!value){
-        typerror("Check error: "..err)
-      }
-      knownTypes[def[1]] = def[2];
-      xpcall(function(){
-        knownValues[def[1]] = value();
-      }, function(err){})
-      
-    }
-    for( _, allassign in pairs(allassigns) ) {
-      if (knownTypes[allassign[1]]) {
-        check(knownTypes[allassign[1]], allassign[2], allassign[1], knownValues, allassign[3]);
-      }else if(!knownValues[allassign[1]]) {
-        knownValues[allassign[1]] = allassign[2];
-      }
-    }
-    for( _, assign in pairs(assigns) ) {
-      check(assign[2], assign[3], assign[1], knownValues, assign[4]);
-      knownValues[assign[1]] = assign[3];
-      knownTypes[assign[1]] = assign[2];
-    }
-  }
-  return true;
-}
-/*
-function typecheck(src){
-  lines = src->split("\n")
-
-  for (i, v in pairs(lines)){
-    v = clean(v)
-    var typedsets / %s: %s = %s / = string.gmatch(v, "([a-zA-Z0-9_]+)%s*:%s*([^%s]+)%s*=%s*(.-)%s*$")
-    var returnfunc / function %s(%s, %s, %s): %s / = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
-    var argfunc / function %s(%s: %s, %s: %s, %s: %s) / = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
-    var bothfunc / function %s(%s: %s, %s: %s, %s: %s): %s / = string.gmatch(v, "function%s+([^%s]+)%s*%(([^%)]*)%)%s*:%s*([^%s]+)%s*$")
-      
-      / need to fix function regex /
-    for (i, v in (typedsets)){
-      print(i, v,1)
-    }
-    for (i, v in (returnfunc)){
-      print(i, v,2)
-    }
-    for (i, v in (argfunc)){
-      print(i, v,3)
-    }
-    for (i, v in (bothfunc)){
-      print(i, v,4)
-    }
-  }
-}
-*/
 typechecker = {
   "all": all,
-  "check": typecheck,
   "clean": clean,
   "revive": revive,
 }

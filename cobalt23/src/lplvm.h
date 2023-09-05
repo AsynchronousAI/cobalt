@@ -1,6 +1,7 @@
-/*
-** $Id: lplvm.h $
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #if !defined(lplvm_h)
 #define lplvm_h

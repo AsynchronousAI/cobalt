@@ -1,7 +1,7 @@
-/*
-** $Id: lpltree.c $
-** Copyright 2013, Lua.org & PUC-Rio  (see 'lpeg.html' for license)
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #include <ctype.h>
 #include <limits.h>

@@ -1,7 +1,7 @@
-/*
-** $Id: lplvm.c $
-** Copyright 2007, Lua.org & PUC-Rio  (see 'lpeg.html' for license)
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #include <limits.h>
 #include <string.h>

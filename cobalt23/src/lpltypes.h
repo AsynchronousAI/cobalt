@@ -1,9 +1,7 @@
-/*
-** $Id: lpltypes.h $
-** LPeg - PEG pattern matching for Lua
-** Copyright 2007-2019, Lua.org & PUC-Rio  (see 'lpeg.html' for license)
-** written by Roberto Ierusalimschy
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
 
 #if !defined(lpltypes_h)
 #define lpltypes_h

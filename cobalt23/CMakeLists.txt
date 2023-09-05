@@ -76,6 +76,10 @@ if (CLANG)
     list(APPEND LUA_LIB_SRCS
         "src/lclang.cpp"
     )
+
+    find_package(Clang REQUIRED)
+    list(APPEND LUA_LINKED_LIBRARIES Clang::Clang)
+    
 endif()
 
 # SDL

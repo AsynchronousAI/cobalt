@@ -102,6 +102,9 @@ static const luaL_Reg preloadedlibs[] = {
   #ifdef COBALT_SOCKET
   {LUA_CURLNAME, luaopen_lcurl},
   #endif
+  #ifdef COBALT_CLANG
+  {LUA_CLANGNAME, luaopen_clang},
+  #endif
 
   {NULL, NULL}
 };

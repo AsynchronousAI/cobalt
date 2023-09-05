@@ -71,6 +71,13 @@ if (FFI)
     )
 endif()
 
+# CLANG
+if (CLANG)
+    list(APPEND LUA_LIB_SRCS
+        "src/lclang.cpp"
+    )
+endif()
+
 # SDL
 if (SDL)
     list(APPEND LUA_LIB_SRCS

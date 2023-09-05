@@ -114,14 +114,23 @@ if (SOCKET)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     if (NOT CURL_LIBS)
-       if (CURL)
-        set(CURL_LIBS "-I${CURL}")
-        else()
-        message(FATAL_ERROR "Failed to find libcurl, disable cobalt cURL support by doing:\n\t\t-DSOCKET=OFF")
-        endif()
+        message(FATAL_ERROR "Failed to find libcurl, disable Cobalt cURL support by doing:\n\t\t-DSOCKET=OFF")
     endif()
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CURL_CFLAGS} ${CURL_LIBS} -DCOBALT_SOCKET")
+endif()
+if (CLANG)
+    message("-- Configuring Clang Library")
+    execute_process(
+        COMMAND pkg-config libclang --libs
+        OUTPUT_VARIABLE CLANG_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT CLANG_LIBS)
+        message(FATAL_ERROR "Failed to find libclang, disable Cobalt Clang support by doing:\n\t\t-DCLANG=OFF")
+    endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG")
 endif()
 
 if (LLVM)

@@ -109,7 +109,10 @@ LUAMOD_API int (luaopen_moonsdl2) (lua_State *L);
 #define LUA_CURLNAME	"cURL"
 LUAMOD_API int (luaopen_lcurl) (lua_State *L);
 #endif
-
+#if defined(COBALT_CLANG)
+#define LUA_CLANGNAME	"clang"
+LUAMOD_API int (luaopen_clang) (lua_State *L);
+#endif
 // Platform specific libraries
 #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
 #define LUA_UNIXNAME	"unix"

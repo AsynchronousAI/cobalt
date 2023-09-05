@@ -58,11 +58,6 @@ set(LUA_LIB_SRCS
 
     # AOT Cobalt compiled
     "src/lpreprocess.c"
-
-    # JIT
-    "src/ljgc.c"
-    "src/ljit.c"
-    "src/ljmem.c"
 )
 
 

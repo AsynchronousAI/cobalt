@@ -1161,50 +1161,9 @@ void luaV_finishOp (lua_State *L) {
 #define vmcase(l)	case l:
 #define vmbreak		break
 
-#ifndef AOT_IS_MODULE
-int jit = 0;
+#if defined(LLVM) && !defined(AOT_IS_MODULE)
+int LLVM = 0;
 #endif 
 
 #include "lexecute.h"
-
-#ifndef AOT_IS_MODULE
-
-/*
-JIT Library
-*/
-
-#include "lauxlib.h"
-#include "lualib.h"
-
-
-static int on(lua_State *L) {
-  #ifdef JIT
-  jit = 1;
-  #else
-  luaL_error(L, "This Cobalt binary was not compiled with JIT support.");
-  #endif
-
-  return 0;
-}
-
-static int off(lua_State *L) {
-  #ifdef JIT
-  jit = 0;
-  #else
-  luaL_error(L, "This Cobalt binary was not compiled with JIT support.");
-  #endif
-
-  return 0;
-}
-
-static const luaL_Reg jit_lib[] = {
-  {"on", on},
-  {"off", off},
-  {NULL, NULL}
-};
-LUAMOD_API int luaopen_jit (lua_State *L) {
-  luaL_newlib(L, jit_lib);
-  return 1;
-}
-#endif
 /* }================================================================== */

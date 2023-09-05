@@ -55,7 +55,6 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_FILESYSTEMNAME, luaopen_lfs},
   {LUA_SIGNALNAME, luaopen_signal},
   {LUA_ALLOCNAME, luaopen_alloc},
-  {LUA_JITNAME, luaopen_jit},
   {LUA_LPEGNAME, luaopen_lpeg},
   
 

@@ -21,7 +21,7 @@
 #ifndef _JIT_VMEM_H
 #define	_JIT_VMEM_H
 
-#include "jit-defs.h"
+#include "jit-defs.h.in"
 
 #ifdef	__cplusplus
 extern "C" {

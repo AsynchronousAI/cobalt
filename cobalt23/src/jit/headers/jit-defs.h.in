@@ -1,5 +1,5 @@
 /*
- * jit-defs.h - Define the primitive numeric types for use by the JIT.
+ * jit-defs.h.in - Define the primitive numeric types for use by the JIT.
  *
  * Copyright (C) 2004  Southern Storm Software, Pty Ltd.
  *
@@ -31,30 +31,45 @@ extern	"C" {
 #define JIT_EXPORT_DATA extern
 #endif
 
-@JIT_INT64_INCLUDE@
+#define JITINT8 char
+#define JITUINT8 unsigned char
+#define JITINT16 short
+#define JITUINT16 unsigned short
+#define JITINT32 int
+#define JITUINT32 unsigned int
+#define JITNATIVEINT long
+#define JITNATIVEUINT unsigned long
+#define JITINT64 long long
+#define JITUINT64 unsigned long long
+#define JITFLOAT32 float
+#define JITFLOAT64 double
+#define JITNATIVEFLOAT double
 
-typedef @JITINT8@ jit_sbyte;
-typedef @JITUINT8@ jit_ubyte;
-typedef @JITINT16@ jit_short;
-typedef unsigned @JITINT16@ jit_ushort;
-typedef @JITINT32@ jit_int;
-typedef unsigned @JITINT32@ jit_uint;
-typedef @JITNATIVEINT@ jit_nint;
-typedef unsigned @JITNATIVEINT@ jit_nuint;
-typedef @JITINT64@ jit_long;
-typedef unsigned @JITINT64@ jit_ulong;
-typedef @JITFLOAT32@ jit_float32;
-typedef @JITFLOAT64@ jit_float64;
-typedef @JITNATIVEFLOAT@ jit_nfloat;
+
+//JIT_INT64_INCLUDE
+
+typedef JITINT8 jit_sbyte;
+typedef JITUINT8 jit_ubyte;
+typedef JITINT16 jit_short;
+typedef unsigned JITINT16 jit_ushort;
+typedef JITINT32 jit_int;
+typedef unsigned JITINT32 jit_uint;
+typedef JITNATIVEINT jit_nint;
+typedef unsigned JITNATIVEINT jit_nuint;
+typedef JITINT64 jit_long;
+typedef unsigned JITINT64 jit_ulong;
+typedef JITFLOAT32 jit_float32;
+typedef JITFLOAT64 jit_float64;
+typedef JITNATIVEFLOAT jit_nfloat;
 typedef void *jit_ptr;
 
-#define	@JITNATIVEINTDEFINE@ 1
-@JITNFLOATISDOUBLE@
+#define	JITNATIVEINTDEFINE 1
+//JITNFLOATISDOUBLE
 
 typedef jit_nuint jit_size_t;
 
 #if defined(__cplusplus) && defined(__GNUC__)
-# define JIT_NOTHROW		@JITTHROWIDIOM@
+# define JIT_NOTHROW
 #else
 # define JIT_NOTHROW
 #endif

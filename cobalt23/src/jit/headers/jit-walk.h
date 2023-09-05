@@ -21,7 +21,15 @@
 #ifndef	_JIT_WALK_H
 #define	_JIT_WALK_H
 
-#include "jit-arch.h"
+#if defined(arm) || defined(__arm__) || defined(__arm) || defined(__ARM__) || defined(__ARM) || defined(_ARM_) || defined(_M_ARM) || defined(__TARGET_ARCH_ARM) || defined(__TARGET_ARCH_THUMB) || defined(__TARGET_ARCH_AARCH64)
+#include "jit-arch-arm.h"
+#elif defined(i386) || defined(__i386__) || defined(__i386) || defined(__X86__) || defined(_X86_) || defined(_M_IX86) || defined(__I86__)
+#include "jit-arch-x86.h"
+#elif defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(__amd64) || defined(__X86_64__) || defined(_M_X64)
+#include "jit-arch-x86-64.h"
+#else
+#include "jit-arch-generic.h"
+#endif
 
 #ifdef	__cplusplus
 extern	"C" {

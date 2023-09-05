@@ -21,7 +21,7 @@
 #ifndef	_JIT_INIT_H
 #define	_JIT_INIT_H
 
-#include "jit-defs.h"
+#include "jit-defs.h.in"
 
 #ifdef	__cplusplus
 extern	"C" {

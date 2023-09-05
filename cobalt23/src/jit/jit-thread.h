@@ -23,7 +23,7 @@
 #ifndef	_JIT_THREAD_H
 #define	_JIT_THREAD_H
 
-#include "headers/jit-defs.h"
+#include "headers/jit-defs.h.in"
 #include "jit-config.h"
 
 #if defined(JIT_THREADS_PTHREAD)

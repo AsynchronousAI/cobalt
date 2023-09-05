@@ -25,7 +25,7 @@
 extern	"C" {
 #endif
 
-#include "jit-defs.h"
+#include "jit-defs.h.in"
 #include "jit-common.h"
 #include "jit-context.h"
 #include "jit-apply.h"
@@ -41,7 +41,7 @@ extern	"C" {
 #include "jit-memory.h"
 #include "jit-meta.h"
 #include "jit-objmodel.h"
-#include "jit-opcode.h"
+#include "jit-opcode-compat.h"
 #include "jit-type.h"
 #include "jit-unwind.h"
 #include "jit-util.h"

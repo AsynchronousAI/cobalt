@@ -22,7 +22,7 @@
 
 /* This is the GNU/Linux <elf.h> file, with slight modifications
    to compile within the libjit environment */
-#include "headers/jit-defs.h"
+#include "headers/jit-defs.h.in"
 
 #ifdef	__cplusplus
 extern	"C" {

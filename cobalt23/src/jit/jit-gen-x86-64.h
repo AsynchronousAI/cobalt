@@ -23,7 +23,7 @@
 #ifndef	_JIT_GEN_X86_64_H
 #define	_JIT_GEN_X86_64_H
 
-#include "headers/jit-defs.h"
+#include "headers/jit-defs.h.in"
 #include "jit-gen-x86.h"
 
 #ifdef	__cplusplus

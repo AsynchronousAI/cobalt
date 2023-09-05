@@ -15,7 +15,9 @@
         "gen.C": "cpp",
         "sdl_image.h": "c",
         "lmem.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "*.in": "cpp",
+        "jit-common.h": "c"
     },
     "terminal.integrated.scrollback": 1000000
 }

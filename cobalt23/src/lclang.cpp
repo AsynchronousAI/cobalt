@@ -1,5 +1,9 @@
 #include <clang-c/Index.h>
-#include <lua.hpp>
+#include "cobalt.hpp"
+
+
+
+#define EXPORT_API LUA_MODAPI
 
 #define LCM_INDEX  "ClangIndex"
 #define LCM_TU     "ClangTU"
@@ -583,6 +587,12 @@ static int l_isStatic(lua_State *L) {
     return 1;
 }
 
+static int l_method_isConst(lua_State *L){
+	CXCursor cur = toCursor(L, 1);
+	lua_pushboolean(L, clang_CXXMethod_isConst(cur));
+	return 1;
+}
+
 static int l_isVirtual(lua_State *L) {
     CXCursor cur = toCursor(L, 1);
     lua_pushboolean(L, clang_CXXMethod_isVirtual(cur));
@@ -621,6 +631,7 @@ static luaL_Reg cursor_functions[] = {
     {"definition", l_definition},
     {"isStatic", l_isStatic},
     {"isVirtual", l_isVirtual},
+	{"isConst",l_method_isConst},
     {"resultType", l_resultType},
     {"__eq", l_cursorEqual},
     {NULL, NULL}
@@ -687,9 +698,19 @@ static int l_isConst(lua_State *L) {
     return 1;
 }
 
+static int l_spelling(lua_State* L)
+{
+	CXType type = toType(L, 1);
+	CXString str = clang_getTypeSpelling(type);
+	lua_pushstring(L, clang_getCString(str));
+	clang_disposeString(str);
+	return 1;
+}
+
 static luaL_Reg type_functions[] = {
     {"__tostring", l_typeToString},
     {"name", l_typeToString},
+	{"spelling",l_spelling},
     {"canonical", l_canonical},
     {"pointee", l_pointee},
     {"isPod", l_isPod},
@@ -708,7 +729,7 @@ void newMetatable(lua_State *L, const char * name, luaL_Reg *reg) {
     lua_setfield(L, -2, "__index");
 }
 
-extern "C" LUALIB_API int luaopen_clang(lua_State *L) {
+extern "C" EXPORT_API int luaopen_clang(lua_State *L) {
     newMetatable(L, LCM_INDEX, index_functions);
     newMetatable(L, LCM_TU, tu_functions);
     newMetatable(L, LCM_CURSOR, cursor_functions);

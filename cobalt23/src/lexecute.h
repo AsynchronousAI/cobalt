@@ -8,7 +8,7 @@
 
 #ifdef JIT
 /* Include libjit */
-//#include <jit/jit.h>
+#include "ljit.h"
 #endif
 
 // Interpreter Executer

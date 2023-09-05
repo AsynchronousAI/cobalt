@@ -9,7 +9,6 @@ set(LUA_LIB_SRCS
     "src/lfpconv.c"
     "src/lstrbuf.c"
     "src/lulib.c"
-    #"src/lnum.c"
     "src/ldo.c"
     "src/ldump.c"
     "src/lfunc.c"
@@ -59,6 +58,11 @@ set(LUA_LIB_SRCS
 
     # AOT Cobalt compiled
     "src/lpreprocess.c"
+
+    # JIT
+    "src/ljgc.c"
+    "src/ljit.c"
+    "src/ljmem.c"
 )
 
 
@@ -139,12 +143,6 @@ if (SOCKET)
     )
     find_package(CURL REQUIRED)
     list(APPEND LUA_LINKED_LIBRARIES CURL::libcurl)
-endif()
-
-# JIT
-## Check if libjit is installed
-if (JIT)
-    
 endif()
 
 set(TARGETS_TO_INSTALL lua_internal lua_include)

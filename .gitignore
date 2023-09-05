@@ -21,6 +21,7 @@
 /test.cobalt.cii
 /test.c
 /cobalt23-tests/music.mp3
+/jit
 
 # CMake Ignore
 CMakeLists.txt.user

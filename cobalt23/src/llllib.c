@@ -16,7 +16,7 @@
 #include "lobject.h"
 #include "lprefix.h"
 #include "lstate.h"
-#include "lua.h"
+#include "cobalt.h"
 #include "lualib.h"
 #include "lmem.h"
 

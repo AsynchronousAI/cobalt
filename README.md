@@ -10,6 +10,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - allocation tracker (track bytes and pool allocator stats)
 - `uwait`, `swait`, `mwait` for system sleep
 - new std functions
+- Vector2 and Vector3 type (5x faster than Vector libraries)
 - `unix`, `win`, and `core` (core is cross plat) for lowlevel system calls
 - AOT compiler byte->C or byte->LLVMIR if you have LLVM capable version of cobalt
 - libclang bindings (compile C code from Cobalt)
@@ -19,9 +20,9 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - improved vm
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - LLVM JIT compiler
-- `minicobalt` interpreter without alot of std functions and runs on bare bones
+- `minicobalt` interpreter without alot of std functions and runs on bare bones only 4k lines of code
 - bytecode optimizer
-- C++ bridge
+- C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - 30% increase with pool allocator
 - lpeg-labels built in
 - `$`, `@`, `&` symbols for pairs, ipairs, table.unpack

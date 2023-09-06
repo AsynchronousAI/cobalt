@@ -17,7 +17,8 @@
         "lmem.h": "c",
         "stdlib.h": "c",
         "*.in": "cpp",
-        "jit-common.h": "c"
+        "jit-common.h": "c",
+        "lualib.h": "c"
     },
     "terminal.integrated.scrollback": 1000000
 }

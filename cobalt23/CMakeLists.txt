@@ -12,6 +12,7 @@ set(LUA_LIB_SRCS
     "src/lregex.c"
     "src/ldo.c"
     "src/ldump.c"
+    "src/lautoc.c"
     "src/lfunc.c"
     "src/lgc.c"
     "src/llex.c"

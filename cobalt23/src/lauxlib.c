@@ -43,8 +43,6 @@
 #define LEVELS1	10	/* size of the first part of the stack */
 #define LEVELS2	11	/* size of the second part of the stack */
 
-
-
 /*
 ** Search for 'objidx' in table at index -1. ('objidx' must be an
 ** absolute index.) Return 1 + string at top if it found a good name.

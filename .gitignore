@@ -41,6 +41,8 @@ Makefile
 /build
 install_manifest.txt
 /cobalt23/pre/cobaltpre
+/gc
+/lll
 /cobalt23/raptor/src/host/buildvm_arch.h
 /cobalt23/CMakeLists.txt.user
 /cobalt23/CMakeCache.txt

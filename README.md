@@ -20,6 +20,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - improved vm
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - LLVM JIT compiler
+- `debug.snap` to track current stack
 - `minicobalt` interpreter without alot of std functions and runs on bare bones only 4k lines of code
 - bytecode optimizer
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped

@@ -55,7 +55,6 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_FILESYSTEMNAME, luaopen_lfs},
   {LUA_SIGNALNAME, luaopen_signal},
   {LUA_ALLOCNAME, luaopen_alloc},
-  {LUA_LPEGNAME, luaopen_lpeg},
   
 
   {NULL, NULL}
@@ -79,6 +78,7 @@ static const luaL_Reg preloadedlibs[] = {
   /* C API */
   {LUA_STRUCTNAME, luaopen_struct},
   {LUA_COLORLIBNAME, luaopen_color},
+  {LUA_LPEGNAME, luaopen_lpeg},
   {LUA_2DLIBNAME, luaopen_2D},
   {LUA_3DLIBNAME, luaopen_3D},
   {LUA_TRANSFORMNAME, luaopen_transform},

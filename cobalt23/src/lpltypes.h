@@ -16,8 +16,8 @@
 #define VERSION         "1.6.1"
 
 
-#define PATTERN_T	"lpeglabel-pattern"
-#define MAXSTACKIDX	"lpeglabel-maxstack"
+#define PATTERN_T	"pattern"
+#define MAXSTACKIDX	"maxstack"
 
 
 /*

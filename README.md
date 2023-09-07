@@ -23,7 +23,6 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - LLVM JIT compiler
 - `debug.snap` to track current stack
-- `minicobalt` interpreter without alot of std functions and runs on bare bones only 4k lines of code
 - bytecode optimizer
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - 30% increase with pool allocator
@@ -93,3 +92,28 @@ Cobalt is made to be built and run on PC's running Windows, macOS, or Linux then
 using LLVM or bindings further ported to other platforms. Cobalt is not made to be
 built on other platforms or built for other platforms than the host computer as
 upon buildtime many CPU specific optimizations are made.
+
+### What about for microcontrollers?
+For microcontrollers you need to have atleast 40kb of ram and 200kb of flash. Libraries like `core`, `device` might be
+missing features and the `unix`, `win` libraries should not be available.
+
+Then you can `#include` the cobalt stdlibs. 
+```c
+#include <cobalt.h>
+#include <lauxlib.h>
+#include <lualib.h>
+#include <lautoc.h>
+
+/* This is a barebones start without the Clang, LLVM, cURL, and SDL libraries or standard libraries */
+```
+Then you can use the C API to run cobalt code.
+```c
+int main(){
+    lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+    luaL_loadstring(L, "print('Hello World!')");
+    lua_pcall(L, 0, 0, 0);
+    lua_close(L);
+    return 0;
+}
+```

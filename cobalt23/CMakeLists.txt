@@ -153,12 +153,33 @@ if (SOCKET)
     list(APPEND LUA_LINKED_LIBRARIES CURL::libcurl)
 endif()
 
+# LLVM
+set(LLVM OFF)
+if (LLVM)
+    list(APPEND LUA_LIB_SRCS
+        "src/lllarith.cpp"
+        "src/lllcompiler.cpp"
+        "src/lllcompilerstate.cpp"
+        "src/lllengine.cpp"
+        "src/llllib.c"
+        "src/llllogical.cpp"
+        "src/lllopcode.cpp"
+        "src/lllruntime.cpp"
+        "src/llltableset.cpp"
+        "src/lllvalue.cpp"
+        "src/lllvararg.cpp"
+        "src/lllcore.cpp"
+    )
+    find_package(LLVM REQUIRED CONFIG)
+    list(APPEND LUA_LINKED_LIBRARIES LLVM::LLVM)
+endif()
+
 set(TARGETS_TO_INSTALL lua_internal lua_include)
 
 set(LUA_LINKED_LIBRARIES)
 
 if(LUA_BUILD_AS_CXX)
-	set_source_files_properties(${LUA_LIB_SRCS} "src/cobalt.c" "src/cobaltc.c" PROPERTIES LANGUAGE CXX )
+	set_source_files_properties(${LUA_LIB_SRCS} "src/cobalt.c" "src/cobaltc.c" "src/cobaltaot.c" "src/host/minicobalt.c" "pre/main.c" PROPERTIES LANGUAGE CXX )
 endif()
 
 add_library(lua_internal INTERFACE)

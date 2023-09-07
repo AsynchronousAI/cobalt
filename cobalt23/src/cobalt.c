@@ -363,8 +363,11 @@ static int handle_luainit(lua_State *L) {
 */
 
 #if !defined(LUA_PROMPT)
-#define LUA_PROMPT "> "
-#define LUA_PROMPT2 ">> "
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+
+#define LUA_PROMPT ANSI_COLOR_GREEN "-> " ANSI_COLOR_RESET
+#define LUA_PROMPT2 ANSI_COLOR_GREEN ">> " ANSI_COLOR_RESET
 #endif
 
 #if !defined(LUA_MAXINPUT)
@@ -628,7 +631,6 @@ static int pmain(lua_State *L) {
     doREPL(L);      /* do read-eval-print loop */
   else if (script == argc && !(args & (has_e | has_v))) { /* no arguments? */
     if (lua_stdin_is_tty()) { /* running in interactive mode? */
-      print_version();
       doREPL(L); /* do read-eval-print loop */
     } else
       dofile(L, NULL); /* executes stdin as a file */

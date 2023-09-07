@@ -95,11 +95,31 @@ built on other platforms or built for other platforms than the host computer as
 upon buildtime many CPU specific optimizations are made.
 
 ### What about for microcontrollers?
-For microcontrollers you need to have atleast 10kb of ram and 200kb of flash. Libraries like `core`, `device` might be
+#### Executable
+For microcontrollers you need to have atleast 20kb of ram and 200kb of flash. Libraries like `core`, `device` might be
 missing features and the `unix`, `win` libraries should not be available.
 
-Then you can `#include` the cobalt stdlibs. 
+To build the following flags are reccomended:
+```bash
+-DCURL=off -DSDL=off -DM=2 -DCLANG=off -DLLVM=off -DCROSS=on
+```
+* -DCURL, -DSDL, -DCLANG disable the bindings for those libraries (they are not supported and needed for microcontrollers)
+* -DLLVM=off disables JIT and LLVM AOT which are just junk for microcontrollers.
+* -DM=2 maxes out memory optimizations in sacrifice of speed. `-DM=0` is the default and `-DM=1` is light memory optimizations.
+* -DCROSS=on disables CPU specific optimizations.
+
+> **NOTICE:** You must build cobalt on the host OS (and device is -DCROSS and -DFFI is off) so this is not really good for distrubuting to other platforms/devices.
+#### C API
+You can also use `#include` to include the cobalt stdlibs and run it there.
 ```c
+/* equivelent to flags: */
+#define COBALT_CURL 0
+#define COBALT_SDL 0
+#define COBALT_CLANG 0
+#define COBALT_LLVM 0
+#define MOPT 2
+/*************/
+
 #include <cobalt.h>
 #include <lauxlib.h>
 #include <lualib.h>
@@ -117,4 +137,14 @@ int main(){
     lua_close(L);
     return 0;
 }
+```
+#### C
+You could compile sourcecode to C or LLVM IR on your local computer and use that in the microcontroller.
+```bash
+cobaltaot main.cobalt -o main.c -m mainsymbol
+```
+will generate a C file representing `main.cobalt` and the symbol that will start operating for the linker is `mainsymbol`.
+#### LLVM
+```bash
+cobaltaot main.cobalt -o main.ll -m mainsymbol
 ```

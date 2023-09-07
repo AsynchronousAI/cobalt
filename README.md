@@ -79,7 +79,7 @@ for (i = 1, 10){
     }
 }
 
-var table = {1, 2, 3}
+var table = [1, 2, 3] // [] is array (no keys), {} is table (keys)
 for (i, v in $table){ // $, @, & are preprocessor only
     print(i, v)
 }

@@ -3,6 +3,7 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #include <signal.h>
 
 #include "cobalt.h"
@@ -12,10 +13,9 @@
 
 #define lsig
 
-struct lua_signal
-{
+struct lua_signal {
   char *name; /* name of the signal */
-  int sig; /* the signal */
+  int sig;    /* the signal */
 };
 
 #endif

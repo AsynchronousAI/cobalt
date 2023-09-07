@@ -4,21 +4,23 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #ifndef _L52UTIL_H_
 #define _L52UTIL_H_
 
+#include <stdint.h>
+
 #include "../cobalt.h"
 #include "../lauxlib.h"
-#include <stdint.h>
 
 #if COBALTLUA_VERSION_NUM >= 503 /* Lua 5.3 */
 
 #ifndef luaL_checkint
-#define luaL_checkint  luaL_checkinteger
+#define luaL_checkint luaL_checkinteger
 #endif
 
 #ifndef luaL_checklong
-#define luaL_checklong  luaL_checkinteger
+#define luaL_checklong luaL_checkinteger
 #endif
 
 #ifndef luaL_optint
@@ -39,42 +41,46 @@
 /* lua_absindex */
 
 #ifndef lua_objlen
-#define lua_objlen      lua_rawlen
+#define lua_objlen lua_rawlen
 #endif
 
-int   luaL_typerror (lua_State *L, int narg, const char *tname);
+int luaL_typerror(lua_State *L, int narg, const char *tname);
 
 #ifndef luaL_register
-void luaL_register (lua_State *L, const char *libname, const luaL_Reg *l);
+void luaL_register(lua_State *L, const char *libname, const luaL_Reg *l);
 #endif
 
 #ifndef lua_equal
-#define lua_equal(L,idx1,idx2) lua_compare(L,(idx1),(idx2),LUA_OPEQ)
+#define lua_equal(L, idx1, idx2) lua_compare(L, (idx1), (idx2), LUA_OPEQ)
 #endif
 
-#else                      /* Lua 5.1 */
+#else /* Lua 5.1 */
 
 /* functions from lua 5.2 */
 
-# define lua_absindex(L, i) (((i)>0)?(i):((i)<=LUA_REGISTRYINDEX?(i):(lua_gettop(L)+(i)+1)))
-# define lua_rawlen  lua_objlen
+#define lua_absindex(L, i) \
+  (((i) > 0) ? (i)         \
+             : ((i) <= LUA_REGISTRYINDEX ? (i) : (lua_gettop(L) + (i) + 1)))
+#define lua_rawlen lua_objlen
 
-void  lua_rawgetp   (lua_State *L, int index, const void *p);
-void  lua_rawsetp   (lua_State *L, int index, const void *p);
-void  luaL_setfuncs  (lua_State *L, const luaL_Reg *l, int nup);
+void lua_rawgetp(lua_State *L, int index, const void *p);
+void lua_rawsetp(lua_State *L, int index, const void *p);
+void luaL_setfuncs(lua_State *L, const luaL_Reg *l, int nup);
 
 #endif
 
-int   lutil_newmetatablep (lua_State *L, const void *p);
-void  lutil_getmetatablep (lua_State *L, const void *p);
-void  lutil_setmetatablep (lua_State *L, const void *p);
+int lutil_newmetatablep(lua_State *L, const void *p);
+void lutil_getmetatablep(lua_State *L, const void *p);
+void lutil_setmetatablep(lua_State *L, const void *p);
 
-#define lutil_newudatap(L, TTYPE, TNAME) (TTYPE *)lutil_newudatap_impl(L, sizeof(TTYPE), TNAME)
-int   lutil_isudatap      (lua_State *L, int ud, const void *p);
-void *lutil_checkudatap   (lua_State *L, int ud, const void *p);
-int   lutil_createmetap   (lua_State *L, const void *p, const luaL_Reg *methods, int nup);
+#define lutil_newudatap(L, TTYPE, TNAME) \
+  (TTYPE *)lutil_newudatap_impl(L, sizeof(TTYPE), TNAME)
+int lutil_isudatap(lua_State *L, int ud, const void *p);
+void *lutil_checkudatap(lua_State *L, int ud, const void *p);
+int lutil_createmetap(lua_State *L, const void *p, const luaL_Reg *methods,
+                      int nup);
 
-void *lutil_newudatap_impl     (lua_State *L, size_t size, const void *p);
+void *lutil_newudatap_impl(lua_State *L, size_t size, const void *p);
 
 void lutil_pushuint(lua_State *L, unsigned int v);
 

@@ -3,11 +3,9 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #define lulib_c
 #define LUA_LIB
-
-#include "lprefix.h"
-
 
 #include <ctype.h>
 #include <stdio.h>
@@ -15,8 +13,8 @@
 #include <string.h>
 
 #include "cobalt.h"
-
 #include "lauxlib.h"
+#include "lprefix.h"
 #include "lualib.h"
 #ifdef _WIN32
 #include <windows.h>
@@ -24,11 +22,12 @@
 #include <unistd.h>
 #endif
 
-#include <stdio.h>
 #include <stdarg.h>
+#include <stdio.h>
 
-static int luaUB_global(lua_State *L){
-  // takes in a string (key) and a value. sets the global variable with the key to the value and returns the value
+static int luaUB_global(lua_State *L) {
+  // takes in a string (key) and a value. sets the global variable with the key
+  // to the value and returns the value
   int nargs = lua_gettop(L);
   luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
   luaL_argcheck(L, nargs <= 2, 2, "expected at most 2 arguments");
@@ -40,15 +39,13 @@ static int luaUB_global(lua_State *L){
   return 1;
 }
 
-static const luaL_Reg base_funcs[] = {
-  {"global", luaUB_global},
+static const luaL_Reg base_funcs[] = {{"global", luaUB_global},
 
-  /* placeholders */
-  {"VERSION", NULL},
-  {NULL, NULL}
-};
+                                      /* placeholders */
+                                      {"VERSION", NULL},
+                                      {NULL, NULL}};
 
-LUALIB_API int luaopen_under (lua_State *L) {
+LUALIB_API int luaopen_under(lua_State *L) {
   /* open lib into global table */
   luaL_newlib(L, base_funcs);
 
@@ -56,12 +53,9 @@ LUALIB_API int luaopen_under (lua_State *L) {
   lua_pushnumber(L, COBALT_VERSION_NUM);
   lua_setfield(L, -2, "VERSION");
 
-
   /* set global _LUA */
   lua_pushnumber(L, COBALTLUA_VERSION_NUM);
   lua_setfield(L, -2, "LUA");
-  
 
   return 1;
 }
-

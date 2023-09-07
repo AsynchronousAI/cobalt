@@ -4,25 +4,23 @@
 // ============================================================================== */
 
 
-#include "lllcompilerstate.h"
 #include "lllopcode.h"
+
+#include "lllcompilerstate.h"
 
 namespace lll {
 
-Opcode::Opcode(CompilerState& cs, Stack& stack) :
-    cs_(cs),
-    stack_(stack),
-    entry_(cs.blocks_[cs.curr_]),
-    exit_(cs.blocks_[cs.curr_ + 1]) {
-}
+Opcode::Opcode(CompilerState& cs, Stack& stack)
+    : cs_(cs),
+      stack_(stack),
+      entry_(cs.blocks_[cs.curr_]),
+      exit_(cs.blocks_[cs.curr_ + 1]) {}
 
 llvm::Value* Opcode::CreatePHI(llvm::Type* type, const IncomingList& incoming,
-            const std::string& name) {
-    auto phi = cs_.B_.CreatePHI(type, incoming.size(), name);
-    for (auto& i : incoming)
-        phi->addIncoming(i.first, i.second);
-    return phi;
+                               const std::string& name) {
+  auto phi = cs_.B_.CreatePHI(type, incoming.size(), name);
+  for (auto& i : incoming) phi->addIncoming(i.first, i.second);
+  return phi;
 }
 
-}
-
+}  // namespace lll

@@ -3,11 +3,11 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #if !defined(lplvm_h)
 #define lplvm_h
 
 #include "lplcap.h"
-
 
 /* Virtual Machine's instructions */
 typedef enum Opcode {
@@ -42,8 +42,6 @@ typedef enum Opcode {
   IEmpty  /* to fill empty slots left by optimizations */
 } Opcode;
 
-
-
 typedef union Instruction {
   struct Inst {
     byte code;
@@ -54,14 +52,13 @@ typedef union Instruction {
   byte buff[1];
 } Instruction;
 
-
 /* extract 24-bit value from an instruction */
-#define utf_to(inst)	(((inst)->i.key << 8) | (inst)->i.aux)
+#define utf_to(inst) (((inst)->i.key << 8) | (inst)->i.aux)
 
-
-LUAI_FUNC void printpatt (Instruction *p, int n);
-LUAI_FUNC const char *match (lua_State *L, const char *o, const char *s, const char *e,
-                   Instruction *op, Capture *capture, int ptop, short *labelf, const char **sfail); /* labeled failure */
+LUAI_FUNC void printpatt(Instruction *p, int n);
+LUAI_FUNC const char *match(lua_State *L, const char *o, const char *s,
+                            const char *e, Instruction *op, Capture *capture,
+                            int ptop, short *labelf,
+                            const char **sfail); /* labeled failure */
 
 #endif
-

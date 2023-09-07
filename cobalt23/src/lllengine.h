@@ -7,33 +7,32 @@
 #ifndef LLLENGINE_H
 #define LLLENGINE_H
 
-#include <memory>
-
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
+
+#include <memory>
 
 namespace lll {
 
 class Engine {
-public:
-    Engine(llvm::ExecutionEngine* ee, llvm::Module* module,
-            llvm::Function* function);
+ public:
+  Engine(llvm::ExecutionEngine* ee, llvm::Module* module,
+         llvm::Function* function);
 
-    // Gets the compiled function
-    void* GetFunction();
+  // Gets the compiled function
+  void* GetFunction();
 
-    // Dumps the compiled modules
-    void Dump();
+  // Dumps the compiled modules
+  void Dump();
 
-    // Writes the bytecode and asm files
-    void Write(const std::string& path);
+  // Writes the bytecode and asm files
+  void Write(const std::string& path);
 
-private:
-    std::unique_ptr<llvm::ExecutionEngine> ee_;
-    llvm::Module* module_;
-    void* function_;
+ private:
+  std::unique_ptr<llvm::ExecutionEngine> ee_;
+  llvm::Module* module_;
+  void* function_;
 };
 
-}
+}  // namespace lll
 
 #endif
-

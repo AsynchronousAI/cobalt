@@ -3,113 +3,113 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #include "lsignal.h"
 
 #define LUA_SIGNAL "lua_signal"
 
 static const struct lua_signal lua_signals[] = {
-  /* ANSI C signals */
+/* ANSI C signals */
 #ifdef SIGABRT
-  {"SIGABRT", SIGABRT},
+    {"SIGABRT", SIGABRT},
 #endif
 #ifdef SIGFPE
-  {"SIGFPE", SIGFPE},
+    {"SIGFPE", SIGFPE},
 #endif
 #ifdef SIGILL
-  {"SIGILL", SIGILL},
+    {"SIGILL", SIGILL},
 #endif
 #ifdef SIGINT
-  {"SIGINT", SIGINT},
+    {"SIGINT", SIGINT},
 #endif
 #ifdef SIGSEGV
-  {"SIGSEGV", SIGSEGV},
+    {"SIGSEGV", SIGSEGV},
 #endif
 #ifdef SIGTERM
-  {"SIGTERM", SIGTERM},
+    {"SIGTERM", SIGTERM},
 #endif
-  /* posix signals */
+/* posix signals */
 #ifdef SIGHUP
-  {"SIGHUP", SIGHUP},
+    {"SIGHUP", SIGHUP},
 #endif
 #ifdef SIGQUIT
-  {"SIGQUIT", SIGQUIT},
+    {"SIGQUIT", SIGQUIT},
 #endif
 #ifdef SIGTRAP
-  {"SIGTRAP", SIGTRAP},
+    {"SIGTRAP", SIGTRAP},
 #endif
 #ifdef SIGKILL
-  {"SIGKILL", SIGKILL},
+    {"SIGKILL", SIGKILL},
 #endif
 #ifdef SIGUSR1
-  {"SIGUSR1", SIGUSR1},
+    {"SIGUSR1", SIGUSR1},
 #endif
 #ifdef SIGUSR2
-  {"SIGUSR2", SIGUSR2},
+    {"SIGUSR2", SIGUSR2},
 #endif
 #ifdef SIGPIPE
-  {"SIGPIPE", SIGPIPE},
+    {"SIGPIPE", SIGPIPE},
 #endif
 #ifdef SIGALRM
-  {"SIGALRM", SIGALRM},
+    {"SIGALRM", SIGALRM},
 #endif
 #ifdef SIGCHLD
-  {"SIGCHLD", SIGCHLD},
+    {"SIGCHLD", SIGCHLD},
 #endif
 #ifdef SIGCONT
-  {"SIGCONT", SIGCONT},
+    {"SIGCONT", SIGCONT},
 #endif
 #ifdef SIGSTOP
-  {"SIGSTOP", SIGSTOP},
+    {"SIGSTOP", SIGSTOP},
 #endif
 #ifdef SIGTTIN
-  {"SIGTTIN", SIGTTIN},
+    {"SIGTTIN", SIGTTIN},
 #endif
 #ifdef SIGTTOU
-  {"SIGTTOU", SIGTTOU},
+    {"SIGTTOU", SIGTTOU},
 #endif
-  /* some BSD signals */
+/* some BSD signals */
 #ifdef SIGIOT
-  {"SIGIOT", SIGIOT},
+    {"SIGIOT", SIGIOT},
 #endif
 #ifdef SIGBUS
-  {"SIGBUS", SIGBUS},
+    {"SIGBUS", SIGBUS},
 #endif
 #ifdef SIGCLD
-  {"SIGCLD", SIGCLD},
+    {"SIGCLD", SIGCLD},
 #endif
 #ifdef SIGURG
-  {"SIGURG", SIGURG},
+    {"SIGURG", SIGURG},
 #endif
 #ifdef SIGXCPU
-  {"SIGXCPU", SIGXCPU},
+    {"SIGXCPU", SIGXCPU},
 #endif
 #ifdef SIGXFSZ
-  {"SIGXFSZ", SIGXFSZ},
+    {"SIGXFSZ", SIGXFSZ},
 #endif
 #ifdef SIGVTALRM
-  {"SIGVTALRM", SIGVTALRM},
+    {"SIGVTALRM", SIGVTALRM},
 #endif
 #ifdef SIGPROF
-  {"SIGPROF", SIGPROF},
+    {"SIGPROF", SIGPROF},
 #endif
 #ifdef SIGWINCH
-  {"SIGWINCH", SIGWINCH},
+    {"SIGWINCH", SIGWINCH},
 #endif
 #ifdef SIGPOLL
-  {"SIGPOLL", SIGPOLL},
+    {"SIGPOLL", SIGPOLL},
 #endif
 #ifdef SIGIO
-  {"SIGIO", SIGIO},
+    {"SIGIO", SIGIO},
 #endif
-  /* add odd signals */
+/* add odd signals */
 #ifdef SIGSTKFLT
-  {"SIGSTKFLT", SIGSTKFLT}, /* stack fault */
+    {"SIGSTKFLT", SIGSTKFLT}, /* stack fault */
 #endif
 #ifdef SIGSYS
-  {"SIGSYS", SIGSYS},
+    {"SIGSYS", SIGSYS},
 #endif
-  {NULL, 0}
-};
+    {NULL, 0}};
 
 static int Nsig = 0;
 static lua_State *Lsig = NULL;
@@ -117,8 +117,7 @@ static lua_Hook Hsig = NULL;
 static int Hmask = 0;
 static int Hcount = 0;
 
-static void sighook(lua_State *L, lua_Debug *ar)
-{
+static void sighook(lua_State *L, lua_Debug *ar) {
   lua_pushstring(L, LUA_SIGNAL);
   lua_gettable(L, LUA_REGISTRYINDEX);
   lua_pushnumber(L, Nsig);
@@ -130,8 +129,7 @@ static void sighook(lua_State *L, lua_Debug *ar)
   lua_sethook(L, Hsig, Hmask, Hcount);
 }
 
-static void handle(int sig)
-{
+static void handle(int sig) {
   Hsig = lua_gethook(Lsig);
   Hmask = lua_gethookmask(Lsig);
   Hcount = lua_gethookcount(Lsig);
@@ -159,10 +157,9 @@ static void handle(int sig)
  *         if caught, Lua function _must_
  *         exit, as the stack is most likely
  *         in an unstable state.
-*/  
+ */
 
-static int l_signal(lua_State *L)
-{
+static int l_signal(lua_State *L) {
   int args = lua_gettop(L);
   int t, sig; /* type, signal */
 
@@ -170,16 +167,14 @@ static int l_signal(lua_State *L)
   luaL_checkany(L, 1);
   t = lua_type(L, 1);
   if (t == LUA_TNUMBER)
-    sig = (int) lua_tonumber(L, 1);
-  else if (t == LUA_TSTRING)
-  {
+    sig = (int)lua_tonumber(L, 1);
+  else if (t == LUA_TSTRING) {
     lua_pushstring(L, LUA_SIGNAL);
     lua_gettable(L, LUA_REGISTRYINDEX);
     lua_pushvalue(L, 1);
     lua_gettable(L, -2);
-    if (!lua_isnumber(L, -1))
-      luaL_error(L, "invalid signal string");
-    sig = (int) lua_tonumber(L, -1);
+    if (!lua_isnumber(L, -1)) luaL_error(L, "invalid signal string");
+    sig = (int)lua_tonumber(L, -1);
     lua_pop(L, 1); /* get rid of number we pushed */
   } else
     luaL_checknumber(L, 1); /* will always error, with good error msg */
@@ -196,8 +191,7 @@ static int l_signal(lua_State *L)
     lua_settable(L, -4);
     lua_remove(L, -2); /* remove LUA_SIGNAL table */
     signal(sig, SIG_DFL);
-  } else
-  {
+  } else {
     luaL_checktype(L, 2, LUA_TFUNCTION);
 
     lua_pushstring(L, LUA_SIGNAL);
@@ -231,10 +225,9 @@ static int l_signal(lua_State *L)
  * l_raise == raise(signal)
  *
  * signal = signal number or string
-*/  
+ */
 
-static int l_raise(lua_State *L)
-{
+static int l_raise(lua_State *L) {
   int args = lua_gettop(L);
   int t = 0; /* type */
   lua_Number ret;
@@ -242,19 +235,16 @@ static int l_raise(lua_State *L)
   luaL_checkany(L, 1);
 
   t = lua_type(L, 1);
-  if (t == LUA_TNUMBER)
-  {
-    ret = (lua_Number) raise((int) lua_tonumber(L, 1));
+  if (t == LUA_TNUMBER) {
+    ret = (lua_Number)raise((int)lua_tonumber(L, 1));
     lua_pushnumber(L, ret);
-  } else if (t == LUA_TSTRING)
-  {
+  } else if (t == LUA_TSTRING) {
     lua_pushstring(L, LUA_SIGNAL);
     lua_gettable(L, LUA_REGISTRYINDEX);
     lua_pushvalue(L, 1);
     lua_gettable(L, -2);
-    if (!lua_isnumber(L, -1))
-      luaL_error(L, "invalid signal string");
-    ret = (lua_Number) raise((int) lua_tonumber(L, -1));
+    if (!lua_isnumber(L, -1)) luaL_error(L, "invalid signal string");
+    ret = (lua_Number)raise((int)lua_tonumber(L, -1));
     lua_pop(L, 1); /* get rid of number we pushed */
     lua_pushnumber(L, ret);
   } else
@@ -272,32 +262,26 @@ static int l_raise(lua_State *L)
  *
  * pid = process id
  * signal = signal number or string
-*/  
+ */
 
-static int l_kill(lua_State *L)
-{
-  int t; /* type */
+static int l_kill(lua_State *L) {
+  int t;          /* type */
   lua_Number ret; /* return value */
 
   luaL_checknumber(L, 1); /* must be int for pid */
-  luaL_checkany(L, 2); /* check for a second arg */
+  luaL_checkany(L, 2);    /* check for a second arg */
 
   t = lua_type(L, 2);
-  if (t == LUA_TNUMBER)
-  {
-    ret = (lua_Number) kill((int) lua_tonumber(L, 1),
-        (int) lua_tonumber(L, 2));
+  if (t == LUA_TNUMBER) {
+    ret = (lua_Number)kill((int)lua_tonumber(L, 1), (int)lua_tonumber(L, 2));
     lua_pushnumber(L, ret);
-  } else if (t == LUA_TSTRING)
-  {
+  } else if (t == LUA_TSTRING) {
     lua_pushstring(L, LUA_SIGNAL);
     lua_gettable(L, LUA_REGISTRYINDEX);
     lua_pushvalue(L, 2);
     lua_gettable(L, -2);
-    if (!lua_isnumber(L, -1))
-      luaL_error(L, "invalid signal string");
-    ret = (lua_Number) kill((int) lua_tonumber(L, 1),
-        (int) lua_tonumber(L, -1));
+    if (!lua_isnumber(L, -1)) luaL_error(L, "invalid signal string");
+    ret = (lua_Number)kill((int)lua_tonumber(L, 1), (int)lua_tonumber(L, -1));
     lua_pop(L, 1); /* get rid of number we pushed */
     lua_pushnumber(L, ret);
   } else
@@ -307,21 +291,18 @@ static int l_kill(lua_State *L)
 
 #endif
 
-static const struct luaL_Reg lsignal_lib[] = {
-  {"new", l_signal},
-  {"call", l_raise},
+static const struct luaL_Reg lsignal_lib[] = {{"new", l_signal},
+                                              {"call", l_raise},
 #ifdef _POSIX_SOURCE
-  {"kill", l_kill},
+                                              {"kill", l_kill},
 #endif
-  {NULL, NULL}
-};
+                                              {NULL, NULL}};
 
-int luaopen_signal(lua_State *L)
-{
+int luaopen_signal(lua_State *L) {
   int i = 0;
 
-  /* add the library */
-  #define luaL_register(L,n,f)	luaL_newlib(L,f)
+/* add the library */
+#define luaL_register(L, n, f) luaL_newlib(L, f)
   luaL_register(L, "signal", lsignal_lib);
 
   /* push lua_signals table into the registry */
@@ -330,8 +311,7 @@ int luaopen_signal(lua_State *L)
   lua_pushstring(L, LUA_SIGNAL);
   lua_createtable(L, 0, 0);
 
-  while (lua_signals[i].name != NULL)
-  {
+  while (lua_signals[i].name != NULL) {
     /* registry table */
     lua_pushstring(L, lua_signals[i].name);
     lua_pushnumber(L, lua_signals[i].sig);

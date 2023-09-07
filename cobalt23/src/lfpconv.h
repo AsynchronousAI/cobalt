@@ -3,13 +3,11 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
-# define FPCONV_G_FMT_BUFSIZE   32
+
+#define FPCONV_G_FMT_BUFSIZE 32
 
 #ifdef USE_INTERNAL_FPCONV
-static inline void fpconv_init()
-{
-    /* Do nothing - not required */
-}
+static inline void fpconv_init() { /* Do nothing - not required */ }
 #else
 extern void fpconv_init();
 #endif

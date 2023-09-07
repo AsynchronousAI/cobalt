@@ -4,16 +4,15 @@
 // ============================================================================== */
 
 
-
 #include <stdio.h>
 #include <stdlib.h>
-
 
 #ifdef _WIN32
 #include <windows.h>
 #define W
 
-#elif defined(LUA_USE_POSIX) || defined(__unix__) || defined(__unix) || defined(__APPLE__)
+#elif defined(LUA_USE_POSIX) || defined(__unix__) || defined(__unix) || \
+    defined(__APPLE__)
 #include <sys/utsname.h>
 #define U
 #else
@@ -21,14 +20,17 @@
 #endif
 
 static const char* getCPUName() {
-  #ifdef W
+#ifdef W
   char cpuName[256];
   DWORD bufferSize = sizeof(cpuName);
   DWORD type = REG_SZ;
   HKEY hKey;
 
-  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-    if (RegQueryValueEx(hKey, "ProcessorNameString", NULL, &type, (LPBYTE)cpuName, &bufferSize) == ERROR_SUCCESS) {
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                   "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0,
+                   KEY_READ, &hKey) == ERROR_SUCCESS) {
+    if (RegQueryValueEx(hKey, "ProcessorNameString", NULL, &type,
+                        (LPBYTE)cpuName, &bufferSize) == ERROR_SUCCESS) {
       RegCloseKey(hKey);
       return cpuName;
     }
@@ -36,28 +38,32 @@ static const char* getCPUName() {
   }
 
   return "Unknown Windows CPU";
-  #elif defined(U)
+#elif defined(U)
   struct utsname buf;
   if (uname(&buf) == 0) {
     return buf.machine;
   }
   return "Unknown Unix CPU";
-  #else 
+#else
   return "Unknown CPU";
-  #endif
+#endif
 }
 
-static const char* getGPUName(){
-  #ifdef W
+static const char* getGPUName() {
+#ifdef W
   char gpuName[256];
   DWORD bufferSize = sizeof(gpuName);
-  HDEVINFO deviceInfoSet = SetupDiGetClassDevs(&GUID_DEVCLASS_DISPLAY, NULL, NULL, DIGCF_PRESENT);
+  HDEVINFO deviceInfoSet =
+      SetupDiGetClassDevs(&GUID_DEVCLASS_DISPLAY, NULL, NULL, DIGCF_PRESENT);
   if (deviceInfoSet != INVALID_HANDLE_VALUE) {
     SP_DEVINFO_DATA deviceInfoData;
     deviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-    for (DWORD i = 0; SetupDiEnumDeviceInfo(deviceInfoSet, i, &deviceInfoData); i++) {
+    for (DWORD i = 0; SetupDiEnumDeviceInfo(deviceInfoSet, i, &deviceInfoData);
+         i++) {
       DWORD dataType;
-      if (SetupDiGetDeviceRegistryProperty(deviceInfoSet, &deviceInfoData, SPDRP_HARDWAREID, &dataType, (BYTE*)gpuName, bufferSize, &bufferSize)) {
+      if (SetupDiGetDeviceRegistryProperty(
+              deviceInfoSet, &deviceInfoData, SPDRP_HARDWAREID, &dataType,
+              (BYTE*)gpuName, bufferSize, &bufferSize)) {
         if (strstr(gpuName, "VEN_") && strstr(gpuName, "DEV_")) {
           char* vendorID = strstr(gpuName, "VEN_") + 4;
           char* deviceID = strstr(gpuName, "DEV_") + 4;
@@ -72,9 +78,9 @@ static const char* getGPUName(){
     SetupDiDestroyDeviceInfoList(deviceInfoSet);
   }
   return "Unknown Windows GPU";
-  #elif defined(U)
+#elif defined(U)
   return "Unknown Unix GPU";
-  #else
+#else
   return "Unknown GPU";
-  #endif
+#endif
 }

@@ -3,23 +3,21 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #define lmem_c
 #define LUA_CORE
 
-#include "lprefix.h"
-
+#include "lmem.h"
 
 #include <stddef.h>
 
 #include "cobalt.h"
-
 #include "ldebug.h"
 #include "ldo.h"
 #include "lgc.h"
-#include "lmem.h"
 #include "lobject.h"
+#include "lprefix.h"
 #include "lstate.h"
-
 
 #if defined(EMERGENCYGCTESTS)
 /*
@@ -27,19 +25,15 @@
 ** (This fail will trigger 'tryagain' and a full GC cycle at every
 ** allocation.)
 */
-static void *firsttry (global_State *g, void *block, size_t os, size_t ns) {
-  if (completestate(g) && ns > 0)  /* frees never fail */
-    return NULL;  /* fail */
-  else  /* normal allocation */
+static void *firsttry(global_State *g, void *block, size_t os, size_t ns) {
+  if (completestate(g) && ns > 0) /* frees never fail */
+    return NULL;                  /* fail */
+  else                            /* normal allocation */
     return (*g->frealloc)(g->ud, block, os, ns);
 }
 #else
-#define firsttry(g,block,os,ns)    ((*g->frealloc)(g->ud, block, os, ns))
+#define firsttry(g, block, os, ns) ((*g->frealloc)(g->ud, block, os, ns))
 #endif
-
-
-
-
 
 /*
 ** About the realloc function:
@@ -58,9 +52,6 @@ static void *firsttry (global_State *g, void *block, size_t os, size_t ns) {
 ** block to the new size.
 */
 
-
-
-
 /*
 ** {==================================================================
 ** Functions to allocate/deallocate arrays for the Parser
@@ -72,33 +63,29 @@ static void *firsttry (global_State *g, void *block, size_t os, size_t ns) {
 ** reallocating to size 1, then 2, and then 4. All these arrays
 ** will be reallocated to exact sizes or erased when parsing ends.
 */
-#define MINSIZEARRAY	4
+#define MINSIZEARRAY 4
 
-
-void *luaM_growaux_ (lua_State *L, void *block, int nelems, int *psize,
-                     int size_elems, int limit, const char *what) {
+void *luaM_growaux_(lua_State *L, void *block, int nelems, int *psize,
+                    int size_elems, int limit, const char *what) {
   void *newblock;
   int size = *psize;
-  if (nelems + 1 <= size)  /* does one extra element still fit? */
-    return block;  /* nothing to be done */
-  if (size >= limit / 2) {  /* cannot double it? */
-    if (l_unlikely(size >= limit))  /* cannot grow even a little? */
+  if (nelems + 1 <= size)          /* does one extra element still fit? */
+    return block;                  /* nothing to be done */
+  if (size >= limit / 2) {         /* cannot double it? */
+    if (l_unlikely(size >= limit)) /* cannot grow even a little? */
       luaG_runerror(L, "too many %s (limit is %d)", what, limit);
-    size = limit;  /* still have at least one free place */
-  }
-  else {
+    size = limit; /* still have at least one free place */
+  } else {
     size *= 2;
-    if (size < MINSIZEARRAY)
-      size = MINSIZEARRAY;  /* minimum size */
+    if (size < MINSIZEARRAY) size = MINSIZEARRAY; /* minimum size */
   }
   lua_assert(nelems + 1 <= size && size <= limit);
   /* 'limit' ensures that multiplication will not overflow */
   newblock = luaM_saferealloc_(L, block, cast_sizet(*psize) * size_elems,
-                                         cast_sizet(size) * size_elems);
-  *psize = size;  /* update only when everything else is OK */
+                               cast_sizet(size) * size_elems);
+  *psize = size; /* update only when everything else is OK */
   return newblock;
 }
-
 
 /*
 ** In prototypes, the size of the array is also its number of
@@ -106,8 +93,8 @@ void *luaM_growaux_ (lua_State *L, void *block, int nelems, int *psize,
 ** to its number of elements, the only option is to raise an
 ** error.
 */
-void *luaM_shrinkvector_ (lua_State *L, void *block, int *size,
-                          int final_n, int size_elem) {
+void *luaM_shrinkvector_(lua_State *L, void *block, int *size, int final_n,
+                         int size_elem) {
   void *newblock;
   size_t oldsize = cast_sizet((*size) * size_elem);
   size_t newsize = cast_sizet(final_n * size_elem);
@@ -119,22 +106,19 @@ void *luaM_shrinkvector_ (lua_State *L, void *block, int *size,
 
 /* }================================================================== */
 
-
-l_noret luaM_toobig (lua_State *L) {
+l_noret luaM_toobig(lua_State *L) {
   luaG_runerror(L, "memory allocation error: block too big");
 }
-
 
 /*
 ** Free memory
 */
-void luaM_free_ (lua_State *L, void *block, size_t osize) {
+void luaM_free_(lua_State *L, void *block, size_t osize) {
   global_State *g = G(L);
   lua_assert((osize == 0) == (block == NULL));
   (*g->frealloc)(g->ud, block, osize, 0);
   g->GCdebt -= osize;
 }
-
 
 /*
 ** In case of allocation fail, this function will do an emergency
@@ -144,55 +128,49 @@ void luaM_free_ (lua_State *L, void *block, size_t osize) {
 ** when 'gcstopem' is true, because then the interpreter is in the
 ** middle of a collection step.
 */
-static void *tryagain (lua_State *L, void *block,
-                       size_t osize, size_t nsize) {
+static void *tryagain(lua_State *L, void *block, size_t osize, size_t nsize) {
   global_State *g = G(L);
   if (completestate(g) && !g->gcstopem) {
-    luaC_fullgc(L, 1);  /* try to free some memory... */
-    return (*g->frealloc)(g->ud, block, osize, nsize);  /* try again */
-  }
-  else return NULL;  /* cannot free any memory without a full state */
+    luaC_fullgc(L, 1); /* try to free some memory... */
+    return (*g->frealloc)(g->ud, block, osize, nsize); /* try again */
+  } else
+    return NULL; /* cannot free any memory without a full state */
 }
-
 
 /*
 ** Generic allocation routine.
 */
-void *luaM_realloc_ (lua_State *L, void *block, size_t osize, size_t nsize) {
+void *luaM_realloc_(lua_State *L, void *block, size_t osize, size_t nsize) {
   void *newblock;
   global_State *g = G(L);
   lua_assert((osize == 0) == (block == NULL));
   newblock = firsttry(g, block, osize, nsize);
   if (l_unlikely(newblock == NULL && nsize > 0)) {
     newblock = tryagain(L, block, osize, nsize);
-    if (newblock == NULL)  /* still no memory? */
-      return NULL;  /* do not update 'GCdebt' */
+    if (newblock == NULL) /* still no memory? */
+      return NULL;        /* do not update 'GCdebt' */
   }
   lua_assert((nsize == 0) == (newblock == NULL));
   g->GCdebt = (g->GCdebt + nsize) - osize;
   return newblock;
 }
 
-
-void *luaM_saferealloc_ (lua_State *L, void *block, size_t osize,
-                                                    size_t nsize) {
+void *luaM_saferealloc_(lua_State *L, void *block, size_t osize, size_t nsize) {
   void *newblock = luaM_realloc_(L, block, osize, nsize);
-  if (l_unlikely(newblock == NULL && nsize > 0))  /* allocation failed? */
+  if (l_unlikely(newblock == NULL && nsize > 0)) /* allocation failed? */
     luaM_error(L);
   return newblock;
 }
 
-
-void *luaM_malloc_ (lua_State *L, size_t size, int tag) {
+void *luaM_malloc_(lua_State *L, size_t size, int tag) {
   if (size == 0)
-    return NULL;  /* that's all */
+    return NULL; /* that's all */
   else {
     global_State *g = G(L);
     void *newblock = firsttry(g, NULL, tag, size);
     if (l_unlikely(newblock == NULL)) {
       newblock = tryagain(L, NULL, tag, size);
-      if (newblock == NULL)
-        luaM_error(L);
+      if (newblock == NULL) luaM_error(L);
     }
     g->GCdebt += size;
     return newblock;

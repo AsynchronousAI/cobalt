@@ -15,31 +15,30 @@ class Register;
 class Value;
 
 class Logical : public Opcode {
-public:
-    // Constructor
-    Logical(CompilerState& cs, Stack& stack);
+ public:
+  // Constructor
+  Logical(CompilerState& cs, Stack& stack);
 
-    // Compiles the opcode
-    void Compile();
+  // Compiles the opcode
+  void Compile();
 
-private:
-    // Compilation steps
-    void ComputeInteger();
-    void ComputeTaggedMethod();
+ private:
+  // Compilation steps
+  void ComputeInteger();
+  void ComputeTaggedMethod();
 
-    // Performs the integer binary operation
-    llvm::Value* PerformIntOp(llvm::Value* a, llvm::Value* b);
-    
-    // Obtains the corresponding tag for the opcode
-    int GetMethodTag();
+  // Performs the integer binary operation
+  llvm::Value* PerformIntOp(llvm::Value* a, llvm::Value* b);
 
-    Register& ra_;
-    Value& rkb_;
-    Value& rkc_;
-    llvm::BasicBlock* trytm_;
+  // Obtains the corresponding tag for the opcode
+  int GetMethodTag();
+
+  Register& ra_;
+  Value& rkb_;
+  Value& rkc_;
+  llvm::BasicBlock* trytm_;
 };
 
-}
+}  // namespace lll
 
 #endif
-

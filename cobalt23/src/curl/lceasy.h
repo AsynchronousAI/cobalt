@@ -4,12 +4,13 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #ifndef _LCEASY_H_
 #define _LCEASY_H_
 
+#include "lchttppost.h"
 #include "lcurl.h"
 #include "lcutils.h"
-#include "lchttppost.h"
 
 #define LCURL_LST_INDEX(N) LCURL_##N##_LIST,
 #define LCURL_STR_INDEX(N)
@@ -21,7 +22,7 @@
 enum {
   LCURL_LIST_DUMMY = -1,
 
-#include"lcopteasy.h"
+#include "lcopteasy.h"
 
   LCURL_LIST_COUNT,
 };
@@ -36,27 +37,27 @@ enum {
 #define LCURL_EASY_MAGIC 0xEA
 
 #if LCURL_CC_SUPPORT_FORWARD_TYPEDEF
-  typedef struct lcurl_multi_tag lcurl_multi_t;
-  #if LCURL_CURL_VER_GE(7,56,0)
-    typedef struct lcurl_mime_tag lcurl_mime_t;
-  #endif
-  #if LCURL_CURL_VER_GE(7,63,0)
-    typedef struct lcurl_url_tag lcurl_url_t;
-  #endif
+typedef struct lcurl_multi_tag lcurl_multi_t;
+#if LCURL_CURL_VER_GE(7, 56, 0)
+typedef struct lcurl_mime_tag lcurl_mime_t;
+#endif
+#if LCURL_CURL_VER_GE(7, 63, 0)
+typedef struct lcurl_url_tag lcurl_url_t;
+#endif
 #else
-  struct lcurl_multi_tag;
-  #define lcurl_multi_t struct lcurl_multi_tag
-  #if LCURL_CURL_VER_GE(7,56,0)
-    struct lcurl_mime_tag;
-    #define lcurl_mime_t struct lcurl_mime_tag
-  #endif
-  #if LCURL_CURL_VER_GE(7,63,0)
-    struct lcurl_url_tag;
-    #define lcurl_url_t struct lcurl_url_tag
-  #endif
+struct lcurl_multi_tag;
+#define lcurl_multi_t struct lcurl_multi_tag
+#if LCURL_CURL_VER_GE(7, 56, 0)
+struct lcurl_mime_tag;
+#define lcurl_mime_t struct lcurl_mime_tag
+#endif
+#if LCURL_CURL_VER_GE(7, 63, 0)
+struct lcurl_url_tag;
+#define lcurl_url_t struct lcurl_url_tag
+#endif
 #endif
 
-typedef struct lcurl_easy_tag{
+typedef struct lcurl_easy_tag {
   unsigned char magic;
 
   lua_State *L;
@@ -67,7 +68,7 @@ typedef struct lcurl_easy_tag{
 
   lcurl_multi_t *multi;
 
-#if LCURL_CURL_VER_GE(7,56,0)
+#if LCURL_CURL_VER_GE(7, 56, 0)
   lcurl_mime_t *mime;
 #endif
 
@@ -83,32 +84,32 @@ typedef struct lcurl_easy_tag{
   lcurl_callback_t match;
   lcurl_callback_t chunk_bgn;
   lcurl_callback_t chunk_end;
-#if LCURL_CURL_VER_GE(7,19,6)
+#if LCURL_CURL_VER_GE(7, 19, 6)
   lcurl_callback_t ssh_key;
 #endif
-#if LCURL_CURL_VER_GE(7,64,0)
+#if LCURL_CURL_VER_GE(7, 64, 0)
   lcurl_callback_t trailer;
 #endif
-#if LCURL_CURL_VER_GE(7,74,0) && LCURL_USE_HSTS
+#if LCURL_CURL_VER_GE(7, 74, 0) && LCURL_USE_HSTS
   lcurl_callback_t hstsread;
   lcurl_callback_t hstswrite;
 #endif
-}lcurl_easy_t;
+} lcurl_easy_t;
 
 int lcurl_easy_create(lua_State *L, int error_mode);
 
 lcurl_easy_t *lcurl_geteasy_at(lua_State *L, int i);
 
-#define lcurl_geteasy(L) lcurl_geteasy_at((L),1)
+#define lcurl_geteasy(L) lcurl_geteasy_at((L), 1)
 
 void lcurl_easy_initlib(lua_State *L, int nup);
 
-void lcurl__easy_assign_lua(lua_State *L, lcurl_easy_t *p, lua_State *value, int assign_multi);
+void lcurl__easy_assign_lua(lua_State *L, lcurl_easy_t *p, lua_State *value,
+                            int assign_multi);
 
-size_t lcurl_read_callback(lua_State *L,
-  lcurl_callback_t *rd, lcurl_read_buffer_t *rbuffer,
-  char *buffer, size_t size, size_t nitems
-);
+size_t lcurl_read_callback(lua_State *L, lcurl_callback_t *rd,
+                           lcurl_read_buffer_t *rbuffer, char *buffer,
+                           size_t size, size_t nitems);
 
 #if !LCURL_CC_SUPPORT_FORWARD_TYPEDEF
 #undef lcurl_multi_t

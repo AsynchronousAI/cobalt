@@ -3,152 +3,138 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #if !defined(lpltypes_h)
 #define lpltypes_h
-
 
 #include <assert.h>
 #include <limits.h>
 
 #include "cobalt.h"
 
+#define VERSION "1.6.1"
 
-#define VERSION         "1.6.1"
-
-
-#define PATTERN_T	"pattern"
-#define MAXSTACKIDX	"maxstack"
-
+#define PATTERN_T "pattern"
+#define MAXSTACKIDX "maxstack"
 
 /*
 ** compatibility with Lua 5.1
 */
 #if (LUA_VERSION_NUM == 501)
 
-#define lp_equal	lua_equal
+#define lp_equal lua_equal
 
-#define lua_getuservalue	lua_getfenv
-#define lua_setuservalue	lua_setfenv
+#define lua_getuservalue lua_getfenv
+#define lua_setuservalue lua_setfenv
 
-#define lua_rawlen		lua_objlen
+#define lua_rawlen lua_objlen
 
-#define luaL_setfuncs(L,f,n)	luaL_register(L,NULL,f)
-#define luaL_newlib(L,f)	luaL_register(L,"lpeglabel",f)
+#define luaL_setfuncs(L, f, n) luaL_register(L, NULL, f)
+#define luaL_newlib(L, f) luaL_register(L, "lpeglabel", f)
 
 typedef size_t lua_Unsigned;
 
 #endif
 
-
 #if !defined(lp_equal)
-#define lp_equal(L,idx1,idx2)  lua_compare(L,(idx1),(idx2),LUA_OPEQ)
+#define lp_equal(L, idx1, idx2) lua_compare(L, (idx1), (idx2), LUA_OPEQ)
 #endif
-
 
 /* default maximum size for call/backtrack stack */
 #if !defined(MAXBACK)
-#define MAXBACK         400
+#define MAXBACK 400
 #endif
-
 
 /* maximum number of rules in a grammar (limited by 'unsigned short') */
 #if !defined(MAXRULES)
-#define MAXRULES        1000
+#define MAXRULES 1000
 #endif
 
-
-
 /* initial size for capture's list */
-#define INITCAPSIZE	32
-
+#define INITCAPSIZE 32
 
 /* index, on Lua stack, for subject */
-#define SUBJIDX		2
+#define SUBJIDX 2
 
 /* number of fixed arguments to 'match' (before capture arguments) */
-#define FIXEDARGS	3
+#define FIXEDARGS 3
 
 /* index, on Lua stack, for capture list */
-#define caplistidx(ptop)	((ptop) + 2)
+#define caplistidx(ptop) ((ptop) + 2)
 
 /* index, on Lua stack, for pattern's ktable */
-#define ktableidx(ptop)		((ptop) + 3)
+#define ktableidx(ptop) ((ptop) + 3)
 
 /* index, on Lua stack, for backtracking stack */
-#define stackidx(ptop)	((ptop) + 4)
-
-
+#define stackidx(ptop) ((ptop) + 4)
 
 typedef unsigned char byte;
 
+#define BITSPERCHAR 8
 
-#define BITSPERCHAR		8
-
-#define CHARSETSIZE		((UCHAR_MAX/BITSPERCHAR) + 1)
-
-
+#define CHARSETSIZE ((UCHAR_MAX / BITSPERCHAR) + 1)
 
 typedef struct Charset {
   byte cs[CHARSETSIZE];
 } Charset;
 
-
-
-#define loopset(v,b)    { int v; for (v = 0; v < CHARSETSIZE; v++) {b;} }
+#define loopset(v, b)                   \
+  {                                     \
+    int v;                              \
+    for (v = 0; v < CHARSETSIZE; v++) { \
+      b;                                \
+    }                                   \
+  }
 
 /* access to charset */
-#define treebuffer(t)      ((byte *)((t) + 1))
+#define treebuffer(t) ((byte *)((t) + 1))
 
 /* number of slots needed for 'n' bytes */
-#define bytes2slots(n)  (((n) - 1) / sizeof(TTree) + 1)
+#define bytes2slots(n) (((n)-1) / sizeof(TTree) + 1)
 
 /* set 'b' bit in charset 'cs' */
-#define setchar(cs,b)   ((cs)[(b) >> 3] |= (1 << ((b) & 7)))
-
+#define setchar(cs, b) ((cs)[(b) >> 3] |= (1 << ((b)&7)))
 
 /*
 ** in capture instructions, 'kind' of capture and its offset are
 ** packed in field 'aux', 4 bits for each
 */
-#define getkind(op)		((op)->i.aux & 0xF)
-#define getoff(op)		(((op)->i.aux >> 4) & 0xF)
-#define joinkindoff(k,o)	((k) | ((o) << 4))
+#define getkind(op) ((op)->i.aux & 0xF)
+#define getoff(op) (((op)->i.aux >> 4) & 0xF)
+#define joinkindoff(k, o) ((k) | ((o) << 4))
 
-#define MAXOFF		0xF
-#define MAXAUX		0xFF
-
+#define MAXOFF 0xF
+#define MAXAUX 0xFF
 
 /* maximum number of bytes to look behind */
-#define MAXBEHIND	MAXAUX
-
+#define MAXBEHIND MAXAUX
 
 /* maximum size (in elements) for a pattern */
-#define MAXPATTSIZE	(SHRT_MAX - 10)
-
+#define MAXPATTSIZE (SHRT_MAX - 10)
 
 /* size (in elements) for an instruction plus extra l bytes */
-#define instsize(l)  (((l) + sizeof(Instruction) - 1)/sizeof(Instruction) + 1)
-
+#define instsize(l) (((l) + sizeof(Instruction) - 1) / sizeof(Instruction) + 1)
 
 /* size (in elements) for a ISet instruction */
-#define CHARSETINSTSIZE		instsize(CHARSETSIZE)
+#define CHARSETINSTSIZE instsize(CHARSETSIZE)
 
 /* size (in elements) for a IFunc instruction */
-#define funcinstsize(p)		((p)->i.aux + 2)
+#define funcinstsize(p) ((p)->i.aux + 2)
 
-
-
-#define testchar(st,c)	(((int)(st)[((c) >> 3)] & (1 << ((c) & 7))))
+#define testchar(st, c) (((int)(st)[((c) >> 3)] & (1 << ((c)&7))))
 
 /* labeled failure begin */
 #if !defined(LUAI_FUNC)
-#define LUAI_FUNC    extern
+#define LUAI_FUNC extern
 #endif
 
 #define LFAIL 0
 
 /* update the farthest failure */
-#define updatefarthest(s1,s2) { if ((s2) > (s1)) s1 = s2; }
+#define updatefarthest(s1, s2) \
+  {                            \
+    if ((s2) > (s1)) s1 = s2;  \
+  }
 
 #define OUTPRED 0
 
@@ -156,4 +142,3 @@ typedef struct Charset {
 /* labeled failure end */
 
 #endif
-

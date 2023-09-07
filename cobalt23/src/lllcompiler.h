@@ -18,73 +18,72 @@ namespace lll {
 class Engine;
 
 class Compiler {
-public:
-    // Constructor, receiver the proto that will be compiled
-    Compiler(lua_State* L, Proto* proto);
+ public:
+  // Constructor, receiver the proto that will be compiled
+  Compiler(lua_State* L, Proto* proto);
 
-    // Starts the function compilation
-    // Returns false if it fails
-    bool Compile();
+  // Starts the function compilation
+  // Returns false if it fails
+  bool Compile();
 
-    // Gets the compilation error message
-    const std::string& GetErrorMessage();
+  // Gets the compilation error message
+  const std::string& GetErrorMessage();
 
-    // Gets the engine (only if compilation succeeds)
-    Engine* GetEngine();
+  // Gets the engine (only if compilation succeeds)
+  Engine* GetEngine();
 
-private:
-    // Compiles the Lua proto instructions
-    bool CompileInstructions();
+ private:
+  // Compiles the Lua proto instructions
+  bool CompileInstructions();
 
-    // Returns true if the module doesn't have any error
-    bool VerifyModule();
+  // Returns true if the module doesn't have any error
+  bool VerifyModule();
 
-    // Optimize the generated module
-    bool OptimizeModule();
+  // Optimize the generated module
+  bool OptimizeModule();
 
-    // Creates the engine and returns true if it doesn't have any error
-    bool CreateEngine();
+  // Creates the engine and returns true if it doesn't have any error
+  bool CreateEngine();
 
-    // Compiles the specific instruction
-    void CompileMove();
-    void CompileLoadk(bool extraarg);
-    void CompileLoadbool();
-    void CompileLoadnil();
-    void CompileGetupval();
-    void CompileGettabup();
-    void CompileGettable();
-    void CompileSettabup();
-    void CompileSetupval();
-    void CompileSettable();
-    void CompileNewtable();
-    void CompileSelf();
-    void CompileUnm();
-    void CompileBNot();
-    void CompileNot();
-    void CompileLen();
-    void CompileConcat();
-    void CompileJmp();
-    void CompileCmp(const std::string& function);
-    void CompileTest();
-    void CompileTestset();
-    void CompileCall();
-    void CompileTailcall();
-    void CompileReturn();
-    void CompileForloop();
-    void CompileForprep();
-    void CompileTforcall();
-    void CompileTforloop();
-    void CompileSetlist();
-    void CompileClosure();
-    void CompileCheckcg(llvm::Value* reg);
+  // Compiles the specific instruction
+  void CompileMove();
+  void CompileLoadk(bool extraarg);
+  void CompileLoadbool();
+  void CompileLoadnil();
+  void CompileGetupval();
+  void CompileGettabup();
+  void CompileGettable();
+  void CompileSettabup();
+  void CompileSetupval();
+  void CompileSettable();
+  void CompileNewtable();
+  void CompileSelf();
+  void CompileUnm();
+  void CompileBNot();
+  void CompileNot();
+  void CompileLen();
+  void CompileConcat();
+  void CompileJmp();
+  void CompileCmp(const std::string& function);
+  void CompileTest();
+  void CompileTestset();
+  void CompileCall();
+  void CompileTailcall();
+  void CompileReturn();
+  void CompileForloop();
+  void CompileForprep();
+  void CompileTforcall();
+  void CompileTforloop();
+  void CompileSetlist();
+  void CompileClosure();
+  void CompileCheckcg(llvm::Value* reg);
 
-    std::string error_;
-    CompilerState cs_;
-    Stack stack_;
-    std::unique_ptr<Engine> engine_;
+  std::string error_;
+  CompilerState cs_;
+  Stack stack_;
+  std::unique_ptr<Engine> engine_;
 };
 
-}
+}  // namespace lll
 
 #endif
-

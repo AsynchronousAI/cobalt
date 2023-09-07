@@ -3,27 +3,23 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #define l3dtransform_c
 #define LUA_LIB
 
-#include "lprefix.h"
-
-
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cobalt.h"
-
 #include "lauxlib.h"
-#include "lualib.h"
 #include "lclasses.h"
+#include "lprefix.h"
+#include "lualib.h"
 
+int default_transform[12] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0};
 
-
-int default_transform[12] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 0 ,0 ,0};
-
-static int transform_index(lua_State *L) {
+static int transform_index(lua_State* L) {
   Transform* transform = (Transform*)lua_touserdata(L, 1);
   const char* key = luaL_checkstring(L, 2);
   if (strcmp(key, "X") == 0) {
@@ -66,7 +62,9 @@ static int transform_index(lua_State *L) {
   return 0;
 }
 
-static int push_transform(lua_State *L, int x, int y, int z, int ox, int oy, int oz, int sx, int sy, int sz, int px, int py, int pz) {
+static int push_transform(lua_State* L, int x, int y, int z, int ox, int oy,
+                          int oz, int sx, int sy, int sz, int px, int py,
+                          int pz) {
   Transform* transform = (Transform*)lua_newuserdata(L, sizeof(Transform));
   transform->x = x ?: default_transform[0];
   transform->y = y ?: default_transform[1];
@@ -89,15 +87,14 @@ static int push_transform(lua_State *L, int x, int y, int z, int ox, int oy, int
   return 1;
 }
 
-static int transform_new(lua_State *L){
+static int transform_new(lua_State* L) {
   // Input can be in many forms:
-  // Values can be ints or Vec3 userdatas (x,y,z). 
+  // Values can be ints or Vec3 userdatas (x,y,z).
   // Will be organized like this:
   // pos, orient, scale, pivot
   // if any of them are -1 that means default value
   // pos, orient, scale, pivot can be a a Vec3 each or 3 ints each
 
-  
   int x = default_transform[0];
   int y = default_transform[1];
   int z = default_transform[2];
@@ -112,9 +109,9 @@ static int transform_new(lua_State *L){
   int pz = default_transform[11];
 
   int nargs = lua_gettop(L);
-  
+
   if (nargs >= 1) {
-  if (lua_isnumber(L, 1)) {
+    if (lua_isnumber(L, 1)) {
       x = lua_tointeger(L, 1);
       if (nargs >= 2 && lua_isnumber(L, 2)) {
         y = lua_tointeger(L, 2);
@@ -180,41 +177,46 @@ static int transform_new(lua_State *L){
       pz = vec->z;
     }
   }
-    push_transform(L, x, y, z, ox, oy, oz, sx, sy, sz, px, py, pz);
-    return 1;
-}
-
-static int transform_add(lua_State *L){
-  Transform* a = (Transform*)lua_touserdata(L, 1);
-  Transform* b = (Transform*)lua_touserdata(L, 2);
-
-  push_transform(L, a->x+b->x, a->y+b->y, a->z+b->z, a->ox+b->ox, a->oy+b->oy, a->oz+b->oz, a->sx+b->sx, a->sy+b->sy, a->sz+b->sz, a->px+b->px, a->py+b->py, a->pz+b->pz);
-  return 1;
-}
-static int transform_sub(lua_State *L){
-  Transform* a = (Transform*)lua_touserdata(L, 1);
-  Transform* b = (Transform*)lua_touserdata(L, 2);
-
-  push_transform(L, a->x-b->x, a->y-b->y, a->z-b->z, a->ox-b->ox, a->oy-b->oy, a->oz-b->oz, a->sx-b->sx, a->sy-b->sy, a->sz-b->sz, a->px-b->px, a->py-b->py, a->pz-b->pz);
+  push_transform(L, x, y, z, ox, oy, oz, sx, sy, sz, px, py, pz);
   return 1;
 }
 
+static int transform_add(lua_State* L) {
+  Transform* a = (Transform*)lua_touserdata(L, 1);
+  Transform* b = (Transform*)lua_touserdata(L, 2);
 
-static const luaL_Reg lib[] = {
-    {"new", transform_new},
-    {"add", transform_add},
-    {"sub", transform_sub},
-  {NULL, NULL}
-};
+  push_transform(L, a->x + b->x, a->y + b->y, a->z + b->z, a->ox + b->ox,
+                 a->oy + b->oy, a->oz + b->oz, a->sx + b->sx, a->sy + b->sy,
+                 a->sz + b->sz, a->px + b->px, a->py + b->py, a->pz + b->pz);
+  return 1;
+}
+static int transform_sub(lua_State* L) {
+  Transform* a = (Transform*)lua_touserdata(L, 1);
+  Transform* b = (Transform*)lua_touserdata(L, 2);
 
-LUAMOD_API int luaopen_transform (lua_State *L) {
+  push_transform(L, a->x - b->x, a->y - b->y, a->z - b->z, a->ox - b->ox,
+                 a->oy - b->oy, a->oz - b->oz, a->sx - b->sx, a->sy - b->sy,
+                 a->sz - b->sz, a->px - b->px, a->py - b->py, a->pz - b->pz);
+  return 1;
+}
+
+static const luaL_Reg lib[] = {{"new", transform_new},
+                               {"add", transform_add},
+                               {"sub", transform_sub},
+                               {NULL, NULL}};
+
+LUAMOD_API int luaopen_transform(lua_State* L) {
   luaL_newlib(L, lib);
 
   push_transform(L, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0);
   lua_setfield(L, -2, "zero");
   push_transform(L, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0);
   lua_setfield(L, -2, "one");
-  push_transform(L, default_transform[0], default_transform[1], default_transform[2], default_transform[3], default_transform[4], default_transform[5], default_transform[6], default_transform[7], default_transform[8], default_transform[9], default_transform[10], default_transform[11]);
+  push_transform(
+      L, default_transform[0], default_transform[1], default_transform[2],
+      default_transform[3], default_transform[4], default_transform[5],
+      default_transform[6], default_transform[7], default_transform[8],
+      default_transform[9], default_transform[10], default_transform[11]);
   lua_setfield(L, -2, "default");
   return 1;
 }

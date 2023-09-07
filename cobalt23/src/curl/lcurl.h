@@ -3,16 +3,17 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+
 #ifndef _LCURL_H_
 #define _LCURL_H_
 
-#include "l52util.h"
+#include <assert.h>
+#include <string.h>
+
 #include "curl/curl.h"
 #include "curl/easy.h"
 #include "curl/multi.h"
-
-#include <assert.h>
-#include <string.h>
+#include "l52util.h"
 
 #define LCURL_PREFIX "cURL"
 

@@ -67,9 +67,9 @@ end
 local x = if a == 1 then "A is 1" else "A is not 1"
 ```
 ### Cobalt:
-```js
+```ts
 var a = 1
-var b <const> = 2
+var b <const> = 2;
 var c: number = a + b /* optional typechecker/annotations */
 
 for (i = 1, 10){

@@ -35,6 +35,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 In comparision to Lua, cobalt has the following to improve speed/memory:
 - 2x faster gc
 - 30% faster pool allocator
+- 3-4x less memory usage by the cobalt core
 - light functions and rotables
 - 1.5x to 2.5x faster vm with JIT
 - Easy memory leak tracking
@@ -94,7 +95,7 @@ built on other platforms or built for other platforms than the host computer as
 upon buildtime many CPU specific optimizations are made.
 
 ### What about for microcontrollers?
-For microcontrollers you need to have atleast 40kb of ram and 200kb of flash. Libraries like `core`, `device` might be
+For microcontrollers you need to have atleast 10kb of ram and 200kb of flash. Libraries like `core`, `device` might be
 missing features and the `unix`, `win` libraries should not be available.
 
 Then you can `#include` the cobalt stdlibs. 

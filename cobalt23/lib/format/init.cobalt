@@ -1,0 +1,57 @@
+/*
+    Formatter for cobalt code
+*/
+
+/* code cleaning */
+function removeStringsAndComments(line){
+    /* Clears all comments and strings so parser doesnt have to deal with them */
+    return line->gsub("//.*", "")->gsub("/%*.-%*/", "")->gsub("'[^']*'", "")->gsub('"[^"]*"', "")
+}
+function configurator(line){
+    /* Looks for //format:x:y and will lib.config(x, y)*/
+    return line->gsub("//%*format:(%w+):(%w+)", function(x, y){
+        lib.config(x, y)
+        return ""
+    })
+}
+function deindent(line){
+    /* Removes all whitespace before first not whitespace character */
+    return line->gsub("^%s+", "")
+}
+function all(line){
+    return deindent(configurator(removeStringsAndComments(line)))
+}
+
+/* main */
+lib = {
+    "config": function(name, val){ 
+        _G["configurations"][name] = val 
+    },
+    "indent": function(code){
+        /*
+        Indents code by looking for { and } and adding indent spaces based on config.indent
+        */
+        lines = code->split("\n")
+        indent = _G["configurations"]["indent"] || 4
+        cindent = 0
+    
+        for (_, line in pairs(lines)){
+            tl = 0;
+            line = all(line)
+            for (i = 1, #line){
+                char = line->sub(i, i)
+
+                if (char == "{") {cindent++; tl=_;}
+                else if (char == "}") {cindent--; tl=0;}
+            }
+            if (tl != _) lines[_] = (" ")->rep(cindent * indent) .. line
+        }
+        return table.concat(lines, "\n")
+    }
+}
+
+/* init */
+_G["configurations"] = _G["configurations"] || {}
+
+/* exports */
+return lib

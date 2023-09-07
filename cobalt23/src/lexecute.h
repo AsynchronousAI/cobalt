@@ -3,15 +3,16 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
-
-#define VM_CASE(name) \
-  vmcase(OP_##name)  // just a macro to make the code more readable
 #include <stdio.h>
 
 #if defined(LLVM) && !defined(AOT_IS_MODULE)
 /* Include LLVM */
 #include "ljit.h"
 #endif
+
+
+#define VM_CASE(name) \
+  vmcase(OP_##name)  // just a macro to make the code more readable
 
 // Interpreter Executer
 static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci) {

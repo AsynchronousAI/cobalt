@@ -28,6 +28,7 @@
 #include "lstring.h"
 #include "ltable.h"
 #include "ltm.h"
+#include "luaconf.h"
 
 /*
 ** We use ifdefs to clearly mark the parts that we had to change

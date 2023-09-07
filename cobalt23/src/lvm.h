@@ -11,6 +11,9 @@
 #include "lobject.h"
 #include "ltm.h"
 
+#define l_unlikely luai_unlikely
+#define l_likely luai_likely
+
 #if !defined(LUA_NOCVTN2S)
 #define cvt2str(o) ttisnumber(o)
 #else

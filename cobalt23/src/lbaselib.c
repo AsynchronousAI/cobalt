@@ -348,7 +348,7 @@ static int luaB_next(lua_State *L) {
 }
 
 static int luaB_pairs(lua_State *L) {
-  return pairsmeta(L, "__pairs", 0, luaB_next);
+  return pairsmeta(L, "__pairs", 0, *luaB_next);
 }
 
 /*
@@ -556,7 +556,7 @@ static int luaB_uwait(lua_State *L) {
   // returns a function that waits m without needing any arguments
   lua_pushvalue(L, lua_upvalueindex(1));
   lua_pushnumber(L, m);
-  lua_pushcclosure(L, luaB_uwait, 1);
+  lua_pushcclosure(L, *luaB_uwait, 1);
   return 1;
 }
 
@@ -589,54 +589,23 @@ static int luaB_mwait(lua_State *L) {
   lua_pushcclosure(L, luaB_uwait, 1);
   return 1;
 }
-
-static int luaB_slice(lua_State *L) {
-  int nargs = lua_gettop(L);
-  luaL_argcheck(L, nargs >= 2, 2, "expected at least 2 arguments");
-
-  int start = luaL_checkinteger(L, 1);
-  int stop = luaL_checkinteger(L, 2);
-  int step = 1;
-
-  if (nargs >= 3) {
-    step = luaL_checkinteger(L, 3);
-    luaL_argcheck(L, step != 0, 3, "step cannot be zero");
+static int luaB_printf(lua_State *L) {
+  /* equivelent to print(string.format(args)) */
+  int n = lua_gettop(L);
+  int i;
+  lua_getglobal(L, "string");
+  lua_getfield(L, -1, "format");
+  lua_remove(L, -2);
+  for (i = 1; i <= n; i++) {
+    lua_pushvalue(L, -1);
+    lua_pushvalue(L, i);
+    lua_call(L, 1, 1);
+    lua_replace(L, i);
   }
-
-  luaL_checktype(L, -1, LUA_TTABLE);
-  int len = lua_rawlen(L, -1);
-
-  if (start < 0) {
-    start = len + start + 1;
-  }
-
-  if (stop < 0) {
-    stop = len + stop + 1;
-  }
-
-  luaL_argcheck(L, start >= 1 && start <= len, 1, "start index out of range");
-  luaL_argcheck(L, stop >= 1 && stop <= len, 2, "stop index out of range");
-
-  if (step > 0) {
-    luaL_argcheck(L, start <= stop, 2,
-                  "stop index must be greater than start index");
-  } else {
-    luaL_argcheck(L, start >= stop, 2,
-                  "stop index must be less than start index");
-  }
-
-  lua_newtable(L);
-  int j = 1;
-
-  for (int i = start; step > 0 ? i <= stop : i >= stop; i += step) {
-    lua_rawgeti(L, -2, i);
-    lua_rawseti(L, -2, j);
-    j++;
-  }
-
+  lua_call(L, n, 1);
+  lua_remove(L, -2);
   return 1;
 }
-
 static int luaB_inputf(lua_State *L) {
   const char *prompt = luaL_optstring(L, 1, " ");
   const char *fmt = luaL_optstring(L, 2, "*l");
@@ -661,131 +630,43 @@ static int luaB_inputf(lua_State *L) {
 
   return 1;
 }
-static int luaB_sizeof(lua_State *L) {
-  // Like C sizeof, but for Lua
-  // sizeof(x) returns the size of x in bytes
-  // sizeof(x, y, z) returns the sum of the sizes of x, y, and z in bytes
-  int nargs = lua_gettop(L);
-  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
-  size_t size = 0;
-
-  for (int i = 1; i <= nargs; i++) {
-    int type = lua_type(L, i);
-
-    switch (type) {
-      case LUA_TNIL:
-        size += sizeof(void *);
-        break;
-      case LUA_TNUMBER:
-        size += sizeof(lua_Number);
-        break;
-      case LUA_TBOOLEAN:
-        size += sizeof(int);
-        break;
-      case LUA_TSTRING:
-        size += sizeof(luaL_Buffer);
-        break;
-      case LUA_TTABLE:
-        size += sizeof(luaL_Buffer);
-        break;
-      case LUA_TFUNCTION:
-        size += sizeof(luaL_Buffer);
-        break;
-      case LUA_TUSERDATA:
-        size += sizeof(luaL_Buffer);
-        break;
-      case LUA_TTHREAD:
-        size += sizeof(luaL_Buffer);
-        break;
-      case LUA_TLIGHTUSERDATA:
-        size += sizeof(luaL_Buffer);
-        break;
-      default:
-        return luaL_error(L, "invalid type");
-    }
-  }
-  return 1;
-}
-static int luaB_range(lua_State *L) {
-  // range(start, stop, step)
-  // returns a table of numbers from start to stop (inclusive) with step
-  // if step is not provided, it defaults to 1
-  luaB_warn("As of 8/17/23 range is deprecated, for (i = x, y) instead.");
-
-  int nargs = lua_gettop(L);
-  luaL_argcheck(L, nargs >= 2, 2, "expected at least 2 arguments");
-  luaL_argcheck(L, nargs <= 3, 3, "expected at most 3 arguments");
-
-  int start = luaL_checkinteger(L, 1);
-  int stop = luaL_checkinteger(L, 2);
-  int step = 1;
-
-  if (nargs >= 3) {
-    step = luaL_checkinteger(L, 3);
-    luaL_argcheck(L, step != 0, 3, "step cannot be zero");
-  }
-
-  if (start < 0) {
-    start = stop + start + 1;
-  }
-
-  if (stop < 0) {
-    stop = stop + stop + 1;
-  }
-
-  luaL_argcheck(L, start >= 1 && start <= stop, 1, "start index out of range");
-  luaL_argcheck(L, stop >= 1 && stop <= stop, 2, "stop index out of range");
-
-  lua_newtable(L);
-  int j = 1;
-
-  for (int i = start; i <= stop; i += step) {
-    lua_pushinteger(L, i);
-    lua_rawseti(L, -2, j);
-    j++;
-  }
-
-  return 1;
-}
 static int luaB_abort(lua_State *L) { abort(); }
-static const luaL_Reg base_funcs[] = {
-    {"assert", luaB_assert},
-    {"sizeof", luaB_sizeof},
-    {"abort", luaB_abort},
-    {"collectgarbage", luaB_collectgarbage},
-    {"dofile", luaB_dofile},
-    {"inputf", luaB_inputf},
-    {"error", luaB_error},
-    {"getmetatable", luaB_getmetatable},
-    {"ipairs", luaB_ipairs},
-    {"loadfile", luaB_loadfile},
-    {"load", luaB_load},
-    {"loadstring", luaB_load},
-    {"next", luaB_next},
-    {"pairs", luaB_pairs},
-    {"pcall", luaB_pcall},
-    {"try", luaB_pcall},
-    {"print", luaB_print},
-    {"warn", luaB_warn},
-    {"info", luaB_info},
-    {"rawequal", luaB_rawequal},
-    {"rawlen", luaB_rawlen},
-    {"rawget", luaB_rawget},
-    {"rawset", luaB_rawset},
-    {"select", luaB_select},
-    {"setmetatable", luaB_setmetatable},
-    //{"newmetatable", luaB_newmetatable}, Use __name
-    {"tonumber", luaB_tonumber},
-    {"tostring", luaB_tostring},
-    {"type", luaB_type},
-    {"xpcall", luaB_xpcall},
-    {"xtry", luaB_xpcall},
 
-    {"wait", luaB_wait},
+static const luaL_Reg base_funcs[] = {
+    {"assert", *luaB_assert},
+    {"abort", *luaB_abort},
+    {"collectgarbage", *luaB_collectgarbage},
+    {"dofile", *luaB_dofile},
+    {"inputf", *luaB_inputf},
+    {"printf", *luaB_printf},
+    {"error", *luaB_error},
+    {"getmetatable", *luaB_getmetatable},
+    {"ipairs", *luaB_ipairs},
+    {"loadfile", *luaB_loadfile},
+    {"load", *luaB_load},
+    {"loadstring", *luaB_load},
+    {"next", *luaB_next},
+    {"pairs", *luaB_pairs},
+    {"pcall", *luaB_pcall},
+    {"print", *luaB_print},
+    {"warn", *luaB_warn},
+    {"info", *luaB_info},
+    {"rawequal", *luaB_rawequal},
+    {"rawlen", *luaB_rawlen},
+    {"rawget", *luaB_rawget},
+    {"rawset", *luaB_rawset},
+    {"select", *luaB_select},
+    {"setmetatable", *luaB_setmetatable},
+    {"tonumber", *luaB_tonumber},
+    {"tostring", *luaB_tostring},
+    {"type", *luaB_type},
+    {"xpcall", *luaB_xpcall},
+
+    {"wait", *luaB_wait},
     /*subwait*/
-    {"swait", luaB_wait},
-    {"mwait", luaB_mwait},
-    {"uwait", luaB_uwait},
+    {"swait", *luaB_wait},
+    {"mwait", *luaB_mwait},
+    {"uwait", *luaB_uwait},
     /* placeholders */
     {"_G", NULL},
     {NULL, NULL}};

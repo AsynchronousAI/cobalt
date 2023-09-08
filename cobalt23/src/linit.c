@@ -85,6 +85,7 @@ static const luaL_Reg preloadedlibs[] = {
     {LUA_BITLIBNAME, luaopen_bit32},
     {LUA_BITOPNAME, luaopen_bit},
     {LUA_SOCKETNAME, luaopen_chan},
+    {LUA_CRYPTNAME, luaopen_crypt},
     {LUA_REGEXNAME, luaopen_regex},
 
 // FFI

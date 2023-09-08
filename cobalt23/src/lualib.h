@@ -93,6 +93,9 @@ LUAMOD_API int(luaopen_alloc)(lua_State *L);
 #define LUA_JSONAME "json"
 LUAMOD_API int(luaopen_cjson_safe)(lua_State *L);
 
+#define LUA_CRYPTNAME "crypt"
+LUAMOD_API int(luaopen_crypt)(lua_State *L);
+
 #define LUA_LPEGNAME "lpeg"
 LUAMOD_API int(luaopen_lpeg)(lua_State *L);
 

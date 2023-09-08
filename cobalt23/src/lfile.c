@@ -71,7 +71,7 @@
 #include "lualib.h"
 
 #define LFS_VERSION "1.8.0"
-#define LFS_LIBNAME "lfs"
+#define LFS_LIBNAME "file"
 
 #if COBALTLUA_VERSION_NUM >= 503 /* Lua 5.3+ */
 
@@ -1028,22 +1028,6 @@ static int link_info(lua_State *L) {
   return ret;
 }
 
-/*
-** Assumes the table is on top of the stack.
-*/
-static void set_info(lua_State *L) {
-  lua_pushliteral(L,
-                  "cobaltFileSystem is a modified version of LuaFileSystem "
-                  "which is a Lua library developed to complement "
-                  "the set of functions related to file systems offered by "
-                  "the standard Lua distribution");
-  lua_setfield(L, -2, "_DESCRIPTION");
-  lua_pushliteral(L, "cobaltFileSystem" LFS_VERSION);
-  lua_setfield(L, -2, "_VERSION");
-}
-
-// I am a test comment
-
 static const struct luaL_Reg fslib[] = {
     {"attributes", file_info},
     {"chdir", change_dir},
@@ -1067,6 +1051,5 @@ LFS_EXPORT int luaopen_lfs(lua_State *L) {
   new_lib(L, fslib);
   lua_pushvalue(L, -1);
   lua_setglobal(L, LFS_LIBNAME);
-  set_info(L);
   return 1;
 }

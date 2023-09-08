@@ -788,7 +788,6 @@ static const luaL_Reg base_funcs[] = {
     {"uwait", luaB_uwait},
     /* placeholders */
     {"_G", NULL},
-    {"void", NULL},
     {NULL, NULL}};
 static int void_eq(lua_State *L) {
   lua_pushnil(L);
@@ -806,9 +805,6 @@ LUAMOD_API int luaopen_base(lua_State *L) {
   /* set global _G */
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "_G");
-  /* set global `void` */
-  lua_pushcclosure(L, sizeof(void), 0);
-  lua_setfield(L, -2, "void");
 
   return 1;
 }

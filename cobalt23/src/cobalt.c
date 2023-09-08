@@ -475,7 +475,7 @@ static int incomplete(lua_State *L, int status) {
   return 0; /* else... */
 }
 
-/*
+/*<
 ** Prompt the user, read a line, and push it into the Lua stack.
 */
 static int pushline(lua_State *L, int firstline) {

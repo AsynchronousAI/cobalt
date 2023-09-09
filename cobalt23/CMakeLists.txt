@@ -80,9 +80,14 @@ if (CLANG)
         "src/lclang.cpp"
     )
 
+    if (CLANG_PATH_OVERRIDE)
+        message("- Overriding Clang Path to: ${CLANG_PATH_OVERRIDE}")
+        set(CLANG_DIR "${CLANG_PATH_OVERRIDE}")
+    endif()
+
     find_package(Clang REQUIRED)
     list(APPEND LUA_LINKED_LIBRARIES Clang::Clang)
-
+    include_directories(${CLANG_INCLUDE_DIRS})
 endif()
 
 # SDL
@@ -124,6 +129,23 @@ if (SDL)
         "src/sdl/objects.c"
         "src/sdl/window.c"
     )
+    if (SDL2_PATH_OVERRIDE)
+        message("- Overriding SDL2 Path to: ${SDL2_PATH_OVERRIDE}")
+        set(CURL_DIR "${SDL2_PATH_OVERRIDE}")
+    endif()
+    if (SDL2_IMAGE_PATH_OVERRIDE)
+        message("- Overriding SDL2 Image Path to: ${SDL2_IMAGE_PATH_OVERRIDE}")
+        set(CURL_DIR "${SDL2_IMAGE_PATH_OVERRIDE}")
+    endif()
+    if (SDL2_TTF_PATH_OVERRIDE)
+        message("- Overriding SDL2 TTF Path to: ${SDL2_TTF_PATH_OVERRIDE}")
+        set(CURL_DIR "${SDL2_TTF_PATH_OVERRIDE}")
+    endif()
+    if (SDL2_MIXER_PATH_OVERRIDE)
+        message("- Overriding SDL2 Mixer Path to: ${SDL2_MIXER_PATH_OVERRIDE}")
+        set(CURL_DIR "${SDL2_MIXER_PATH_OVERRIDE}")
+    endif()
+
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
     find_package(SDL2_ttf REQUIRED)
@@ -132,6 +154,7 @@ if (SDL)
     list(APPEND LUA_LINKED_LIBRARIES SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
 
     set(SDL_LIBRARIES SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer SDL2::SDL2)
+    include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS})
 else()
     set(SDL_LIBRARIES)
 endif()
@@ -150,12 +173,16 @@ if (SOCKET)
         "src/curl/l52util.c"
         "src/curl/lcshare.c"
     )
+    if (CURL_PATH_OVERRIDE)
+        message("- Overriding CURL Path to: ${CURL_PATH_OVERRIDE}")
+        set(CURL_DIR "${CURL_PATH_OVERRIDE}")
+    endif()
     find_package(CURL REQUIRED)
     list(APPEND LUA_LINKED_LIBRARIES CURL::libcurl)
+    include_directories(${CURL_INCLUDE_DIRS})
 endif()
 
 # LLVM
-set(LLVM OFF)
 if (LLVM)
     list(APPEND LUA_LIB_SRCS
         "src/lllarith.cpp"
@@ -171,8 +198,13 @@ if (LLVM)
         "src/lllvararg.cpp"
         "src/lllcore.cpp"
     )
+    if (LLVM_PATH_OVERRIDE)
+        message("- Overriding LLVM Path to: ${LLVM_PATH_OVERRIDE}")
+        set(LLVM_DIR "${LLVM_PATH_OVERRIDE}")
+    endif()
     find_package(LLVM REQUIRED CONFIG)
     list(APPEND LUA_LINKED_LIBRARIES LLVM::LLVM)
+    include_directories(${LLVM_INCLUDE_DIRS})
 endif()
 
 set(TARGETS_TO_INSTALL lua_internal lua_include)
@@ -253,6 +285,7 @@ if(LUA_BUILD_BINARY)
     CHECK_INCLUDE_FILE("readline/readline.h" HAVE_READLINE_READLINE_H)
 
     add_executable(cobalt "src/cobalt.c")
+
     # Can not use lua_shared because some symbols are not exported
     target_link_libraries(cobalt PRIVATE lua_static)
     set_target_properties(cobalt PROPERTIES 
@@ -275,19 +308,13 @@ if(LUA_BUILD_COMPILER)
 endif()
 
 if(LUA_BUILD_AOT)
-    include(CheckIncludeFile)
-    CHECK_INCLUDE_FILE("readline/readline.h" HAVE_READLINE_READLINE_H)
-
     add_executable(cobaltaot "src/cobaltaot.c")
+    
     # Can not use lua_shared because some symbols are not exported
     target_link_libraries(cobaltaot PRIVATE lua_static)
     set_target_properties(cobaltaot PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
-    if (HAVE_READLINE_READLINE_H)
-        target_compile_definitions(cobaltaot PRIVATE "LUA_USE_READLINE")
-        target_link_libraries(cobaltaot PUBLIC readline)
-    endif()
     list(APPEND TARGETS_TO_INSTALL cobaltaot)
 endif()
 

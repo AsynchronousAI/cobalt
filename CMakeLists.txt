@@ -133,6 +133,10 @@ if (CLANG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG")
 endif()
 
+if (GL)
+    message(FATAL_ERROR "GL is not supported yet")
+endif()
+
 if (LLVM)
     message("-- Building with JIT and LLVM support")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLLVM=ON")

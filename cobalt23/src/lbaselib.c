@@ -667,8 +667,10 @@ static const luaL_Reg base_funcs[] = {
     {"swait", *luaB_wait},
     {"mwait", *luaB_mwait},
     {"uwait", *luaB_uwait},
+
     /* placeholders */
     {"_G", NULL},
+    
     {NULL, NULL}};
 static int void_eq(lua_State *L) {
   lua_pushnil(L);

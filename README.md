@@ -1,6 +1,6 @@
 # Cobalt
 Cobalt is a Lowlevel fork of Lua 5.4 which includes:
-- SDL bindings
+- SDL bindings (optional) for 2D graphics
 - interpreter, compiler, and JIT FFI
 - compile to LLVM IR if you have LLVM capable version of cobalt
 - more libraries/bindings
@@ -19,6 +19,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - regex support (not full regex only a small subset), use `unix.regex` for POSIX regex
 - 2x speed improved gc (optional) using libgc
 - improved vm
+- OpenGL bindings (optional) for 3D graphics
 - readonly tables or `rotables`
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - LLVM JIT compiler

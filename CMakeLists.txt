@@ -35,100 +35,13 @@ endif()
 if(SDL)
     message("-- Configuring SDL Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SDL")
-    execute_process(
-        COMMAND pkg-config sdl2 --cflags
-        OUTPUT_VARIABLE SDL2_CFLAGS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2")
-    endif()
-    execute_process(
-        COMMAND pkg-config SDL2_image --cflags
-        OUTPUT_VARIABLE SDL2_IMAGE_CFLAGS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_IMAGE_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_image")
-    endif()
-    execute_process(
-        COMMAND pkg-config SDL2_ttf --cflags
-        OUTPUT_VARIABLE SDL2_TTF_CFLAGS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_TTF_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_ttf")
-    endif()
-    execute_process(
-        COMMAND pkg-config SDL2_mixer --cflags
-        OUTPUT_VARIABLE SDL2_MIXER_CFLAGS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_MIXER_CFLAGS)
-        message(FATAL_ERROR "Failed to find SDL2_mixer")
-    endif()
-
-    # LIBS
-    execute_process(
-        COMMAND pkg-config sdl2 --libs
-        OUTPUT_VARIABLE SDL2_LIBS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_LIBS)
-        message(FATAL_ERROR "Failed to find SDL2")
-    endif()
-
-    execute_process(
-        COMMAND pkg-config SDL2_image --libs
-        OUTPUT_VARIABLE SDL2_IMAGE_LIBS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_IMAGE_LIBS)
-        message(FATAL_ERROR "Failed to find SDL2_image")
-    endif()
-
-    execute_process(
-        COMMAND pkg-config SDL2_ttf --libs
-        OUTPUT_VARIABLE SDL2_TTF_LIBS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_TTF_LIBS)
-        message(FATAL_ERROR "Failed to find SDL2_ttf")
-    endif()
-
-    execute_process(
-        COMMAND pkg-config SDL2_mixer --libs
-        OUTPUT_VARIABLE SDL2_MIXER_LIBS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT SDL2_MIXER_LIBS)
-        message(FATAL_ERROR "Failed to find SDL2_mixer")
-    endif()
-    set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${SDL2_TTF_LIBS} ${SDL2_MIXER_LIBS}")
 endif() 
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
-    execute_process(
-        COMMAND pkg-config libcurl --libs
-        OUTPUT_VARIABLE CURL_LIBS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT CURL_LIBS)
-        message(FATAL_ERROR "Failed to find libcurl, disable cobalt cURL support by doing:\n\t\t-DSOCKET=OFF")
-    endif()
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CURL_CFLAGS} ${CURL_LIBS} -DCOBALT_SOCKET")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SOCKET")
 endif()
 if (CLANG)
     message("-- Configuring Clang Bindings")
-    execute_process(
-        COMMAND pkg-config libclang --libs
-        OUTPUT_VARIABLE CLANG_LIBS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT CLANG_LIBS)
-        message(FATAL_ERROR "Failed to find libclang, disable cobalt Clang support by doing:\n\t\t-DCLANG=OFF")
-    endif()
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG")
 endif()

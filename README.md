@@ -47,6 +47,7 @@ which is a ~8.5x speed improvement over Lua 5.4.3 (with JIT). and if you are not
 local a = 1
 local b <const> = 2
 local c = a + b
+local w = math.sqrt(1043)
 
 for i = 1, 10 do
     print(i)
@@ -55,8 +56,8 @@ for i = 1, 10 do
     end
 end
 
-local table = {1, 2, 3}
-for i, v in ipairs(table) do
+local tbl = {1, 2, 3}
+for i, v in ipairs(tbl) do
     print(i, v)
 end
 
@@ -69,25 +70,31 @@ local x = if a == 1 then "A is 1" else "A is not 1"
 ```
 ### Cobalt:
 ```ts
-var a = 1
+var a = 1;
 var b <const> = 2;
-var c: number = a + b /* optional typechecker/annotations */
+var w <pre> = math.sqrt(1043); /* will calculate at preprocess time and replace w with the result instead of calculating on runtime */
+var c: number = a + b; /* optional typechecker/annotations */
 
 for (i = 1, 10){
-    print(i)
+    print(i);
     if (i == 5){
-        continue
+        continue;
     }
 }
 
-var table = [1, 2, 3] // [] is array (no keys), {} is table (keys)
-for (i, v in $table){ // $, @, & are preprocessor only
-    print(i, v)
+var tbl = [1, 2, 3]; // [] is array (no keys), {} is table (keys)
+for (i, v in $tbl){ // $, @, & are preprocessor only
+    print(i, v);
+}
+var tbl2 <ref> = tbl[2]; /* tbl2 will not copy tbl[2] to its own instance but rather be a pointer to it, supported in cobalt24+ */
+print(tbl2); // 2 (indexing starts at 1 like Lua)
+
+while (true) {
+    print(f"In a loop, and b is {b}") // python like format
+    break; 
 }
 
-while (true) print(f"In a loop, and b is {b}") break; // python like format
-
-var x: string = a == 1 ? "A is 1" : "A is not 1"
+var x: string = a == 1 ? "A is 1" : "A is not 1";
 ```
 ## Portability
 Cobalt is made to be built and run on PC's running Windows, macOS, or Linux then

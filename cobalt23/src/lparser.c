@@ -1939,9 +1939,10 @@ static int getlocalattribute(LexState *ls) {
     else if (strcmp(attr, "ref") == 0)
       luaK_semerror(
           ls, luaO_pushfstring(ls->L, "refrence values are not supported"));
-    else if (strcmp(attr, "pre") == 0)
+    else if (strcmp(attr, "pre") == 0){
+      luaG_addinfo(ls->L, "\n\033[1;33mwarning: \033[0m preprocessed variables will not work directly in the interpreter, use the preprocessor to generate preprocessed code", ls->linenumber, 0);
       return VDKREG;
-    else
+    } else
       luaK_semerror(ls,
                     luaO_pushfstring(ls->L, "unknown attribute '%s'", attr));
   }

@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
 project(cobalt LANGUAGES C VERSION 99)
-
 option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" ON)
 option(LUA_BUILD_AS_CXX "Build cobalt as C++" OFF)
 option(LUA_ENABLE_SHARED "Build dynamic liblua" OFF)
@@ -13,6 +12,10 @@ option(INSTALL "Install Cobalt" ON)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")
 # Based on the SDL and FFI variable provide them as Flags
+if (LUA_BUILD_AS_CXX)
+    message("-- C++ core not supported yet")
+    set(LUA_BUILD_AS_CXX OFF)
+endif()
 if (CROSS)
     message("-- Configuring Crossplatform CPU Build")
 else()

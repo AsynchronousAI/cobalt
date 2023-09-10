@@ -391,6 +391,145 @@ static int readdecesc(LexState *ls) {
   return r;
 }
 
+#include <stdlib.h>
+#define MAX_FORMAT 10 /* maximum characters allowed in a format */
+
+static void read_format_string(LexState *ls, int del, SemInfo *seminfo) {
+  save_and_next(ls); /* keep delimiter (for error messages) */
+  int track = -1;
+  char format[MAX_FORMAT];
+
+  while (ls->current != del) {
+    if (track == -1){
+      switch (ls->current) {
+        case EOZ:
+          lexerror(ls, "unfinished string", TK_EOS);
+          break; /* to avoid warnings */
+        case '\n':
+        case '\r':
+          lexerror(ls, "unfinished string", TK_STRING);
+          break;             /* to avoid warnings */
+        case '\\': {         /* escape sequences */
+          int c;             /* final character to be saved */
+          save_and_next(ls); /* keep '\\' for error messages */
+          switch (ls->current) {
+            case 'a':
+              c = '\a';
+              goto read_save;
+            case 'b':
+              c = '\b';
+              goto read_save;
+            case 'f':
+              c = '\f';
+              goto read_save;
+            case 'n':
+              c = '\n';
+              goto read_save;
+            case 'r':
+              c = '\r';
+              goto read_save;
+            case 't':
+              c = '\t';
+              goto read_save;
+            case 'v':
+              c = '\v';
+              goto read_save;
+            case '{':
+            case '}':
+              c = ls->current; /* ignore */
+              goto read_save;
+            case 'x':
+              c = readhexaesc(ls);
+              goto read_save;
+            case 'B':
+              c = readbinaesc(ls);
+              goto read_save;
+            case 'o':
+              c = readoctaesc(ls);
+              goto read_save;
+            case 'u':
+              utf8esc(ls);
+              goto no_save;
+            case '\n':
+            case '\r':
+              inclinenumber(ls);
+              c = '\n';
+              goto only_save;
+            case '\\':
+            case '\"':
+            case '\`':
+            case '\'':
+              c = ls->current;
+              goto read_save;
+            case EOZ:
+              goto no_save;                 /* will raise an error next loop */
+            case 'z': {                     /* zap following span of spaces */
+              luaZ_buffremove(ls->buff, 1); /* remove '\\' */
+              next(ls);                     /* skip the 'z' */
+              while (lisspace(ls->current)) {
+                if (currIsNewline(ls))
+                  inclinenumber(ls);
+                else
+                  next(ls);
+              }
+              goto no_save;
+            }
+            default: {
+              esccheck(ls, lisdigit(ls->current), "invalid escape sequence");
+              c = readdecesc(ls); /* digital escape '\ddd' */
+              goto only_save;
+            }
+          }
+        read_save:
+          next(ls);
+          /* go through */
+        only_save:
+          luaZ_buffremove(ls->buff, 1); /* remove '\\' */
+          save(ls, c);
+          /* go through */
+        no_save:
+          break;
+        }
+        case '{': {
+          /* switch to tracking mode */
+          track = 0;
+          save_and_next(ls);
+          break;
+        }
+        default:
+          save_and_next(ls);
+      }
+    }else{
+      /* validate */
+      if (track >= MAX_FORMAT)
+        lexerror(ls, "format string too long and ended", TK_STRING);
+      
+      /* check if end or to be added */
+      if (ls->current == '}') {
+        printf("current format string: %s\n", format);
+
+        for (int i = 0; i < MAX_FORMAT; i++) {
+          format[i] = '\0';
+        }
+
+        track = -1;
+
+        save_and_next(ls);
+      }else{
+        // add to format string
+        format[track] = ls->current;
+        track++;
+
+        save_and_next(ls);
+      }
+    }
+  }
+  save_and_next(ls); /* skip delimiter */
+  seminfo->ts =
+      luaX_newstring(ls, luaZ_buffer(ls->buff) + 1, luaZ_bufflen(ls->buff) - 2);
+}
+
+
 static void read_string(LexState *ls, int del, SemInfo *seminfo) {
   save_and_next(ls); /* keep delimiter (for error messages) */
   while (ls->current != del) {
@@ -446,6 +585,7 @@ static void read_string(LexState *ls, int del, SemInfo *seminfo) {
             goto only_save;
           case '\\':
           case '\"':
+          case '\`':
           case '\'':
             c = ls->current;
             goto read_save;
@@ -649,6 +789,9 @@ static int llex(LexState *ls, SemInfo *seminfo) {
         if (check_next1(ls, '=')) return TK_CMOD;
         return '%';
       }
+      case '`': /* format literal strings */
+        read_format_string(ls, ls->current, seminfo);
+        return TK_FSTRING;
       case '"':
       case '\'': { /* short literal strings */
         read_string(ls, ls->current, seminfo);

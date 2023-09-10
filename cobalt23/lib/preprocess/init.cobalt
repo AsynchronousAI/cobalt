@@ -534,7 +534,6 @@ typechecker = {
 // SECTION 2: Language extensions
 
 /* EXTENDS:
-- f"{x}" = string.format("%s", x)
 - $table = pairs(table)
 - @table = ipairs(table)
 - x~y = _G.x = y, return y
@@ -546,12 +545,6 @@ typechecker = {
 
 /* TODO:
   - Fix the nested string bug
-*/
-
-/* SYSTEM:
- This uses the typechecker's dead & alive system to 
- kill all non syntax statements and will look for a 
- f"x {string} {string2}" and replace it with string.format("x %s", string, string2).
 */
 
 function gsub(str, pattern, replace){
@@ -639,42 +632,6 @@ ext = function(str){
       arg1 = match->sub(1, match->find("~")-1)
       arg2 = match->sub(match->find("~")+1)
       v = gsub(v, match, "_.global(\""..arg1.."\", "..arg2..")")
-    }
-
-    // table [x, y, z] = tbl
-    /*
-    for (match in v->gmatch("([a-zA-Z0-9_]+)%s*%[(.-)%]%s*=")){
-      print(v)
-      // replace the match with the first part of the match
-      v = gsub(v, match, match->sub(1, find(match, "[")-1))
-      // replace the match with the table.insert(tbl, x, y, z)
-      v = gsub(v, match, "table.insert("..match->sub(find(match, "=")+1)..", "..match->sub(find(match, "[")+1, find(match, "]")-1)..")")
-    }
-    */
-
-    for (match in v->gmatch("f'(.-)'")){
-      // replace the f'{}' with string.format("{}", ...)
-      v = typechecker.revive(v->gsub("f'(.-)'", "string.format('"..match.."'"), dead)
-      // find all {} in the string
-      for (it in v->gmatch("{(.-)}")){
-        // For each {} add a , and the value
-        v = v..", "..it
-        // also replace the {} with %s
-        v = v->gsub("{(.-)}", "%%s")
-      }
-
-      // add the closing bracket
-      v = v..")"
-    }
-
-    for (match in v->gmatch("f[[(.*)]]")){
-      print("\27[1;31mPreprocessor error:\27[0m")
-      print("\27[1;31mError with the 'f[[' preprocessor command.\27[0m\n\n")
-      if (errorin) {
-          print("\27[1;31mMultiline formatted strings are not supported.\27[0m\n\n")
-      }
-      print("\27[1;31mStopping preprocessor.\27[0m")
-      os.exit()
     }
 
     lines[i] = typechecker.revive(v)

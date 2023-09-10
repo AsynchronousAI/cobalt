@@ -1,7 +1,7 @@
 {
 	"name": "cobalt-highlighting",
-	"displayName": "cobalt Syntax Highlighting",
-	"description": "Official cobalt syntax highlighting for Visual Studio Code",
+	"displayName": "Cobalt Syntax Highlighting",
+	"description": "Official Cobalt syntax highlighting for Visual Studio Code",
 	"categories": [
 		"Programming Languages"
 	],

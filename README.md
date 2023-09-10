@@ -31,6 +31,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - `$`, `@`, `&` symbols for pairs, ipairs, table.unpack
 - more operators
 - tenary operator
+- `` ` `` for python like format ``print(`Hello {name}`)`` directly implemented to the parser and bytecode compatable
 - CMake build system
 ## Comparision
 In comparision to Lua, cobalt has the following to improve speed/memory:
@@ -90,7 +91,7 @@ var tbl2 <ref> = tbl[2]; /* tbl2 will not copy tbl[2] to its own instance but ra
 print(tbl2); // 2 (indexing starts at 1 like Lua)
 
 while (true) {
-    print(f"In a loop, and b is {b}") // python like format
+    print(`In a loop, and b is {b}`) // python like format
     break; 
 }
 

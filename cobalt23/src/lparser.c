@@ -892,7 +892,7 @@ static void recfield(LexState *ls, ConsControl *cc) {
   if (ls->t.token == TK_NAME) {
     checklimit(fs, cc->nh, MAX_INT, "items in a constructor");
     codename(ls, &key);
-  } else if (ls->t.token == TK_STRING) {
+  } else if (ls->t.token == TK_STRING || ls->t.token == TK_FSTRING) {
     sindex(ls, &key);
   } else /* ls->t.token == '[' */
     yindex(ls, &key);
@@ -940,6 +940,7 @@ static void field(LexState *ls, ConsControl *cc) {
   /* field -> listfield | recfield */
   switch (ls->t.token) {
     case TK_STRING:
+    case TK_FSTRING:
     case TK_NAME: { /* may be 'listfield' or 'recfield' */
       int ntk = luaX_lookahead(ls);
       if (!((ntk == '=') || (ntk == ':'))) /* expression? */
@@ -1220,6 +1221,7 @@ static void simpleexp(LexState *ls, expdesc *v) {
       v->u.ival = ls->t.seminfo.i;
       break;
     }
+    case TK_FSTRING:
     case TK_STRING: {
       codestring(v, ls->t.seminfo.ts);
       break;

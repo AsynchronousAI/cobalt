@@ -76,7 +76,8 @@ enum RESERVED {
   TK_FLT,
   TK_INT,
   TK_NAME,
-  TK_STRING
+  TK_STRING,
+  TK_FSTRING
 };
 
 /* number of reserved words */

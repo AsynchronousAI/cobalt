@@ -61,6 +61,27 @@ set(LUA_LIB_SRCS
 
     # AOT Cobalt compiled
     "src/lpreprocess.c"
+
+    # GLMath
+    "src/math/quat.c"
+    "src/math/rect.c"
+    "src/math/enums.c"
+    "src/math/.DS_Store"
+    "src/math/funcs.c"
+    "src/math/transform.c"
+    "src/math/complex.c"
+    "src/math/tracing.c"
+    "src/math/box.c"
+    "src/math/utils.c"
+    "src/math/hostmem.c"
+    "src/math/main.c"
+    "src/math/viewing.c"
+    "src/math/vec.c"
+    "src/math/datahandling.c"
+    "src/math/mat.c"
+    "src/math/num.c"
+    "src/math/udata.c"
+    "src/math/objects.c"
 )
 
 

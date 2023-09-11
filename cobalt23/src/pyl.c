@@ -3,7 +3,7 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
-#include <Python.h>
+#include "Python.h"
 
 #define LUA_COMPAT_ALL
 

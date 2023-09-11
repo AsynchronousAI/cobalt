@@ -1,11 +1,8 @@
-/* ==============================================================================
-//
-// This file is apart of the Cobalt Programming Language. Cobalt is under the
-MIT //
-// License. Read the bottom of this file for license information //
-//
-==============================================================================
-*/
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 
 #ifndef lua_h
 #define lua_h
@@ -456,6 +453,10 @@ Full credits are available in the file COPYRIGHTS.md
 
 Cobalt is based of Lua 5.4 (with LJS modifications), which is licensed under the
 MIT license.
+
+The mark "This file is apart of the Cobalt Programming Language. Cobalt is under the MIT License. Read `cobalt.h` for license information."
+represents that the file may be written for Cobalt or an opensource snippet/file that has modifications, You can read all the opensource
+licenses in the file COPYRIGHTS.md or it may be in the file itself.
 /****************************************************/
 
 /* Cobalt License */

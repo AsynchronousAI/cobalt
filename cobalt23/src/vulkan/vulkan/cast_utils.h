@@ -1,3 +1,8 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 /* Copyright (c) 2019 The Khronos Group Inc.
  * Copyright (c) 2019 Valve Corporation
  * Copyright (c) 2019 LunarG, Inc.

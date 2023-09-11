@@ -171,6 +171,49 @@ else()
     set(SDL_LIBRARIES)
 endif()
 
+# VULKAN
+if (VULKAN)
+    list(APPEND LUA_LIB_SRCS
+        "src/vulkan/getproc.c"
+        "src/vulkan/descriptor_set.c"
+        "src/vulkan/buffer.c"
+        "src/vulkan/display.c"
+        "src/vulkan/enums.c"
+        "src/vulkan/buffer_view.c"
+        "src/vulkan/descriptor_update_template.c"
+        "src/vulkan/command_pool.c"
+        "src/vulkan/zcheck.c"
+        "src/vulkan/pipeline.c"
+        "src/vulkan/descriptor_pool.c"
+        "src/vulkan/instance.c"
+        "src/vulkan/pipeline_layout.c"
+        "src/vulkan/layers.c"
+        "src/vulkan/display_mode.c"
+        "src/vulkan/queue.c"
+        "src/vulkan/tracing.c"
+        "src/vulkan/validation_cache.c"
+        "src/vulkan/debug_utils_messenger.c"
+        "src/vulkan/image.c"
+        "src/vulkan/device_memory.c"
+        "src/vulkan/physical_device.c"
+        "src/vulkan/cmd.c"
+        "src/vulkan/render_pass.c"
+        "src/vulkan/debug_report_callback.c"
+        "src/vulkan/query_pool.c"
+        "src/vulkan/pipeline_cache.c"
+        "src/vulkan/utils.c"
+        "src/vulkan/main.c"
+        "src/vulkan/semaphore.c"
+        "src/vulkan/event.c"
+        "src/vulkan/surface.c"
+
+        "src/vulkan/vulkan/vk_format_utils.cpp"
+        "src/vulkan/vulkan/vk_layer_config.cpp"
+        "src/vulkan/vulkan/vk_layer_extension_utils.cpp"
+        "src/vulkan/vulkan/vk_layer_utils.cpp"
+        "src/vulkan/vulkan/vk_safe_struct.cpp"
+    )
+endif()
 # SOCKET
 if (SOCKET)
     list(APPEND LUA_LIB_SRCS

@@ -165,8 +165,8 @@ if (CLANG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG")
 endif()
 
-if (GL)
-message(FATAL_ERROR "")
+if (VULKAN)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_VULKAN")
 endif()
 
 if (LLVM)

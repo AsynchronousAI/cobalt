@@ -1139,6 +1139,18 @@ static void primaryexp(LexState *ls, expdesc *v) {
       luaK_dischargevars(ls->fs, v);
       return;
     }
+    case '$': {
+      /* pairs alias */
+      luaX_syntaxerror(ls, "unsupported quick-char");
+    }
+    case '@': {
+      /* table.unpack alias */
+      luaX_syntaxerror(ls, "unsupported quick-char");
+    }
+    case '&': {
+      /* ipairs alias */
+      luaX_syntaxerror(ls, "unsupported quick-char");
+    }
     case TK_NAME: {
       singlevar(ls, v);
       return;

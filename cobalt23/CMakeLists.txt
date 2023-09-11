@@ -64,6 +64,18 @@ set(LUA_LIB_SRCS
 )
 
 
+set(TARGETS_TO_INSTALL lua_internal lua_include)
+
+set(LUA_LINKED_LIBRARIES)
+
+if(LUA_BUILD_AS_CXX)
+	set_source_files_properties(${LUA_LIB_SRCS} "src/cobalt.c" "src/cobaltc.c" "src/cobaltaot.c" "src/host/minicobalt.c" "pre/main.c" PROPERTIES LANGUAGE CXX )
+endif()
+
+add_library(lua_internal INTERFACE)
+
+add_library(lua_include INTERFACE)
+
 # FFI
 if (FFI)
     list(APPEND LUA_LIB_SRCS
@@ -182,6 +194,45 @@ if (SOCKET)
     include_directories(${CURL_INCLUDE_DIRS})
 endif()
 
+# Python 
+if (PYTHON)
+    list(APPEND LUA_LIB_SRCS
+        "src/lpy.c"
+        "src/pyl.c"
+    )
+    message("-- Added python library")
+
+    if (PYTHON_PATH_OVERRIDE)
+        message("- Overriding Python Path to: ${PYTHON_PATH_OVERRIDE}")
+        set(PYTHON_DIR "${PYTHON_PATH_OVERRIDE}")
+    endif()
+    find_package(Python REQUIRED)
+    list(APPEND LUA_LINKED_LIBRARIES Python::Python)
+
+    execute_process(
+        COMMAND python3-config --ldflags
+        OUTPUT_VARIABLE PYTHON_LDFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT PYTHON_LDFLAGS)
+        message(FATAL_ERROR "Failed to find Python3 using python3-config")
+    endif()
+    execute_process(
+        COMMAND python3-config --libs
+        OUTPUT_VARIABLE PYTHON_LIBFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT PYTHON_LIBFLAGS)
+        message(FATAL_ERROR "Failed to find Python3 using python3-config")
+    endif()
+    target_link_libraries(lua_internal INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
+    target_link_libraries(lua_include INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
+    #target_link_libraries(lua_static INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
+    #if (LUA_ENABLE_SHARED)
+    #    target_link_libraries(lua_shared INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
+    #endif()
+endif()
+
 # LLVM
 if (LLVM)
     list(APPEND LUA_LIB_SRCS
@@ -207,24 +258,15 @@ if (LLVM)
     include_directories(${LLVM_INCLUDE_DIRS})
 endif()
 
-set(TARGETS_TO_INSTALL lua_internal lua_include)
-
-set(LUA_LINKED_LIBRARIES)
-
-if(LUA_BUILD_AS_CXX)
-	set_source_files_properties(${LUA_LIB_SRCS} "src/cobalt.c" "src/cobaltc.c" "src/cobaltaot.c" "src/host/minicobalt.c" "pre/main.c" PROPERTIES LANGUAGE CXX )
-endif()
-
-add_library(lua_internal INTERFACE)
-
-add_library(lua_include INTERFACE)
-
-target_include_directories(lua_include INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+add_library(lua_static STATIC ${LUA_LIB_SRCS})
+target_link_libraries(lua_static PRIVATE lua_internal PUBLIC lua_include)
+set_target_properties(lua_static PROPERTIES
+    VERSION "${PACKAGE_VERSION}"
 )
-
-target_link_libraries(lua_internal INTERFACE lua_include ${SDL_LIBRARIES})
+list(APPEND TARGETS_TO_INSTALL lua_static)
+if(NOT BUILD_SHARED_LIBS OR NOT LUA_ENABLE_SHARED)
+    add_library(Lua::Library ALIAS lua_static)
+endif()
 
 if(LUA_ENABLE_SHARED)
     add_library(lua_shared SHARED ${LUA_LIB_SRCS})
@@ -245,15 +287,14 @@ if(LUA_ENABLE_SHARED)
     endif()
 endif()
 
-add_library(lua_static STATIC ${LUA_LIB_SRCS})
-target_link_libraries(lua_static PRIVATE lua_internal PUBLIC lua_include)
-set_target_properties(lua_static PROPERTIES
-    VERSION "${PACKAGE_VERSION}"
+target_include_directories(lua_include INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
-list(APPEND TARGETS_TO_INSTALL lua_static)
-if(NOT BUILD_SHARED_LIBS OR NOT LUA_ENABLE_SHARED)
-    add_library(Lua::Library ALIAS lua_static)
-endif()
+
+target_link_libraries(lua_internal INTERFACE lua_include ${SDL_LIBRARIES})
+
+
 if(UNIX)
     if(NOT EMSCRIPTEN)
         

@@ -550,7 +550,7 @@
 		},
 		"language-variable": {
 			"name": "variable.language.cobalt",
-			"match": "\\bself\\b"
+			"match": "\\bthis\\b"
 		},
 		"support-variable": {
 			"name": "support.variable.cobalt",

@@ -19,7 +19,8 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - regex support (not full regex only a small subset), use `unix.regex` for POSIX regex
 - 2x speed improved gc (optional) using libgc
 - improved vm
-- OpenGL bindings (optional) for 3D graphics
+- Vulkan bindings (optional) for high-performance 3D graphics
+- Python bridge `import("python")`
 - readonly tables or `rotables`
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - LLVM JIT compiler
@@ -28,7 +29,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - 30% increase with pool allocator
 - lpeg-labels built in
-- `$`, `@`, `&` symbols for pairs, ipairs, table.unpack
+- `$`, `@`, `&`, and more quick-chars as alias for functions `pairs`, `ipairs`, and `table.unpack`
 - more operators
 - tenary operator
 - `` ` `` for python like format ``print(`Hello {name}`)`` directly implemented to the parser and bytecode compatable
@@ -110,9 +111,9 @@ missing features and the `unix`, `win` libraries should not be available.
 
 To build the following flags are reccomended:
 ```bash
--DCURL=off -DSDL=off -DM=2 -DCLANG=off -DLLVM=off -DCROSS=on
+-DCURL=off -DSDL=off -DM=2 -DCLANG=off -DLLVM=off -DCROSS=on -DPYTHON=off
 ```
-* -DCURL, -DSDL, -DCLANG disable the bindings for those libraries (they are not supported and needed for microcontrollers)
+* -DCURL, -DSDL, -DPYTHON, -DCLANG disable the bindings for those libraries (they are not supported and needed for microcontrollers)
 * -DLLVM=off disables JIT and LLVM AOT which are just junk for microcontrollers.
 * -DM=2 maxes out memory optimizations in sacrifice of speed. `-DM=0` is the default and `-DM=1` is light memory optimizations.
 * -DCROSS=on disables CPU specific optimizations.
@@ -125,6 +126,7 @@ You can also use `#include` to include the cobalt stdlibs and run it there.
 #define COBALT_CURL 0
 #define COBALT_SDL 0
 #define COBALT_CLANG 0
+#define COBALT_PYTHON 0
 #define COBALT_LLVM 0
 #define MOPT 2
 /*************/
@@ -156,4 +158,20 @@ will generate a C file representing `main.cobalt` and the symbol that will start
 #### LLVM
 ```bash
 cobaltaot main.cobalt -o main.ll -m mainsymbol
+```
+# Python
+Run cobalt code in python
+```py
+import cobalt
+cobalt.eval("print('Hello World!')") # prints Hello World!
+```
+Run python code in cobalt
+```js
+python = import("python")
+python.eval("print('Hello World!')") // prints Hello World!
+sys = python.import("sys")
+sys.version // prints python version
+// Once importing `python` you also get
+Py_None
+// as a global variable to represent None in python
 ```

@@ -113,6 +113,10 @@ LUAMOD_API int(luaopen_moonsdl2)(lua_State *L);
 #define LUA_CURLNAME "cURL"
 LUAMOD_API int(luaopen_lcurl)(lua_State *L);
 #endif
+#ifdef COBALT_PYTHON
+#define LUA_PYTHONNAME "python"
+LUAMOD_API int(luaopen_python)(lua_State *L);
+#endif
 #if defined(COBALT_CLANG)
 #define LUA_CLANGNAME "clang"
 LUAMOD_API int(luaopen_clang)(lua_State *L);

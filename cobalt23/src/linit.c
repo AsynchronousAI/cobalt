@@ -60,7 +60,7 @@ static const luaL_Reg loadedlibs[] = {
 ** into the global table
 */
 static const luaL_Reg preloadedlibs[] = {
-/* Platform specifics */
+    /* Platform specifics */
 #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
     {LUA_UNIXNAME, luaopen_unix},
 #elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || \
@@ -97,6 +97,9 @@ static const luaL_Reg preloadedlibs[] = {
 #ifdef COBALT_SDL
     {LUA_SDLNAME, luaopen_moonsdl2},
 #endif
+#ifdef COBALT_PYTHON
+    {LUA_PYTHONNAME, luaopen_python},
+#endif
 #ifdef COBALT_SOCKET
     {LUA_CURLNAME, luaopen_lcurl},
 #endif
@@ -104,7 +107,8 @@ static const luaL_Reg preloadedlibs[] = {
     {LUA_CLANGNAME, luaopen_clang},
 #endif
 
-    {NULL, NULL}};
+    {NULL, NULL}
+};
 
 LUALIB_API void luaL_openlibs(lua_State *L) {
   const luaL_Reg *lib;

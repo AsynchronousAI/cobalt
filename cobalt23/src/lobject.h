@@ -109,7 +109,14 @@ typedef struct TValue {
     checkliveness(L, io1);            \
     lua_assert(!isnonstrictnil(io1)); \
   }
-
+#define ogsetobj(L, obj1, obj2)  \
+  {                            \
+    const TValue* o2 = (obj2); \
+    TValue* o1 = (obj1);       \
+    o1->value = o2->value;     \
+    o1->tt = o2->tt;           \
+    checkliveness(G(L), o1);   \
+  }
 /*
 ** Different types of assignments, according to source and destination.
 ** (They are mostly equal now, but may be different in the future.)

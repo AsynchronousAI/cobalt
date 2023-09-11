@@ -683,7 +683,6 @@ LUA_API int lua_rawgeti(lua_State *L, int idx, lua_Integer n) {
   t = gettable(L, idx);
   return finishrawget(L, luaH_getint(t, n));
 }
-
 LUA_API int lua_rawgetp(lua_State *L, int idx, const void *p) {
   Table *t;
   TValue k;

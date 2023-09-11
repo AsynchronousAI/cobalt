@@ -22,7 +22,6 @@ else()
     message("-- Configuring Native CPU Build")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
 endif()
-
 if (NOOPT)
     message("-- Configuring No Optimization Build")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -34,6 +33,36 @@ endif()
 if(FFI)
     message("-- Configuring FFI Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_FFI")
+endif()
+if (PYTHON)
+    message("-- Adding Python Bindings")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_PYTHON")
+    execute_process(
+        COMMAND python3-config --cflags
+        OUTPUT_VARIABLE PYTHON_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT PYTHON_CFLAGS)
+        message(FATAL_ERROR "Failed to find Python3 using python3-config")
+    endif()
+    execute_process(
+        COMMAND python3-config --ldflags
+        OUTPUT_VARIABLE PYTHON_LDFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT PYTHON_LDFLAGS)
+        message(FATAL_ERROR "Failed to find Python3 using python3-config")
+    endif()
+    execute_process(
+        COMMAND python3-config --libs
+        OUTPUT_VARIABLE PYTHON_LIBFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT PYTHON_LIBFLAGS)
+        message(FATAL_ERROR "Failed to find Python3 using python3-config")
+    endif()
+    string(REPLACE "-I" "-L" PYTHON_LINKER_FLAGS "${PYTHON_CFLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${PYTHON_CFLAGS} ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS} ${PYTHON_LINKER_FLAGS}")
 endif()
 if(SDL)
     message("-- Configuring SDL Library")
@@ -208,18 +237,6 @@ add_custom_target(lua
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/lua-cobalt
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
     COMMENT "Building lua-cobalt"
-)
-add_custom_target(pre
-    COMMAND make -w
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/pre
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Building preprocessor"
-)
-add_custom_target(mini
-    COMMAND make -w
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/src/host
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-    COMMENT "Building minicobalt"
 )
 if(POOLTEST)
 set(TESTARGS, "-p")

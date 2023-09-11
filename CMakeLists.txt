@@ -9,7 +9,7 @@ option(SOCKET "Install the socket library for Cobalt" ON)
 option(LUA_ENABLE_TESTING "Enable testing for Cobalt" ON)
 option(INSTALL "Install Cobalt" ON)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_INTERFACE") # -DCOBALT_INTERFACE triggers the `main` symbol to be exported for minicobalt.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")
 # Based on the SDL and FFI variable provide them as Flags
 if (LUA_BUILD_AS_CXX)

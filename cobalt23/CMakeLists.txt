@@ -439,7 +439,7 @@ if(LUA_BUILD_MINI)
 endif()
 
 install(TARGETS ${TARGETS_TO_INSTALL}
-        EXPORT LuaTargets
+        EXPORT CobaltTargets
 )
 
 install(DIRECTORY src/ TYPE INCLUDE)
@@ -453,9 +453,9 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion
 )
 
-install(EXPORT LuaTargets
-        FILE LuaTargets.cmake
-        DESTINATION "share/cmake/Lua"
+install(EXPORT CobaltTargets
+        FILE CobaltTargets.cmake
+        DESTINATION "share/cmake/cobalt"
         NAMESPACE Lua::
 )
 

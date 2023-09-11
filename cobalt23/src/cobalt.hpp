@@ -7,4 +7,5 @@ extern "C" {
 #include "cobalt.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "lautoc.h"
 }

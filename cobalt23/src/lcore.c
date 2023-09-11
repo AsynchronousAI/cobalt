@@ -16,6 +16,8 @@
 #include "cobalt.h"
 #include "lauxlib.h"
 #include "lualib.h"
+#include "llangstate.h"
+
 #if defined __unix__ || LUA_USE_POSIX || __APPLE__
 #include <sys/mman.h>
 #include <syslog.h>
@@ -287,6 +289,10 @@ static const errorlen(lua_State *L) {
   return 1;
 }
 static const struct luaL_Reg lcore_lib[] = {{"macros", dumpmacros},
+
+                                            /* expanded from llangstate */
+                                            {"state", luaB_state},
+                                            {"getstate", luaB_getstate},
                                             {NULL, NULL}};
 
 static const struct luaL_Reg lcore_error_lib[] = {{"cerror", error},

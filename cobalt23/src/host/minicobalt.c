@@ -8381,6 +8381,8 @@ static const struct luaL_Reg bitlib[] = {
     {"rshift", rshift}, {"arshift", arshift}, {"rol", rol},
     {"ror", ror},       {"bswap", bswap},     {"tohex", tohex},
     {NULL, NULL}};
+  
+#ifdef COBALT_INTERFACE
 int main(int argc, char** argv) {
   lua_State* L = luaL_newstate();
   int i;
@@ -8401,3 +8403,4 @@ int main(int argc, char** argv) {
   lua_close(L);
   return 0;
 }
+#endif

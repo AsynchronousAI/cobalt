@@ -41,8 +41,10 @@ In comparision to Lua, cobalt has the following to improve speed/memory:
 - 3-4x less memory usage by the cobalt core
 - light functions and rotables
 - 1.5x to 2.5x faster vm with JIT
+- Mini interpreter that kicks in when some of cobalts resources are not needed for less memory usage
 - Easy memory leak tracking
-which is a ~8.5x speed improvement over Lua 5.4.3 (with JIT). and if you are not looking for runtime, the new AOT is 2x faster with Bytecode and 10x faster with LLVM IR AOT.
+***
+which is a ~8.5x speed improvement over Lua 5.4.3 (with Cobalt JIT). and if you are not looking for on-runtime, the new AOT is 2x faster with Bytecode and 10x faster with LLVM IR AOT.
 ## Syntax
 ### Lua:
 ```lua  

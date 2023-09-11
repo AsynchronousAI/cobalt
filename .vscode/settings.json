@@ -18,7 +18,9 @@
         "stdlib.h": "c",
         "*.in": "cpp",
         "jit-common.h": "c",
-        "lualib.h": "c"
+        "lualib.h": "c",
+        "minicobalt.c": "cpp",
+        "locale": "cpp"
     },
     "terminal.integrated.scrollback": 1000000
 }

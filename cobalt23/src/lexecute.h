@@ -4,6 +4,7 @@
 // ============================================================================== */
 
 #include <stdio.h>
+#include "llangstate.h"
 
 #if defined(LLVM) && !defined(AOT_IS_MODULE)
 /* Include LLVM */
@@ -18,7 +19,6 @@
 // AOT Executer
 #if defined(AOT_IS_MODULE)
 // Internal AOT Executer
-
 static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci) {
   LClosure *cl;
   TValue *k;
@@ -49,9 +49,6 @@ returning: /* trap already set */
     ci->u.l.trap = 1; /* assume trap is on, for now */
   }
   base = ci->func + 1;
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-/* LLVM initialization */
-#endif
   /* main loop of interpreter */
   for (;;) {
     Instruction i; /* instruction being executed */
@@ -65,40 +62,25 @@ returning: /* trap already set */
     lua_assert(isIT(i) || (cast_void(L->top = base), 1));
     vmdispatch(i) {
       VM_CASE(MOVE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MOVE\n");
-#endif
         setobjs2s(L, ra, RB(i));
         vmbreak;
       }
       VM_CASE(LOADI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LOADI\n");
-#endif
         lua_Integer b = GETARG_sBx(i);
         setivalue(s2v(ra), b);
         vmbreak;
       }
       VM_CASE(LOADF) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LOADF\n");
-#endif
         int b = GETARG_sBx(i);
         setfltvalue(s2v(ra), cast_num(b));
         vmbreak;
       }
       VM_CASE(LOADK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LOADK\n");
-#endif
         TValue *rb = k + GETARG_Bx(i);
         setobj2s(L, ra, rb);
         vmbreak;
       }
       VM_CASE(LOADKX) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LOADKX\n");
-#endif
         TValue *rb;
         rb = k + GETARG_Ax(*pc);
         pc++;
@@ -106,31 +88,19 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(LOADFALSE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LOADFALSE\n");
-#endif
         setbfvalue(s2v(ra));
         vmbreak;
       }
       VM_CASE(LFALSESKIP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LFALSESKIP\n");
-#endif
         setbfvalue(s2v(ra));
         pc++; /* skip next instruction */
         vmbreak;
       }
       VM_CASE(LOADTRUE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LOADTRUE\n");
-#endif
         setbtvalue(s2v(ra));
         vmbreak;
       }
       VM_CASE(LOADNIL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LOADNIL\n");
-#endif
         int b = GETARG_B(i);
         do {
           setnilvalue(s2v(ra++));
@@ -138,26 +108,17 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(GETUPVAL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("GETUPVAL\n");
-#endif
         int b = GETARG_B(i);
         setobj2s(L, ra, cl->upvals[b]->v);
         vmbreak;
       }
       VM_CASE(SETUPVAL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SETUPVAL\n");
-#endif
         UpVal *uv = cl->upvals[GETARG_B(i)];
         setobj(L, uv->v, s2v(ra));
         luaC_barrier(L, uv, s2v(ra));
         vmbreak;
       }
       VM_CASE(GETTABUP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("GETTABUP\n");
-#endif
         const TValue *slot;
         TValue *upval = cl->upvals[GETARG_B(i)]->v;
         TValue *rc = KC(i);
@@ -169,9 +130,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(GETTABLE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("GETTABLE\n");
-#endif
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = vRC(i);
@@ -185,9 +143,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(GETI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("GETI\n");
-#endif
         const TValue *slot;
         TValue *rb = vRB(i);
         int c = GETARG_C(i);
@@ -201,9 +156,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(GETFIELD) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("GETFIELD\n");
-#endif
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = KC(i);
@@ -215,9 +167,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(SETTABUP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SETTABUP\n");
-#endif
         const TValue *slot;
         TValue *upval = cl->upvals[GETARG_A(i)]->v;
         TValue *rb = KB(i);
@@ -230,9 +179,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(SETTABLE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SETTABLE\n");
-#endif
         const TValue *slot;
         TValue *rb = vRB(i); /* key (table is in 'ra') */
         TValue *rc = RKC(i); /* value */
@@ -247,9 +193,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(SETI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SETI\n");
-#endif
         const TValue *slot;
         int c = GETARG_B(i);
         TValue *rc = RKC(i);
@@ -263,9 +206,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(SETFIELD) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SETFIELD\n");
-#endif
         const TValue *slot;
         TValue *rb = KB(i);
         TValue *rc = RKC(i);
@@ -277,9 +217,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(NEWTABLE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("NEWTABLE\n");
-#endif
         int b = GETARG_B(i); /* log2(hash size) + 1 */
         int c = GETARG_C(i); /* array size */
         Table *t;
@@ -296,9 +233,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(SELF) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SELF\n");
-#endif
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = RKC(i);
@@ -311,86 +245,50 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(ADDI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("ADDI\n");
-#endif
         op_arithI(L, l_addi, luai_numadd);
         vmbreak;
       }
       VM_CASE(ADDK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("ADDK\n");
-#endif
         op_arithK(L, l_addi, luai_numadd);
         vmbreak;
       }
       VM_CASE(SUBK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SUBK\n");
-#endif
         op_arithK(L, l_subi, luai_numsub);
         vmbreak;
       }
       VM_CASE(MULK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MULK\n");
-#endif
         op_arithK(L, l_muli, luai_nummul);
         vmbreak;
       }
       VM_CASE(MODK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MODK\n");
-#endif
         op_arithK(L, luaV_mod, luaV_modf);
         vmbreak;
       }
       VM_CASE(POWK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("POWK\n");
-#endif
         op_arithfK(L, luai_numpow);
         vmbreak;
       }
       VM_CASE(DIVK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("DIVK\n");
-#endif
         op_arithfK(L, luai_numdiv);
         vmbreak;
       }
       VM_CASE(IDIVK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("IDIVK\n");
-#endif
         op_arithK(L, luaV_idiv, luai_numidiv);
         vmbreak;
       }
       VM_CASE(BANDK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("BANDK\n");
-#endif
         op_bitwiseK(L, l_band);
         vmbreak;
       }
       VM_CASE(BORK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("BORK\n");
-#endif
         op_bitwiseK(L, l_bor);
         vmbreak;
       }
       VM_CASE(BXORK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("BXORK\n");
-#endif
         op_bitwiseK(L, l_bxor);
         vmbreak;
       }
       VM_CASE(SHRI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SHRI\n");
-#endif
         TValue *rb = vRB(i);
         int ic = GETARG_sC(i);
         lua_Integer ib;
@@ -401,9 +299,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(SHLI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SHLI\n");
-#endif
         TValue *rb = vRB(i);
         int ic = GETARG_sC(i);
         lua_Integer ib;
@@ -414,93 +309,54 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(ADD) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("ADD\n");
-#endif
         op_arith(L, l_addi, luai_numadd);
         vmbreak;
       }
       VM_CASE(SUB) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SUB\n");
-#endif
         op_arith(L, l_subi, luai_numsub);
         vmbreak;
       }
       VM_CASE(MUL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MUL\n");
-#endif
         op_arith(L, l_muli, luai_nummul);
         vmbreak;
       }
       VM_CASE(MOD) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MOD\n");
-#endif
         op_arith(L, luaV_mod, luaV_modf);
         vmbreak;
       }
       VM_CASE(POW) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("POW\n");
-#endif
         op_arithf(L, luai_numpow);
         vmbreak;
       }
       VM_CASE(DIV) { /* float division (always with floats) */
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("DIV\n");
-#endif
         op_arithf(L, luai_numdiv);
         vmbreak;
       }
       VM_CASE(IDIV) { /* floor division */
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("IDIV\n");
-#endif
         op_arith(L, luaV_idiv, luai_numidiv);
         vmbreak;
       }
       VM_CASE(BAND) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("BAND\n");
-#endif
         op_bitwise(L, l_band);
         vmbreak;
       }
       VM_CASE(BOR) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("BOR\n");
-#endif
         op_bitwise(L, l_bor);
         vmbreak;
       }
       VM_CASE(BXOR) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("BXOR\n");
-#endif
         op_bitwise(L, l_bxor);
         vmbreak;
       }
       VM_CASE(SHR) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SHR\n");
-#endif
         op_bitwise(L, luaV_shiftr);
         vmbreak;
       }
       VM_CASE(SHL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SHL\n");
-#endif
         op_bitwise(L, luaV_shiftl);
         vmbreak;
       }
       VM_CASE(MMBIN) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MMBIN\n");
-#endif
         Instruction pi = *(pc - 2); /* original arith. expression */
         TValue *rb = vRB(i);
         TMS tm = (TMS)GETARG_C(i);
@@ -510,9 +366,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(MMBINI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MMBINI\n");
-#endif
         Instruction pi = *(pc - 2); /* original arith. expression */
         int imm = GETARG_sB(i);
         TMS tm = (TMS)GETARG_C(i);
@@ -522,9 +375,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(MMBINK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("MMBINK\n");
-#endif
         Instruction pi = *(pc - 2); /* original arith. expression */
         TValue *imm = KB(i);
         TMS tm = (TMS)GETARG_C(i);
@@ -534,9 +384,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(UNM) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("UNM\n");
-#endif
         TValue *rb = vRB(i);
         lua_Number nb;
         if (ttisinteger(rb)) {
@@ -549,9 +396,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(BNOT) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("BNOT\n");
-#endif
         TValue *rb = vRB(i);
         lua_Integer ib;
         if (tointegerns(rb, &ib)) {
@@ -561,9 +405,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(NOT) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("NOT\n");
-#endif
         TValue *rb = vRB(i);
         if (l_isfalse(rb))
           setbtvalue(s2v(ra));
@@ -572,16 +413,10 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(LEN) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LEN\n");
-#endif
         Protect(luaV_objlen(L, ra, vRB(i)));
         vmbreak;
       }
       VM_CASE(CONCAT) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("CONCAT\n");
-#endif
         int n = GETARG_B(i); /* number of elements to concatenate */
         L->top = ra + n;     /* mark the end of concat operands */
         ProtectNT(luaV_concat(L, n));
@@ -589,31 +424,19 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(CLOSE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("CLOSE\n");
-#endif
         Protect(luaF_close(L, ra, LUA_OK, 1));
         vmbreak;
       }
       VM_CASE(TBC) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("TBC\n");
-#endif
         /* create new to-be-closed upvalue */
         halfProtect(luaF_newtbcupval(L, ra));
         vmbreak;
       }
       VM_CASE(JMP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("JMP\n");
-#endif
         dojump(ci, i, 0);
         vmbreak;
       }
       VM_CASE(EQ) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("EQ\n");
-#endif
         int cond;
         TValue *rb = vRB(i);
         Protect(cond = luaV_equalobj(L, s2v(ra), rb));
@@ -621,23 +444,14 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(LT) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LT\n");
-#endif
         op_order(L, l_lti, LTnum, lessthanothers);
         vmbreak;
       }
       VM_CASE(LE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LE\n");
-#endif
         op_order(L, l_lei, LEnum, lessequalothers);
         vmbreak;
       }
       VM_CASE(EQK) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("EQK\n");
-#endif
         TValue *rb = KB(i);
         /* basic types do not use '__eq'; we can use raw equality */
         int cond = luaV_rawequalobj(s2v(ra), rb);
@@ -645,9 +459,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(EQI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("EQI\n");
-#endif
         int cond;
         int im = GETARG_sB(i);
         if (ttisinteger(s2v(ra)))
@@ -660,45 +471,27 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(LTI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LTI\n");
-#endif
         op_orderI(L, l_lti, luai_numlt, 0, TM_LT);
         vmbreak;
       }
       VM_CASE(LEI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("LEI\n");
-#endif
         op_orderI(L, l_lei, luai_numle, 0, TM_LE);
         vmbreak;
       }
       VM_CASE(GTI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("GTI\n");
-#endif
         op_orderI(L, l_gti, luai_numgt, 1, TM_LT);
         vmbreak;
       }
       VM_CASE(GEI) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("GEI\n");
-#endif
         op_orderI(L, l_gei, luai_numge, 1, TM_LE);
         vmbreak;
       }
       VM_CASE(TEST) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("TEST\n");
-#endif
         int cond = !l_isfalse(s2v(ra));
         docondjump();
         vmbreak;
       }
       VM_CASE(TESTSET) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("TESTSET\n");
-#endif
         TValue *rb = vRB(i);
         if (l_isfalse(rb) == GETARG_k(i))
           pc++;
@@ -709,9 +502,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(CALL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("CALL\n");
-#endif
         CallInfo *newci;
         int b = GETARG_B(i);
         int nresults = GETARG_C(i) - 1;
@@ -730,9 +520,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(TAILCALL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("TAILCALL\n");
-#endif
         int b = GETARG_B(i); /* number of arguments + 1 (function) */
         int nparams1 = GETARG_C(i);
         /* delta is virtual 'func' - real 'func' (vararg functions) */
@@ -767,9 +554,6 @@ returning: /* trap already set */
         goto startfunc; /* execute the callee */
       }
       VM_CASE(RETURN) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("RETURN\n");
-#endif
         int n = GETARG_B(i) - 1; /* number of results */
         int nparams1 = GETARG_C(i);
         if (n < 0)                   /* not fixed? */
@@ -789,9 +573,6 @@ returning: /* trap already set */
         goto ret;
       }
       VM_CASE(RETURN0) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("RETURN0\n");
-#endif
         if (l_unlikely(L->hookmask)) {
           L->top = ra;
           savepc(ci);
@@ -807,9 +588,6 @@ returning: /* trap already set */
         goto ret;
       }
       VM_CASE(RETURN1) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("RETURN1\n");
-#endif
         if (l_unlikely(L->hookmask)) {
           L->top = ra + 1;
           savepc(ci);
@@ -836,9 +614,6 @@ returning: /* trap already set */
         }
       }
       VM_CASE(FORLOOP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("FORLOOP\n");
-#endif
         if (ttisinteger(s2v(ra + 2))) { /* integer loop? */
           lua_Unsigned count = l_castS2U(ivalue(s2v(ra + 1)));
           if (count > 0) { /* still more iterations? */
@@ -856,17 +631,11 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(FORPREP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("FORPREP\n");
-#endif
         savestate(L, ci);                           /* in case of errors */
         if (forprep(L, ra)) pc += GETARG_Bx(i) + 1; /* skip the loop */
         vmbreak;
       }
       VM_CASE(TFORPREP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("TFORPREP\n");
-#endif
         /* create to-be-closed upvalue (if needed) */
         halfProtect(luaF_newtbcupval(L, ra + 3));
         pc += GETARG_Bx(i);
@@ -875,9 +644,6 @@ returning: /* trap already set */
         goto l_tforcall;
       }
       VM_CASE(TFORCALL) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("TFORCALL\n");
-#endif
       l_tforcall:
         /* 'ra' has the iterator function, 'ra + 1' has the state,
            'ra + 2' has the control variable, and 'ra + 3' has the
@@ -894,9 +660,6 @@ returning: /* trap already set */
         goto l_tforloop;
       }
       VM_CASE(TFORLOOP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("TFORLOOP\n");
-#endif
       l_tforloop:
         if (!ttisnil(s2v(ra + 4))) {    /* continue loop? */
           setobjs2s(L, ra + 2, ra + 4); /* save control variable */
@@ -905,9 +668,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(SETLIST) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("SETLIST\n");
-#endif
         int n = GETARG_B(i);
         unsigned int last = GETARG_C(i);
         Table *h = hvalue(s2v(ra));
@@ -931,26 +691,17 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(CLOSURE) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("CLOSURE\n");
-#endif
         Proto *p = cl->p->p[GETARG_Bx(i)];
         halfProtect(pushclosure(L, p, cl->upvals, base, ra));
         checkGC(L, ra + 1);
         vmbreak;
       }
       VM_CASE(VARARG) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("VARARG\n");
-#endif
         int n = GETARG_C(i) - 1; /* required results */
         Protect(luaT_getvarargs(L, ci, ra, n));
         vmbreak;
       }
       VM_CASE(VARARGPREP) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("VARARGPREP\n");
-#endif
         ProtectNT(luaT_adjustvarargs(L, GETARG_A(i), ci, cl->p));
         if (l_unlikely(trap)) { /* previous "Protect" updated trap */
           luaD_hookcall(L, ci);
@@ -960,9 +711,6 @@ returning: /* trap already set */
         vmbreak;
       }
       VM_CASE(EXTRAARG) {
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-        if (LLVM == 1) printf("EXTRAARG\n");
-#endif
         lua_assert(0);
         vmbreak;
       }
@@ -985,6 +733,10 @@ void luaV_execute_aot(lua_State *L, CallInfo *ci) {
 #else
 // Interpreter Executer
 void luaV_execute (lua_State *L, CallInfo *ci) {
+  /* TODO:
+  - Implement JIT (state)
+  - Implement Mini (state)
+  */
   LClosure *cl;
   TValue *k;
   StkId base;

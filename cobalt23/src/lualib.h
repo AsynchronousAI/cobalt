@@ -51,15 +51,6 @@ LUAMOD_API int(luaopen_math)(lua_State *L);
 #define LUA_COLORLIBNAME "Color"
 LUAMOD_API int(luaopen_color)(lua_State *L);
 
-#define LUA_2DLIBNAME "Vector2"
-LUAMOD_API int(luaopen_2D)(lua_State *L);
-
-#define LUA_3DLIBNAME "Vector3"
-LUAMOD_API int(luaopen_3D)(lua_State *L);
-
-#define LUA_TRANSFORMNAME "Transform"
-LUAMOD_API int(luaopen_transform)(lua_State *L);
-
 #define LUA_CORENAME "core"
 LUAMOD_API int(luaopen_core)(lua_State *L);
 

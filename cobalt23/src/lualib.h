@@ -21,7 +21,7 @@ LUAMOD_API int(luaopen_preprocess)(lua_State *L);
 #define LUA_ASYNCLIBNAME "async"
 LUAMOD_API int(luaopen_async)(lua_State *L);
 
-#define LUA_COLIBNAME "thread"
+#define LUA_COLIBNAME "coroutine"
 LUAMOD_API int(luaopen_coroutine)(lua_State *L);
 
 #define LUA_TABLIBNAME "table"

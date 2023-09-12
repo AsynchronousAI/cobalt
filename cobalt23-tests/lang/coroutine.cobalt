@@ -1,9 +1,9 @@
 { //- traceback
-  var co = thread.create(function() {
+  var co = coroutine.create(function() {
     var x = null;
     var y = x.x;
   });
-  assert(thread.resume(co) == false);
+  assert(coroutine.resume(co) == false);
   debug.traceback(co);
 }
  

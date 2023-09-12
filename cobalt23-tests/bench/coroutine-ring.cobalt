@@ -10,9 +10,9 @@ var poolsize  = 503;
 var threads   = {};
 
 // cache these to avoid global environment lookups
-var create    = thread.create;
-var resume    = thread.resume;
-var yield     = thread.yield;
+var create    = coroutine.create;
+var resume    = coroutine.resume;
+var yield     = coroutine.yield;
 
 var id        = 1;
 var token     = 0;

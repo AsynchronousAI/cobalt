@@ -3,11 +3,11 @@
   var function f() {
     x = getfenv(0);
   }
-  var co = thread.create(f);
+  var co = coroutine.create(f);
   var t = {};
   debug.setfenv(co, t);
   for( i=1,50 ) { f(); f(); f(); }
   assert(x == getfenv(0));
-  thread.resume(co);
+  coroutine.resume(co);
   assert(x == t);
 }

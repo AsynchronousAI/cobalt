@@ -53,6 +53,10 @@
 #define TOSTR_(x) #x
 #define TOSTR(x) TOSTR_(x)
 
+#if defined(LINUX) || defined(BSD) || defined(__APPLE__) || defined(__ANDROID__) || defined(__EMSCRIPTEN__) || defined(__unix__)
+#define UNIX_SYSTEM 1
+#endif
+
 #include "getproc.h"
 
 extern lua_State *moonglfw_L; /* the global Lua state */
@@ -181,7 +185,6 @@ void monitorCallback(GLFWmonitor *monitor, int event);
 int checkminversion(int major, int minor, int rev);
 #define errorCallback moonglfw_errorCallback
 void errorCallback(int ec, const char *descr);
-int luaopen_moonglfw(lua_State *L);
 void moonglfw_utils_init(lua_State *L);
 void moonglfw_open_enums(lua_State *L);
 int moonglfw_open_getproc(lua_State *L);

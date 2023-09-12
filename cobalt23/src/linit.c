@@ -104,6 +104,12 @@ static const luaL_Reg preloadedlibs[] = {
 #ifdef COBALT_CLANG
     {LUA_CLANGNAME, luaopen_clang},
 #endif
+#ifdef COBALT_GLFW
+    {LUA_GLFWNAME, luaopen_moonglfw},
+#endif
+#ifdef COBALT_VULKAN
+    {LUA_VULKANNAME, luaopen_moonvulkan},
+#endif
 
     {NULL, NULL}
 };

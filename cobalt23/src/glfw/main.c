@@ -143,7 +143,7 @@ static const struct luaL_Reg Functions[] =
     };
 
 
-int luaopen_moonglfw(lua_State *L)
+LUALIB_API int luaopen_moonglfw(lua_State *L)
 /* Lua calls this function to load the module */
     {
     moonglfw_L = L;

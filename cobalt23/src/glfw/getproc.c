@@ -12,15 +12,14 @@ moonglfw_dt_t glfw;   /* dispatch table */
  *("ISO C forbids conversion of function pointer to object pointer type")
  */
 
-#if defined(MACOS)
+#if defined(__APPLE__)
 #include <dlfcn.h>
 #define LIBNAME "libglfw.dylib"
 static void *Handle = NULL;
-#elif defined(LINUX)
+#elif defined(UNIX_SYSTEM)
 #include <dlfcn.h>
 #define LIBNAME "libglfw.so"
 static void *Handle = NULL;
-
 #elif defined(MINGW)
 #include <windows.h>
 #define LIBNAME "glfw3.dll"
@@ -38,7 +37,7 @@ static HMODULE Handle = NULL;
 
 static int Init(lua_State *L)
     {
-#if defined(LINUX) || defined(MACOS)
+#if defined(UNIX_SYSTEM)
     char *err;
     Handle = dlopen(LIBNAME, RTLD_LAZY | RTLD_LOCAL);
     if(!Handle)
@@ -235,9 +234,7 @@ static int Init(lua_State *L)
 
 void moonglfw_atexit_getproc(void)
     {
-#if defined(MACOS)
-    if(Handle) dlclose(Handle);
-#elif defined(LINUX)
+#if defined(UNIX_SYSTEM)
     if(Handle) dlclose(Handle);
 #elif defined(MINGW)
     if(Handle) FreeLibrary(Handle);

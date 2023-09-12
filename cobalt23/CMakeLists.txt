@@ -294,6 +294,35 @@ if (PYTHON)
     #endif()
 endif()
 
+# GLFW
+if (GLFW)
+    list(APPEND LUA_LIB_SRCS
+        "src/glfw/callbacks.c"
+        "src/glfw/context.c"
+        "src/glfw/cur.c"
+        "src/glfw/enums.c"
+        "src/glfw/getproc.c"
+        "src/glfw/hint.c"
+        "src/glfw/id.c"
+        "src/glfw/input.c"
+        "src/glfw/main.c"
+        "src/glfw/mon.c"
+        "src/glfw/monitor.c"
+        "src/glfw/native.c"
+        "src/glfw/utils.c"
+        "src/glfw/vulkan.c"
+        "src/glfw/win.c"
+        "src/glfw/window.c"
+    )
+    if (GLFW_PATH_OVERRIDE)
+        message("- Overriding GLFW Path to: ${GLFW_PATH_OVERRIDE}")
+        set(GLFW_DIR "${GLFW_PATH_OVERRIDE}")
+    endif()
+    #find_package(glfw3 REQUIRED)
+    #list(APPEND LUA_LINKED_LIBRARIES glfw)
+    #include_directories(${GLFW_INCLUDE_DIRS})
+endif()
+
 # LLVM
 if (LLVM)
     list(APPEND LUA_LIB_SRCS

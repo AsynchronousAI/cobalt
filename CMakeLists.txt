@@ -12,6 +12,18 @@ option(INSTALL "Install Cobalt" ON)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_INTERFACE") # -DCOBALT_INTERFACE triggers the `main` symbol to be exported for minicobalt.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")
 # Based on the SDL and FFI variable provide them as Flags
+execute_process(
+    COMMAND pkg-config -help
+    OUTPUT_VARIABLE PKG_CONFIGEXISTS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if (NOT PKG_CONFIGEXISTS)
+if (NOT IGNORE_PKG_CONFIG)
+    message(FATAL_ERROR "pkg-config is not installed on your device and is required for locating dependencies. \n\n\tUse -DIGNORE_PKG_CONFIG=ON to ignore this error (but you will not be able to access Vulkan, SDL, GLFW, Clang, and cURL)")
+endif()
+endif()
+
 if (LUA_BUILD_AS_CXX)
     message("-- C++ core not supported yet")
     set(LUA_BUILD_AS_CXX OFF)
@@ -145,6 +157,10 @@ if(SDL)
     endif()
     set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${SDL2_TTF_LIBS} ${SDL2_MIXER_LIBS}")
 endif() 
+if (GLFW)
+    message("-- Configuring GLFW Library")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_GLFW")
+endif()
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
     execute_process(

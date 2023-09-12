@@ -34,6 +34,14 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - tenary operator
 - `` ` `` for python like format ``print(`Hello {name}`)`` directly implemented to the parser and bytecode compatable
 - CMake build system
+## When to, and not use
+### Graphics Programming
+Cobalt is a great choice for graphics programming as it has SDL, GLFW, Vulkan, and a Graphical Math library built in.
+### AI
+Cobalt doesn't include AI libraries/tools but is possible using the Python bridge or C FFI. Cobalt is a great choice for AI as it has a fast VM and JIT and access to Python and C's utilities.
+### Web Development
+Cobalt can compile to WASM through Cobalt->C->WASM or Cobalt->LLVM-IR->WASM and imported by JS. Cobalt 
+natively doesnt support web development but is planned for [`cobalt 2024`](https://cobaltlang.vercel.app/beta). As a backend Cobalt is a great choice with it's networking capabilities and speed.
 ## Comparision
 In comparision to Lua, cobalt has the following to improve speed/memory:
 - 2x faster gc

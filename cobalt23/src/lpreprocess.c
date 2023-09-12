@@ -8,6 +8,7 @@
 This has been compiled using the Cobalt AOT compiler. The source code for this
 file can be found in `cobalt23/lib/init.cobalt`.
 */
+#define INTERNAL_AOT
 #include "aot_header.c"
 
 // source = @init.cobalt

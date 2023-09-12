@@ -7,46 +7,54 @@
 Provides a simple interface to switch the interpreter state.
 */
 
-#ifndef COBALT_MINI_H
-#define COBALT_MINI_H
-#include "host/minicobalt.c"
 
-int langstate = 0; /*
-0: normal interpreter
-1: mini interpreter
-2: JIT interpreter/compiler
-3: AOT compiler (locked and activated if AOT compiler is being used)
+#ifndef LLANGSTATE_H
+#ifndef INTERNAL_AOT
+#define LLANGSTATE_H
+
+extern int State = 1;
+
+/*
+1: normal interpreter
+2: mini interpreter
+3: jit interpreter
+4: byteaot
+5: caot
+6: iraot
 */
-#ifdef AOT_IS_MODULE
-    langstate = 3;
-#endif
 
-static int luaB_state(lua_State *L){
+int luaB_state(lua_State *L){
     /* switches the interpreter state */
-    if (langstate == 3)
-        luaL_error(L, "AOT compiler is used and the state is locked.");
-    int n = lua_gettop(L); /* number of arguments */
-    if (n != 1) {
-        lua_pushliteral(L, "wrong number of arguments");
-        lua_error(L);
-    }
-    if (!lua_isnumber(L, 1)) {
-        lua_pushliteral(L, "wrong argument type");
-        lua_error(L);
-    }
-    if (lua_tonumber(L, 1) < 0 || lua_tonumber(L, 1) > 2) {
-        lua_pushliteral(L, "invalid state");
-        lua_error(L);
-    }
-    langstate = lua_tonumber(L, 1);
-    return 0;
+    #ifdef AOT_IS_MODULE
+        lua_error("AOT compiler is used and the state is locked.");
+        return 0;
+    #else
+        int n = lua_gettop(L); /* number of arguments */
+        if (n != 1) {
+            lua_pushliteral(L, "wrong number of arguments");
+            lua_error(L);
+        }
+        if (!lua_isnumber(L, 1)) {
+            lua_pushliteral(L, "wrong argument type");
+            lua_error(L);
+        }
+        if (lua_tonumber(L, 1) < 1 || lua_tonumber(L, 1) > 3) {
+            lua_pushliteral(L, "invalid state");
+            lua_error(L);
+        }
+        State = lua_tonumber(L, 1);
+        return 0;
+    #endif
 }
 
-static int luaB_getstate(lua_State *L){
+int luaB_getstate(lua_State *L){
     /* returns the current interpreter state */
-    lua_pushnumber(L, langstate);
+    #ifdef AOT_IS_MODULE
+        lua_pushnumber(L, 3);
+    #else
+        lua_pushnumber(L, State);
+    #endif
     return 1;
 }
-
-
-#endif
+#endif // INTERNAL_AOT
+#endif // LLANGSTATE_H

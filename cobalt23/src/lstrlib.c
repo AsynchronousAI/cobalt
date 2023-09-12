@@ -1823,6 +1823,49 @@ static int str_split(lua_State *L) {
 
   return 1;
 }
+static int str_get(lua_State *L){
+  // arg 1: string
+  // arg 2: number
+  // returns char at position
+  const char *str = luaL_checkstring(L, 1);
+  int pos = luaL_checkinteger(L, 2);
+  if (pos < 0) {
+    pos = strlen(str) + pos + 1;
+  }
+  if (pos < 1 || pos > strlen(str)) {
+    return luaL_error(L, "index out of bounds");
+  }
+  lua_pushlstring(L, str + pos - 1, 1);
+  return 1;
+}
+static int str_set(lua_State *L){
+  // arg 1: string
+  // arg 2: number
+  // arg 3: char (or number)
+  // arg 4: if arg 3 was a number (range) this would be a character otherwise it is optional
+  // returns new string
+  const char *str = luaL_checkstring(L, 1);
+  int pos = luaL_checkinteger(L, 2);
+  if (pos < 0) {
+    pos = strlen(str) + pos + 1;
+  }
+  if (pos < 1 || pos > strlen(str)) {
+    return luaL_error(L, "index out of bounds");
+  }
+  const char *newChar;
+  if (lua_isnumber(L, 3)) {
+    // arg4 would be the character/characters replace arg2-arg3 in arg1 with arg4
+    luaL_error(L, "not implemented");
+  } else {
+    newChar = luaL_checkstring(L, 3);
+  }
+  char *newStr = malloc(strlen(str) + 1);
+  strcpy(newStr, str);
+  newStr[pos - 1] = *newChar;
+  lua_pushstring(L, newStr);
+  free(newStr);
+  return 1;
+}
 /* }====================================================== */
 
 static const luaL_Reg strlib[] = {{"byte", str_byte},
@@ -1836,6 +1879,8 @@ static const luaL_Reg strlib[] = {{"byte", str_byte},
                                   {"len", str_len},
                                   {"lower", str_lower},
                                   {"match", str_match},
+                                  {"get", str_get},
+                                  {"set", str_set},
                                   {"rep", str_rep},
                                   {"reverse", str_reverse},
                                   {"sub", str_sub},

@@ -1372,7 +1372,14 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         /* push function, state, and control variable */
         memcpy(ra + 4, ra, 3 * sizeof(*ra));
         L->top = ra + 4 + 3;
-        ProtectNT(luaD_call(L, ra + 4, GETARG_C(i)));  /* do the call */
+
+        /* if the object is not a function then wrap it in a pairs */
+        /*if (!ttisfunction(s2v(ra + 4))) {
+          
+        }else{*/
+          ProtectNT(luaD_call(L, ra + 4, GETARG_C(i)));  /* do the call */
+        /*}*/
+        
         updatestack(ci);  /* stack may have changed */
         i = *(pc++);  /* go to next instruction */
         lua_assert(GET_OPCODE(i) == OP_TFORLOOP && ra == RA(i));

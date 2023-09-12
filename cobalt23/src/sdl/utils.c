@@ -99,8 +99,7 @@ void Free(lua_State *L, void *ptr) {
  | Time utilities |
  *------------------------------------------------------------------------------*/
 
-#if defined(LINUX) || defined(__APPLE__) || defined(__unix__) || \
-    defined(__unix) || defined(LUA_USE_POSIX)
+#if defined(UNIX_SYSTEM)
 #include <sys/time.h>
 #include <unistd.h>
 #if 0

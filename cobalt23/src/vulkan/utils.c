@@ -21,7 +21,9 @@ int notavailable(lua_State *L, ...)
  | Time utilities                                                               |
  *------------------------------------------------------------------------------*/
 
-#if defined(LINUX) || defined(__APPLE__) || defined(BSD) || defined(__unix__)
+#if defined(UNIX_SYSTEM)
+#include <sys/time.h>
+#include <unistd.h>
 
 #if 0
 static double tstosec(const struct timespec *ts)

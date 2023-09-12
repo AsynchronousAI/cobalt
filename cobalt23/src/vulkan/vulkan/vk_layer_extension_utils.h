@@ -23,7 +23,7 @@
  *
  */
 
-#include "vulkan/vk_layer.h"
+#include "vk_layer.h"
 
 #ifndef LAYER_EXTENSION_UTILS_H
 #define LAYER_EXTENSION_UTILS_H

@@ -28,10 +28,10 @@
 #include <winsock2.h>
 #endif  // _WIN32
 
-#include "vulkan/vk_platform.h"
+#include "vk_platform.h"
 // sdk_platform header redefines NOMINMAX
 #undef NOMINMAX
-#include "vulkan/vk_sdk_platform.h"
+#include "vk_sdk_platform.h"
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
 /* Linux-specific common code: */

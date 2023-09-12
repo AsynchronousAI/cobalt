@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "vulkan/vulkan.h"
+#include "vulkan.h"
 #include "vk_layer_config.h"
 
 static const uint8_t kUtF8OneByteCode = 0xC0;

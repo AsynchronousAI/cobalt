@@ -29,7 +29,7 @@
 #include <vector>
 #include <map>
 #include <set>
-#include "vulkan/vulkan.h"
+#include "vulkan.h"
 #include "vk_layer_data.h"
 #include "vk_format_utils.h"
 

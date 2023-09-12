@@ -163,7 +163,7 @@ void sleeep(double seconds)
 #else
     usleep((useconds_t)(seconds*1.0e6));
 #endif
-    }
+}
 
 #define time_init(L) do { (void)L; /* do nothing */ } while(0)
 

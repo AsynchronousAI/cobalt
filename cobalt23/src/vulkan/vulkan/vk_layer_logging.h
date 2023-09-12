@@ -49,7 +49,7 @@
 #include "vk_layer_config.h"
 #include "vk_layer_data.h"
 #include "vk_loader_platform.h"
-#include "vulkan/vk_layer.h"
+#include "vk_layer.h"
 #include "vk_object_types.h"
 #include "vk_enum_string_helper.h"
 #include "cast_utils.h"

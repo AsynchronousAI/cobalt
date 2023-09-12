@@ -173,7 +173,25 @@ if (CLANG)
 endif()
 
 if (VULKAN)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_VULKAN")
+    execute_process(
+        COMMAND vulkaninfo
+        OUTPUT_VARIABLE VULKAN_EXISTS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT VULKAN_EXISTS)
+        message(FATAL_ERROR "Vulkan (SDK) is not installed on your device")
+    endif()
+    message("-- Configuring Vulkan Bindings")
+    execute_process(
+        COMMAND pkg-config vulkan --libs
+        OUTPUT_VARIABLE VULKAN_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT VULKAN_LIBS)
+        message(FATAL_ERROR "Failed to find Vulkan, disable cobalt Vulkan support by doing:\n\t\t-DVULKAN=OFF")
+    endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_VULKAN ${VULKAN_LIBS}")
 endif()
 
 if (LLVM)
@@ -198,6 +216,8 @@ endif()
 if (MINGW)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMINGW")
 endif()
+# Set c++ flags to c flags
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wc++")
 
 
 enable_language(CXX)

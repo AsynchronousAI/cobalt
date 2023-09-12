@@ -27,8 +27,8 @@
 #include <stdio.h>
 #include <string>
 
-#include "vulkan/vk_layer.h"
-#include "vulkan/vulkan.h"
+#include "vk_layer.h"
+#include "vulkan.h"
 #include "vk_layer_data.h"
 
 #if defined(WIN32)

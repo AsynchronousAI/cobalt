@@ -20,6 +20,10 @@
 #include "windows.h"
 #endif
 
+#if defined(LINUX) || defined(BSD) || defined(__APPLE__) || defined(__ANDROID__) || defined(__EMSCRIPTEN__) || defined(__unix__)
+#define UNIX_SYSTEM 1
+#endif
+
 #define TOSTR_(x) #x
 #define TOSTR(x) TOSTR_(x)
 

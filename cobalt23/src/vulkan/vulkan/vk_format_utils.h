@@ -27,7 +27,7 @@
 #pragma once
 #include <stdbool.h>
 #include <vector>
-#include "vulkan/vulkan.h"
+#include "vulkan.h"
 
 #if !defined(VK_LAYER_EXPORT)
 #if defined(__GNUC__) && __GNUC__ >= 4

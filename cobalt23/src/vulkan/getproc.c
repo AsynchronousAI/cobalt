@@ -8,7 +8,7 @@
 
 global_dt_t vk; /* global dispatch table (non-instance and non-device functions) */
 
-#if defined(LINUX) || (defined(__unix__) && !defined(__APPLE__))
+#if defined(UNIX_SYSTEM) && !defined(__APPLE__)
 #include <dlfcn.h>
 static void *Handle = NULL;
 #define LIBNAME "libvulkan.so"
@@ -40,7 +40,7 @@ static PFN_vkGetDeviceProcAddr GetDeviceProcAddr;
 
 static int Init(lua_State *L)
     {
-#if defined(LINUX)
+#if defined(UNIX_SYSTEM)
     char *err;
 
     Handle = dlopen(LIBNAME, RTLD_LAZY | RTLD_LOCAL);
@@ -519,7 +519,7 @@ device_dt_t* getproc_device(lua_State *L, VkDevice device, VkDeviceCreateInfo *c
 
 void moonvulkan_atexit_getproc(void)
     {
-#if defined(LINUX)
+#if defined(UNIX_SYSTEM)
     if(Handle) dlclose(Handle);
 #elif defined(MINGW)
     if(Handle) FreeLibrary(Handle);

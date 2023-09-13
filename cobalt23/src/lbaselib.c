@@ -589,47 +589,6 @@ static int luaB_mwait(lua_State *L) {
   lua_pushcclosure(L, luaB_uwait, 1);
   return 1;
 }
-static int luaB_printf(lua_State *L) {
-  /* equivelent to print(string.format(args)) */
-  int n = lua_gettop(L);
-  int i;
-  lua_getglobal(L, "string");
-  lua_getfield(L, -1, "format");
-  lua_remove(L, -2);
-  for (i = 1; i <= n; i++) {
-    lua_pushvalue(L, -1);
-    lua_pushvalue(L, i);
-    lua_call(L, 1, 1);
-    lua_replace(L, i);
-  }
-  lua_call(L, n, 1);
-  lua_remove(L, -2);
-  return 1;
-}
-static int luaB_inputf(lua_State *L) {
-  const char *prompt = luaL_optstring(L, 1, " ");
-  const char *fmt = luaL_optstring(L, 2, "*l");
-  int nargs = lua_gettop(L);
-  luaL_argcheck(L, nargs <= 2, 2, "expected at most 2 arguments");
-  luaL_argcheck(L, nargs >= 1, 1, "expected at least 1 argument");
-
-  printf("%s", prompt);
-  char buf[1024];
-  fgets(buf, sizeof(buf), stdin);
-  buf[strlen(buf) - 1] = '\0';
-
-  if (strcmp(fmt, "*n") == 0) {
-    lua_pushnumber(L, atof(buf));
-  } else if (strcmp(fmt, "*a") == 0) {
-    lua_pushstring(L, buf);
-  } else if (strcmp(fmt, "*l") == 0) {
-    lua_pushstring(L, buf);
-  } else {
-    return luaL_error(L, "invalid format");
-  }
-
-  return 1;
-}
 static int luaB_abort(lua_State *L) { abort(); }
 
 static const luaL_Reg base_funcs[] = {
@@ -637,8 +596,6 @@ static const luaL_Reg base_funcs[] = {
     {"abort", *luaB_abort},
     {"collectgarbage", *luaB_collectgarbage},
     {"dofile", *luaB_dofile},
-    {"inputf", *luaB_inputf},
-    {"printf", *luaB_printf},
     {"error", *luaB_error},
     {"getmetatable", *luaB_getmetatable},
     {"ipairs", *luaB_ipairs},
@@ -662,8 +619,8 @@ static const luaL_Reg base_funcs[] = {
     {"type", *luaB_type},
     {"xpcall", *luaB_xpcall},
 
+    /*wait*/
     {"wait", *luaB_wait},
-    /*subwait*/
     {"swait", *luaB_wait},
     {"mwait", *luaB_mwait},
     {"uwait", *luaB_uwait},

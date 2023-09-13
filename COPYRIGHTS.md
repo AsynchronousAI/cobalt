@@ -105,12 +105,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-# lcomplex:
- lcomplex.c
- C99 complex nummbers for Lua
- Luiz Henrique de Figueiredo <lhf@tecgraf.puc-rio.br>
- 02 Nov 2009 23:15:43
- This code is hereby placed in the public domain.
 # lfs:
 Copyright © 2003-2010 Kepler Project.
 Copyright © 2010-2022 The LuaFileSystem authors.
@@ -155,7 +149,6 @@ SOFTWARE.
  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 # lsignal:
   lsignal.c -- Signal Handler Library for Lua
  
@@ -364,27 +357,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-# luaparser
-The MIT License (MIT)
-
-Copyright (c) 2014 Andre Murbach Maidl
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # luaclang-parser
 No license, https://github.com/mkottman/luaclang-parser
 # tiny-regex-c
@@ -1051,8 +1023,7 @@ of the Software repository.)
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
  /
-
- # moonglfw
+# moonglfw
  The MIT License (MIT)
 
 Copyright (c) 2016 Stefano Trettel
@@ -1080,7 +1051,6 @@ SOFTWARE.
 
 (See also the THIRD-PARTY LICENSES contained in the thirdparty/ directory
 of the Software repository.)
-
 # asciidoctor-styles
 ========================================================================
 
@@ -1129,7 +1099,6 @@ Other licensed work
 - The iconic theme is inspired by O'Reilly typography and Atlas manual.
 
   http://oreilly.com
-
 # openbsd tree
 ===========================================================================
 
@@ -1196,7 +1165,6 @@ Other licensed work
   REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
   OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  
-
 # g_fmt
 
  

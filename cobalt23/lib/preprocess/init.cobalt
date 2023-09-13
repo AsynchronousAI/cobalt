@@ -1,907 +1,1904 @@
-// Built in preprocessor for cobalt
-// The preprocesser is not apart of the compiler
-// and needs to be built using `cmake . && make` and
-// used before compiling the source code
-
-// The preprocessor replaces preprocessor directives with
-// cobalt code depending on system and other factors
-
-// Not used directly, rather compiled to C and included in source.
-
-// INIT
-/*
-NOT THE SAME VERSION AS IN C. THIS MAY HAVE BUGS
-*/
-filesystem = file // File library for cobalt
-var lfs = {};
-var windows = package.config->sub(1,1) == "\\";
-
-var other_sep;
-var sep;
-var dirsep;
-
-if( windows ) {
-	sep = '\\';
-	other_sep = '/';
-	dirsep = ';';
-} else {
-	sep = '/';
-	dirsep = ':';
-}
-
-
-var function at(s,i) {
-	return string.sub(s,i,i);
-}
-
-//- returns if the path is an absolute path
-function lfs.isabs(path) {
-	if( windows ) {
-		return at(path, 1) == '/' || at(path, 1) == '\\' || at(path, 2) ==':';
-	} else {
-		return at(path, 1) == '/';
-	}
-}
-
-// return the path resulting from combining the individual paths.
-// if the second (or later) path is absolute, we return the last absolute path (joined with any non-absolute paths following).
-// empty elements (except the last) will be ignored.
-function lfs.join(path1, path2,...) {
-	if( select('#', ...) > 0 ) {
-		var p = lfs.join(path1, path2);
-		var args = {...};
-		for( i = 1,#args ) {
-			p = lfs.join(p, args[i]);
-		}
-		return p;
-	}
-	if( lfs.isabs(path2) ) { return path2; }
-	var endc = at(path1, #path1);
-	if( endc != sep && endc != other_sep && endc != "" ) {
-		path1 = path1 .. sep;
-	}
-	return path1 .. path2;
-}
-
-// Returns the users home directory
-function lfs.home() {
-	var home = os.getenv('HOME');
-	if( ! home ) {
-		home = os.getenv('USERPROFILE') || (os.getenv('HOMEDRIVE') .. os.getenv('HOMEPATH'));
-	}
-	return home;
-}
-
-// We make the simplifying assumption in these functions that path separators
-// are always forward slashes. This is true on *nix and *should* be true on
-// windows, but you can never tell what a user will put into a config file
-// somewhere. This function enforces this.
-function lfs.normalize(path) {
-	if( windows ) {
-		return (path->gsub("\\", "/"));
-	} else {
-		return path;
-	}
-}
-
-var _attributes = lfs.attributes;
-function lfs.attributes(path, ...) {
-	path = lfs.normalize(path);
-	if( windows ) {
-		// Windows stat() is kind of awful. If the path has a trailing slash, it
-		// will always fail. Except on drive root directories, which *require* a
-		// trailing slash. Thankfully, appending a "." will always work if the
-		// target is a directory; and if it's not, failing on paths with trailing
-		// slashes is consistent with other OSes.
-		path = path->gsub("/$", "/.");
-	}
-
-	return _attributes(path, ...);
-}
-
-function lfs.exists(path) {
-	return lfs.attributes(path, "mode") != null;
-}
-
-function lfs.dirname(oldpath) {
-	var path = lfs.normalize(oldpath)->gsub("[^/]+/*$", "");
-	if( path == "" ) {
-		return oldpath;
-	}
-	return path;
-}
-
-function lfs.basename(oldpath) {
-	var path = lfs.normalize(oldpath)->match("[^/]+/*$");
-	if( path == "" ) {
-		return oldpath;
-	}
-	return path;
-}
-
-// Recursive directory creation a la mkdir -p. Unlike lfs.mkdir, this will
-// create missing intermediate directories, and will not fail if the
-// destination directory already exists.
-// It assumes that the directory separator is '/' and that the path is valid
-// for the OS it's running on, e.g. no trailing slashes on windows -- it's up
-// to the caller to ensure this!
-function lfs.mkdirs(path) {
-	path = lfs.normalize(path);
-	if( lfs.exists(path) ) {
-		return true;
-	}
-	if( lfs.dirname(path) == path ) {
-		// We're being asked to create the root directory!
-		return null,"mkdir: unable to create root directory";
-	}
-	var r,err = lfs.mkdirs(lfs.dirname(path));
-	if( ! r ) {
-		return null,err.." (creating "..path..")";
-	}
-	return lfs.mkdir(path);
-}
-
-
-// Recursive directory deletion. Unlike lfs.rmdir, this will
-// delete all files recursivly, and will not fail if the
-// directory is not empty.
-function lfs.rmdirs(path) {
-	for( file in lfs.dir(path) ) {
-		var file_path = path .. sep .. file;
-		if( file != "." && file != ".." ) {
-			if( lfs.attributes(file_path, 'mode') == 'file' ) {
-				os.remove(file_path);
-			} else if( lfs.attributes(file_path, 'mode') == 'directory' ) {
-				deletedir(file_path);
-			}
-		}
-	}
-	return lfs.rmdir(path);
-}
-
-filex = lfs // Extended File library for cobalt
-
-macros = function(){} // core.macros
-
-function switch(value, cases){
-    if (type(cases) != "table"){
-        error("Switch expects a table as the second argument")
-    }
-    
-    if(cases[value]){
-        if (type(cases[value]) == "string"){
-            print(cases[value])
-            return
-        } else {
-            cases[value](value)
-            return
-        }
-    }
-    if(cases["default"]){
-        if (type(cases["default"]) == "string"){
-            print(cases["default"])
-            return
-        } else {
-            cases["default"](value)
-            return
-        }
-    }
-    warn("Switch cannot find a case for " .. tostring(value) .. " and no default case was provided")
-}
-
-
-
-
-// TYPES
-types = {
-  "string": function(item){
-    // Check if item is a string
-    return type(item) == "string"
-  },
-  "pos": function(item){
-    return math.abs(item) == item
-  },
-  "neg": function(item){
-    return math.abs(item) != item
-  },
-  "posint": function(item){
-    return math.abs(item) == item && math.floor(item) == item
-  },
-  "negint": function(item){
-    return math.abs(item) != item && math.floor(item) == item
-  },
-  "pointer": function(item){
-    // Check if the item is a string which is parsed like a pointer
-    return type(item) == "string" && (string.sub(item, 1, 1) == "&" || string.sub(item, 1, 2) == "0x")
-  },
-  "array": function(item){
-    // Make sure that all the indexes are integers
-    for (i, v in pairs(item)) {
-      if (type(i) != "number") {
-        return false
-      }
-    }
-  },
-  "matrix": function(item){
-    // Check if all the values are a table
-    for (i, v in pairs(item)) {
-      if (type(v) != "table") {
-        return false
-      }
-    }
-  },
-  "Vector3": function(item){
-    // Uses the `Vector3` class and check if tostring(item) == "vec3: <pointer>"
-    return type(item) == "userdata" && string.match(tostring(item), "^vec3: ")
-  },
-  "Vector2": function(item){
-    // Uses the `Vector2` class and check if tostring(item) == "vec2: <pointer>"
-    return type(item) == "userdata" && string.match(tostring(item), "^vec2: ")
-  },
-  "Color": function(item){
-    // Uses the `Color` class and check if tostring(item) == "color: <pointer>"
-    return type(item) == "userdata" && string.match(tostring(item), "^color: ")
-  },
-  "Transform": function(item){
-    // Uses the `Transform` class and check if tostring(item) == "transform: <pointer>"
-    return type(item) == "userdata" && string.match(tostring(item), "^transform: ")
-  },
-  "number": function(item){
-    // Check if item is a number
-    return type(item) == "number"
-  },
-  "boolean": function(item){
-    // Check if item is a boolean
-    return type(item) == "boolean"
-  },
-  "table": function(item){
-    // Check if item is a table
-    return type(item) == "table"
-  },
-  "function": function(item){
-    // Check if item is a function
-    return type(item) == "function"
-  },
-  "userdata": function(item){
-    // Check if item is a userdata
-    return type(item) == "userdata"
-  },
-  "thread": function(item){
-    // Check if item is a thread
-    return type(item) == "thread"
-  },
-  "null": function(item){
-    // Check if item is null
-    return type(item) == "null"
-  },
-  "void": function(item){
-    // Check if item is void, which is no
-    s = 0
-    xpcall(function(){
-      type(item)// should error
-    }, function(){
-      s = 1
-    })
-    if (s) return true
-  },
-  "char": function(item){
-    // Check if the item is a string and 1 character long
-    return type(item) == "string" && #item == 1;
-  },
-  "msg": function(item){
-    // Check if tostring(item) == "message: <pointer>"
-    // messages are used in the Message library for communication between threads
-    return tostring(item) == string.match("^message: ")
-  },
-  "complex": function(item){
-    // Try to get item.__name, if it is "complex number" then it is a complex number
-    s, e = pcall(function(){ if (!item.__name){error("Force error")} })
-    return s
-  },
-  "directory": function(item){
-    // For `file` directory type
-    // return tostring(item) == "directory: <pointer>"
-    return tostring(item) == string.match("^directory: ")
-  },
-  "lock": function(item){
-    // For `file` lock type
-    // return tostring(item) == "lock: <pointer>"
-    return tostring(item) == string.match("^lock: ")
-  },
-  "protected": function(item){
-    // return getmetatable(item).__metatable != nil
-    return getmetatable(item).__metatable != null
-  },
-  "_LUABOX": function(item){
-    // Check if tostring(item) == "LUABOX: <pointer>"
-    // this shouldnt be used for average code, LUABOX is internal
-    return tostring(item) == string.match("^LUABOX: ")
-  },
-  "any": function(item){
-    // Check if item is any type
-    return true
-  },
-  "thread": function(item){
-    // Check if item is a thread
-    return type(item) == "thread"
-  },
-  "int": function(item){
-    // Check if item is an integer
-    return type(item) == "number" && math.floor(item) == item
-  },
-  "float": function(item){
-    // Check if item is a float
-    return type(item) == "number" && math.floor(item) != item
-  },
-  "double": function(item){
-    // Check if item is a double
-    return type(item) == "number" && math.floor(item) != item
-  },
+var preprocessor = {};
+var ok, bit = require("bit");
+coroutine = coroutine ? coroutine : (pcall(require, "coroutine") ? require("coroutine") : thread); /* for beta versions of cobalt */
+if( ! ok ) {
+bit = {
+        lshift = function (x, y) {
+                if( y < 0 ) { return bit.rshift(x,-y); } 
+                return (x * 2**y) % (2**32);
+        },
+        rshift = function (x, y) {
+                if( y < 0 ) { return bit.lshift(x,-y); }
+                return math.floor(x % (2**32) / (2**y));
+        },
+        bxor = function (x, y) {
+                // from http://lua-users.org/wiki/BitUtils
+                var z = 0;
+                for( i = 0, 31 ) {
+                        if( (x % 2 == 0) ) {                      // x had a '0' in bit i
+                                if( ( y % 2 == 1) ) {                  // y had a '1' in bit i
+                                        --y    ; 
+                                        z = z + 2 ** i;                       // set bit i of z to '1' 
+                                }
+                        } else {                                      // x had a '1' in bit i
+                                --x    ;
+                                if( (y % 2 == 0) ) {                  // y had a '0' in bit i
+                                        z = z + 2 ** i;                       // set bit i of z to '1' 
+                                } else {
+                                        --y    ; 
+                                }
+                        }
+                        y /=   2;
+                        x /=   2;
+                }
+                return z;
+        },
+        bnot = function (x) {
+                // if word size is not defined, I think it better than 0xFFFFFFFF - x.
+                return -1 - x;
+        },
+        band = function (x, y) {
+                return ((x + y) - bit.bxor(x, y)) / 2;
+        },
+        bor = function (x, y) {
+                return bit.bnot(bit.band(bit.bnot(x), bit.bnot(y)));
+        },
 };
-// Main
-
-function process(str, itemtype, out, outfile, ...){
-    // 0: Init
-    
-    /// Check mode:
-    if (outfile == "-types" || (str == "-types" && !outfile) ){
-        typechecker.all() // Print all valid types
-        return;
-    }if ({...} == {}){
-        error("No arguments or invalid flags provided.")
-    }
-
-    /// Init macros
-    macros()
-
-    // 1: Split lines
-    var nstr
-    var ogstr = out ? str : null
-    if (itemtype == "file") {
-        var file = io.open(str)
-        if (!file){
-            error(core.error.strerror(2).." "..str)
-        }
-        nstr = file->read("*all")
-        file->close()
-        if (!nstr){
-            error(core.error.strerror(2))
-        }
-    }
-    // 0: Run typechecker and language extensions
-    
-    if (!nstr) nstr = str
-
-    // 0.5: Split lines
-    var lines = []
-    for (line in nstr->gmatch("[^\r\n]+")) {
-        lines[#lines + 1] = line
-    }
-
-    function getname(){
-        if (ogstr){
-            // cwd/ogstr
-            return filex.join(filesystem.currentdir(), ogstr)
-        }else{
-            return debug.getinfo(2, "S").source->sub(2)
-        }
-    }
-
-    // 2: Look for preprocess lines
-    var preprocess = []
-    for (i, v in pairs(lines)) {
-        var first = v->sub(1, 1) 
-        var char = 1
-
-        while (first == " " || first == "\t") {
-            char++;
-            first = v->sub(char, char)
-        }
-
-        if (first == "#") {
-            v = v->sub(char, #v)
-        
-            table.insert(preprocess, [i, v])
-        }
-    }
-    
-    // 3: Execute preprocess lines
-    var env = {
-        "cobalt": true, 
-        "cobaltversion": "23",
-        "edition": "standard",
-        "cplusplus": false,
-    }
-    // inenv will be like: -X="t" -M=2 -Z=true will become {["X"]="t", ["M"]=2, ["Z"]=true}
-    envitems = table.pack(...)
-    inenv = {}
-    for (i, v in pairs(envitems)){
-        if (type(v) == "number"){
-            break;
-        }
-        var split = v->gsub("-", "")->split("=")
-        inenv[split[1]] = loadstring("return "..split[2])()
-    }
-
-    // 4: Add inenv to env
-    for (i, v in pairs(inenv)){
-        if (type(v) == "string") v = '"'..v..'"'
-        env[i] = v
-    }
-    var newlines = lines
-    var activeifs = []
-    var run = true
-    var incomment = false
-
-    function envload(str2){
-        var tbld = "{"
-        for (k, v in pairs(env)) {
-            if (type(k) == "number") {
-                tbld = tbld .. v .. ","
-            }else if (type(k) == "string") {
-                tbld = tbld .. '"' .. k .. '": ' .. tostring(v) .. ","
-            }
-        }
-        tbld = tbld .. "}"
-        return loadstring([=[// Cobalt execution environment: Ignore.
-            env = ]=]..tbld..[=[;
-            for (i, v in pairs(env)){
-                _ENV[i] = v
-            }
-            core = import("core")
-            function defined(val){
-                // check if it is in env, if it return the value
-                if (env[val] != null && env[val] != false) {
-                    return env[val]
-                }
-            }]=]..str2)
-    }
-    for (i, v in pairs(lines)) {
-        // Check if i is v[1] for one of the preprocess lines
-        /// Go through every character, if a /* is found make incomment true, if a */ is found make incomment false
-        /// If incomment is true, remove the line
-        for (ii = 1, #v) {
-            var char = v->sub(ii, ii)
-            if (char == "/" && v->sub(ii + 1, ii + 1) == "*") {
-                incomment = true
-            }
-            if (char == "*" && v->sub(ii + 1, ii + 1) == "/") {
-                incomment = false
-            }
-        }
-        if (incomment) {
-            continue;
-        }
-        var found = false
-        for (i2, v2 in pairs(preprocess)) {
-            if (v2[1] == i) {
-                v = v2
-                found = true
-                break;
-            }
-        }
-        if (!found) {
-            if (!run) {
-                newlines[i] = null
-            }
-            continue;
-        }
-
-        // Get the first word of the line
-        function errorpreprocessor(errorin){
-            print("\27[1;31mPreprocessor error:\27[0m")
-            print("\27[1;31mError with the '"..v[2].."' preprocessor command.\27[0m\n\n")
-            if (errorin) {
-                print("\27[1;31m"..errorin.."\27[0m\n\n")
-            }
-            print("\27[1;31mStopping preprocessor.\27[0m")
-            os.exit()
-        }
-
-        // If the second character is a !, ignore the line
-        if (v[2]->sub(2, 2) == "!") {
-            newlines[v[1]] = null
-            return // Skip this line
-        }
-
-        switch(v[2]->match("%S+"), {
-            "#open": function(){
-                // Example:
-                // #open X
-                // this is assuming X is in the env
-                // var X = <whatever X is in the env>
-                var name = v[2]->gsub("#open ", "")
-                var value = env[name]
-                if (value == null) {
-                    errorpreprocessor("Macro '"..name.."' is not defined")
-                }
-                newlines[v[1]] = "var "..tostring(name).." = "..((type(value) == "string" && (str->sub(1,1) == '"' && str->sub(-1) == '"') || (str->sub(1,1) == "'" && str->sub(-1) == "'")) ? '"'..value..'"' : tostring(value))
-                
-                // Avoid memory leaks
-                name, value = null
-            },
-            "#define": function(){
-                // split v[2] by spaces
-                var split = v[2]->split(" ")
-                // 1: Get the name
-                var name = split[2]
-                if (string.sub(name, -1) == ")"){
-                    // Example:
-                    // #define RADTODEG(rad) (rad * 180 / PI)
-                    // should become
-                    // var RADTODEG = function(rad){ return (rad * 180 / PI)}
-
-                    // 1: Get the name
-                    var values = string.split(v[2], " ")
-                    var defname = values[2]->split("(")[1]
-                    var args = values[2]->split("(")[2]->gsub("%)", "")->split(",")
-                    var func = values[3]
-                    for (ii = 4, #values) {
-                        func = func.." "..values[ii]
-                    }
-                    for (ii, vv in pairs(args)){
-                        args[ii] = vv->gsub(" ", "")
-                    }
-
-                    var funcdef = "function("..table.concat(args, ",").."){ return "..func.."; }"
-                    var valdef = "var "..defname.." = "..funcdef
-
-                    // 2: Set values
-                    newlines[v[1]] = valdef
-                    env[name] = funcdef
-
-                    // 3: Clear memory
-                    values, defname, funcdef, valdef, args, func = null
-                }else{
-                    // 2: Get the value
-                    var value 
-                    var fun, err = envload("return "..split[3] || "false")
-                    if (!fun){
-                        errorpreprocessor(err)
-                    }else{
-                        value = fun()
-                    }
-                    // 3: Set the value in the env
-                    env[name] = value
-                    // 4: Remove the line
-                    newlines[v[1]] = "var "..name.." = "..(type(value) == "string" ? '"'..value..'"' : tostring(value))
-                    return
-                }
-            },
-            "##line": function(){
-                // Example:
-                // #line 1 "file.cobalt"
-                // Will add everything after that line in that file to the newlines[i] table
-                // "file.cobalt" if it is not provided it is the current file
-                // 1 is the line number
-                warn("Using #line is not recommended, Use import() instead")
-                var split = v[2]->split(" ")
-                var line = split[2]
-                var filename
-                if (!split[3]) {
-                    filename = getname()
-                }else{
-                    filename = string.sub(split[3], 2, -2)
-                }
-                print(filename)
-                var f = io.open(filename)
-                if (!f) {
-                    var script_path = getname()
-                    var script_dir = script_path->match("(.*/)")
-                    if (script_dir == null) {
-                        script_dir = "./"
-                    }
-                    f = io.open(script_dir..filename)
-                    if (!f) {
-                        errorpreprocessor("File '"..script_dir..filename.."' not found")
-                    }
-                }
-                
-                var content = f->read("*all")
-                f->close()
-                // Set i line number to r(content)
-                content = process(content, null, null)
-                // Split content to everything after tonumber(line)
-                split = content->split("\n")
-                var newcontent = ""
-                for (ii = tonumber(line), #split) {
-                    newcontent = newcontent..split[ii].."\n"
-                }
-                newlines[v[1]] = newcontent
-
-                // Avoid memory leaks
-                f = null
-                content = null
-                newcontent = null
-                split = null
-                file, line = null
-            },
-            "##include": function(){
-                warn("Using #include is not recommended, Use import() instead")
-
-                var file = v[2]->gsub("#include \"", "")
-                var ogfile = file
-                // File should be a string that ends with " and may have stuff after the "
-                // Remove the last " and only keep everything before it
-                for (ii = 1, #file) {
-                    var vv = file->sub(ii, ii)
-                    if (vv == "\"") {
-                        file = file->sub(1, ii - 1)
-                        break;
-                    }
-                }
-
-                var f;
-                for (_, vv in pairs(package.searchers)){
-                    if (#table.pack(vv(file)) == 2 &&  table.pack(vv(file))[1] != null) {
-                        f = table.pack(vv(file));
-                        break;
-                    }
-                }
-                if (!f) {
-                    var script_path = getname()
-                    var script_dir = script_path->match("(.*/)")
-                    if (script_dir == null) {
-                        script_dir = "./"
-                    }
-
-                    f = (io.open(script_dir..file))
-                    if (!f) {
-                        errorpreprocessor("File '"..file.."' not found")
-                    }
-                }
-                if (type(f)=="string"){
-                    file = io.open(f[2])
-                }else{
-                    file = f
-                }
-                var content = file->read("*all")
-                file->close()
-                
-                // Set i line number to r(content)
-    
-                newlines[v[1]], newincludes = process(content, null, null)
-                // Avoid memory leaks
-                file = null
-                content = null
-                f = null
-            },
-            "#if": function(){
-                // Example:
-                // #if (true)
-                
-                // 1: Get the condition, Everything in between the ()
-                var condition = v[2]->gsub("#if ", "")
-                /// Get everything in between the ()
-                for (ii = 1, #condition) {
-                    var vv = condition->sub(ii, ii)
-                    if (vv == "(") {
-                        condition = condition->sub(ii + 1, #condition)
-                        break;
-                    }
-                }
-                for (ii = #condition, 1, -1) {
-                    var vv = condition->sub(ii, ii)
-                    if (vv == ")") {
-                        condition = condition->sub(1, ii - 1)
-                        break;
-                    }
-                }
-                // 2: Evaluate the condition
-                var success, result = xpcall(function(){
-                    return (envload("return "..condition) || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
-                }, function(err){
-                    errorpreprocessor(err)
-                })
-                if (!success) {
-                    errorpreprocessor(result)
-                }
-                // 3: Remove the line 
-                newlines[v[1]] = null
-                table.insert(activeifs, result)
-
-                // 4: Remove all code if result is false until #endif or #else
-                run = result
-            },
-            "#ifdef": function(){
-                // Example:
-                // #ifdef (__APPLE__)
-                
-                // 1: Get the condition, Everything in between the ()
-                var condition = v[2]->gsub("#if ", "")
-                /// Get everything in between the ()
-                for (ii = 1, #condition) {
-                    var vv = condition->sub(ii, ii)
-                    if (vv == "(") {
-                        condition = condition->sub(ii + 1, #condition)
-                        break;
-                    }
-                }
-                for (ii = #condition, 1, -1) {
-                    var vv = condition->sub(i, i)
-                    if (vv == ")") {
-                        condition = condition->sub(1, ii - 1)
-                        break;
-                    }
-                }
-                // 2: Evaluate the condition
-                var success, result = xpcall(function(){
-                    return (envload("return defined(\""..(condition || "null").."\")") || errorpreprocessor("Failed to check condition\n"..(table.pack(envload("return "..(condition || "null"))) || "Failed to error")[2]))()
-                }, function(err){
-                    errorpreprocessor(err)
-                })
-                if (!success) {
-                    errorpreprocessor(result)
-                }
-                // 3: Remove the line 
-                newlines[v[1]] = null
-                table.insert(activeifs, result)
-
-                // 4: Remove all code if result is false until #endif or #else
-                run = result
-            },
-            "#ifndef": function(){
-                // Example:
-                // #ifdef (__APPLE__)
-                
-                // 1: Get the condition, Everything in between the ()
-                var condition = v[2]->gsub("#if ", "")
-                /// Get everything in between the ()
-                for (ii = 1, #condition) {
-                    var vv = condition->sub(ii, ii)
-                    if (vv == "(") {
-                        condition = condition->sub(ii + 1, #condition)
-                        break;
-                    }
-                }
-                for (ii = #condition, 1, -1) {
-                    var vv = condition->sub(ii, ii)
-                    if (vv == ")") {
-                        condition = condition->sub(1, ii - 1)
-                        break;
-                    }
-                }
-                // 2: Evaluate the condition
-                var success, result = xpcall(function(){
-                    return (envload("return !defined(\""..condition.."\")") || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
-                }, function(err){
-                    errorpreprocessor(err)
-                })
-                if (!success) {
-                    errorpreprocessor(result)
-                }
-                // 3: Remove the line 
-                newlines[v[1]] = null
-                table.insert(activeifs, result)
-
-                // 4: Remove all code if result is false until #endif or #else
-                run = result
-            },
-            "#elif": function(){
-                // Example:
-                // #elif (true)
-                if (run) {
-                    newlines[v[1]] = null
-                    return // Skip this line
-                }
-                // 1: Get the condition, Everything in between the ()
-                var condition = v[2]->gsub("#elif ", "")
-                /// Get everything in between the ()
-                for (ii = 1, #condition) {
-                    var vv = condition->sub(ii, ii)
-                    if (vv == "(") {
-                        condition = condition->sub(ii + 1, #condition)
-                        break;
-                    }
-                }
-                for (ii = #condition, 1, -1) {
-                    var vv = condition->sub(ii, ii)
-                    if (vv == ")") {
-                        condition = condition->sub(1, ii - 1)
-                        break;
-                    }
-                }
-                // 2: Evaluate the condition
-                var success, result = xpcall(function(){
-                    return (envload("return "..condition) || errorpreprocessor("Failed to check condition\n"..table.pack(envload("return "..condition))[2]))()
-                }, function(err){
-                    errorpreprocessor(err)
-                })
-                if (!success) {
-                    errorpreprocessor(result)
-                }
-                // 3: Remove the line 
-                newlines[v[1]] = null
-                table.insert(activeifs, result)
-
-                // 4: Remove all code if result is false until #endif or #else
-                run = result
-            },
-            "#else": function(){
-                run = !run
-                newlines[v[1]] = null
-            },
-            "#endif": function(){
-                activeifs[#activeifs] = null
-                newlines[v[1]] = null
-                run = true
-            },
-            "#undef": function(){
-                // split v[2] by spaces
-                var split = v[2]->split(" ")
-                // 1: Get the name
-                var name = split[2]
-                // 2: Remove the value in the env
-                env[name] = null
-                // 3: Remove the line
-                newlines[v[1]] = null
-            },
-            "#error": function(){
-                var error = v[2]->gsub("#error ", "")
-                print("\27[1;31mRaised error:\27[0m")
-                print("\27[1;31m"..error.."\27[0m\n\n")
-                error("Ending preprocessor")
-            },
-            "#warning": function(){
-                var warning = v[2]->gsub("#warning ", "")
-                warn(warning)
-                newlines[v[1]] = null
-            },
-            "#config": function(){
-                errorpreprocessor("Config is not supported")
-            },
-            "#ext": function(){
-                // Installs an extension
-                errorpreprocessor("Extensions are not supported")
-            },
-            "default": function(value){
-                if (!run){
-                    newlines[v[1]] = null
-                    return // Skip this line
-                }
-
-                // Execute everything past the # as a cobalt line
-                var code = v[2]->sub(2, #v[2])
-                
-                var success, result = xpcall(function(){
-                    return (envload(code) || errorpreprocessor("Failed to load preprocessor command"))()
-                }, function(err){
-                    errorpreprocessor(err)
-                })
-                if (!success) {
-                    errorpreprocessor(result)
-                }else {
-                    newlines[v[1]] = result
-                }
-            }
-        })
-        // Remove line from newlines 
-    }
-
-    // 4: Join newlines and return
-    if (#activeifs > 0) {
-        errorpreprocessor("Missing #endif(s)")
-    }
-    lines = null
-    preprocess = null
-    str = null
-    var joined = "/* Preprocessed with the built in Cobalt preprocessor */\n\n\n"
-    for (i, v in pairs(newlines)) {
-        if (v == null) {
-            continue;
-        }
-        joined = joined..v.."\n"
-    }
-    newlines = null
-    if (out){
-        // Write to out 
-        var file = io.open(outfile, "w")
-        file->write(joined)
-        file->close()
-    }
-    collectgarbage() // Collect garbage
-    return joined
 }
 
-process("test.cobalt", "file", true, "test2.cobalt")
-return process
+// CONFIG
+preprocessor.PRE_FFI         = pcall(require, "ffi");   // whether to use preprocessor to preprocess LuaJIT ffi code (ffi.cdef)
+preprocessor.PRE_TEST        = false;   // whether to run preprocessor unit tests when loading preprocessor module
+preprocessor.ENV              = {};      // static predefines (env-like)
+preprocessor.FAST             = false;   // perf. tweaks when enabled. con: breaks minor stuff like LINE macros
+preprocessor.DEBUG            = false;
+
+// PREDEFINES
+var FILE  = "FILE";
+var LINE        = "LINE";
+var DATE        = "DATE";
+var TIME        = "TIME";
+var PRE_INDENT  = "PRE_INDENT";
+
+// BNF LEAVES
+var ENDL            = "$";
+var STARTL          = "^";
+var NEWL            = "\n";
+var NEWL_BYTE       = NEWL->byte(1);
+var NEWL_ESC        = "\\";
+var NEWML           = "\\\n";
+var CMD             = "#";
+var CMD_BYTE        = CMD->byte(1);
+var COMMENT         = "^(.-)//.-$";
+var MLCOMMENT       = "/[*].-[*]/";
+var WHITESPACES     = "%s+";
+var OPTSPACES       = "%s*";
+var IDENTIFIER      = "[_%a][_%w]*";
+var NOIDENTIFIER    = "[^%w_]+";
+var FILENAME        = "[0-9a-zA-Z.%-_/\\]+";
+var TEXT            = ".+";
+var STRINGIFY       = "#";
+var STRINGIFY_BYTE  = STRINGIFY->byte(1);
+var STRING_LITERAL  = ".*";
+
+// BNF WORDS
+var _INCLUDE        = "include";
+var _INCLUDE_NEXT   = "include_next";
+var _DEFINE         = "define";
+var _IFDEF          = "ifdef";
+var _IFNDEF         = "ifndef";
+var _ENDIF          = "endif";
+var _UNDEF          = "undef";
+var _IF             = "if";
+var _ELSE           = "else";
+var _ELIF           = "elif";
+var _NOT            = "!";
+var _ERROR          = "error";
+var _WARNING        = "warning";
+var _PRAGMA         = "pragma";
+
+// BNF RULES
+var INCLUDE         = STARTL.._INCLUDE..WHITESPACES.."[<]("..FILENAME..")[>]"..OPTSPACES..ENDL;
+var LOCAL_INCLUDE   = STARTL.._INCLUDE..WHITESPACES.."[\"]("..FILENAME..")[\"]"..OPTSPACES..ENDL;
+var INCLUDE_NEXT    = STARTL.._INCLUDE_NEXT..WHITESPACES.."[\"<]("..FILENAME..")[\">]"..OPTSPACES..ENDL;
+var DEFINE          = STARTL.._DEFINE;
+var IFDEF           = STARTL.._IFDEF..WHITESPACES.."("..IDENTIFIER..")"..OPTSPACES..ENDL;
+var IFNDEF          = STARTL.._IFNDEF..WHITESPACES.."("..IDENTIFIER..")"..OPTSPACES..ENDL;
+var ENDIF           = STARTL.._ENDIF..OPTSPACES..ENDL;
+var UNDEF           = STARTL.._UNDEF..WHITESPACES.."("..IDENTIFIER..")"..OPTSPACES..ENDL;
+var IF              = STARTL.._IF..WHITESPACES.."(.*)"..ENDL;
+var ELSE            = STARTL.._ELSE..OPTSPACES..ENDL;
+var ELIF            = STARTL.._ELIF..WHITESPACES.."(.*)"..ENDL;
+var ELSEIF          = STARTL.._ELSE..WHITESPACES.._IF..WHITESPACES.."(.*)"..ENDL;
+var ERROR           = STARTL.._ERROR..WHITESPACES.."("..TEXT..")"..OPTSPACES..ENDL;
+var WARNING         = STARTL.._WARNING..WHITESPACES.."("..TEXT..")"..OPTSPACES..ENDL;
+var ERROR_NOTEXT    = STARTL.._ERROR..OPTSPACES..ENDL;  //> not required when we have POSIX regex
+var PRAGMA          = STARTL.._PRAGMA;
+
+// speedups
+var TRUEMACRO = STARTL.."("..IDENTIFIER..")%s*$";
+var REPLMACRO = STARTL.."("..IDENTIFIER..")"..WHITESPACES.."(.+)$";
+var FUNCMACRO = STARTL.."("..IDENTIFIER..")%(([_%s%w,]*)%)%s*(.*)";
+
+
+// ------------
+// LOCAL UTILS
+// ------------
+preprocessor.STATE = {lineno = 0}; // current state for debugging the last operation
+var function error(msg) { _G.print(debug.traceback()); _G.error(string.format("preprocessor ERR [%04i] %s", preprocessor.STATE.lineno, msg)); }
+var function print(msg) { _G.print(string.format("preprocessor INF [%04i] %s", preprocessor.STATE.lineno, msg)); }
+
+// splits a string using a pattern into a table of substrings
+var function gsplit(str, pat) {
+        var function _split(str, pat) {
+                var t = {};  // NOTE: use {n = 0} in Lua-5.0
+                var fpat = "(.-)"..pat;
+                var last_end = 1;
+                var s, e, cap = str->find(fpat, 1);
+                while( s ) {
+                        if( s != 1 || cap != "" ) {
+                                coroutine.yield(cap);
+                        }
+                        last_end = e + 1;
+                        s, e, cap = str->find(fpat, last_end);
+                }
+                if( last_end <= #str ) {
+                        cap = str->sub(last_end);
+                        coroutine.yield(cap);
+                }
+        }
+        return coroutine.wrap(function() { _split(str, pat); });
+}
+var function split(str, pat) {
+        var t = {};
+        for( str in gsplit(str, pat) ) { table.insert(t, str); }
+        return t;
+}
+
+// Checks whether a string starts with a given substring
+// offset is optional
+var function strsw(str, pat, offset) {
+        if( ! str ) { return false; }
+        if( ! offset ) { offset = 0; }
+        return string.sub(str, 1+offset, string.len(pat)+offset) == pat;
+}
+
+// Checks whether a string ends with a given substring
+var function strew(str, pat) {
+        if( ! str ) { return false; }
+        return pat=='' || string.sub(str,-string.len(pat)) == pat;
+}
+
+// string trim12 from lua wiki
+var function trim(str) {
+        var from = str->match("^%s*()");
+        return from > #str && "" || str->match(".*%S", from);
+}
+
+// returns the number of string occurrences
+var function findn(input, what) {
+        var count = 0;
+        var offset = 0;
+        var _;
+        while( true ) { 
+                        _, offset = string.find(input, what, offset+1, true);
+                        if( ! offset ) { return count; }
+                        ++count    ;
+        }
+}
+
+// C literal string concatenation
+var function concatStringLiteral(input) {
+        // screener does remove multiline definition, so just check ".*"%s*".*" pattern
+        return input->gsub("\"("..STRING_LITERAL..")\""..OPTSPACES.."\"("..STRING_LITERAL..")\"", "\"%1%2\"");
+}
+
+// c style boolean check (thus, 0 will be false)
+var function CBoolean(value) {
+        return value && (value != 0);
+}
+
+// eval with c style number parse (UL, LL, L)
+var function CEval(expr) {
+        var ok, r = pcall(loadstring, "return " .. parseCInteger(expr));
+        if( ok && r ) {
+                return r();
+        } else {
+                error(r);
+        }
+}
+
+// a lightweight and flexible tokenizer
+var function _tokenizer(str, setup) {
+                var defsetup = {
+                        // EXAMPLE patterns have to be pretended with "^" for the tokenizer
+                        ["identifier"] = '^[_%a][_%w]*',
+                        ["number"] = '^[%+%-]?%d+[%.]?%d*[UL]*',
+                        ["ignore"] = '^%s+', 
+                        ["string"] = true,
+                        ["keywords"] = { 
+                                // ["NAME"] = '^pattern',
+                                // ...
+                        },
+                };
+        if( ! setup ) {
+                setup = defsetup;
+        }
+        setup.identifier = setup.identifier || defsetup.identifier;
+        setup.number = setup.number || defsetup.number;
+        setup.ignore = setup.ignore || defsetup.ignore;
+        if( null == setup.string ) { setup.string = true; }
+        setup.keywords = setup.keywords || {};
+
+        var strlen = #str;
+        var i = 1;
+        var i1, i2;
+        var keyword;
+
+        var function find(pat) {
+                i1, i2 = str->find(pat,i);
+                return i1 != null;
+        }
+
+        var function cut() {
+                return str->sub(i, i2);
+        }
+
+        var findKeyword;
+        if( setup.keywords_order ) {
+                findKeyword = function () {
+                        for( _, name in ipairs(setup.keywords_order) ) {
+                                assert(setup.keywords[name]);
+                                var pat = setup.keywords[name];
+                                var result = find(pat);
+                                if( result ) {
+                                        keyword = name; 
+                                        return true; 
+                                }
+                        }
+                };
+        } else {
+                findKeyword = function () {
+                        for( name, pat in pairs(setup.keywords) ) {
+                                var result = find(pat);
+                                if( result ) {
+                                        keyword = name; 
+                                        return true; 
+                                }
+                        }
+                };
+        }
+
+        while( true ) {
+                if( i > strlen ) { return 'eof', null, strlen, strlen; }
+                if( findKeyword() ) {
+                        coroutine.yield(keyword, cut(), i1, i2);
+                } else if( find(setup.ignore) ) {
+                        coroutine.yield("ignore", cut(), i1, i2);
+                } else if( find(setup.number) ) {
+                        coroutine.yield('number', tonumber(cut()), i1, i2);
+                } else if( find(setup.identifier) ) {
+                        coroutine.yield('identifier', cut(), i1, i2);
+                } else if( setup.string && (find('^"[^"]*"') || find("^'[^']*'")) ) {
+                        // strip the quotes
+                        coroutine.yield('string', cut()->sub(2,-2), i1, i2);
+                } else { // any other unknown character
+                        i1 = i;
+                        i2 = i;
+                        coroutine.yield('unknown', cut(), i1, i2);
+                }
+                i = i2+1;
+        }
+}
+var function tokenizer(str, setup) {
+        return coroutine.wrap(function() { _tokenizer(str, setup); });
+}
+
+
+// ------------
+// PARSER
+// ------------
+
+var PRE_TOKENIZE_COMMENT = {
+        string = false,
+        keywords = { 
+                MLCOMMENT = "^/%*.-%*/",
+                SLCOMMENT = "^//.-\n",
+                STRING_LITERAL = '^"[^"]*"',
+        },
+};
+// hint: LuaJIT ffi does not rely on us to remove the comments, but maybe other usecases
+var function removeComments(input) {
+        var out = {};
+        for( k, v, start, end_ in tokenizer(input, PRE_TOKENIZE_COMMENT) ) {
+                if( k == "MLCOMMENT" ) {
+                        var newlineCount = findn(input->sub(start, end_), "\n");
+                        var newlines = string.rep("\n", newlineCount);
+                        table.insert(out, newlines);
+                } else if( k == "SLCOMMENT" ) { 
+                        table.insert(out, "\n");
+                } else {
+                        table.insert(out, input->sub(start, end_));
+                }
+        }
+        return table.concat(out);
+}
+
+// C style number parse (UL, LL, L) and (octet, hex, binary)
+var PRE_TOKENIZE_INTEGER = {
+        string = false,
+        keywords_order = {
+                "STRING_LITERAL",
+                "CHAR_LITERAL",
+                "HEX_LITERAL",
+                "BIN_LITERAL",
+                "OCT_LITERAL",
+                "FPNUM_LITERAL",
+                "NUMBER_LITERAL",
+        },
+        keywords = { 
+                STRING_LITERAL = '^"[^"]*"',
+                CHAR_LITERAL = "^L'.*'",
+                HEX_LITERAL = '^[%+%-]?%s*0x[a-fA-F%d]+[UL]*',
+                BIN_LITERAL = '^[%+%-]?%s*0b%d+[UL]*',
+                OCT_LITERAL = '^[%+%-]?%s*0%d+[UL]*',
+                FPNUM_LITERAL = '^[%+%-]?%s*%d+[%.]?%d*e[%+%-]%d*',
+                NUMBER_LITERAL = '^[%+%-]?%s*%d+[%.]?%d*[UL]+',
+        },
+};
+var function parseCInteger(input) {
+        // print('parseCInteger:input:' .. input)
+        var out = {};
+        var unary;
+        for( k, v, start, end_ in tokenizer(input, PRE_TOKENIZE_INTEGER) ) {
+        // print('parseCInteger:' .. k .. "|" .. v)
+                if( k == "CHAR_LITERAL" ) {
+                        table.insert(out, tostring(string.byte(loadstring("return \"" .. v->gsub("^L%'(.+)%'", "%1") .. "\"")())));
+                } else if( k == "HEX_LITERAL" ) { 
+                        unary, v = v->match('([%+%-]?)0x([a-fA-F%d]+)[UL]*');
+                        var n = tonumber(v, 16);
+                        table.insert(out, unary..tostring(n));
+                } else if( k == "NUMBER_LITERAL" ) { 
+                        v = v->match('([^UL]+)[UL]+');
+                        table.insert(out, v);
+                } else if( k == "BIN_LITERAL" ) { 
+                        unary, v = v->match('([%+%-]?)0b([01]+)[UL]*');
+                        var n = tonumber(v, 2);
+                        table.insert(out, unary..tostring(n));
+                } else if( k == "OCT_LITERAL" ) { 
+                        unary, v = v->match('([%+%-]?)(0%d+)[UL]*');
+                        var n = tonumber(v, 8);
+                        table.insert(out, unary..tostring(n));
+                } else {
+                        table.insert(out, input->sub(start, end_));
+                }
+        }
+        var str = table.concat(out);
+        // print('parseCInteger:result:'..str)
+        return str;
+}
+
+// screener: revmoce comments, trim, ml concat...
+// it only splits to cpp input lines and removes comments. it does not tokenize. 
+var function screener(input) {
+        var function _screener(input) {
+                input = removeComments(input);
+
+                // concat mulit-line input.
+                var count = 1;
+                while( count > 0 ) { input, count = string.gsub(input, "^(.-)\\\n(.-)$", "%1 %2\n"); }
+
+                // trim and join blocks not starting with "#"
+                var buffer = {};
+                for( line in gsplit(input, NEWL) ) {
+                        //print('newline:'..line)
+                        line = trim(line);
+                        if( #line > 0 ) {
+                                if( line->byte(1) == CMD_BYTE ) { 
+                                        line = line->gsub("#%s*(.*)", "#%1");   // remove optinal whitespaces after "#". reduce triming later.
+                                        if( #buffer > 0 ) { 
+                                                coroutine.yield(table.concat(buffer, NEWL));
+                                                buffer = {}; 
+                                        }
+                                        coroutine.yield(line); 
+                                } else {
+                                        if( preprocessor.FAST ) {
+                                                table.insert(buffer, line); 
+                                        } else {
+                                                coroutine.yield(line); 
+                                        }
+                                }
+                        } else if( ! preprocessor.FAST ) {
+                                coroutine.yield(line); 
+                        }
+                }
+                if( #buffer > 0 ) { 
+                        coroutine.yield(table.concat(buffer, NEWL));
+                }
+        }
+
+        return coroutine.wrap(function() { _screener(input); });
+}
+
+// apply currently known macros to input (and returns it)
+var PRE_TOKENIZE_APPLY_MACRO = {
+        keywords = { 
+                DEFINED = "^defined%s*%(%s*"..IDENTIFIER.."%s*%)"       ,
+        },
+};
+var function apply(state, input) {
+        while( true ) {
+                var out = {};
+                var functions = {};
+                var expand;
+
+                for( k, v, start, end_ in tokenizer(input, PRE_TOKENIZE_APPLY_MACRO) ) {
+                        // print('tokenize:'..tostring(k).."|"..tostring(v))
+                        if( k == "identifier" ) { 
+                                var repl = v;
+                                var macro = state.defines[v]; 
+                                if( macro ) {
+                                        if( type(macro)     == "boolean" ) {
+                                                repl = "";
+                                                expand = true;
+                                        } else if( type(macro) == "string" ) {
+                                                repl = macro;
+                                                expand = (repl != v);
+                                        } else if( type(macro) == "number" ) {
+                                                repl = tostring(macro);
+                                                expand = (repl != v);
+                                        } else if( type(macro) == "function" ) {
+                                                var decl,cnt = input->sub(start)->gsub("^[_%a][_%w]*%s*%b()", "%1");
+                                                // print('matching:'..input.."|"..decl.."|"..cnt)
+                                                if( cnt > 0 ) {
+                                                        repl = macro(decl);
+                                                        // print("d&r:"..decl.."|"..repl)
+                                                        expand = true;
+                                                        table.insert(out, repl);
+                                                        table.insert(out, input->sub(end_ + #decl));
+                                                        break;
+                                                } else {
+                                                        if( input->sub(start)->find("^[_%a][_%w]*%s*%(") ) {
+                                                                // that is part of functional macro declaration.
+                                                                // print(v ..': cannot replace:<'..input..'> read more line')
+                                                                return input,true;
+                                                        } else {
+                                                                // on macro name is also used as the symbol of some C declaration
+                                                                // (e.g. /usr/include/spawn.h, /usr/include/sys/select.h on centos 6.4)
+                                                                // no need to preprocess.
+                                                                print(v .. ': macro name but used as C declaration in:' .. input);
+                                                        }
+                                                }
+                                        }
+                                }
+                                table.insert(out, repl);
+                        } else if( k == "DEFINED" ) {
+                                table.insert(out, input->sub(start, end_));
+                        } else {
+                                table.insert(out, input->sub(start, end_));
+                        }
+                }
+                input = table.concat(out);
+                if( ! expand ) {
+                        break;
+                }
+        }
+
+        // C liberal string concatenation, processing U,L,UL,LL
+        return parseCInteger(concatStringLiteral(input)),false;
+}
+
+// processes an input line. called from preprocessor doWork loop
+var function processLine(state, line) {
+        if( ! line || #line == 0 ) { return line; }
+        var cmd = null; 
+        if( line->byte(1) == CMD_BYTE ) { cmd = line->sub(2); }
+        // print("process:"..line)--.."|"..tostring(state:skip()))
+
+        /* IF/THEN/ELSE STRUCTURAL BLOCKS *///
+        if( cmd ) {
+                var ifdef   = cmd->match(IFDEF);
+                var ifexp   = cmd->match(IF);
+                var ifndef  = cmd->match(IFNDEF);
+                var elif    = cmd->match(ELIF);
+                var elseif_ = cmd->match(ELSEIF);
+                var else_   = cmd->match(ELSE);
+                var endif   = cmd->match(ENDIF);
+                var struct  = ifdef || ifexp || ifndef || elif || elseif_ || else_ || endif;
+
+                if( struct ) { 
+                        var skip = state->skip();
+                        if( ifdef   ) { state->openBlock(state->defined(ifdef));      }
+                        // if skipped, it may have undefined expression. so not parse them
+                        if( ifexp   ) { state->openBlock(skip && true || CBoolean(state->parseExpr(ifexp)));    }
+                        if( ifndef  ) { state->openBlock(! state->defined(ifndef)); }
+                        if( elif    ) { state->elseBlock((skip && skip < #state.stack) && true || CBoolean(state->parseExpr(elif)));     }
+                        if( elseif_ ) { state->elseBlock((skip && skip < #state.stack) && true || CBoolean(state->parseExpr(elseif_)));  }
+                        if( else_   ) { state->elseBlock(true);                      }
+                        if( endif   ) { state->closeBlock();                         }
+                        return; // remove structural directives
+                }
+        }
+
+
+        /* SKIPPING */// 
+        if( state->skip() ) { 
+                // print('skip:' .. line)
+                return; 
+        }
+
+
+        /* READ NEW DIRECTIVES *///
+        if( cmd ) {
+                // handle #undef ...
+                var key = cmd->match(UNDEF);
+                if( type(key) == "string" ) {
+                        state->undefine(key);
+                        return;
+                }
+
+                // read "#define >FooBar...<" directives
+                if( cmd->match(DEFINE) ) {
+                        var define = trim(cmd->sub(DEFINE->len()+1));
+                        var macroname, replacement;
+
+                        // simple "true" defines
+                        macroname = define->match(TRUEMACRO);
+                        if( macroname ) {
+                                state->define(macroname, true);
+                        } else {
+
+                        // replace macro defines
+                        macroname, replacement = define->match(REPLMACRO);
+                        if( macroname && replacement ) {
+                                state->define(macroname, replacement);
+                        } else {
+
+                        // read functional macros
+                        macroname, replacement, source = state->parseFunction(define);
+                        if( macroname && replacement ) {
+                                // add original text for definition to check identify
+                                state->define(macroname, replacement, false, source);
+                        }
+
+                        }
+                        }
+
+                        return;
+                }
+
+                // handle #include ...
+                var filename = cmd->match(INCLUDE);
+                if( filename ) {
+                        return state->includeFile(filename);
+                }
+                filename = cmd->match(LOCAL_INCLUDE);
+                if( filename ) {
+                        return state->includeFile(filename, false, true);
+                }
+                filename = cmd->match(INCLUDE_NEXT);
+                if( filename ) {
+                //print("include_next:"..filename)
+                        return state->includeFile(filename, true);
+                }
+
+                // ignore, because we dont have any pragma directives yet
+                if( cmd->match(PRAGMA) ) { return; }
+
+                // handle #error
+                var errMsg = cmd->match(ERROR);
+                var errNoTxt = cmd->match(ERROR_NOTEXT);
+                var warnMsg = cmd->match(WARNING);
+                if( errMsg ) { error(errMsg); }
+                if( errNoTxt ) { error("<ERROR MESSAGE NOT SET>"); }
+                if( warnMsg ) { 
+                        print(warnMsg); 
+                        return;
+                }
+
+                // abort on unknown keywords
+                error("unknown directive: "..line);
+        }
+
+        if( state.incompleteLine ) {
+                //print('merge with incompleteLine:'..state.incompleteLine)
+                line = (state.incompleteLine .. line);
+                state.incompleteLine = null;
+        }
+
+
+        /* APPLY MACROS *///
+        // print(line)
+        var _line,more = state->apply(line);
+        // print('endprocess:'.._line)
+        if( more ) {
+                state.incompleteLine = line;
+                return "";
+        } else {
+                return _line;
+        }
+
+        return line;
+}
+
+var function doWork(state) {
+        var function _doWork(state) {
+                if( ! state->defined(FILE) ) { state->define(FILE, "<USER_CHUNK>", true); }
+                var oldIndent = state->getIndent();
+                while( true ) {
+                        var input = state->getLine();
+                        if( ! input ) { break; }
+                        var output = processLine(state, input);
+                        if( ! preprocessor.FAST && ! output ) { output = ""; } // output empty skipped lines
+                        if( preprocessor.DEBUG ) { output = output.." -- "..input; } // input as comment when DEBUG
+                        if( output ) { coroutine.yield(output); }
+                }
+                if( (oldIndent != state->getIndent()) ) { error("indentation level must be balanced within a file. was:"..oldIndent.." is:"..state->getIndent()); }
+        }
+        return coroutine.wrap(function() { _doWork(state); });
+}
+
+var function includeFile(state, filename, next, _local) {
+        var result, result_state = preprocessor.compileFile(filename, state.defines, state.macro_sources, next, _local);
+        // now, we take the define table of the sub file for further processing
+        state.defines = result_state.defines;
+        // and return the compiled result
+        return result;
+}
+
+// sets a global define
+var function define(state, key, value, override, macro_source) {
+        //print("define:"..key.." type:"..tostring(value).." value:"..tostring(pval))
+        if( value && ! override ) {
+                if( type(value) == 'function' ) {
+                        assert(macro_source, "macro source should specify to check identity");
+                        var pval = state.macro_sources[key];
+                        if( pval && (pval != macro_source) ) { error("already defined: "..key); }
+                        state.macro_sources[key] = macro_source;
+                } else {
+                        var pval = state.defines[key];
+                        if( pval && (pval != value) ) { error("already defined: "..key); }
+                }
+        }
+        state.defines[key] = state->prepareMacro(value);
+}
+
+// parses CPP exressions
+// i.e.: #if !defined(_UNICODE) && !defined(UNICODE)
+//
+//BNF:
+//  EXPR     -> (BRACKET_OPEN)(EXPR)(BRACKET_CLOSE)
+//  EXPR     -> (EXPR)(OR)(EXPR)
+//  EXPR     -> (EXPR)(AND)(EXPR)
+//  EXPR     -> (NOT)(EXPR)
+//  EXPR     -> (FUNCTION)
+//  FUNCTION -> (IDENTIFIER)(BRACKET_OPEN)(ARGS)(BRACKET_CLOSE)
+//  ARGS     -> ((IDENTIFIER)[(COMMA)(IDENTIFIER)])?
+//LEAVES:
+//  IGNORE -> " \t"
+//  BRACKET_OPEN  -> "("
+//  BRACKET_CLOSE -> ")"
+//  OR -> "||"
+//  AND -> "&&"
+//  NOT -> "!"
+//  IDENTIFIER -> "[0-9a-zA-Z_]"
+//
+
+var PRE_TOKENIZE_MACRO = {
+        string = true,
+        keywords_order = {
+                "CONCAT",
+                "SPACE",
+        },
+        keywords = { 
+                CONCAT = "^%s*##%s*",
+                SPACE = "^%s",
+        },
+};
+var PRE_TOKENIZE_MACRO_ARGS = {
+        string = true,
+        keywords_order = {
+                "STRING_LITERAL",
+                "PARENTHESE",
+                "FUNCTIONAL",
+                "ARGS",
+                "SINGLE_CHARACTER_ARGS",
+                "COMMA",
+        },
+        keywords = { 
+                PARENTHESE = "^%s*%b()",
+                FUNCTIONAL = "^".. IDENTIFIER .. "%s*%b()",
+                STRING_LITERAL = '^"[^"]*"',
+                ARGS = "^[^,%s][^,]*[^,%s]",
+                SINGLE_CHARACTER_ARGS = "^[^,%s]",
+                COMMA = "^,",
+        },
+};
+var PRE_TOKENIZE_EXPR = {
+        string = false,
+        keywords_order = {
+                "DEFINED", 
+                "FUNCTIONAL_MACRO",
+                "BROPEN", 
+                "BRCLOSE", 
+
+                "TENARY_START",
+                "TENARY_MIDDLE",
+                // binary operators
+                "EQUAL",
+                "NOT_EQUAL",
+                "AND", 
+                "OR",
+                "BAND",
+                "BOR",
+                "BXOR",
+                "PLUS",
+                "MINUS",
+                "MULTIPLY",
+                "DIV",
+                "MOD",
+                "LTE",
+                "MTE",
+                "LSHIFT",
+                "RSHIFT",
+                "LT",
+                "MT",
+                // unary operator
+                "NOT", 
+                "BNOT", 
+                // literal
+                "STRING_LITERAL",
+                "CHAR_LITERAL",
+                "HEX_LITERAL",
+                "FPNUM_LITERAL",
+                "NUMBER_LITERAL",
+        },
+        keywords = { 
+                DEFINED = '^defined', 
+                FUNCTIONAL_MACRO = '^' .. IDENTIFIER .. "%s*%b()",
+                BROPEN = '^[(]', 
+                BRCLOSE = '^[)]', 
+
+                TENARY_START = '^%?',
+                TENARY_MIDDLE = '^%:',
+
+                EQUAL = '^==',
+                NOT_EQUAL = '^!=',
+                AND = '^&&', 
+                OR = '^||',
+                BAND = '^&', 
+                BOR = '^|',
+                BXOR = '^%^',
+                PLUS = '^%+',
+                MINUS = '^%-',
+                MULTIPLY = '^%*',
+                DIV = '^%/',
+                MOD = '^%%',
+                LTE = '^<=',
+                MTE = '^>=',
+                LSHIFT = '^<<',
+                RSHIFT = '^>>',
+                LT = '^<',
+                MT = '^>',
+
+                NOT = '^!', 
+                BNOT = '^~',
+
+                STRING_LITERAL = '^L?"[^"]*"',
+                CHAR_LITERAL = "^L?'.*'",
+                HEX_LITERAL = '^[%+%-]?0?x[a-fA-F%d]+[UL]*',
+                FPNUM_LITERAL = '^[%+%-]?%d+[%.]?%d*e[%+%-]%d*',
+                NUMBER_LITERAL = '^[%+%-]?0?b?%d+[%.]?%d*[UL]*',
+        },
+};
+
+var function parseDefined(state, input) {
+        var result = false;
+        var bropen = false;
+        var brclose = false;
+        var ident = null;
+
+        for( key, value in input ) {
+                if( key == "BROPEN" ) {
+                        bropen = true;
+                }
+                if( key == "identifier" ) {
+                         ident = value;
+                         if( ! bropen ) { break; }
+                }
+                if( key == "BRCLOSE" && ident ) {
+                        brclose = true;
+                        break;
+                }
+        }
+
+        // wiht and w/o brackets allowed
+        if( ident && ((bropen && brclose) || (! bropen && ! brclose)) ) {
+                return state->defined(ident);
+        }
+
+        error("expression parse error: defined(ident)");
+}
+
+
+/*
+order : smaller is higher priority
+1       ()   []   ->   .  
+2        !   ~   -   +   *   &   sizeof   type cast   ++   --  
+3       *   /   %
+4       +   -
+5       <<   >>
+6       <   <=   >   >=
+7       ==   !=
+8       &
+9       ^
+10      |
+11      &&
+12      ||
+13       ?:   =   +=   -=   *=   /=   %=   &=   |=   ^=   <<=   >>=
+14      ,
+*/
+var combination_order = function (op, unary) {
+        if( unary ) {
+                if( op == '-' || op == '!' || op == '~' ) {
+                        return 2;
+                } else {
+                        assert(false, 'unsupported unary operator:' .. op);
+                }
+        } else {
+                if( op == '*' || op == '/' || op == '%' ) {
+                        return 3;
+                } else if( op == '+' || op == '-' ) {
+                        return 4;
+                } else if( op == '>>' || op == '<<' ) {
+                        return 5;
+                } else if( op == '<' || op == '>' || op == '<=' || op == '>=' ) {
+                        return 6;
+                } else if( op == '==' || op == '!=' ) {
+                        return 7;
+                } else if( op == '&' ) {
+                        return 8;
+                } else if( op == '^' ) {
+                        return 9;
+                } else if( op == '|' ) {
+                        return 10;
+                } else if( op == '&&' ) {
+                        return 11;
+                } else if( op == '||' ) {
+                        return 12;
+                } else if( op == '?' || op == ':' ) {
+                        return 13;
+                } else {
+                        assert(false, 'unsupported operator:' .. op);
+                }
+        }
+};
+
+var evaluate;
+evaluate = function (node) {
+        if( ! node.op ) { // leaf node or leaf node with unary operators
+                var v = node.v;
+                if( node.uops ) {
+                        for( _, uop in ipairs(node.uops) ) {
+                                // print('apply uop:'..uop.."|"..tostring(v))
+                                if( uop == '-' ) {
+                                        v = -v;
+                                } else if( uop == '!' ) {
+                                        v = (! v);
+                                } else if( uop == '~' ) {
+                                        v = bit.bnot(v);
+                                } else {
+                                        assert(false, 'invalid uop:' .. tostring(uop));
+                                }
+                        }
+                }
+                // print('after apply:'..tostring(v))
+                return v;
+        }
+        // print(node.op..':'..tostring(node.l.v or node.l.op).."("..type(node.l.v)..")|"..tostring(node.r.v or node.r.op).."("..type(node.r.v)..")")
+        if( node.op == '+' ) { // binary operators
+                return (evaluate(node.l) + evaluate(node.r));
+        } else if( node.op == '-' ) {
+                return (evaluate(node.l) - evaluate(node.r));
+        } else if( node.op == '*' ) {
+                return (evaluate(node.l) * evaluate(node.r));
+        } else if( node.op == '/' ) {
+                return (evaluate(node.l) / evaluate(node.r));
+        } else if( node.op == '%' ) {
+                return (evaluate(node.l) % evaluate(node.r));
+        } else if( node.op == '==' ) {
+                return (evaluate(node.l) == evaluate(node.r));
+        } else if( node.op == '!=' ) {
+                return (evaluate(node.l) != evaluate(node.r));
+        } else if( node.op == '<<' ) {
+                return bit.lshift(evaluate(node.l), evaluate(node.r));
+        } else if( node.op == '>>' ) {
+                return bit.rshift(evaluate(node.l), evaluate(node.r));
+        } else if( node.op == '&&' ) {
+                return (CBoolean(evaluate(node.l)) && CBoolean(evaluate(node.r)));
+        } else if( node.op == '||' ) {
+                return (CBoolean(evaluate(node.l)) || CBoolean(evaluate(node.r)));
+        } else if( node.op == '&' ) {
+                return bit.band(evaluate(node.l), evaluate(node.r));
+        } else if( node.op == '|' ) {
+                return bit.bor(evaluate(node.l), evaluate(node.r));
+        } else if( node.op == '^' ) {
+                return bit.bxor(evaluate(node.l), evaluate(node.r));
+        } else if( node.op == '<=' ) {
+                return (evaluate(node.l) <= evaluate(node.r));
+        } else if( node.op == '>=' ) {
+                return (evaluate(node.l) >= evaluate(node.r));
+        } else if( node.op == '<' ) {
+                return (evaluate(node.l) < evaluate(node.r));
+        } else if( node.op == '>' ) {
+                return (evaluate(node.l) > evaluate(node.r));
+        } else {
+                assert(false, 'invalid op:' .. tostring(node.op));
+        }
+};
+
+var function setValue(node, v) {
+        // print('setValue:' .. tostring(v).."|"..tostring(node.uops))-- .. "\t" .. debug.traceback())
+        if( ! node.op ) {
+                assert(! node.v, debug.traceback());
+                node.v = v;
+        } else {
+                assert(node.l && (! node.r));
+                node.r = {v = v, uops = node.uops};
+        }
+}
+
+var function setUnaryOp(node, uop) {
+        // print('setUnaryOp:' .. tostring(uop))-- .. "\t" .. debug.traceback())
+        if( ! node.uops ) { node.uops = {}; }
+        table.insert(node.uops, 1, uop);
+}
+
+var function parseExpr(state, input) { 
+        var node = {};
+        var root = node;
+        // first call gets string input. rest uses tokenizer
+        if( type(input) == "string" ) {
+                // print('parse:' .. input) 
+                input = tokenizer(input, PRE_TOKENIZE_EXPR); 
+        }
+
+        for( type, value in input ) {
+                // print("type:"..type.." value:"..value)
+                // unary operator
+                if( type == "NOT" || 
+                        type == "BNOT" ) {
+                        setUnaryOp(node, value);
+                }
+                if( type == "BROPEN" ) {
+                        setValue(node, state->parseExpr(input));
+                }
+                if( type == "BRCLOSE" ) {
+                        //print('BRCLOSE:' .. tostring(result))
+                        break;
+                }
+                if( type == "STRING_LITERAL" ) {
+                        setValue(node, value->sub(value[1] == 'L' && 3 || 2,-2));
+                }
+                if( type == "NUMBER_LITERAL" || type == "HEX_LITERAL" || type == "FPNUM_LITERAL" || type == "CHAR_LITERAL" ) {
+                        setValue(node, tonumber(parseCInteger(value)));
+                }
+                // tenary operator
+                // tenary has lowest priority, so any other operation can be calculate now.
+                if( type == "TENARY_START" ) {
+                        var l = state->parseExpr(input);
+                        var r = state->parseExpr(input);
+                        if( evaluate(root) ) {
+                                return l;
+                        } else {
+                                return r;
+                        }
+                }
+                if( type == "TENARY_MIDDLE" ) {
+                        break;
+                }
+                // binary operator
+                if( type == "EQUAL" ||
+                        type == "NOT_EQUAL" ||
+                        type == "AND" ||
+                        type == "OR" ||
+                        type == "BAND" ||
+                        type == "BOR" ||
+                        type == "BXOR" ||
+                        type == "PLUS" ||
+                        type == "MINUS" ||
+                        type == "MULTIPLY" ||
+                        type == "DIV" ||
+                        type == "MOD" ||
+                        type == "LTE" ||
+                        type == "MTE" ||
+                        type == "LSHIFT" ||
+                        type == "RSHIFT" ||
+                        type == "LT" ||
+                        type == "MT" ) {
+                        if( node.op ) { 
+                                if( ! node.r ) { // during parse right operand : uop1 uop2 ... uopN operand1 op1 uop(N+1) uop(N+2) ... [uop(N+K)]
+                                        assert(type == "MINUS",  "error: operators come consequently: " .. tostring(node.op) .. " and " .. tostring(value));
+                                        // unary operater after binary operator
+                                        setUnaryOp(node, value);
+                                } else { // uop1 uop2 ... uopN operand1 op1 uop(N+1) uop(N+2) ... uop(N+M) operand2 [op2]
+                                        // print("operator processing:" .. tostring(node.op) .. "|" .. value .. "|" .. tostring(node.l) .. "|" .. tostring(node.r))
+                                        var tmp = node;
+                                        while( tmp ) {
+                                                // print('compare ' .. value..' and ' .. tmp.op)
+                                                if( combination_order(tmp.op) > combination_order(value) ) {
+                                                        // print(value..' is stronger than ' .. tmp.op)
+                                                        break;
+                                                }
+                                                tmp = tmp.parent;
+                                        }
+                                        if( tmp ) {
+                                                node = {
+                                                        op = value,
+                                                        l = tmp.r,
+                                                        parent = tmp
+                                                };
+                                                tmp.r.parent = node;
+                                                tmp.r = node;
+                                        } else {
+                                                node = {
+                                                        op = value,
+                                                        l = root,
+                                                };
+                                                root.parent = node;
+                                                root = node;
+                                        }
+                                }
+                        } else if( node.v != null ) { // uop1 uop2 ... uopN operand1 [op]
+                                var devided;
+                                if( node.uops ) {
+                                        for( _, uop in ipairs(node.uops) ) {
+                                                if( combination_order(uop, true) > combination_order(value) ) {
+                                                        // there is a binary operator which has stronger than any of the unary
+                                                        devided = uop;
+                                                }
+                                        }
+                                }
+                                if( devided ) {
+                                        assert(false, "TODO: can we do something about this case??:"..value.." is stronger than "..devided);
+                                } else {
+                                        node.l = { v = node.v, uops = node.uops };
+                                        node.v = null;
+                                        node.uops = null;
+                                        node.op = value;
+                                }
+                        } else { // unary operator : uop1 uop2 ... [uopN]
+                                assert(type == "MINUS", "error: invalid unary operator:" .. value);
+                                setUnaryOp(node, value);
+                        }
+                }
+                if( type == "DEFINED" ) {
+                        setValue(node, parseDefined(state, input));
+                } else if( type == "identifier" || type == "FUNCTIONAL_MACRO" ) {
+                        // print('ident:' .. value)
+                        var eval = state->apply(value);
+                        // print('apply result ' .. eval .. "|" .. tostring(unprocessed))
+                        if( eval != value ) {
+                                eval = state->parseExpr(eval);
+                                // print('re-evaluate expr ' .. tostring(eval))
+                                setValue(node, eval);
+                        } else {
+                                // undefined macro symbol is always treated as 0.
+                                // http://gcc.gnu.org/onlinedocs/cpp/If.html#If
+                                setValue(node, 0);
+                        }
+                }
+        }
+
+        var r = evaluate(root);
+        // print('evaluate:' .. tostring(r))
+        return r;
+}
+
+// apply string ops "##"
+var function prepareMacro(state, input) {
+        if( type(input) != "string" ) { return input; }
+        do {
+                var out = {};
+                var concat;
+                for( k, v, start, end_ in tokenizer(input, PRE_TOKENIZE_MACRO) ) {
+                        if( k == "CONCAT" ) {
+                                // remove concat op "##"
+                                concat = true;
+                        } else {
+                                table.insert(out, input->sub(start, end_));
+                        }
+                }
+                input = table.concat(out);
+        } while(!( ! concat) );
+        return input;
+}
+
+// macro args replacement function slower but more torelant for pathological case 
+var function replaceArgs(argsstr, repl) {
+        var args = {};
+        argsstr = argsstr->sub(2,-2);
+        // print('argsstr:'..argsstr)
+        var comma;
+        for( k, v, start, end_ in tokenizer(argsstr, PRE_TOKENIZE_MACRO_ARGS) ) {
+                // print("replaceArgs:" .. k .. "|" .. v)
+                if( k == "ARGS" || k == "PARENTHESE" || k == "STRING_LITERAL" || 
+                        k == "FUNCTIONAL" || k == "SINGLE_CHARACTER_ARGS" ) {
+                        table.insert(args, v);
+                        comma = false;
+                } else if( k == "COMMA" ) {
+                        if( comma ) {
+                                // continued comma means empty parameter
+                                table.insert(args, "");
+                        }
+                        comma = true;
+                }
+        }
+        var v = repl->gsub("%$(%d+)", function (m) { return args[tonumber(m)] || ""; });
+        // print("replaceArgs:" .. repl .. "|" .. tostring(#args) .. "|" .. v)
+        return v;
+}
+
+// i.e.: "MAX(x, y) (((x) > (y)) ? (x) : (y))"
+var function parseFunction(state, input) {
+        if( ! input ) { return; }
+        var concat;
+        var name, argsstr, repl = input->match(FUNCMACRO);
+        if( ! name || ! argsstr || ! repl ) { return; }
+
+        // rename args to $1,$2... for later gsub
+        var noargs = 0;
+        for( argname in argsstr->gmatch(IDENTIFIER) ) {
+                noargs = noargs + 1;
+                // avoid matching substring of another identifier (eg. attrib matches attribute and replace it)
+                repl = repl->gsub("(#*)(%s*)("..argname..")([_%w]?)", function (s1, s2, s3, s4) {
+                        if( #s4 <= 0 ) {
+                                return (#s1 == 1) && ("\"$"..noargs.."\"") || (s1..s2.."$"..noargs);
+                        } else {
+                                return s1..s2..s3..s4;
+                        }
+                });
+        }
+        // remove concat (after replace matching argument name to $1, $2, ...)
+        repl = repl->gsub("%s*##%s*", "");
+
+        // build macro funcion
+        var func = function(input) {
+                return input->gsub(name.."%s*(%b())", function (match) {
+                        return replaceArgs(match, repl);
+                });
+        };
+
+        return name, func, repl;
+}
+
+
+// ------------
+// PRE INTERFACE
+// ------------
+
+//- initialies a preprocessor state. not needed manually. handy for testing
+function preprocessor.init(input, predefines, macro_sources) {
+        // create sate var
+        var state     = {};              // init the state object
+        state.defines   = {};              // the table of known defines and replacements
+        state.screener  = screener(input);
+        state.lineno    = 0;               // the current line number
+        state.stack     = {};              // stores wether the current stack level is to be included
+        state.once      = {};              // stack level was once true (first if that evals to true)
+        state.macro_sources = macro_sources || {}; // original replacement text for functional macro 
+
+        // funcs
+        state.define = define;
+        state.undefine = function(state, key) {
+                state->define(key, null);
+                state.macro_sources[key] = null;
+        };
+        state.defined = function(state, key) {
+                return state.defines[key] != null;
+        };
+        state.apply = apply;
+        state.includeFile = includeFile;
+        state.doWork = doWork;
+        state.getIndent = function(state) {
+                return #state.stack;
+        };
+        state.openBlock = function(state, bool) {
+                state.stack[#state.stack+1] = bool;
+                state.once [#state.once+1]  = bool;
+                state->define(PRE_INDENT, state->getIndent(), true);
+        };
+        state.elseBlock = function(state, bool) {
+                if( state.once[#state.once] ) {
+                        state.stack[#state.stack] = false;
+                } else {
+                        state.stack[#state.stack] = bool;
+                        if( bool ) { state.once[#state.once] = true; }
+                }
+        };
+        state.closeBlock = function(state) {
+                state.stack[#state.stack] = null;
+                state.once [#state.once]  = null;
+                state->define(PRE_INDENT, state->getIndent(), true);
+                if( state->getIndent() < 0 ) { error("Unopened block detected. Indentaion problem."); }
+        };
+        state.skip = function(state) {
+                for( i = 1, #state.stack ) {
+                        if( ! state.stack[i] ) { return i; }
+                }
+                return false;
+        };
+        state.getLine = function(state) {
+                state.lineno = state.lineno + 1;
+                state->define(LINE, state.lineno, true);
+                return state.screener();
+        };
+        state.prepareMacro = prepareMacro;
+        state.parseExpr = parseExpr;
+        state.parseFunction = parseFunction;
+
+        // predefines
+        state->define(DATE, os.date("%B %d %Y"), true);
+        state->define(TIME, os.date("%H:%M:%S"), true);
+        state->define(LINE, state.lineno, true);
+        state->define(PRE_INDENT, state->getIndent(), true);
+        predefines = predefines || {};
+        for( k,v in pairs(preprocessor.ENV) ) { state->define(k, v, true); }    // static ones
+        for( k,v in pairs(predefines) ) {       state->define(k, v, true); }
+
+        if( preprocessor.PRE_TEST ) { preprocessor.STATE = state; } // activate static state debugging
+
+        return state;
+}
+
+//- the preprocessors main function.
+// returns the preprocessed output as a string.
+// @param code data as string
+// @param predefines OPTIONAL a table of predefined variables
+// @usage preprocessor.compile("#define bar 0x1337\nstatic const int foo = bar;")
+// @usage preprocessor.compile("#define bar 0x1337\nstatic const int foo = bar;", {["bar"] = "0x1338"})
+function preprocessor.compile(code, predefines, macro_sources) {
+        var state = preprocessor.init(code, predefines, macro_sources);
+        var buf = {};
+        for( output in state->doWork() ) {
+                table.insert(buf, output);
+        }
+        var output = table.concat(buf, NEWL);
+        if( preprocessor.DEBUG ) { print(output); }
+        return output, state;
+}
+
+//- preprocesses a file
+// @param filename the file to read
+// @param predefines OPTIONAL a table of predefined variables
+// @usage out, state = preprocessor.compileFile("../odbg/plugin.h", {["MAX_PAH"]=260, ["UNICODE"]=true})
+function preprocessor.compileFile(filename, predefines, macro_sources, next, _local) {
+        if( ! filename ) { error("processFile() arg1 has to be a string"); }
+        var file = io.open(filename, 'r');
+        if( ! file ) { error("file not found: "..filename); }
+        var code = file->read('*a');
+        predefines = predefines || {};
+        predefines[FILE] = filename;
+        return preprocessor.compile(code, predefines, macro_sources);
+}
+
+
+// ------------
+// SATIC UNIT TESTS
+// ------------
+function preprocessor.test(suppressMsg) {
+        var testLabelCount = 0;
+        var function getTestLabel() {
+                ++testLabelCount    ;
+                return " preprocessor_assert_"..testLabelCount;
+        }
+
+        // this ugly global is required so our testcode can find it
+        _G.preprocessor_test = {
+                assertTrueCalls = 0;
+                assertTrueCount = 0;
+                assertTrue = function() {
+                        preprocessor_test.assertTrueCount = preprocessor_test.assertTrueCount + 1;
+                }
+        };
+
+        var testpreprocessor = [=[
+                assert(LINE == 1, "_LINE_ macro test 1: LINE")
+                // This test uses PRE with lua code (uncommon but possible)
+                assert(LINE == 3, "_LINE_ macro test 3: LINE")
+                /* 
+                 * It therefore asserts any if/else/macro functions and various syntaxes
+                 * (including this comment, that would cause errors if not filtered)
+                 */
+                assert(LINE == 8, "_LINE_ macro test 8: LINE")
+                /*
+                 assert(false, "multi-line comment not removed")
+                 */
+                /* pathological case which contains single line comment start in multiline comments.
+                 * e.g. this multiline comment should be finish next line.
+                 * http://foobar.com */ // comment
+                /* if singleline comment processes first, sometimes indicator of end of multiline loss */ #define THIS_SHOULD_ENABLE 111 /*
+                        continuous multiline comment after macro definition
+                //*/
+                ///* this removed.
+                assert(THIS_SHOULD_ENABLE == 111, "pathological multiline comment test")
+
+
+                #define TRUE
+                #define ONE (1)
+                #define TWO (2)
+                #define THREE_FUNC(x) (3)
+                #define LEET 0x1337
+                #define CLONG 123456789L
+                #define CLONGLONG 123456789123456789LL
+                #define CULONG 12345678UL
+                #define CUINT 123456U
+                #define BINARY -0b1001 /* -9 */
+                #define OCTET 075 /* 61 */
+                #define NON_OCTET 75
+                #define HEX 0xffffU
+                #define P(x) x
+                #define WCHAR_ZERO L'\0'
+                #  define NCURSES_IMPEXP
+                #  define NCURSES_API
+                #  define NCURSES_EXPORT(type) NCURSES_IMPEXP type NCURSES_API
+                #define MACRO_TO_ITSELF MACRO_TO_ITSELF
+                local MACRO_TO_ITSELF = 111
+                assert(MACRO_TO_ITSELF == 111, "can process macro to itself")
+                assert(WCHAR_ZERO == 0, "wchar evaluate fails")
+                assert(CLONG == 123456789, "read *L fails")
+                assert(CLONGLONG == 123456789123456789, "read *LL fails")
+                assert(CULONG == 12345678, "read *UL fails")
+                assert(HEX == 65535, "read hex fails")
+                #if CUINT != 123456U
+                assert(false, "cannot evaluate number which contains Unsinged postfix correctly")
+                #else
+                assert(CUINT == 123456, "read *U fails")
+                #endif
+                #pragma ignored
+                assert P((BINARY == -9, "parse, binary literal fails"))
+                assert(OCTET == 61 and NON_OCTET == 75, "parse octet literal fails")
+
+                preprocessor_test.assertTrue()
+                assert(LEET == 0x1337, "simple #define replacement")
+                local msg
+                /* function to check macro expand to empty */
+                local function check_argnum(...)
+                        return select('#', ...)
+                end
+                NCURSES_EXPORT(function) test_export(a)
+                        return a + 1
+                end
+                assert(test_export(2) == 3, "EXPORT style macro")
+                local macrofunc = function P((
+                        a, b))
+                        return a + b
+                end
+                assert(macrofunc(1, 2) == 3, "macro arg contains parenthese")
+
+                msg = "tenary operator test"
+                #if (HEX % 2 == 1 ? CUINT : CULONG) == 123456
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."1")
+                #endif
+                #if (OCTET % 2 == 0 ? CUINT : CULONG) == 123456
+                        assert(false, msg.."1")
+                #else
+                        preprocessor_test.assertTrue()
+                #endif
+
+
+
+
+                # if defined TRUE 
+                        preprocessor_test.assertTrue() -- valid strange syntax test (spaces and missing brackets)
+                # endif
+
+
+                msg = "#define if/else test"
+                #ifdef TRUE
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."1")
+                #endif
+                #ifdef NOTDEFINED
+                        assert(false, msg.."2")
+                #else
+                        preprocessor_test.assertTrue()
+                #endif
+                #ifndef NOTDEFINED
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."3")
+                #endif
+
+
+                msg = "#if defined statement test"
+                #if defined(TRUE)
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."1")
+                #endif
+                #if !defined(LEET) && !defined(TRUE)
+                        assert(false, msg.."2")
+                #endif
+                #if !defined(NOTLEET) && !defined(NOTDEFINED)
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."3")
+                #endif
+                #if !(defined(LEET) && defined(TRUE))
+                        assert(false, msg.."4")
+                #else
+                        preprocessor_test.assertTrue()
+                #endif
+                #if !defined(LEET) && !defined(TRUE)
+                        assert(false, msg.."5")
+                #endif
+                #if defined(LEET) && defined(TRUE) && defined(NOTDEFINED)
+                        assert(false, msg.."6")
+                #endif
+                #if ONE + TWO * TWO == 5
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."7")
+                #endif
+                #if (ONE + TWO) * TWO == 0x6
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."8")
+                #endif
+                #if ONE * TWO + ONE / TWO == 2.5
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."9")
+                #endif
+                #if ONE + ONE * TWO / TWO == 2
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."10")
+                #endif
+                #if TWO - - TWO == 4
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."11")
+                #endif
+                #if (TWO - - TWO) % (ONE + TWO) == 1
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."12")
+                #endif
+                #if ONE << TWO + TWO >> ONE == 8
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."13")
+                #endif
+                #if (ONE << TWO) + (TWO >> ONE) == 5
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."14")
+                #endif
+                #if (ONE << TWO) + TWO >> ONE == 3
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."15")
+                #endif
+                #if (THREE_FUNC(0xfffffU) & 4) == 0
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."16")
+                #endif
+                #if (0x3 & THREE_FUNC("foobar")) == 0b11
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."17")
+                #endif
+                #if defined(TWO) && ((TWO-0) < 3)
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."17")
+                #endif
+                #if TWO == 1--1 
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."18")
+                #endif
+                #if HEX > 0xfFfFU 
+                        assert(false, msg.."18")
+                #else
+                        preprocessor_test.assertTrue()
+                #endif
+                #define TRUE_DEFINED defined(TRUE)
+                #if TRUE_DEFINED
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."19")
+                #endif
+                #define NOTDEFINED_DEFINED defined(TRUE) && defined(NOTDEFINED)
+                #if NOTDEFINED_DEFINED
+                        assert(false, msg.."20")
+                #else
+                        preprocessor_test.assertTrue()
+                #endif
+                #if LEET && LEET > 0x1336
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."20")
+                #endif
+                #if NOTLEET && NOTLEET > 0x1336
+                        assert(false, msg.."21")
+                #else
+                        preprocessor_test.assertTrue()
+                #endif
+                #if defined(NOTLEET) || BINARY + 0 >= 10L || !defined(TRUE)
+                        assert(false, msg.."22")
+                #else
+                        preprocessor_test.assertTrue()
+                #endif
+
+
+
+                msg = "macro chaining"
+                #define FOO 0x7B
+                #define BAR (FOO+0x7B)
+                assert(-BAR == -0x7B*2, msg)
+                #define BAZ 456
+                #define BLUR BA##Z
+                assert(BLUR == 456, msg)
+                local testfunc = function (x) return "["..tostring(x).."]" end
+                #define FOOBAR(x) testfunc(x)
+                assert(FOOBAR(1) == "[1]", msg)
+                #define testfunc(x)
+                #define FOOBAZ(x) testfunc(x)
+                assert(check_argnum(FOOBAR(1)) == 0, msg)
+                assert(check_argnum(FOOBAZ(1)) == 0, msg)
+                #undef testfunc
+                assert(FOOBAR(1) == "[1]", msg)
+                assert(FOOBAZ(1) == "[1]", msg)
+
+
+                msg = "indentation test"
+                assert(PRE_INDENT == 0, msg.."1")
+                #if defined(TRUE)
+                        assert(PRE_INDENT == 1, msg.."2")
+                #endif
+                assert(PRE_INDENT == 0, msg.."3")
+
+
+                #define PRE_FUNCTION_1(x, y) (x and not y)
+                assert(PRE_FUNCTION_1(true, false), "function macro")
+                #define PRE_FUNCTION_2(x, y) \
+                        (not x \
+                         and y)
+                assert(PRE_FUNCTION_2(false, true), "multiline function macro")
+                #define PRE_FUNCTION_3(_x, _y) PRE_FUNCTION_2(_x, _y)
+                assert(PRE_FUNCTION_3(false, true), "function macro with argname contains _")
+
+                #define PRE_FUNCTION_4_CHILD() false
+                #define PRE_FUNCTION_4(_x)
+
+                assert(check_argnum(PRE_FUNCTION_4(PRE_FUNCTION_4_CHILD())) == 0, "functional macro which receives functional macro as argument")
+                assert(check_argnum(PRE_FUNCTION_4(PRE_FUNCTION_3(true, true))) == 0, "functional macro which receives functional macro as argument2")
+
+                #define PRE_FUNCTION_5(x, y) (x) + (x) + (y) + (y)
+                assert(PRE_FUNCTION_5(10, 20) == 60, "macro argument multiple usage")
+
+                #define PRE_NOT_FUNCTION (BLUR)
+                assert(PRE_NOT_FUNCTION == 456, "if space between macro name and argument definition exists, it is regarded as replacement macro")
+
+                #define CONCAT(x, y, z, w) x ## y ## z (w)
+                local fncall = function (x) return x + 111 end
+                assert(111 == CONCAT(   ,   fnc , all, 0 ), "funcall fails")
+                assert(222 == CONCAT(   ,, fncall, 111  ), "funcall fails2")
+                #define ATTRIB_CALL(x, y, attrib) attribute(x, y, attrib)
+                local attribute = function (x, y, attr) 
+                        return attr * (x + y)
+                end
+                assert(ATTRIB_CALL(  1, 2  , 100 ) == 300, "funcall fails3")
+
+
+                msg = "#elif test"
+                #if defined(NOTDEFINED)
+                        -- it should not be processed
+                        #if NOTDEFINED
+                        #else
+                        assert(false, msg.."1")
+                        #endif
+                #elif defined(NOTDEFINED)
+                        assert(false, msg.."2")
+                #elif defined(TRUE)
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."3")
+                #endif
+
+
+                msg = "#else if test"
+                #if defined(NOTDEFINED)
+                        assert(false, msg.."1")
+                #else if defined(NOTDEFINED)
+                        assert(false, msg.."2")
+                #else if defined(TRUE)
+                        preprocessor_test.assertTrue()
+                #else
+                        assert(false, msg.."3")
+                #endif
+
+
+                msg = "bock stack tree test"
+                #ifdef TRUE
+                        #ifdef NOTDEFINED
+                                assert(false, msg.."1")
+                        #elif defined(TRUE)
+                                preprocessor_test.assertTrue()
+                        #else
+                                assert(false, msg.."2")
+                        #endif
+                #else
+                        assert(false, msg.."3")
+                #endif
+                #ifdef NOTDEFINED
+                        #ifdef TRUE
+                                assert(false, msg.."4")
+                        #endif
+                #endif
+
+                msg = "test concat ## operator"
+                #define CONCAT_TEST1 foo##bar
+                local CONCAT_TEST1 = "blubb"
+                assert(foobar == "blubb", msg)
+                #define CONCAT_TEST2() bar##foo
+                local CONCAT_TEST2() = "blubb"
+                assert(barfoo == "blubb", msg)
+                -- dont process ## within strings
+                #define CONCAT_TEST3 "foo##bar" 
+                assert(CONCAT_TEST3 == "foo##bar", msg)
+                msg = "test concat inside func type macro"
+                #define CONCAT_TEST4(baz) CONCAT_TEST##baz
+                local CONCAT_TEST4(1) = "bazbaz"
+                assert(foobar == "bazbaz", msg)
+
+                msg = "#undef test"
+                #define UNDEF_TEST 
+                #undef UNDEF_TEST
+                #ifdef UNDEF_TEST
+                        assert(false, msg)
+                #endif
+
+                msg = "stringify operator(#) test"
+                #define STRINGIFY(str) #str
+                assert(STRINGIFY(abcde) == "abcde", msg)
+                #define STRINGIFY_AND_CONCAT(str1, str2) #str1 ## \
+                #str2
+                assert(STRINGIFY_AND_CONCAT(fgh, ij) == "fghij", msg)
+
+                #define msg_concat(msg1, msg2) msg1 ## msg2
+                assert("I, am, preprocessor" == msg_concat("I, am", ", preprocessor"), "processing macro argument which includes ,")
+
+                #define FUNCARG 500
+                #define ARG 100
+                #define FUNC(x) FUNC##x
+                assert(FUNC(ARG) == 500, "create new macro symbol by concat")
+
+                msg = "same macro definition which has exactly same value allows. (checked with gcc 4.4.7 WORDSIZE)"
+                #define DUP_MACRO_DEF (111)
+                #define DUP_MACRO_DEF (111)
+                #define DUP_FUNC_MACRO(x, y) x + y
+                #define DUP_FUNC_MACRO(x, y) x + y
+
+
+                msg = "check #if conditional check"
+                #define VALUE1 (123)
+                #if VALUE1 != 123 
+                        assert(false, msg .." #if " .. tostring(VALUE1) .. " != 123")
+                #endif
+                #if 123 != VALUE1 
+                        assert(false, msg .." #if " .. tostring(VALUE1) .. " != 123 (2)")
+                #endif
+
+                #define VALUE2 ("hoge")
+                #if VALUE2 == "hoge"
+                        #define VALUE3 (true)
+                #endif
+                assert(VALUE3 == true, msg .. " #if " .. tostring(VALUE3) .. " == true")
+
+                #define VALUE4 (VALUE1 + VALUE1)
+                #if VALUE4 != 246 
+                        assert(false, msg .." #if check for nested definition:" .. tostring(VALUE4))
+                #endif
+
+                msg = "+-*/<> in #if expression:"
+                #define CALC_VALUE_A (1)
+                #define CALC_VALUE_B (2)
+                #if (CALC_VALUE_A + CALC_VALUE_B) != 3
+                        assert(false, msg .. " + not work:")
+                #endif
+                #if (CALC_VALUE_A * CALC_VALUE_B) != 2
+                        assert(false, msg .. " * not work:")
+                #endif
+                #if (CALC_VALUE_A - CALC_VALUE_B) != -1
+                        assert(false, msg .. " - not work:")
+                #endif
+                #if (CALC_VALUE_A / CALC_VALUE_B) != 0.5
+                        assert(false, msg .. " / not work:")
+                #endif
+
+                #if (CALC_VALUE_A >= CALC_VALUE_A)
+                #else
+                        assert(false, msg .. " >= not work1")
+                #endif
+                #if (CALC_VALUE_B >= CALC_VALUE_A)
+                #else
+                        assert(false, msg .. " >= not work2")
+                #endif
+
+                #if (CALC_VALUE_B <= CALC_VALUE_B)
+                #else
+                        assert(false, msg .. " <= not work1")
+                #endif
+                #if (CALC_VALUE_A <= CALC_VALUE_B)
+                #else
+                        assert(false, msg .. " <= not work2")
+                #endif
+
+                #if (CALC_VALUE_B > CALC_VALUE_A)
+                #else
+                        assert(false, msg .. " > not work1")
+                #endif
+                #if (CALC_VALUE_A > CALC_VALUE_A)
+                        assert(false, msg .. " > not work2")
+                #endif
+
+                #if (CALC_VALUE_A < CALC_VALUE_B)
+                #else
+                        assert(false, msg .. " < not work1")
+                #endif
+                #if (CALC_VALUE_B < CALC_VALUE_B)
+                        assert(false, msg .. " < not work2")
+                #endif
+                #if (CALC_VALUE_B | CALC_VALUE_A) != 3
+                        assert(false, msg .. " | not work")
+                #endif
+                #if (CALC_VALUE_B & CALC_VALUE_A) != 0
+                        assert(false, msg .. " &         not work")
+                #endif
+                #if (CALC_VALUE_B ^ CALC_VALUE_A) != 3
+                        assert(false, msg .. " ^ not work")
+                #endif
+                #if -CALC_VALUE_B != -2
+                        assert(false, msg .. " unary - not work")
+                #endif
+                #if ~CALC_VALUE_B != -3
+                        assert(false, msg .. " unary ~ not work")
+                #endif
+        ]=];
+        preprocessor.FAST = false;      // enable full valid output for testing
+        preprocessor.SELF_TEST = true;
+        var testlua = preprocessor.compile(testpreprocessor);
+        preprocessor.SELF_TEST = null;
+        //      print(testlua)
+        assert(loadstring(testlua, "testlua"))();
+        preprocessor_test.assertTrueCalls = findn(testpreprocessor, "preprocessor_test.assertTrue()");
+        assert(preprocessor_test.assertTrueCount == preprocessor_test.assertTrueCalls, "assertTrue calls:"..preprocessor_test.assertTrueCalls.." count:"..preprocessor_test.assertTrueCount);
+        _G.preprocessor_test = null;    // delete ugly global hack
+        if( ! suppressMsg ) { print("Test run suscessully"); }
+}
+if( preprocessor.PRE_TEST ) { preprocessor.test(true); }
+
+
+// ------------
+// REGISTER PRE
+// ------------
+
+//- disable preprocessor processing for ffi, loadstring and such
+preprocessor.disable = function() {
+        if( /*preprocessor.PRE_LUA*/ true ) {
+                // activate PRE_LUA actually does anything useful
+                // _G.loadstring = _G.loadstring_preprocessor_backup
+        }
+
+        if( preprocessor.PRE_FFI && pcall(require, "ffi") ) {
+                ffi = require("ffi");
+                if( ffi.preprocessor_cdef_backup ) {
+                        ffi.cdef = ffi.preprocessor_cdef_backup;
+                        ffi.preprocessor_cdef_backup = null;
+                }
+        }
+};
+
+//- (re)enable preprocessor processing for ffi, loadstring and such
+preprocessor.enable = function() {
+        // Use PRE to process Lua code (load, loadfile, loadstring...)
+        if( /*preprocessor.PRE_LUA*/ true ) {
+                // TODO: make it properly work on all functions
+                _G.loadstring_preprocessor_backup = _G.loadstring;
+                _G.loadstring = function(str, chunk) { 
+                        return loadstring_preprocessor_backup(preprocessor.compile(str), chunk); 
+                };
+        }
+        // Use PRE as LuaJIT PreProcessor if used inside LuaJIT. i.e. Hook ffi.cdef
+        if( preprocessor.PRE_FFI && pcall(require, "ffi") ) {
+                ffi = require("ffi");
+                if( ! ffi.preprocessor_cdef_backup ) {
+                        if( ! ffi.preprocessor_defs ) { ffi.preprocessor_defs = {}; } // defs are stored and reused
+                        ffi.preprocessor = function(input) { 
+                                var output, state = preprocessor.compile(input, ffi.preprocessor_defs, ffi.preprocessor_macro_sources);
+                                ffi.preprocessor_defs = state.defines;
+                                ffi.preprocessor_macro_sources = state.macro_sources;
+                                return output;
+                        };
+                        ffi.preprocessor_cdef_backup = ffi.cdef;
+                        ffi.cdef = function(input) { 
+                                if( true ) {
+                                        return ffi.preprocessor_cdef_backup(ffi.preprocessor(input)); 
+                                } else {
+                                        var fn,cnt = input->gsub('#include ["<].-([^/]+%.h)[">]', '%1');
+                                        input = ffi.preprocessor(input);
+                                        if( cnt > 0 ) {
+                                                var f = io.open("./tmp/"..fn, 'w');
+                                                if( f ) {
+                                                        f->write(input);
+                                                        f->close();
+                                                } else {
+                                                        assert(fn->find('/'), 'cannot open: ./tmp/'..fn);
+                                                }
+                                        }
+                                        return ffi.preprocessor_cdef_backup(input); 
+                                }
+                        };
+                }
+        }
+};
+
+preprocessor.enable();
+
+/* interface */
+function preprocessor::Interface(args){
+    // First arg should be a filename
+    filename = args[1];
+
+    // Second arg will be flags
+    outfile = ""
+
+    table.remove(1, args);
+    flags = {}
+
+    for (i, v in pairs(args)){
+        if (v == "-d"){
+            preprocessor.DEBUG = true;
+        }else if (v == "-t"){
+            preprocessor.PRE_TEST = true;
+        }else if (v == "-f"){
+            preprocessor.FAST = true;
+        }else if (v == "-o"){
+            outfile = flags[i+1];
+        }else if (v == "-D"){
+            rest = v->sub(3)
+            key = rest->sub(1, rest->find("=")-1)
+            value = rest->sub(rest->find("=")+1)
+            flags[key] = value
+        }else if (v == "-h"){
+            print("Usage: cobaltpre [flags] <filename>")
+            print("Flags:")
+            print("  -d: Enable debug output")
+            print("  -t: Run unit tests")
+            print("  -f: Enable fast mode")
+            print("  -o: Output to file")
+            print("  -h: Show this help")
+            return;
+        }
+    }
+    
+    /* run */
+    compiled = preprocessor.compileFile(filename, flags);
+
+    if (outfile == ""){
+        error("No file to output to")
+    }else{
+        file = io.open(outfile, "w")
+        file->write(compiled)
+        file->close()
+    }
+}
+return preprocessor;

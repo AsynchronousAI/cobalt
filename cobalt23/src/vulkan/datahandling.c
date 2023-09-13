@@ -346,8 +346,8 @@ static const struct luaL_Reg Functions[] =
 
 void moonvulkan_open_datahandling(lua_State *L)
     {
-    if(sizeof(float)!=4) luaL_error(L, "MoonVulkan expects sizeof(float)==4");
-    if(sizeof(double)!=8) luaL_error(L, "MoonVulkan expects sizeof(double)==8");
+    if(sizeof(float)!=4) luaL_error(L, "Vulkan expects sizeof(float)==4");
+    if(sizeof(double)!=8) luaL_error(L, "Vulkan expects sizeof(double)==8");
     luaL_setfuncs(L, Functions, 0);
     }
 

@@ -44,12 +44,9 @@ static void AddVersions(lua_State *L)
     {
     int major, minor, rev;
     lua_pushstring(L, "_VERSION");
-    lua_pushstring(L, "MoonGLFW "MOONGLFW_VERSION);
-    lua_settable(L, -3);
-
-    lua_pushstring(L, "_GLFW_VERSION");
     glfw.GetVersion(&major, &minor, &rev);
     lua_pushfstring(L, "GLFW %d.%d.%d", major, minor, rev);
+    lua_settable(L, -3);
 #if 0
     lua_pushfstring(L, "GLFW %d.%d.%d release %d",
             GLFW_VERSION_MAJOR, GLFW_VERSION_MINOR, GLFW_VERSION_REVISION, GLFW_RELEASE);
@@ -59,7 +56,7 @@ static void AddVersions(lua_State *L)
     Version = MAKE_VERSION(major, minor, rev);
     if(!checkminversion(3, 1, 0))
         {
-        lua_pushfstring(L, "MoonGLFW requires GLFW version >= 3.1 (found version %d.%d.%d)",
+        lua_pushfstring(L, "Cobalt GLFW requires GLFW version >= 3.1 (found version %d.%d.%d)",
                             major, minor, rev);
         lua_error(L);
         }
@@ -143,7 +140,7 @@ static const struct luaL_Reg Functions[] =
     };
 
 
-LUALIB_API int luaopen_moonglfw(lua_State *L)
+LUAMOD_API int luaopen_moonglfw(lua_State *L)
 /* Lua calls this function to load the module */
     {
     moonglfw_L = L;
@@ -153,12 +150,12 @@ LUALIB_API int luaopen_moonglfw(lua_State *L)
     lua_newtable(L); /* the glfw table */
     moonglfw_open_enums(L);
     moonglfw_open_getproc(L);
-    AddVersions(L);
+    //AddVersions(L);
 
     /* Do not include hats in glfwGetJoystickButtons() if version >= 3.3.0 */
     if(checkminversion(3, 3, 0))
         glfw.InitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-
+    
     if(glfw.Init() != GL_TRUE)
         {
         const char *descr;
@@ -166,6 +163,7 @@ LUALIB_API int luaopen_moonglfw(lua_State *L)
         if(descr) return luaL_error(L, descr);
         return luaL_error(L, "glfwInit() failed");
         }
+    
     atexit(AtExit);
     glfw.SetErrorCallback(errorCallback);
 

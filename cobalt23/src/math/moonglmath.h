@@ -50,12 +50,12 @@ typedef double moonglmath_quat_t[4];
 typedef double complex moonglmath_complex_t;
 
 /* Metatables names (keys in the Lua registry) */
-#define MOONGLMATH_VEC_MT "moonglmath_vec"
-#define MOONGLMATH_BOX_MT "moonglmath_box"
-#define MOONGLMATH_RECT_MT "moonglmath_rect"
-#define MOONGLMATH_MAT_MT "moonglmath_mat"
-#define MOONGLMATH_QUAT_MT "moonglmath_quat"
-#define MOONGLMATH_COMPLEX_MT "moonglmath_complex"
+#define MOONGLMATH_VEC_MT "vec"
+#define MOONGLMATH_BOX_MT "box"
+#define MOONGLMATH_RECT_MT "rect"
+#define MOONGLMATH_MAT_MT "mat"
+#define MOONGLMATH_QUAT_MT "quat"
+#define MOONGLMATH_COMPLEX_MT "complex"
 
 int moonglmath_testmetatable(lua_State *L, int arg, const char *metatable);
 int moonglmath_checkmetatable(lua_State *L, int arg, const char *metatable);

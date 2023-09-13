@@ -15,7 +15,7 @@ static int AddVersions(lua_State *L)
     {
     int i = 0;
     lua_pushstring(L, "_VERSION");
-    lua_pushstring(L, "MoonVulkan "MOONVULKAN_VERSION);
+    lua_pushstring(L, VK_HEADER_VERSION);
     lua_settable(L, -3);
 
     lua_pushstring(L, "HEADER_VERSION");

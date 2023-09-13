@@ -11,41 +11,41 @@
 #include "udata.h"
 
 /* Objects' metatable names */
-#define INSTANCE_MT "moonvulkan_instance"
-#define PHYSICAL_DEVICE_MT "moonvulkan_physical_device"
-#define DEVICE_MT "moonvulkan_device"
-#define QUEUE_MT "moonvulkan_queue"
-#define COMMAND_POOL_MT "moonvulkan_command_pool"
-#define COMMAND_BUFFER_MT "moonvulkan_command_buffer"
-#define SEMAPHORE_MT "moonvulkan_semaphore"
-#define FENCE_MT "moonvulkan_fence"
-#define BUFFER_MT "moonvulkan_buffer"
-#define DEVICE_MEMORY_MT "moonvulkan_device_memory"
-#define IMAGE_MT "moonvulkan_image"
-#define EVENT_MT "moonvulkan_event"
-#define QUERY_POOL_MT "moonvulkan_query_pool"
-#define BUFFER_VIEW_MT "moonvulkan_buffer_view"
-#define IMAGE_VIEW_MT "moonvulkan_image_view"
-#define SHADER_MODULE_MT "moonvulkan_shader_module"
-#define PIPELINE_CACHE_MT "moonvulkan_pipeline_cache"
-#define PIPELINE_MT "moonvulkan_pipeline"
-#define PIPELINE_LAYOUT_MT "moonvulkan_pipeline_layout"
-#define SAMPLER_MT "moonvulkan_sampler"
-#define DESCRIPTOR_SET_LAYOUT_MT "moonvulkan_descriptor_set_layout"
-#define DESCRIPTOR_POOL_MT "moonvulkan_descriptor_pool"
-#define DESCRIPTOR_SET_MT "moonvulkan_descriptor_set"
-#define FRAMEBUFFER_MT "moonvulkan_framebuffer"
-#define RENDER_PASS_MT "moonvulkan_render_pass"
+#define INSTANCE_MT "vulkan_instance"
+#define PHYSICAL_DEVICE_MT "vulkan_physical_device"
+#define DEVICE_MT "vulkan_device"
+#define QUEUE_MT "vulkan_queue"
+#define COMMAND_POOL_MT "vulkan_command_pool"
+#define COMMAND_BUFFER_MT "vulkan_command_buffer"
+#define SEMAPHORE_MT "vulkan_semaphore"
+#define FENCE_MT "vulkan_fence"
+#define BUFFER_MT "vulkan_buffer"
+#define DEVICE_MEMORY_MT "vulkan_device_memory"
+#define IMAGE_MT "vulkan_image"
+#define EVENT_MT "vulkan_event"
+#define QUERY_POOL_MT "vulkan_query_pool"
+#define BUFFER_VIEW_MT "vulkan_buffer_view"
+#define IMAGE_VIEW_MT "vulkan_image_view"
+#define SHADER_MODULE_MT "vulkan_shader_module"
+#define PIPELINE_CACHE_MT "vulkan_pipeline_cache"
+#define PIPELINE_MT "vulkan_pipeline"
+#define PIPELINE_LAYOUT_MT "vulkan_pipeline_layout"
+#define SAMPLER_MT "vulkan_sampler"
+#define DESCRIPTOR_SET_LAYOUT_MT "vulkan_descriptor_set_layout"
+#define DESCRIPTOR_POOL_MT "vulkan_descriptor_pool"
+#define DESCRIPTOR_SET_MT "vulkan_descriptor_set"
+#define FRAMEBUFFER_MT "vulkan_framebuffer"
+#define RENDER_PASS_MT "vulkan_render_pass"
 /* extensions objects */
-#define SURFACE_MT "moonvulkan_surface" /* KHR */
-#define SWAPCHAIN_MT "moonvulkan_swapchain" /* KHR */
-#define DISPLAY_MT "moonvulkan_display" /* KHR */
-#define DISPLAY_MODE_MT "moonvulkan_display_mode" /* KHR */
-#define DEBUG_REPORT_CALLBACK_MT "moonvulkan_debug_report_callback" /* EXT */
-#define DESCRIPTOR_UPDATE_TEMPLATE_MT "moonvulkan_descriptor_update_template"
-#define VALIDATION_CACHE_MT "moonvulkan_validation_cache" /* EXT */
-#define SAMPLER_YCBCR_CONVERSION_MT "moonvulkan_sampler_ycbcr_conversion"
-#define DEBUG_UTILS_MESSENGER_MT "moonvulkan_debug_utils_messenger" /* EXT */
+#define SURFACE_MT "vulkan_surface" /* KHR */
+#define SWAPCHAIN_MT "vulkan_swapchain" /* KHR */
+#define DISPLAY_MT "vulkan_display" /* KHR */
+#define DISPLAY_MODE_MT "vulkan_display_mode" /* KHR */
+#define DEBUG_REPORT_CALLBACK_MT "vulkan_debug_report_callback" /* EXT */
+#define DESCRIPTOR_UPDATE_TEMPLATE_MT "vulkan_descriptor_update_template"
+#define VALIDATION_CACHE_MT "vulkan_validation_cache" /* EXT */
+#define SAMPLER_YCBCR_CONVERSION_MT "vulkan_sampler_ycbcr_conversion"
+#define DEBUG_UTILS_MESSENGER_MT "vulkan_debug_utils_messenger" /* EXT */
 
 /* Userdata memory associated with objects */
 #define ud_t moonvulkan_ud_t

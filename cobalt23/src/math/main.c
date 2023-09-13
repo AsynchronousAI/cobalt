@@ -39,9 +39,6 @@ static void AtExit(void)
 static int AddVersions(lua_State *L)
 /* Add version strings to the gl table */
     {
-    lua_pushstring(L, "_VERSION");
-    lua_pushstring(L, "MoonGLMATH "MOONGLMATH_VERSION);
-    lua_settable(L, -3);
     return 0;
     }
 

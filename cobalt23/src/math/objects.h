@@ -43,7 +43,7 @@ typedef struct {
 /*------------------------------------------------------*/
 
 /* Objects' metatable names */
-#define HOSTMEM_MT "moonglmath_hostmem"
+#define HOSTMEM_MT "hostmem"
 
 /* Userdata memory associated with objects */
 #define ud_t moonglmath_ud_t

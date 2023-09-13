@@ -188,10 +188,9 @@ static int pmain(lua_State* L) {
       "<PROCESS>")'"
       */
       char command[256];
-      snprintf(
-          command, sizeof(command),
-          "cobalt -e 'import(\"preprocess\")(\"%s\", \"file\", true, \"%s\")'",
-          filename, process);
+      snprintf(command, sizeof(command),
+            "cobalt -e 'import(\"preprocess\")->Interface(\"%s\", \"-o\", \"%s\")'",
+            filename, process);
       // printf(command);
       FILE* fp;
       char path[1035];

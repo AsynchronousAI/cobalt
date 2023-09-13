@@ -98,7 +98,7 @@ static const char *txtToken(LexState *ls, int token) {
 
 static l_noret lexerror(LexState *ls, const char *msg, int token) {
   msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);
-  if (token) luaO_pushfstring(ls->L, "%s near %s", msg, txtToken(ls, token));
+  if (token) luaO_pushfstring(ls->L, "\033[3;31m[SYNTAXERR]\033[0m\033[31m\t%s near %s\033[0m", msg, txtToken(ls, token));
   luaD_throw(ls->L, LUA_ERRSYNTAX);
 }
 

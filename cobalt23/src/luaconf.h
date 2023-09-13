@@ -468,7 +468,9 @@
 /*
 ** Should warnings be enabled
 */
-#define COBALT_WARNING 1
+#ifndef COBALT_WARNING
+#define COBALT_WARNING 0
+#endif
 
 /*
 @@ LUA_UNSIGNED is the unsigned version of LUA_INTEGER.

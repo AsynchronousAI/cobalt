@@ -40,6 +40,7 @@ static char *provided_input_filename = NULL;
 static char *module_name = NULL;
 
 int aotswitches = 0;
+int preprocessor = 1;
 
 static FILE *output_file = NULL;
 static int nfunctions = 0;
@@ -85,7 +86,6 @@ static void printnl() {
 static void doargs(int argc, char **argv) {
   program_name = argv[0];
 
-  int preprocessor = 1;
   int do_opts = 1;
   int npos = 0;
   for (int i = 1; i < argc; i++) {
@@ -163,36 +163,37 @@ int main(int argc, char **argv) {
   replace_dots(module_name);
 
   // Run preprocessor
-  char command[256];
-  // set process to input_filename+.ii
   char process[256];
-  if (provided_input_filename == NULL) {
-    strcpy(process, input_filename);
-    strcat(process, ".cii");
-  } else {
-    strcpy(process, provided_input_filename);
-  }
+  if (preprocessor == 1){
+    char command[256];
+    // set process to input_filename+.ii
+    if (provided_input_filename == NULL) {
+      strcpy(process, input_filename);
+      strcat(process, ".cii");
+    } else {
+      strcpy(process, provided_input_filename);
+    }
 
-  snprintf(command, sizeof(command),
-           "cobalt -e 'import(\"preprocess\")(\"%s\", \"file\", true, \"%s\")'",
-           input_filename, process);
-  // printf(command);
-  FILE *fp;
-  char path[1035];
-  fp = popen(command, "r");
-  if (fp == NULL) {
-    printf("Failed to run preprocessor\n");
-    exit(1);
+    snprintf(command, sizeof(command),
+            "cobalt -e 'import(\"preprocess\")->Interface(\"%s\", \"-o\", \"%s\")'",
+            input_filename, process);
+    // printf(command);
+    FILE *fp;
+    char path[1035];
+    fp = popen(command, "r");
+    if (fp == NULL) {
+      printf("Failed to run preprocessor\n");
+      exit(1);
+    }
+    while (fgets(path, sizeof(path) - 1, fp) != NULL) {
+      printf("%s", path);
+    }
+    pclose(fp);
   }
-  while (fgets(path, sizeof(path) - 1, fp) != NULL) {
-    printf("%s", path);
-  }
-  pclose(fp);
-
   // Read the input
 
   lua_State *L = luaL_newstate();
-  if (luaL_loadfile(L, process) != LUA_OK) {
+  if (luaL_loadfile(L, preprocessor == 1 ? process : input_filename) != LUA_OK) {
     fatal_error(lua_tostring(L, -1));
   }
   Proto *proto = getproto(s2v(L->top - 1));

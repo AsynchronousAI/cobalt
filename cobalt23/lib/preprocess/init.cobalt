@@ -1,3 +1,8 @@
+/* ============================================================================== //
+// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
+// License. Read `cobalt.h` for license information.                              //
+// ============================================================================== */
+
 var preprocessor = {};
 var ok, bit = require("bit");
 coroutine = coroutine ? coroutine : (pcall(require, "coroutine") ? require("coroutine") : thread); /* for beta versions of cobalt */
@@ -125,8 +130,13 @@ var FUNCMACRO = STARTL.."("..IDENTIFIER..")%(([_%s%w,]*)%)%s*(.*)";
 // LOCAL UTILS
 // ------------
 preprocessor.STATE = {lineno = 0}; // current state for debugging the last operation
-var function error(msg) { _G.print(debug.traceback()); _G.error(string.format("preprocessor ERR [%04i] %s", preprocessor.STATE.lineno, msg)); }
-var function print(msg) { _G.print(string.format("preprocessor INF [%04i] %s", preprocessor.STATE.lineno, msg)); }
+var function error(msg) { 
+    print(string.format("\x1b[1;31mpreprocessor (ERROR) [%04i] %s\x1b[0m", preprocessor.STATE.lineno, msg)); 
+    os.exit(1);
+}
+var function print(msg) { 
+    _G.print(string.format("preprocessor (LOG) [%04i] %s", preprocessor.STATE.lineno, msg));
+ }
 
 // splits a string using a pattern into a table of substrings
 var function gsplit(str, pat) {
@@ -1302,477 +1312,7 @@ function preprocessor.test(suppressMsg) {
                 }
         };
 
-        var testpreprocessor = [=[
-                assert(LINE == 1, "_LINE_ macro test 1: LINE")
-                // This test uses PRE with lua code (uncommon but possible)
-                assert(LINE == 3, "_LINE_ macro test 3: LINE")
-                /* 
-                 * It therefore asserts any if/else/macro functions and various syntaxes
-                 * (including this comment, that would cause errors if not filtered)
-                 */
-                assert(LINE == 8, "_LINE_ macro test 8: LINE")
-                /*
-                 assert(false, "multi-line comment not removed")
-                 */
-                /* pathological case which contains single line comment start in multiline comments.
-                 * e.g. this multiline comment should be finish next line.
-                 * http://foobar.com */ // comment
-                /* if singleline comment processes first, sometimes indicator of end of multiline loss */ #define THIS_SHOULD_ENABLE 111 /*
-                        continuous multiline comment after macro definition
-                //*/
-                ///* this removed.
-                assert(THIS_SHOULD_ENABLE == 111, "pathological multiline comment test")
-
-
-                #define TRUE
-                #define ONE (1)
-                #define TWO (2)
-                #define THREE_FUNC(x) (3)
-                #define LEET 0x1337
-                #define CLONG 123456789L
-                #define CLONGLONG 123456789123456789LL
-                #define CULONG 12345678UL
-                #define CUINT 123456U
-                #define BINARY -0b1001 /* -9 */
-                #define OCTET 075 /* 61 */
-                #define NON_OCTET 75
-                #define HEX 0xffffU
-                #define P(x) x
-                #define WCHAR_ZERO L'\0'
-                #  define NCURSES_IMPEXP
-                #  define NCURSES_API
-                #  define NCURSES_EXPORT(type) NCURSES_IMPEXP type NCURSES_API
-                #define MACRO_TO_ITSELF MACRO_TO_ITSELF
-                local MACRO_TO_ITSELF = 111
-                assert(MACRO_TO_ITSELF == 111, "can process macro to itself")
-                assert(WCHAR_ZERO == 0, "wchar evaluate fails")
-                assert(CLONG == 123456789, "read *L fails")
-                assert(CLONGLONG == 123456789123456789, "read *LL fails")
-                assert(CULONG == 12345678, "read *UL fails")
-                assert(HEX == 65535, "read hex fails")
-                #if CUINT != 123456U
-                assert(false, "cannot evaluate number which contains Unsinged postfix correctly")
-                #else
-                assert(CUINT == 123456, "read *U fails")
-                #endif
-                #pragma ignored
-                assert P((BINARY == -9, "parse, binary literal fails"))
-                assert(OCTET == 61 and NON_OCTET == 75, "parse octet literal fails")
-
-                preprocessor_test.assertTrue()
-                assert(LEET == 0x1337, "simple #define replacement")
-                local msg
-                /* function to check macro expand to empty */
-                local function check_argnum(...)
-                        return select('#', ...)
-                end
-                NCURSES_EXPORT(function) test_export(a)
-                        return a + 1
-                end
-                assert(test_export(2) == 3, "EXPORT style macro")
-                local macrofunc = function P((
-                        a, b))
-                        return a + b
-                end
-                assert(macrofunc(1, 2) == 3, "macro arg contains parenthese")
-
-                msg = "tenary operator test"
-                #if (HEX % 2 == 1 ? CUINT : CULONG) == 123456
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."1")
-                #endif
-                #if (OCTET % 2 == 0 ? CUINT : CULONG) == 123456
-                        assert(false, msg.."1")
-                #else
-                        preprocessor_test.assertTrue()
-                #endif
-
-
-
-
-                # if defined TRUE 
-                        preprocessor_test.assertTrue() -- valid strange syntax test (spaces and missing brackets)
-                # endif
-
-
-                msg = "#define if/else test"
-                #ifdef TRUE
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."1")
-                #endif
-                #ifdef NOTDEFINED
-                        assert(false, msg.."2")
-                #else
-                        preprocessor_test.assertTrue()
-                #endif
-                #ifndef NOTDEFINED
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."3")
-                #endif
-
-
-                msg = "#if defined statement test"
-                #if defined(TRUE)
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."1")
-                #endif
-                #if !defined(LEET) && !defined(TRUE)
-                        assert(false, msg.."2")
-                #endif
-                #if !defined(NOTLEET) && !defined(NOTDEFINED)
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."3")
-                #endif
-                #if !(defined(LEET) && defined(TRUE))
-                        assert(false, msg.."4")
-                #else
-                        preprocessor_test.assertTrue()
-                #endif
-                #if !defined(LEET) && !defined(TRUE)
-                        assert(false, msg.."5")
-                #endif
-                #if defined(LEET) && defined(TRUE) && defined(NOTDEFINED)
-                        assert(false, msg.."6")
-                #endif
-                #if ONE + TWO * TWO == 5
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."7")
-                #endif
-                #if (ONE + TWO) * TWO == 0x6
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."8")
-                #endif
-                #if ONE * TWO + ONE / TWO == 2.5
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."9")
-                #endif
-                #if ONE + ONE * TWO / TWO == 2
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."10")
-                #endif
-                #if TWO - - TWO == 4
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."11")
-                #endif
-                #if (TWO - - TWO) % (ONE + TWO) == 1
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."12")
-                #endif
-                #if ONE << TWO + TWO >> ONE == 8
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."13")
-                #endif
-                #if (ONE << TWO) + (TWO >> ONE) == 5
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."14")
-                #endif
-                #if (ONE << TWO) + TWO >> ONE == 3
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."15")
-                #endif
-                #if (THREE_FUNC(0xfffffU) & 4) == 0
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."16")
-                #endif
-                #if (0x3 & THREE_FUNC("foobar")) == 0b11
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."17")
-                #endif
-                #if defined(TWO) && ((TWO-0) < 3)
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."17")
-                #endif
-                #if TWO == 1--1 
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."18")
-                #endif
-                #if HEX > 0xfFfFU 
-                        assert(false, msg.."18")
-                #else
-                        preprocessor_test.assertTrue()
-                #endif
-                #define TRUE_DEFINED defined(TRUE)
-                #if TRUE_DEFINED
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."19")
-                #endif
-                #define NOTDEFINED_DEFINED defined(TRUE) && defined(NOTDEFINED)
-                #if NOTDEFINED_DEFINED
-                        assert(false, msg.."20")
-                #else
-                        preprocessor_test.assertTrue()
-                #endif
-                #if LEET && LEET > 0x1336
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."20")
-                #endif
-                #if NOTLEET && NOTLEET > 0x1336
-                        assert(false, msg.."21")
-                #else
-                        preprocessor_test.assertTrue()
-                #endif
-                #if defined(NOTLEET) || BINARY + 0 >= 10L || !defined(TRUE)
-                        assert(false, msg.."22")
-                #else
-                        preprocessor_test.assertTrue()
-                #endif
-
-
-
-                msg = "macro chaining"
-                #define FOO 0x7B
-                #define BAR (FOO+0x7B)
-                assert(-BAR == -0x7B*2, msg)
-                #define BAZ 456
-                #define BLUR BA##Z
-                assert(BLUR == 456, msg)
-                local testfunc = function (x) return "["..tostring(x).."]" end
-                #define FOOBAR(x) testfunc(x)
-                assert(FOOBAR(1) == "[1]", msg)
-                #define testfunc(x)
-                #define FOOBAZ(x) testfunc(x)
-                assert(check_argnum(FOOBAR(1)) == 0, msg)
-                assert(check_argnum(FOOBAZ(1)) == 0, msg)
-                #undef testfunc
-                assert(FOOBAR(1) == "[1]", msg)
-                assert(FOOBAZ(1) == "[1]", msg)
-
-
-                msg = "indentation test"
-                assert(PRE_INDENT == 0, msg.."1")
-                #if defined(TRUE)
-                        assert(PRE_INDENT == 1, msg.."2")
-                #endif
-                assert(PRE_INDENT == 0, msg.."3")
-
-
-                #define PRE_FUNCTION_1(x, y) (x and not y)
-                assert(PRE_FUNCTION_1(true, false), "function macro")
-                #define PRE_FUNCTION_2(x, y) \
-                        (not x \
-                         and y)
-                assert(PRE_FUNCTION_2(false, true), "multiline function macro")
-                #define PRE_FUNCTION_3(_x, _y) PRE_FUNCTION_2(_x, _y)
-                assert(PRE_FUNCTION_3(false, true), "function macro with argname contains _")
-
-                #define PRE_FUNCTION_4_CHILD() false
-                #define PRE_FUNCTION_4(_x)
-
-                assert(check_argnum(PRE_FUNCTION_4(PRE_FUNCTION_4_CHILD())) == 0, "functional macro which receives functional macro as argument")
-                assert(check_argnum(PRE_FUNCTION_4(PRE_FUNCTION_3(true, true))) == 0, "functional macro which receives functional macro as argument2")
-
-                #define PRE_FUNCTION_5(x, y) (x) + (x) + (y) + (y)
-                assert(PRE_FUNCTION_5(10, 20) == 60, "macro argument multiple usage")
-
-                #define PRE_NOT_FUNCTION (BLUR)
-                assert(PRE_NOT_FUNCTION == 456, "if space between macro name and argument definition exists, it is regarded as replacement macro")
-
-                #define CONCAT(x, y, z, w) x ## y ## z (w)
-                local fncall = function (x) return x + 111 end
-                assert(111 == CONCAT(   ,   fnc , all, 0 ), "funcall fails")
-                assert(222 == CONCAT(   ,, fncall, 111  ), "funcall fails2")
-                #define ATTRIB_CALL(x, y, attrib) attribute(x, y, attrib)
-                local attribute = function (x, y, attr) 
-                        return attr * (x + y)
-                end
-                assert(ATTRIB_CALL(  1, 2  , 100 ) == 300, "funcall fails3")
-
-
-                msg = "#elif test"
-                #if defined(NOTDEFINED)
-                        -- it should not be processed
-                        #if NOTDEFINED
-                        #else
-                        assert(false, msg.."1")
-                        #endif
-                #elif defined(NOTDEFINED)
-                        assert(false, msg.."2")
-                #elif defined(TRUE)
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."3")
-                #endif
-
-
-                msg = "#else if test"
-                #if defined(NOTDEFINED)
-                        assert(false, msg.."1")
-                #else if defined(NOTDEFINED)
-                        assert(false, msg.."2")
-                #else if defined(TRUE)
-                        preprocessor_test.assertTrue()
-                #else
-                        assert(false, msg.."3")
-                #endif
-
-
-                msg = "bock stack tree test"
-                #ifdef TRUE
-                        #ifdef NOTDEFINED
-                                assert(false, msg.."1")
-                        #elif defined(TRUE)
-                                preprocessor_test.assertTrue()
-                        #else
-                                assert(false, msg.."2")
-                        #endif
-                #else
-                        assert(false, msg.."3")
-                #endif
-                #ifdef NOTDEFINED
-                        #ifdef TRUE
-                                assert(false, msg.."4")
-                        #endif
-                #endif
-
-                msg = "test concat ## operator"
-                #define CONCAT_TEST1 foo##bar
-                local CONCAT_TEST1 = "blubb"
-                assert(foobar == "blubb", msg)
-                #define CONCAT_TEST2() bar##foo
-                local CONCAT_TEST2() = "blubb"
-                assert(barfoo == "blubb", msg)
-                -- dont process ## within strings
-                #define CONCAT_TEST3 "foo##bar" 
-                assert(CONCAT_TEST3 == "foo##bar", msg)
-                msg = "test concat inside func type macro"
-                #define CONCAT_TEST4(baz) CONCAT_TEST##baz
-                local CONCAT_TEST4(1) = "bazbaz"
-                assert(foobar == "bazbaz", msg)
-
-                msg = "#undef test"
-                #define UNDEF_TEST 
-                #undef UNDEF_TEST
-                #ifdef UNDEF_TEST
-                        assert(false, msg)
-                #endif
-
-                msg = "stringify operator(#) test"
-                #define STRINGIFY(str) #str
-                assert(STRINGIFY(abcde) == "abcde", msg)
-                #define STRINGIFY_AND_CONCAT(str1, str2) #str1 ## \
-                #str2
-                assert(STRINGIFY_AND_CONCAT(fgh, ij) == "fghij", msg)
-
-                #define msg_concat(msg1, msg2) msg1 ## msg2
-                assert("I, am, preprocessor" == msg_concat("I, am", ", preprocessor"), "processing macro argument which includes ,")
-
-                #define FUNCARG 500
-                #define ARG 100
-                #define FUNC(x) FUNC##x
-                assert(FUNC(ARG) == 500, "create new macro symbol by concat")
-
-                msg = "same macro definition which has exactly same value allows. (checked with gcc 4.4.7 WORDSIZE)"
-                #define DUP_MACRO_DEF (111)
-                #define DUP_MACRO_DEF (111)
-                #define DUP_FUNC_MACRO(x, y) x + y
-                #define DUP_FUNC_MACRO(x, y) x + y
-
-
-                msg = "check #if conditional check"
-                #define VALUE1 (123)
-                #if VALUE1 != 123 
-                        assert(false, msg .." #if " .. tostring(VALUE1) .. " != 123")
-                #endif
-                #if 123 != VALUE1 
-                        assert(false, msg .." #if " .. tostring(VALUE1) .. " != 123 (2)")
-                #endif
-
-                #define VALUE2 ("hoge")
-                #if VALUE2 == "hoge"
-                        #define VALUE3 (true)
-                #endif
-                assert(VALUE3 == true, msg .. " #if " .. tostring(VALUE3) .. " == true")
-
-                #define VALUE4 (VALUE1 + VALUE1)
-                #if VALUE4 != 246 
-                        assert(false, msg .." #if check for nested definition:" .. tostring(VALUE4))
-                #endif
-
-                msg = "+-*/<> in #if expression:"
-                #define CALC_VALUE_A (1)
-                #define CALC_VALUE_B (2)
-                #if (CALC_VALUE_A + CALC_VALUE_B) != 3
-                        assert(false, msg .. " + not work:")
-                #endif
-                #if (CALC_VALUE_A * CALC_VALUE_B) != 2
-                        assert(false, msg .. " * not work:")
-                #endif
-                #if (CALC_VALUE_A - CALC_VALUE_B) != -1
-                        assert(false, msg .. " - not work:")
-                #endif
-                #if (CALC_VALUE_A / CALC_VALUE_B) != 0.5
-                        assert(false, msg .. " / not work:")
-                #endif
-
-                #if (CALC_VALUE_A >= CALC_VALUE_A)
-                #else
-                        assert(false, msg .. " >= not work1")
-                #endif
-                #if (CALC_VALUE_B >= CALC_VALUE_A)
-                #else
-                        assert(false, msg .. " >= not work2")
-                #endif
-
-                #if (CALC_VALUE_B <= CALC_VALUE_B)
-                #else
-                        assert(false, msg .. " <= not work1")
-                #endif
-                #if (CALC_VALUE_A <= CALC_VALUE_B)
-                #else
-                        assert(false, msg .. " <= not work2")
-                #endif
-
-                #if (CALC_VALUE_B > CALC_VALUE_A)
-                #else
-                        assert(false, msg .. " > not work1")
-                #endif
-                #if (CALC_VALUE_A > CALC_VALUE_A)
-                        assert(false, msg .. " > not work2")
-                #endif
-
-                #if (CALC_VALUE_A < CALC_VALUE_B)
-                #else
-                        assert(false, msg .. " < not work1")
-                #endif
-                #if (CALC_VALUE_B < CALC_VALUE_B)
-                        assert(false, msg .. " < not work2")
-                #endif
-                #if (CALC_VALUE_B | CALC_VALUE_A) != 3
-                        assert(false, msg .. " | not work")
-                #endif
-                #if (CALC_VALUE_B & CALC_VALUE_A) != 0
-                        assert(false, msg .. " &         not work")
-                #endif
-                #if (CALC_VALUE_B ^ CALC_VALUE_A) != 3
-                        assert(false, msg .. " ^ not work")
-                #endif
-                #if -CALC_VALUE_B != -2
-                        assert(false, msg .. " unary - not work")
-                #endif
-                #if ~CALC_VALUE_B != -3
-                        assert(false, msg .. " unary ~ not work")
-                #endif
-        ]=];
+        var testpreprocessor = [=[]=];
         preprocessor.FAST = false;      // enable full valid output for testing
         preprocessor.SELF_TEST = true;
         var testlua = preprocessor.compile(testpreprocessor);
@@ -1854,15 +1394,17 @@ preprocessor.enable = function() {
 preprocessor.enable();
 
 /* interface */
-function preprocessor::Interface(args){
+function preprocessor::Interface(...){
+    args = {...};
+
     // First arg should be a filename
     filename = args[1];
 
     // Second arg will be flags
-    outfile = ""
+    outfile = "";
 
-    table.remove(1, args);
-    flags = {}
+    table.remove(args, 1);
+    flags = {};
 
     for (i, v in pairs(args)){
         if (v == "-d"){
@@ -1872,20 +1414,20 @@ function preprocessor::Interface(args){
         }else if (v == "-f"){
             preprocessor.FAST = true;
         }else if (v == "-o"){
-            outfile = flags[i+1];
+            outfile = args[i+1];
         }else if (v == "-D"){
-            rest = v->sub(3)
-            key = rest->sub(1, rest->find("=")-1)
-            value = rest->sub(rest->find("=")+1)
-            flags[key] = value
+            rest = v->sub(3);
+            key = rest->sub(1, rest->find("=")-1);
+            value = rest->sub(rest->find("=")+1);
+            flags[key] = value;
         }else if (v == "-h"){
-            print("Usage: cobaltpre [flags] <filename>")
-            print("Flags:")
-            print("  -d: Enable debug output")
-            print("  -t: Run unit tests")
-            print("  -f: Enable fast mode")
-            print("  -o: Output to file")
-            print("  -h: Show this help")
+            print("Usage: cobaltpre [flags] <filename>");
+            print("Flags:");
+            print("  -d: Enable debug output");
+            print("  -t: Run unit tests");
+            print("  -f: Enable fast mode");
+            print("  -o: Output to file");
+            print("  -h: Show this help");
             return;
         }
     }
@@ -1893,12 +1435,13 @@ function preprocessor::Interface(args){
     /* run */
     compiled = preprocessor.compileFile(filename, flags);
 
-    if (outfile == ""){
-        error("No file to output to")
+    if (outfile == "" || !outfile){
+        error("No file to output to");
     }else{
-        file = io.open(outfile, "w")
-        file->write(compiled)
-        file->close()
+        file = io.open(outfile, "w");
+        file->write(compiled);
+        file->close();
     }
 }
+
 return preprocessor;

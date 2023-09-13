@@ -1,4 +1,1 @@
-var z: int = "Rug roh raggy!"
-
-
-print(1&&1)
+print("Hi")

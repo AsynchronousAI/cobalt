@@ -224,12 +224,15 @@ static void var_check_unique_or_shadow(LexState *ls, FuncState *fs,
       Vardesc *vd = dyd->actvar.arr + vidx;
       if (vd && name == vd->vd.name) {
         if (vidx <= first_block_local) {
+          /*
           int saved_top = lua_gettop(ls->L);
           luaX_syntaxwarning(
               ls, luaO_pushfstring(
                       ls->L, "Name [%s] already declared will be shadowed",
                       str_name));
           lua_settop(ls->L, saved_top);
+          */ 
+          /* disabled warnings (they are annoying and uneeded)*/
         } else if (!shadowOnly) {
           luaX_syntaxerror(
               ls,

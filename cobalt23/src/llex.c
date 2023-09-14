@@ -790,8 +790,9 @@ static int llex(LexState *ls, SemInfo *seminfo) {
         return '%';
       }
       case '`': /* format literal strings */
-        read_format_string(ls, ls->current, seminfo);
-        return TK_FSTRING;
+        lexerror(ls, "format strings not supported", TK_STRING);
+        //read_format_string(ls, ls->current, seminfo);
+        //return TK_FSTRING;
       case '"':
       case '\'': { /* short literal strings */
         read_string(ls, ls->current, seminfo);

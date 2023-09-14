@@ -895,8 +895,10 @@ static void recfield(LexState *ls, ConsControl *cc) {
   if (ls->t.token == TK_NAME) {
     checklimit(fs, cc->nh, MAX_INT, "items in a constructor");
     codename(ls, &key);
-  } else if (ls->t.token == TK_STRING || ls->t.token == TK_FSTRING) {
+  } else if (ls->t.token == TK_STRING) {
     sindex(ls, &key);
+  } else if (ls->t.token == TK_FSTRING) {
+    luaX_syntaxerror(ls, "formatted strings cannot be used as a key");
   } else /* ls->t.token == '[' */
     yindex(ls, &key);
   cc->nh++;
@@ -939,11 +941,14 @@ static void listfield(LexState *ls, ConsControl *cc) {
   cc->tostore++;
 }
 
+#include <stdio.h>
+
 static void field(LexState *ls, ConsControl *cc) {
   /* field -> listfield | recfield */
   switch (ls->t.token) {
     case TK_STRING:
     case TK_FSTRING:
+      printf("field: TK_STRING\n");
     case TK_NAME: { /* may be 'listfield' or 'recfield' */
       int ntk = luaX_lookahead(ls);
       if (!((ntk == '=') || (ntk == ':'))) /* expression? */
@@ -1338,6 +1343,8 @@ static BinOpr getbinopr(int op) {
       return OPR_SHL;
     case TK_SHR:
       return OPR_SHR;
+    case TK_FSTRING:
+      return OPR_CONCAT;
     case TK_CONCAT:
       return OPR_CONCAT;
     case TK_NE:

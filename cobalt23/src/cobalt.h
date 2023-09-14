@@ -362,6 +362,71 @@ LUA_API void(lua_closeslot)(lua_State *L, int idx);
 
 /*
 ** {==============================================================
+** Typechecker
+** ===============================================================
+*/
+#define cobaltT_checkBoolean(L, narg) \
+  (lua_type(L, (narg)) == LUA_TBOOLEAN || luaL_typeerror(L, (narg), "boolean"))
+
+#define cobaltT_checkInteger(L, narg) \
+  (lua_type(L, (narg)) == LUA_TNUMBER || luaL_typeerror(L, (narg), "integer"))
+
+#define cobaltT_checkNumber(L, narg) \
+  (lua_type(L, (narg)) == LUA_TNUMBER || luaL_typeerror(L, (narg), "number"))
+
+#define cobaltT_checkString(L, narg) \
+  (lua_type(L, (narg)) == LUA_TSTRING || luaL_typeerror(L, (narg), "string"))
+
+#define cobaltT_checkTable(L, narg) \
+  (lua_type(L, (narg)) == LUA_TTABLE || luaL_typeerror(L, (narg), "table"))
+
+#define cobaltT_checkFunction(L, narg) \
+  (lua_type(L, (narg)) == LUA_TFUNCTION || luaL_typeerror(L, (narg), "function"))
+
+#define cobaltT_checkThread(L, narg) \
+  (lua_type(L, (narg)) == LUA_TTHREAD || luaL_typeerror(L, (narg), "thread"))
+
+#define cobaltT_checkUserdata(L, narg) \
+  (lua_type(L, (narg)) == LUA_TUSERDATA || luaL_typeerror(L, (narg), "userdata"))
+
+#define cobaltT_checkAny(L, narg) (lua_type(L, (narg)) != LUA_TNONE)
+
+#define cobaltT_checkChar(L, narg) \
+  ((lua_type(L, (narg)) == LUA_TSTRING || luaL_typeerror(L, (narg), "string")) && \
+   lua_rawlen(L, (narg)) == 1)
+
+#define cobaltT_optBoolean(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkBoolean(L, (narg)))
+
+#define cobaltT_optInteger(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkInteger(L, (narg)))
+
+#define cobaltT_optNumber(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkNumber(L, (narg)))
+
+#define cobaltT_optString(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkString(L, (narg)))
+
+#define cobaltT_optTable(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkTable(L, (narg)))
+
+#define cobaltT_optFunction(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkFunction(L, (narg)))
+
+#define cobaltT_optThread(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkThread(L, (narg)))
+
+#define cobaltT_optUserdata(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkUserdata(L, (narg)))
+
+#define cobaltT_optChar(L, narg, d) \
+  (lua_type(L, (narg)) == LUA_TNONE ? (d) : cobaltT_checkChar(L, (narg)))
+
+
+/* }============================================================== */
+
+/*
+** {==============================================================
 ** compatibility macros
 ** ===============================================================
 */

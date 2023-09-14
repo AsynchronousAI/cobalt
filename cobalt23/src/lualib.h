@@ -75,9 +75,6 @@ LUAMOD_API int(luaopen_signal)(lua_State *L);
 #define LUA_FILESYSTEMNAME "file"
 LUAMOD_API int(luaopen_lfs)(lua_State *L);
 
-#define LUA_REGEXNAME "regex"
-LUAMOD_API int(luaopen_regex)(lua_State *L);
-
 #define LUA_SOCKETNAME "msg"
 LUAMOD_API int(luaopen_chan)(lua_State *L);
 

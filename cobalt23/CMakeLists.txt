@@ -9,7 +9,6 @@ set(LUA_LIB_SRCS
     "src/lfpconv.c"
     "src/lstrbuf.c"
     "src/lulib.c"
-    "src/lregex.c"
     "src/ldo.c"
     "src/ldump.c"
     "src/lautoc.c"

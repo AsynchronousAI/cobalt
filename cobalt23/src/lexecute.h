@@ -3,31 +3,37 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+/*
+lexecute.h is a huge script added to the Cobalt source code to switch
+between the different VMs dynamically. 
+
+This is responsible for the following:
+- Primary executer/interpreter
+- Handling AOT execution (AOT_IS_MODULE)
+- Binding to the JIT (LLVM) 
+- Using `llangstate.h` to allow the user to switch between VMs at runtime
+- Using `minicobalt.c` for a miniture execution engine
+*/
 #include <stdio.h>
 #include "llangstate.h"
-
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-/* Include LLVM */
-#include "ljit.h"
-#endif
 
 
 #define VM_CASE(name) \
   vmcase(OP_##name)  // just a macro to make the code more readable
 
-
 // AOT Executer
 #if defined(AOT_IS_MODULE)
-// Internal AOT Executer
 static CallInfo *luaV_execute_(lua_State *L, CallInfo *ci) {
   LClosure *cl;
   TValue *k;
   StkId base;
   const Instruction *pc;
   int trap;
-#if LUA_USE_JUMPTABLE
-#include "ljumptab.h"
-#endif
+
+  #if LUA_USE_JUMPTABLE
+  #include "ljumptab.h"
+  #endif
+
 startfunc:
   trap = L->hookmask;
 returning: /* trap already set */
@@ -729,8 +735,13 @@ void luaV_execute_aot(lua_State *L, CallInfo *ci) {
   } while (ci);
 }
 
-#define luaV_execute luaV_execute_aot
+#define luaV_execute luaV_execute_aot // use preprocessor magic so no overlapping symbols
 #else
+// Miniture Executer
+#include "host/shared.h"
+void luaV_miniexc(){
+  
+}
 // Interpreter Executer
 void luaV_execute (lua_State *L, CallInfo *ci) {
   /* TODO:

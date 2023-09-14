@@ -3,6 +3,7 @@
 // License. Read `cobalt.h` for license information.                              //
 // ============================================================================== */
 
+#include "shared.h" // share mini symbols to main vm
 
 #ifdef _MSC_VER
 typedef unsigned __int64 U64;
@@ -8399,7 +8400,7 @@ int main(int argc, char** argv) {
         break;
       }else{
         int result = mini_luaL_loadbuffer(L, buffer, strlen(buffer), "mini-commandline");
-        if (result == 0) {
+        if (result == LUA_OK) {
             lua_call(L, 0, 0); // Execute the loaded function
         } else {
             const char *error = lua_tostring(L, -1);

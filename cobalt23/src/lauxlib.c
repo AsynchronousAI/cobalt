@@ -931,7 +931,7 @@ static void *l_alloc(void *ud, void *ptr, size_t osize, size_t nsize) {
 static int panic(lua_State *L) {
   const char *msg = lua_tostring(L, -1);
   if (msg == NULL) msg = "error object is not a string";
-  lua_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
+  lua_writestringerror("PANIC: unprotected error in call to Cobalt API (%s)\n",
                        msg);
   return 0; /* return to Lua to abort */
 }

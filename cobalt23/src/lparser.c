@@ -948,7 +948,6 @@ static void field(LexState *ls, ConsControl *cc) {
   switch (ls->t.token) {
     case TK_STRING:
     case TK_FSTRING:
-      printf("field: TK_STRING\n");
     case TK_NAME: { /* may be 'listfield' or 'recfield' */
       int ntk = luaX_lookahead(ls);
       if (!((ntk == '=') || (ntk == ':'))) /* expression? */

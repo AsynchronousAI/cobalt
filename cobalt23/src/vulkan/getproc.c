@@ -8,7 +8,7 @@
 
 global_dt_t vk; /* global dispatch table (non-instance and non-device functions) */
 
-#if defined(MACOSX) || defined(DVK_USE_PLATFORM_IOS_MVK)
+#if defined(MACOSX) || defined(DVK_USE_PLATFORM_IOS_MVK) || defined(__APPLE__)
 #include <dlfcn.h>
 static void *Handle = NULL;
 #define LIBNAME "libvulkan.dylib"

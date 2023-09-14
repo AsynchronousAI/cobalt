@@ -97,7 +97,7 @@
 #define  moonglmath_
 #endif
 
-#if defined(LINUX) || defined(BSD) || defined(__APPLE__) || defined(__ANDROID__) || defined(__EMSCRIPTEN__) || defined(__unix__)
+#if defined(LINUX) || defined(BSD) || defined(DVK_USE_PLATFORM_IOS_MVK) || defined(__APPLE__) || defined(__ANDROID__) || defined(__EMSCRIPTEN__) || defined(__unix__)
 #define UNIX_SYSTEM 1
 #endif
 

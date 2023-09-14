@@ -51,7 +51,6 @@ set(LUA_LIB_SRCS
     "src/linit.c"
     "src/lplcap.c"
     "src/lplcode.c"
-    "src/lplprint.c"
     "src/lpltree.c"
     "src/lplvm.c"
 

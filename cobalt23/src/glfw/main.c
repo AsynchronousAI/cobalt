@@ -150,7 +150,6 @@ LUAMOD_API int luaopen_moonglfw(lua_State *L)
     lua_newtable(L); /* the glfw table */
     moonglfw_open_enums(L);
     moonglfw_open_getproc(L);
-    //AddVersions(L);
 
     /* Do not include hats in glfwGetJoystickButtons() if version >= 3.3.0 */
     if(checkminversion(3, 3, 0))

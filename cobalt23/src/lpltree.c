@@ -14,7 +14,6 @@
 #include "lauxlib.h"
 #include "lplcap.h"
 #include "lplcode.h"
-#include "lplprint.h"
 #include "lpltypes.h"
 #include "lualib.h"
 
@@ -1158,18 +1157,18 @@ static int lp_printtree(lua_State *L) {
     lua_getuservalue(L, 1); /* push 'ktable' (may be used by 'finalfix') */
     finalfix(L, 0, NULL, tree);
     lua_pop(L, 1); /* remove 'ktable' */
-  }
+  }/*
   printktable(L, 1);
-  printtree(tree, 0);
+  printtree(tree, 0);*/
   return 0;
 }
 
 static int lp_printcode(lua_State *L) {
   Pattern *p = getpattern(L, 1);
-  printktable(L, 1);
+  //printktable(L, 1);
   if (p->code == NULL) /* not compiled yet? */
     prepcompile(L, p, 1);
-  printpatt(p->code, p->codesize);
+  //printpatt(p->code, p->codesize);
   return 0;
 }
 

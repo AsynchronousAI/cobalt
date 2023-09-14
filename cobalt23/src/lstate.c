@@ -153,7 +153,7 @@ void luaE_shrinkCI(lua_State *L) {
 */
 void luaE_checkcstack(lua_State *L) {
   if (getCcalls(L) == LUAI_MAXCCALLS)
-    luaG_runerror(L, "C stack overflow");
+    luaG_runerror(L, "\033[3;31m[INTERNERR]\033[0m\033[31m\tC stack overflow\033[0m");
   else if (getCcalls(L) >= (LUAI_MAXCCALLS / 10 * 11))
     luaD_throw(L, LUA_ERRERR); /* error while handling stack error */
 }

@@ -12,7 +12,6 @@
 #include "cobalt.h"
 #include "lauxlib.h"
 #include "lplcap.h"
-#include "lplprint.h"
 #include "lpltypes.h"
 
 /* initial size for call/backtrack stack */

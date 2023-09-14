@@ -36,20 +36,20 @@ static HMODULE Handle = NULL;
 
 
 static int Init(lua_State *L)
-    {printf("Init"); /*
+    {
 #if defined(UNIX_SYSTEM)
     char *err;
     Handle = dlopen(LIBNAME, RTLD_LAZY | RTLD_LOCAL);
     if(!Handle)
-        {
-        err = dlerror();
-        return luaL_error(L, err != NULL ? err : "cannot load "LIBNAME);
-        }
+    {
+    err = dlerror();
+    return luaL_error(L, err != NULL ? err : "cannot load "LIBNAME);
+    }
 #define GET(fn) do {                                                \
     FP(glfw.fn) = dlsym(Handle, "glfw"#fn);                         \
     if(!glfw.fn) return luaL_error(L, "cannot find glfw"#fn);       \
 } while(0)
-#define OPT(fn) do {    /* optional /                              \
+#define OPT(fn) do {    /* optional */                              \
     FP(glfw.fn) = dlsym(Handle, "glfw"#fn);                         \
 } while(0)
 
@@ -57,20 +57,21 @@ static int Init(lua_State *L)
     Handle = LoadLibraryW(LLIBNAME);
     if(!Handle)
         return luaL_error(L, "cannot load "LIBNAME);
-#define GET(fn) do {                                                \
+#define GET(fn) do {                                      \
     glfw.fn = (PFN_glfw##fn)GetProcAddress(Handle, "glfw"#fn);      \
     if(!glfw.fn) return luaL_error(L, "cannot find glfw"#fn);       \
 } while(0)
-#define OPT(fn) do {    /* optional /                              \
+#define OPT(fn) do {    /* optional */                              \
     glfw.fn = (PFN_glfw##fn)GetProcAddress(Handle, "glfw"#fn);      \
 } while(0)
 #endif
 
-    /* Fill the global dispatch table /
+    /* Fill the global dispatch table */
 
     /* If MoonGLFW loads successfully, these function pointers are guaranteed
      * to be valid so they need not be checked before using them.
-     /
+     */
+    
     GET(Init);
     GET(Terminate);
     GET(GetVersion);
@@ -148,10 +149,10 @@ static int Init(lua_State *L)
     GET(GetCurrentContext);
     GET(SwapBuffers);
     GET(SwapInterval);
-    GET(ExtensionSupported);
+    //GET(ExtensionSupported);
     /* Optional functions, i.e. functions from GLFW > 3.1
      * These functions pointers may be NULL, so check before using them.
-     /
+     */
     // GLFW ver 3.2.0:
     OPT(GetKeyName);
     OPT(GetTimerFrequency);
@@ -197,7 +198,8 @@ static int Init(lua_State *L)
     OPT(GetPhysicalDevicePresentationSupport);
     OPT(CreateWindowSurface);
 //#endif
-    /*  Native access functions /
+    /*  Native access functions */
+    
     OPT(GetWin32Adapter);
     OPT(GetWin32Monitor);
     OPT(GetWin32Window);
@@ -229,7 +231,7 @@ static int Init(lua_State *L)
 #undef GET
 #undef OPT
     return 0;
-    */}
+    }
 
 
 void moonglfw_atexit_getproc(void)

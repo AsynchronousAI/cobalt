@@ -91,11 +91,6 @@ int luaopen_moonvulkan(lua_State *L)
     moonvulkan_open_sampler_ycbcr_conversion(L);
     moonvulkan_open_debug_utils_messenger(L);
 
-    /* Add functions implemented in Lua */
-    lua_pushvalue(L, -1); lua_setglobal(L, "moonvulkan");
-    if(luaL_dostring(L, "require('moonvulkan.constructors')") != 0) lua_error(L);
-    lua_pushnil(L);  lua_setglobal(L, "moonvulkan");
-
     return 1;
     }
 

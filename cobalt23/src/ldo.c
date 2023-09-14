@@ -767,7 +767,7 @@ LUA_API int lua_resume(lua_State *L, lua_State *from, int nargs,
     return resume_error(L, "cannot resume dead coroutine", nargs);
   L->nCcalls = (from) ? getCcalls(from) : 0;
   if (getCcalls(L) >= LUAI_MAXCCALLS)
-    return resume_error(L, "C stack overflow", nargs);
+    return resume_error(L, "\033[3;31m[INTERNERR]\033[0m\033[31m\tC stack overflow\033[0m", nargs);
   L->nCcalls++;
   luai_userstateresume(L, nargs);
   api_checknelems(L, (L->status == LUA_OK) ? nargs + 1 : nargs);

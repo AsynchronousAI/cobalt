@@ -8,11 +8,10 @@
 
 global_dt_t vk; /* global dispatch table (non-instance and non-device functions) */
 
-#if defined(UNIX_SYSTEM) && !defined(__APPLE__)
+#if defined(MACOSX) || defined(DVK_USE_PLATFORM_IOS_MVK)
 #include <dlfcn.h>
 static void *Handle = NULL;
-#define LIBNAME "libvulkan.so"
-
+#define LIBNAME "libvulkan.dylib"
 #elif defined(MINGW)
 #include "windows.h"
 #define LIBNAME "vulkan-1.dll"
@@ -20,11 +19,10 @@ static void *Handle = NULL;
 #define LIBNAME1 "vulkan.dll"
 #define LLIBNAME1 L"vulkan.dll"
 static HMODULE Handle = NULL;
-
-#elif defined(__APPLE__)
+#elif defined(UNIX_SYSTEM)
 #include <dlfcn.h>
 static void *Handle = NULL;
-#define LIBNAME "libvulkan.dylib"
+#define LIBNAME "libvulkan.so"
 #else
 #error "Cannot determine platform"
 #endif

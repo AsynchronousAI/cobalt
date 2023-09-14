@@ -119,6 +119,34 @@ if (PYTHON)
     endif()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${PYTHON_CFLAGS} ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS} ${PYTHON_LINKER_FLAGS} ${PYTHON_FLAG}")
 endif()
+if (USB)
+    message("-- Configuring USB Library")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_USB")
+    execute_process(
+        COMMAND pkg-config libusb-1.0 --cflags
+        OUTPUT_VARIABLE USB_CFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT USB_CFLAGS)
+        message(FATAL_ERROR "Failed to find libusb-1.0")
+    endif()
+    execute_process(
+        COMMAND pkg-config libusb-1.0 --libs
+        OUTPUT_VARIABLE USB_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if (NOT USB_LIBS)
+        message(FATAL_ERROR "Failed to find libusb-1.0")
+    endif()
+    
+    if (METHOD1)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DINCLUDE_METHOD_1")
+    else()
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DINCLUDE_METHOD_2")
+    endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USB_CFLAGS} ${USB_LIBS}")
+endif()
 if(SDL)
     message("-- Configuring SDL Library")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_SDL")

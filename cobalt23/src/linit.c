@@ -109,6 +109,9 @@ static const luaL_Reg preloadedlibs[] = {
 #ifdef COBALT_VULKAN
     {LUA_VULKANNAME, luaopen_moonvulkan},
 #endif
+#ifdef COBALT_USB
+    {LUA_USBNAME, luaopen_moonusb},
+#endif
 
     {NULL, NULL}
 };

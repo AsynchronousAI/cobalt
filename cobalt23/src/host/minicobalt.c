@@ -8400,7 +8400,7 @@ int main(int argc, char** argv) {
         break;
       }else{
         int result = mini_luaL_loadbuffer(L, buffer, strlen(buffer), "mini-commandline");
-        if (result == LUA_OK) {
+        if (result == 0) {
             lua_call(L, 0, 0); // Execute the loaded function
         } else {
             const char *error = lua_tostring(L, -1);

@@ -200,3 +200,9 @@ Py_None
 - typechecker & type creation
 - OpenGL bindings (check moonGL)
 - Test on windows.
+# Known Issues (and fixes)
+## Library not loaded: _
+This happens with the SDL library, to fix this you need to install (or reinstall) SDL2.
+
+## `cobalt: error: cannot open file 'lua.h'`
+Cobalt uses `cobalt.h` not `lua.h` so you need to change your include to `cobalt.h`.

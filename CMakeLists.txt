@@ -13,7 +13,7 @@ option(SOCKET "Install the socket library for Cobalt" ON)
 option(LUA_ENABLE_TESTING "Enable testing for Cobalt" ON)
 option(INSTALL "Install Cobalt" ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -w -Wc++-extensions -Wunused-command-line-argument")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_INTERFACE") # -DCOBALT_INTERFACE triggers the `main` symbol to be exported for minicobalt.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")
 # Based on the SDL and FFI variable provide them as Flags
@@ -240,16 +240,32 @@ if (SOCKET)
 endif()
 if (CLANG)
     message("-- Configuring Clang Bindings")
+    if (LLVM_CONFIG)
+        set(LLVM_CONFIG_PATH "${LLVM_CONFIG}")
+    else()
+        set(LLVM_CONFIG_PATH "llvm-config")
+        execute_process(
+            COMMAND llvm-config
+            OUTPUT_VARIABLE LLVM_CONFIG_EXISTS
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if (NOT LLVM_CONFIG_EXISTS)
+            message(FATAL_ERROR "llvm-config is not in your system path, please locate it and provide it to cmake like so:\n\t\t-DLLVM_CONFIG=/path/to/llvm-config")
+        endif()
+    endif()
     execute_process(
-        COMMAND pkg-config libclang --libs
+        COMMAND ${LLVM_CONFIG_PATH} --includedir --ldflags --libs --cflags
         OUTPUT_VARIABLE CLANG_LIBS
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     if (NOT CLANG_LIBS)
         message(FATAL_ERROR "Failed to find libclang, disable cobalt Clang support by doing:\n\t\t-DCLANG=OFF")
     endif()
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG")
+    string(REPLACE "\n" " " CLANG_LIBS "${CLANG_LIBS}")
+    set(CLANG_LIBS "-I${CLANG_LIBS}")
+    message("-- ${CLANG_LIBS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG ${CLANG_LIBS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_LIBS}")
 endif()
 
 if (VULKAN)
@@ -289,10 +305,13 @@ if(LUA_ENABLE_TESTING)
     enable_testing()
 endif()
 if (DEBUG)
-    message("-- DEBUG: Using these flags for building:\n\t\t${CMAKE_C_FLAGS}")
+    message("-- DEBUG: Using these flags for building C:\n\t\t${CMAKE_C_FLAGS}")
+    message("-- DEBUG: Using these flags for building C++:\n\t\t${CMAKE_CXX_FLAGS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunused-command-line-argument -Wcomment -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-command-line-argument -Wcomment -g")
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 endif()
 if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
     set(TOP_LEVEL TRUE)

@@ -4,11 +4,16 @@
 // ============================================================================== */
 
 
-#include <clang-c/Index.h>
+#include "clang-c/Index.h"
 
 #include "cobalt.hpp"
 
-#define EXPORT_API LUA_MODAPI
+/* COMPAT */
+#define luaL_register(L, n, f) luaL_newlib(L, f)
+#define lua_objlen(L, i) lua_rawlen(L, (i))
+/*********/
+
+#define EXPORT_API LUALIB_API
 
 #define LCM_INDEX "ClangIndex"
 #define LCM_TU "ClangTU"
@@ -256,8 +261,8 @@ static const char *completionKindName(CXCompletionChunkKind kind) {
 static int l_codeComplete(lua_State *L) {
   CXTranslationUnit tu = toTU(L, 1);
   const char *file = luaL_checkstring(L, 2);
-  int line = luaL_checkint(L, 3);
-  int col = luaL_checkint(L, 4);
+  int line = luaL_checkinteger(L, 3);
+  int col = luaL_checkinteger(L, 4);
 
   CXCodeCompleteResults *results = clang_codeCompleteAt(
       tu, file, line, col, NULL, 0, clang_defaultCodeCompleteOptions());

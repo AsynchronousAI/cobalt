@@ -69,10 +69,10 @@ setup(name="cobalt",
       long_description="""Cobalt is a programming language that aims to be
 Lua turned into a lowlevel language, like C.""",
       ext_modules=[
-        Extension("lua-python",
+        Extension("cobalt-python",
                   ["cobalt23/src/pyl.c", "cobalt23/src/lpy.c"],
                   **lua_pkgconfig),
-        Extension("lua",
+        Extension("cobalt",
                   ["cobalt23/src/pyl.c", "cobalt23/src/lpy.c"],
                   **lua_pkgconfig),
         ],

@@ -11078,14 +11078,14 @@ namespace VULKAN_HPP_NAMESPACE
 #  endif
       }
 
-#  ifndef VULKAN_HPP_NO_EXCEPTIONS
+#ifndef VULKAN_HPP_NO_EXCEPTIONS
       if ( m_library == nullptr )
       {
         // NOTE there should be an InitializationFailedError, but msvc insists on the symbol does not exist within the
         // scope of this function.
         throw std::runtime_error( "Failed to load vulkan library!" );
       }
-#  endif
+#endif
     }
 
     DynamicLoader( DynamicLoader const & ) = delete;

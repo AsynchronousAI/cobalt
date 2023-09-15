@@ -185,9 +185,6 @@ python = import("python")
 python.eval("print('Hello World!')") // prints Hello World!
 sys = python.import("sys")
 sys.version // prints python version
-// Once importing `python` you also get
-Py_None
-// as a global variable to represent None in python
 ```
 ***
 # TODO

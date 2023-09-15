@@ -1123,8 +1123,6 @@ Other licensed work
   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # dtoa
-
- 
   The author of this software is David M. Gay.
  
   Copyright (c) 1991, 2000, 2001 by Lucent Technologies.
@@ -1139,10 +1137,7 @@ Other licensed work
   WARRANTY.  IN PARTICULAR, NEITHER THE AUTHOR NOR LUCENT MAKES ANY
   REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
   OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
- 
 # g_fmt
-
- 
   The author of this software is David M. Gay.
  
   Copyright (c) 1991, 1996 by Lucent Technologies.
@@ -1157,8 +1152,6 @@ Other licensed work
   WARRANTY.  IN PARTICULAR, NEITHER THE AUTHOR NOR LUCENT MAKES ANY
   REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
   OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
- 
-
 # strbuf
 
   Copyright (c) 2010-2012  Mark Pulford <mark@kyne.com.au>
@@ -1181,10 +1174,8 @@ Other licensed work
   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 # lcpp
-## License (MIT)
- -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights

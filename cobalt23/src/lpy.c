@@ -640,7 +640,7 @@ LUALIB_API int luaopen_python(lua_State *L)
         }
 
         maind = PyModule_GetDict(mainm);
-        PyDict_SetItemString(maind, "lua", luam);
+        PyDict_SetItemString(maind, "cobalt", luam);
         Py_DECREF(luam);
     }
 

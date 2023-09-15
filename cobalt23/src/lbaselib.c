@@ -627,16 +627,10 @@ static const luaL_Reg base_funcs[] = {
 
     /* placeholders */
     {"_G", NULL},
+    {"_VERSION", NULL},
+    {"_INCLUDES", NULL},
     
     {NULL, NULL}};
-static int void_eq(lua_State *L) {
-  lua_pushnil(L);
-  return 1;
-}
-
-static int void_error(lua_State *L) {
-  return luaL_error(L, "attempt to operate on void");
-}
 
 LUAMOD_API int luaopen_base(lua_State *L) {
   /* open lib into global table */
@@ -645,6 +639,68 @@ LUAMOD_API int luaopen_base(lua_State *L) {
   /* set global _G */
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "_G");
-
+  /* set global _VERSION */
+  lua_pushstring(L, "cobalt23");
+  lua_setfield(L, -2, "_VERSION");
+  /* set global _INCLUDES */
+  /* it is a table */
+  lua_newtable(L);
+  int LENGTH = 0;
+  #ifdef COBALT_PYTHON
+  lua_pushstring(L, "python");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_GLFW
+  lua_pushstring(L, "glfw");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_SDL
+  lua_pushstring(L, "sdl");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_VULKAN
+  lua_pushstring(L, "vulkan");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_OPENGL
+  lua_pushstring(L, "opengl");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_CLANG
+  lua_pushstring(L, "clang");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_SOCKET
+  lua_pushstring(L, "cURL");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_USB
+  lua_pushstring(L, "usb");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #ifdef COBALT_FFI
+  lua_pushstring(L, "ffi");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
+  lua_pushstring(L, "unix");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || \
+    defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+  lua_pushstring(L, "win");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
+  lua_setfield(L, -2, "_INCLUDES");
   return 1;
 }

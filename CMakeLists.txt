@@ -111,7 +111,7 @@ if (PYTHON)
     endif()
     string(REPLACE "-I" "-L" PYTHON_LINKER_FLAGS "${PYTHON_CFLAGS}")
     if (NOT PYTHON_FLAG)
-        message("-- No python library was provided, If errors occur please provide like so:\n\n\t-DPYTHON_FLAG=python3.11")
+        message(WARNING "No python library was provided, If errors occur please provide like so:\n\n\t-DPYTHON_FLAG=python3.11")
         set (PYTHON_FLAG "")
     else()
         # concat a -l to the start of the flag

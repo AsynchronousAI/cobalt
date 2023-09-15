@@ -11,6 +11,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
+- `_INCLUDES` global variable is a table of all libraries built with cobalt (ex: `if (!_INCLUDES["sdl"]) error("SDL is required")`)
 - allocation tracker (track bytes and pool allocator stats)
 - `uwait`, `swait`, `mwait` for system sleep
 - new std functions

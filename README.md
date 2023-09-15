@@ -1,5 +1,7 @@
 # Cobalt
 > **NOTICE** Cobalt is heavily indevelopment, read the bottom of this file for a TODO.
+
+
 Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - SDL bindings (optional) for 2D graphics
 - interpreter, compiler, and JIT FFI
@@ -31,7 +33,6 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - 30% increase with pool allocator
 - lpeg-labels built in
-- `$`, `@`, `&`, and more quick-chars as alias for functions `pairs`, `ipairs`, and `table.unpack`
 - more operators
 - tenary operator
 - `` ` `` for python like format ``print(`Hello {name}`)`` directly implemented to the parser and bytecode compatable
@@ -193,6 +194,8 @@ Py_None
 - Mini interpreter that can kick in
 - Bind JIT source files and fixes
 - LLVM IR AOT
+- Fix formatstrings
+- Preprocess values 
 - Implement the `rlua` memory optimizations
 - typechecker & type creation
 - OpenGL bindings (check moonGL)

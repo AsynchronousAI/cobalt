@@ -1,4 +1,5 @@
 # Cobalt
+> **NOTICE** Cobalt is heavily indevelopment, read the bottom of this file for a TODO.
 Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - SDL bindings (optional) for 2D graphics
 - interpreter, compiler, and JIT FFI
@@ -186,3 +187,13 @@ sys.version // prints python version
 Py_None
 // as a global variable to represent None in python
 ```
+***
+# TODO
+- Redo [documentation site](cobaltlang.vercel.app)
+- Mini interpreter that can kick in
+- Bind JIT source files and fixes
+- LLVM IR AOT
+- Implement the `rlua` memory optimizations
+- typechecker & type creation
+- OpenGL bindings (check moonGL)
+- Test on windows.

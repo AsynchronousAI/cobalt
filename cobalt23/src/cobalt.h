@@ -22,7 +22,7 @@
 
 #define LUA_VERSION "cobalt23"
 #define LUA_RELEASE LUA_VERSION "." COBALT_VERSION_RELEASE
-#define LUA_COPYRIGHT LUA_RELEASE "  Read full credits in COPYRIGHTS.md"
+#define LUA_COPYRIGHT LUA_RELEASE "  Read full credits in CREDITS.md"
 #define LUA_AUTHORS ""
 
 /* mark for precompiled code ('<esc>Lua') */
@@ -514,14 +514,14 @@ struct lua_Debug {
 };
 
 /****************************************************
-Full credits are available in the file COPYRIGHTS.md
+Full credits are available in the file CREDITS.md
 
 Cobalt is based of Lua 5.4 (with LJS modifications), which is licensed under the
 MIT license.
 
 The mark "This file is apart of the Cobalt Programming Language. Cobalt is under the MIT License. Read `cobalt.h` for license information."
 represents that the file may be written for Cobalt or an opensource snippet/file that has modifications, You can read all the opensource
-licenses in the file COPYRIGHTS.md or it may be in the file itself.
+licenses in the file CREDITS.md or it may be in the file itself.
 /****************************************************/
 
 /* Cobalt License */

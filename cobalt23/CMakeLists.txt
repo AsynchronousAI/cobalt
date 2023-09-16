@@ -37,6 +37,7 @@ set(LUA_LIB_SRCS
     "src/lstruct.c" 
     "src/lsignal.c" 
     "src/lchan.c"
+    "src/ldyn.c"
     "src/lcolorlib.c"
     "src/lbitlib.c"
     "src/liolib.c"

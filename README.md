@@ -15,6 +15,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - allocation tracker (track bytes and pool allocator stats)
 - `uwait`, `swait`, `mwait` for system sleep
 - new std functions
+- Manipulate dynamic libraries like `dyn.load`, `.get`, and `.close`. 
 - USB (libusb) bindings
 - `unix`, `win`, and `core` (core is cross plat) for lowlevel system calls
 - AOT compiler byte->C or byte->LLVMIR if you have LLVM capable version of cobalt

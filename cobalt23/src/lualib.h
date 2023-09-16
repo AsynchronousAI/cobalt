@@ -24,6 +24,9 @@ LUAMOD_API int(luaopen_async)(lua_State *L);
 #define LUA_COLIBNAME "coroutine"
 LUAMOD_API int(luaopen_coroutine)(lua_State *L);
 
+#define LUA_DYNNAME "dynamic"
+LUAMOD_API int(luaopen_dyn)(lua_State *L);
+
 #define LUA_TABLIBNAME "table"
 LUAMOD_API int(luaopen_table)(lua_State *L);
 

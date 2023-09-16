@@ -79,6 +79,7 @@ static const luaL_Reg preloadedlibs[] = {
     {LUA_COLIBNAME, luaopen_coroutine},
     {LUA_ASYNCLIBNAME, luaopen_async},
     {LUA_UTF8LIBNAME, luaopen_utf8},
+    {LUA_DYNNAME, luaopen_dyn},
     {LUA_BITLIBNAME, luaopen_bit32},
     {LUA_GLMATHNAME, luaopen_moonglmath},
     {LUA_BITOPNAME, luaopen_bit},

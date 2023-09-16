@@ -484,6 +484,17 @@ if(LUA_BUILD_AOT)
     list(APPEND TARGETS_TO_INSTALL cobaltaot)
 endif()
 
+if (LUA_BUILD_LLVM)
+    add_executable(cobaltllvm "src/cobaltllvm.c")
+        
+    # Can not use lua_shared because some symbols are not exported
+    target_link_libraries(cobaltllvm PRIVATE lua_static)
+    set_target_properties(cobaltllvm PROPERTIES 
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+    )
+    list(APPEND TARGETS_TO_INSTALL cobaltllvm)
+endif()
+
 if(LUA_BUILD_PRE)
     add_executable(cobaltpre "pre/main.c")
     target_link_libraries(cobaltpre PRIVATE lua_static)

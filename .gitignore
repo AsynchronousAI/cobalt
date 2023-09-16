@@ -11,8 +11,10 @@
 /cobalt
 /cobaltc
 /cobaltaot
+/cobaltllvm
 /test.cobalt
 /cobaltpre
+/test.ll
 /libjit
 /cobalt23/lemon
 /cobaltmini

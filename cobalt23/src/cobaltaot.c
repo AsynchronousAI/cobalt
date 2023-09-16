@@ -24,10 +24,6 @@
 #include "lstate.h"
 #include "lundump.h"
 
-#ifdef COBALT_LLVM
-#include "lllbyte.h"
-#endif
-
 //
 // Command-line arguments and main function
 // ----------------------------------------

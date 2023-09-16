@@ -41,6 +41,7 @@ static char *module_name = NULL;
 
 int aotswitches = 0;
 int preprocessor = 1;
+int executable = 0;
 
 static FILE *output_file = NULL;
 static int nfunctions = 0;
@@ -53,7 +54,7 @@ static void usage() {
           "the input\n  -i name  preprocess to file 'name'\n  -m name  "
           "generate code with `name` function as main function\n  -s       use "
           "switches instead of gotos in generated code\n  -D name  provide "
-          "'name' to the preprocessor\n",
+          "'name' to the preprocessor\n  -e       add a main symbol for executables\n",
           program_name);
 }
 
@@ -110,6 +111,8 @@ static void doargs(int argc, char **argv) {
         output_filename = argv[i];
       } else if (0 == strcmp(arg, "-p")) {
         preprocessor = 0;
+      } else if (0 == strcmp(arg, "-e")) {
+        executable = 1;
       } else if (0 == strcmp(arg, "-i")) {
         i++;
         if (i >= argc) {
@@ -222,6 +225,13 @@ int main(int argc, char **argv) {
     println("#include \"aot_footer.c\"");
   } else {
     println("#include \"trampoline_footer.c\"");
+  }
+  if (executable) {
+    println("int main(int argc, char *argv[]) {");
+    println(" lua_State *L = luaL_newstate();");
+    println(" luaL_openlibs(L);");
+    println(" AOT_LUAOPEN_NAME(L);");
+    println("}");
   }
 }
 

@@ -65,3 +65,4 @@ install_manifest.txt
 
 # Libs
 /libglfw.dylib
+/test

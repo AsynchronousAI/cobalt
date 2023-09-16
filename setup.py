@@ -18,13 +18,13 @@ from distutils.sysconfig import get_python_lib, get_python_version
 if os.path.isfile("MANIFEST"):
     os.unlink("MANIFEST")
 
-LUAVERSION = "23"
+COBALTVERSION = "23"
 
 PYTHONVERSION = get_python_version()
 PYLIBS = ["python" + get_python_version(), "pthread", "util"]
 PYLIBDIR = [get_python_lib(standard_lib=True) + "/config"]
-LUALIBS = ["cobalt" + LUAVERSION]
-LUALIBDIR = []
+COBALTLIBS = ["cobalt" + COBALTVERSION]
+COBALTLIBDIR = []
 
 def pkgconfig(*packages):
     # map pkg-config output to kwargs for distutils.core.Extension
@@ -57,8 +57,8 @@ def pkgconfig(*packages):
 
     return kwargs
 
-lua_pkgconfig = pkgconfig('cobalt' + LUAVERSION, 'python-' + PYTHONVERSION)
-lua_pkgconfig['extra_compile_args'] = ['-I/usr/include/lua'+LUAVERSION]
+cobalt_pkgconfig = pkgconfig('cobalt' + COBALTVERSION, 'python-' + PYTHONVERSION)
+cobalt_pkgconfig['extra_compile_args'] = ['-I/usr/include/cobalt'+COBALTVERSION]
 
 setup(name="cobalt",
       version="23.0",
@@ -71,9 +71,9 @@ Lua turned into a lowlevel language, like C.""",
       ext_modules=[
         Extension("cobalt-python",
                   ["cobalt23/src/pyl.c", "cobalt23/src/lpy.c"],
-                  **lua_pkgconfig),
+                  **cobalt_pkgconfig),
         Extension("cobalt",
                   ["cobalt23/src/pyl.c", "cobalt23/src/lpy.c"],
-                  **lua_pkgconfig),
+                  **cobalt_pkgconfig),
         ],
       )

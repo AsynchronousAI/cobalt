@@ -18,7 +18,7 @@ from distutils.sysconfig import get_python_lib, get_python_version
 if os.path.isfile("MANIFEST"):
     os.unlink("MANIFEST")
 
-LUAVERSION = "cobalt23"
+LUAVERSION = "23"
 
 PYTHONVERSION = get_python_version()
 PYLIBS = ["python" + get_python_version(), "pthread", "util"]
@@ -57,7 +57,7 @@ def pkgconfig(*packages):
 
     return kwargs
 
-lua_pkgconfig = pkgconfig('lua' + LUAVERSION, 'python-' + PYTHONVERSION)
+lua_pkgconfig = pkgconfig('cobalt' + LUAVERSION, 'python-' + PYTHONVERSION)
 lua_pkgconfig['extra_compile_args'] = ['-I/usr/include/lua'+LUAVERSION]
 
 setup(name="cobalt",

@@ -651,6 +651,11 @@ LUAMOD_API int luaopen_base(lua_State *L) {
   LENGTH++;
   lua_rawseti(L, -2, LENGTH);
   #endif
+  #if defined(LUA_USE_DLOPEN) || defined(LUA_DL_DLL)
+  lua_pushstring(L, "dynamic");
+  LENGTH++;
+  lua_rawseti(L, -2, LENGTH);
+  #endif
   #ifdef COBALT_GLFW
   lua_pushstring(L, "glfw");
   LENGTH++;

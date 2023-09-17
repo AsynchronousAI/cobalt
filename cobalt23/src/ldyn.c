@@ -140,8 +140,10 @@ static void *ldyn_run_c(lua_State *L) {
 
 /* calling */
 static int ldyn_call_function(lua_State *L) {
-  void (*func)(void) = lua_touserdata(L, 1);
-  func()
+  void (*func)(int,int,int,int,int) = lua_touserdata(L, 1);
+  int args[5] = {luaL_optinteger(L, 2, 0), luaL_optinteger(L, 3, 0), luaL_optinteger(L, 4, 0), luaL_optinteger(L, 5, 0), luaL_optinteger(L, 6, 0)};
+
+  func(args[0], args[1], args[2], args[3], args[4]);
   lua_pushnil(L);
   return 0;
 }

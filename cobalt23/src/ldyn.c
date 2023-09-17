@@ -47,9 +47,9 @@ static void *ldyn_get_function(lua_State *L) {
     luaL_error(L, "unable to find function '%s'", funcname);
     return 2;
   }
-  lua_pushlightuserdata(L, func);
-  luaL_newmetatable(L, DYNAMIC);
-  lua_setmetatable(L, -2);
+  lua_pushcfunction(L, func);
+  //luaL_newmetatable(L, DYNAMIC);
+  //lua_setmetatable(L, -2);
 
   return 1;
 }

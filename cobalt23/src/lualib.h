@@ -24,9 +24,6 @@ LUAMOD_API int(luaopen_async)(lua_State *L);
 #define LUA_COLIBNAME "coroutine"
 LUAMOD_API int(luaopen_coroutine)(lua_State *L);
 
-#define LUA_DYNNAME "dynamic"
-LUAMOD_API int(luaopen_dyn)(lua_State *L);
-
 #define LUA_TABLIBNAME "table"
 LUAMOD_API int(luaopen_table)(lua_State *L);
 
@@ -127,6 +124,7 @@ LUAMOD_API int(luaopen_moonvulkan)(lua_State *L);
 #define LUA_USBNAME "usb"
 LUAMOD_API int(luaopen_moonusb)(lua_State *L);
 #endif
+
 // Platform specific libraries
 #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
 #define LUA_UNIXNAME "unix"
@@ -135,6 +133,10 @@ LUAMOD_API int(luaopen_unix)(lua_State *L);
     defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
 #define LUA_WINNAME "win"
 LUAMOD_API int(luaopen_win)(lua_State *L);
+#endif
+#if defined(LUA_USE_DLOPEN) || defined(LUA_DL_DLL)
+#define LUA_DYNNAME "dynamic"
+LUAMOD_API int(luaopen_dyn)(lua_State *L);
 #endif
 
 /* open all previous libraries */

@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #define LIB_HANDLE HMODULE
@@ -38,18 +40,32 @@ static void *ldyn_load_library(lua_State *L) {
   return 1;
 }
 
-static void *ldyn_get_function(lua_State *L) {
+static void *ldyn_call_function(lua_State *L) {
   LIB_HANDLE handle = lua_touserdata(L, 1);
   const char *funcname = luaL_checkstring(L, 2);
+
   void *func = GET_FUNCTION(handle, funcname);
   if (func == NULL) {
     lua_pushnil(L);
     luaL_error(L, "unable to find function '%s'", funcname);
     return 2;
   }
-  lua_pushcfunction(L, func);
-  //luaL_newmetatable(L, DYNAMIC);
-  //lua_setmetatable(L, -2);
+  
+  /* 
+  The functions are unlike Lua C API functions and do not use
+  lua_states. Instead, they use the C std library functions.
+  
+  This calls func with the arguments passed to this function after arg 2.
+  */
+  int argc = lua_gettop(L)-2;
+  void *args[argc];
+  for (int i = 0; i < argc; i++) {
+    args[i] = lua_touserdata(L, i+3);
+  }
+  func(); // temp
+  
+  lua_pushinteger(L, 0);
+
 
   return 1;
 }
@@ -62,7 +78,7 @@ static void *ldyn_close_library(lua_State *L) {
 
 static const luaL_Reg ldyn_lib[] = {
     {"load", ldyn_load_library},
-    {"get", ldyn_get_function},
+    {"call", ldyn_call_function},
     {"close", ldyn_close_library},
     {NULL, NULL},
 };

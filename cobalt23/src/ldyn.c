@@ -141,6 +141,21 @@ static void *ldyn_run_c(lua_State *L) {
 /* calling */
 static int ldyn_call_function(lua_State *L) {
   void (*func)(int,int,int,int,int) = lua_touserdata(L, 1);
+  // if any other args are passed verify it is a number and up to 5 args
+  int numargs = lua_gettop(L);
+  if (numargs > 6) {
+    lua_pushnil(L);
+    luaL_error(L, "too many arguments passed to function (DYNERR: too many args)");
+    return 2;
+  }
+  for (int i = 2; i <= numargs; i++) {
+    if (!lua_isnumber(L, i)) {
+      lua_pushnil(L);
+      luaL_error(L, "argument %d is not a number (DYNERR: not a number)", i);
+      return 2;
+    }
+  }
+  // call
   int args[5] = {luaL_optinteger(L, 2, 0), luaL_optinteger(L, 3, 0), luaL_optinteger(L, 4, 0), luaL_optinteger(L, 5, 0), luaL_optinteger(L, 6, 0)};
 
   func(args[0], args[1], args[2], args[3], args[4]);

@@ -13,6 +13,7 @@
 /cobaltaot
 /cobaltllvm
 /test.cobalt
+/Pluto
 /cobaltpre
 /test.ll
 /libjit

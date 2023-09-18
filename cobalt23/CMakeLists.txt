@@ -83,7 +83,7 @@ set(LUA_LIB_SRCS
 
 set(TARGETS_TO_INSTALL lua_internal lua_include)
 
-set(LUA_LINKED_LIBRARIES)
+set(LINKED_LIBRARIES)
 
 if(LUA_BUILD_AS_CXX)
 	set_source_files_properties(${LUA_LIB_SRCS} "src/cobalt.c" "src/cobaltc.c" "src/cobaltaot.c" "src/host/minicobalt.c" "pre/main.c" PROPERTIES LANGUAGE CXX )
@@ -114,7 +114,7 @@ if (CLANG)
         set(Clang_DIR "${CLANG_PATH_OVERRIDE}")
     endif()
     find_package(Clang REQUIRED)
-    list(APPEND LUA_LINKED_LIBRARIES Clang::Clang)
+    list(APPEND LINKED_LIBRARIES Clang::Clang)
     include_directories(${CLANG_INCLUDE_DIRS})
 endif()
 
@@ -179,7 +179,7 @@ if (SDL)
     find_package(SDL2_ttf REQUIRED)
     find_package(SDL2_mixer REQUIRED)
 
-    list(APPEND LUA_LINKED_LIBRARIES SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
+    list(APPEND LINKED_LIBRARIES SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer)
 
     set(SDL_LIBRARIES SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf SDL2_mixer::SDL2_mixer SDL2::SDL2)
     include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS})
@@ -287,7 +287,7 @@ if (SOCKET)
         set(CURL_DIR "${CURL_PATH_OVERRIDE}")
     endif()
     find_package(CURL REQUIRED)
-    list(APPEND LUA_LINKED_LIBRARIES CURL::libcurl)
+    list(APPEND LINKED_LIBRARIES CURL::libcurl)
     include_directories(${CURL_INCLUDE_DIRS})
 endif()
 
@@ -304,7 +304,7 @@ if (PYTHON)
         set(PYTHON_DIR "${PYTHON_PATH_OVERRIDE}")
     endif()
     find_package(Python REQUIRED)
-    list(APPEND LUA_LINKED_LIBRARIES Python::Python)
+    list(APPEND LINKED_LIBRARIES Python::Python)
 
     execute_process(
         COMMAND python3-config --ldflags
@@ -324,10 +324,6 @@ if (PYTHON)
     endif()
     target_link_libraries(lua_internal INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
     target_link_libraries(lua_include INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
-    #target_link_libraries(lua_static INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
-    #if (LUA_ENABLE_SHARED)
-    #    target_link_libraries(lua_shared INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
-    #endif()
 endif()
 
 # GLFW
@@ -355,7 +351,7 @@ if (GLFW)
         set(GLFW_DIR "${GLFW_PATH_OVERRIDE}")
     endif()
     #find_package(glfw3 REQUIRED)
-    #list(APPEND LUA_LINKED_LIBRARIES glfw)
+    #list(APPEND LINKED_LIBRARIES glfw)
     #include_directories(${GLFW_INCLUDE_DIRS})
 endif()
 
@@ -380,18 +376,18 @@ if (LLVM)
         set(LLVM_DIR "${LLVM_PATH_OVERRIDE}")
     endif()
     find_package(LLVM REQUIRED CONFIG)
-    list(APPEND LUA_LINKED_LIBRARIES LLVM::LLVM)
+    list(APPEND LINKED_LIBRARIES LLVM::LLVM)
     include_directories(${LLVM_INCLUDE_DIRS})
 endif()
 
-add_library(lua_static STATIC ${LUA_LIB_SRCS})
-target_link_libraries(lua_static PRIVATE lua_internal PUBLIC lua_include)
-set_target_properties(lua_static PROPERTIES
+add_library(cobalt_static STATIC ${LUA_LIB_SRCS})
+target_link_libraries(cobalt_static PRIVATE lua_internal PUBLIC lua_include)
+set_target_properties(cobalt_static PROPERTIES
     VERSION "${PACKAGE_VERSION}"
 )
-list(APPEND TARGETS_TO_INSTALL lua_static)
+list(APPEND TARGETS_TO_INSTALL cobalt_static)
 if(NOT BUILD_SHARED_LIBS OR NOT LUA_ENABLE_SHARED)
-    add_library(Lua::Library ALIAS lua_static)
+    add_library(Lua::Library ALIAS cobalt_static)
 endif()
 
 if(LUA_ENABLE_SHARED)
@@ -430,11 +426,11 @@ if(UNIX)
         endif()
         target_compile_definitions(lua_internal INTERFACE "LUA_USE_POSIX")
         target_link_libraries(lua_internal INTERFACE m)
-        list(APPEND LUA_LINKED_LIBRARIES m)
+        list(APPEND LINKED_LIBRARIES m)
         if(LUA_SUPPORT_DL)
             target_compile_definitions(lua_internal INTERFACE "LUA_USE_DLOPEN")
             target_link_libraries(lua_internal INTERFACE "${CMAKE_DL_LIBS}")
-            list(APPEND LUA_LINKED_LIBRARIES "${CMAKE_DL_LIBS}")
+            list(APPEND LINKED_LIBRARIES "${CMAKE_DL_LIBS}")
         endif()
     endif()
 
@@ -454,7 +450,7 @@ if(LUA_BUILD_BINARY)
     add_executable(cobalt "src/cobalt.c")
 
     # Can not use lua_shared because some symbols are not exported
-    target_link_libraries(cobalt PRIVATE lua_static)
+    target_link_libraries(cobalt PRIVATE cobalt_static)
     set_target_properties(cobalt PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
@@ -467,7 +463,7 @@ endif()
 
 if(LUA_BUILD_COMPILER)
     add_executable(cobaltc "src/cobaltc.c")
-    target_link_libraries(cobaltc PRIVATE lua_static)
+    target_link_libraries(cobaltc PRIVATE cobalt_static)
     set_target_properties(cobaltc PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
@@ -478,7 +474,7 @@ if(LUA_BUILD_AOT)
     add_executable(cobaltaot "src/cobaltaot.c")
     
     # Can not use lua_shared because some symbols are not exported
-    target_link_libraries(cobaltaot PRIVATE lua_static)
+    target_link_libraries(cobaltaot PRIVATE cobalt_static)
     set_target_properties(cobaltaot PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
@@ -489,7 +485,7 @@ if (LUA_BUILD_LLVM)
     add_executable(cobaltllvm "src/cobaltllvm.c")
         
     # Can not use lua_shared because some symbols are not exported
-    target_link_libraries(cobaltllvm PRIVATE lua_static)
+    target_link_libraries(cobaltllvm PRIVATE cobalt_static)
     set_target_properties(cobaltllvm PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
@@ -498,7 +494,7 @@ endif()
 
 if(LUA_BUILD_PRE)
     add_executable(cobaltpre "pre/main.c")
-    target_link_libraries(cobaltpre PRIVATE lua_static)
+    target_link_libraries(cobaltpre PRIVATE cobalt_static)
     set_target_properties(cobaltpre PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )
@@ -507,7 +503,7 @@ endif()
 
 if(LUA_BUILD_MINI)
     add_executable(cobaltmini "src/host/minicobalt.c")
-    target_link_libraries(cobaltmini PRIVATE lua_static)
+    target_link_libraries(cobaltmini PRIVATE cobalt_static)
     set_target_properties(cobaltmini PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
     )

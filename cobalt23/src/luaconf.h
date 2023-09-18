@@ -731,6 +731,12 @@
 */
 #define LUA_IDSIZE 60
 
+
+/*
+@@ New cobalt features and to enable or not.
+*/
+#define NEW_SYNTAX_ERR 1 /* default: ON */
+
 /*
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
 */

@@ -763,6 +763,7 @@ const char *luaG_addinfo(lua_State *L, const char *msg, TString *src,
   return luaO_pushfstring(L, "%s:%d: %s", buff, line, msg);
 }
 
+
 l_noret luaG_errormsg(lua_State *L) {
   if (L->errfunc != 0) { /* is there an error handling function? */
     StkId errfunc = restorestack(L, L->errfunc);

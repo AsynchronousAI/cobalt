@@ -96,15 +96,58 @@ static const char *txtToken(LexState *ls, int token) {
   }
 }
 
+/* teal arrows */
+#define ARROW "\033[32m^\033[0m"
+
 static l_noret lexerror(LexState *ls, const char *msg, int token) {
+  #ifdef NEW_SYNTAX_ERR
+  /* turn file name to a string */
+  char buff[LUA_IDSIZE];
+  if (ls->source)
+    luaO_chunkid(buff, getstr(ls->source), tsslen(ls->source));
+  else { /* no source available; use "?" instead */
+    buff[0] = '?';
+    buff[1] = '\0';
+  } 
+
+  /* TODO:
+  - Arrows in error
+  - Get line
+  - Implement for other error systems
+  */
+  
+  /* get line contents */
+  char line_contents[] = ls->buff->buffer;
+  int line_length = strlen(line_contents);
+
+
+  /* get the errored character and generate arrows */
+  int faultyChar = ls->current;
+  char arrows[line_length + 1];
+  for (int i = 0; i < line_length; i++) {
+    if (i == faultyChar) {
+      arrows[i] = '^';
+    } else {
+      arrows[i] = ' ';
+    }
+  }
+  arrows[line_length] = '\0';
+
+  /* throw error */
+  if (token)
+    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t%d| %s\n\t%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents, arrows);
+  luaD_throw(ls->L, LUA_ERRSYNTAX);
+  #else
   msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);
   if (token) luaO_pushfstring(ls->L, "\033[3;31m[SYNTAXERR]\033[0m\033[31m\t%s near %s\033[0m", msg, txtToken(ls, token));
   luaD_throw(ls->L, LUA_ERRSYNTAX);
+  #endif
 }
 
 l_noret luaX_syntaxerror(LexState *ls, const char *msg) {
   lexerror(ls, msg, ls->t.token);
 }
+
 static void lexwarning(LexState *ls, const char *msg, int token) {
 #if defined COBALT_WARNING
   const char *msg0 = luaG_addinfo(ls->L, "\n\033[1;33mwarning: \033[0m",

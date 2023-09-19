@@ -751,6 +751,7 @@ typedef struct Table {
   Node *lastfree; /* any free position is before this position */
   struct Table *metatable;
   GCObject *gclist;
+  int locked; /* for locked tables */
 } Table;
 
 /*

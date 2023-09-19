@@ -213,6 +213,11 @@ LUA_API const char *lua_setlocal(lua_State *L, const lua_Debug *ar, int n) {
   lua_lock(L);
   name = luaG_findlocal(L, ar->i_ci, n, &pos);
   if (name) {
+    if (ttistable(s2v(pos))) {
+      if (hvalue(s2v(pos))->locked) {
+        luaG_runerror(L, "attempt to modify local variable with a locked table.");
+      }
+    }
     setobjs2s(L, pos, L->top - 1);
     L->top--; /* pop value */
   }

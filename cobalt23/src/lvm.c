@@ -329,6 +329,8 @@ void luaV_finishset(lua_State *L, const TValue *t, TValue *key, TValue *val,
       lua_assert(isempty(slot));                 /* slot must be empty */
       tm = fasttm(L, h->metatable, TM_NEWINDEX); /* get metamethod */
       if (tm == NULL) {                          /* no metamethod? */
+        if (l_unlikely(h->locked)) luaG_runerror(L, "attempt to modify locked table.");
+
         luaH_finishset(L, h, key, slot, val);    /* set new value */
         invalidateTMcache(h);
         luaC_barrierback(L, obj2gco(h), val);
@@ -346,6 +348,7 @@ void luaV_finishset(lua_State *L, const TValue *t, TValue *key, TValue *val,
     }
     t = tm; /* else repeat assignment over 'tm' */
     if (luaV_fastget(L, t, key, slot, luaH_get)) {
+      if (l_unlikely(hvalue(t)->locked)) luaG_runerror(L, "attempt to modify locked table.");
       luaV_finishfastset(L, t, slot, val);
       return; /* done */
     }

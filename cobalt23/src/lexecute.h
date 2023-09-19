@@ -14,12 +14,13 @@ This is responsible for the following:
 - Using `llangstate.h` to allow the user to switch between VMs at runtime
 - Using `minicobalt.c` for a miniture execution engine
 */
+
 #include <stdio.h>
 #include "llangstate.h"
 
 
-#define VM_CASE(name) \
-  vmcase(OP_##name)  // just a macro to make the code more readable
+#define vmcase(OP_name) \
+  vmcase(##name)  // just a macro to make the code more readable
 
 // AOT Executer
 #if defined(AOT_IS_MODULE)
@@ -61,70 +62,70 @@ returning: /* trap already set */
     StkId ra;      /* instruction's A register */
     vmfetch();
     // low-level line tracing for debugging Cobalt
-    // printf("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
+    // luaG_runerror("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
     lua_assert(base == ci->func + 1);
     lua_assert(base <= L->top && L->top < L->stack_last);
     /* invalidate top for instructions not expecting it */
     lua_assert(isIT(i) || (cast_void(L->top = base), 1));
     vmdispatch(i) {
-      VM_CASE(MOVE) {
+      vmcase(OP_MOVE) {
         setobjs2s(L, ra, RB(i));
         vmbreak;
       }
-      VM_CASE(LOADI) {
+      vmcase(OP_LOADI) {
         lua_Integer b = GETARG_sBx(i);
         setivalue(s2v(ra), b);
         vmbreak;
       }
-      VM_CASE(LOADF) {
+      vmcase(OP_LOADF) {
         int b = GETARG_sBx(i);
         setfltvalue(s2v(ra), cast_num(b));
         vmbreak;
       }
-      VM_CASE(LOADK) {
+      vmcase(OP_LOADK) {
         TValue *rb = k + GETARG_Bx(i);
         setobj2s(L, ra, rb);
         vmbreak;
       }
-      VM_CASE(LOADKX) {
+      vmcase(OP_LOADKX) {
         TValue *rb;
         rb = k + GETARG_Ax(*pc);
         pc++;
         setobj2s(L, ra, rb);
         vmbreak;
       }
-      VM_CASE(LOADFALSE) {
+      vmcase(OP_LOADFALSE) {
         setbfvalue(s2v(ra));
         vmbreak;
       }
-      VM_CASE(LFALSESKIP) {
+      vmcase(OP_LFALSESKIP) {
         setbfvalue(s2v(ra));
         pc++; /* skip next instruction */
         vmbreak;
       }
-      VM_CASE(LOADTRUE) {
+      vmcase(OP_LOADTRUE) {
         setbtvalue(s2v(ra));
         vmbreak;
       }
-      VM_CASE(LOADNIL) {
+      vmcase(OP_LOADNIL) {
         int b = GETARG_B(i);
         do {
           setnilvalue(s2v(ra++));
         } while (b--);
         vmbreak;
       }
-      VM_CASE(GETUPVAL) {
+      vmcase(OP_GETUPVAL) {
         int b = GETARG_B(i);
         setobj2s(L, ra, cl->upvals[b]->v);
         vmbreak;
       }
-      VM_CASE(SETUPVAL) {
+      vmcase(OP_SETUPVAL) {
         UpVal *uv = cl->upvals[GETARG_B(i)];
         setobj(L, uv->v, s2v(ra));
         luaC_barrier(L, uv, s2v(ra));
         vmbreak;
       }
-      VM_CASE(GETTABUP) {
+      vmcase(OP_GETTABUP) {
         const TValue *slot;
         TValue *upval = cl->upvals[GETARG_B(i)]->v;
         TValue *rc = KC(i);
@@ -135,7 +136,7 @@ returning: /* trap already set */
           Protect(luaV_finishget(L, upval, rc, ra, slot));
         vmbreak;
       }
-      VM_CASE(GETTABLE) {
+      vmcase(OP_GETTABLE) {
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = vRC(i);
@@ -148,7 +149,7 @@ returning: /* trap already set */
           Protect(luaV_finishget(L, rb, rc, ra, slot));
         vmbreak;
       }
-      VM_CASE(GETI) {
+      vmcase(OP_GETI) {
         const TValue *slot;
         TValue *rb = vRB(i);
         int c = GETARG_C(i);
@@ -161,7 +162,7 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(GETFIELD) {
+      vmcase(OP_GETFIELD) {
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = KC(i);
@@ -172,23 +173,35 @@ returning: /* trap already set */
           Protect(luaV_finishget(L, rb, rc, ra, slot));
         vmbreak;
       }
-      VM_CASE(SETTABUP) {
+      vmcase(OP_SETTABUP) {
         const TValue *slot;
         TValue *upval = cl->upvals[GETARG_A(i)]->v;
         TValue *rb = KB(i);
         TValue *rc = RKC(i);
         TString *key = tsvalue(rb); /* key must be a string */
+        
+        /* verify locks */
+        Table *t = hvalue(upval);
+        if (l_unlikely(t->locked))
+          luaG_runerror(L, "attempt to modify locked table.");
+        
         if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {
           luaV_finishfastset(L, upval, slot, rc);
         } else
           Protect(luaV_finishset(L, upval, rb, rc, slot));
         vmbreak;
       }
-      VM_CASE(SETTABLE) {
+      vmcase(OP_SETTABLE) {
         const TValue *slot;
         TValue *rb = vRB(i); /* key (table is in 'ra') */
         TValue *rc = RKC(i); /* value */
         lua_Unsigned n;
+
+        /* verify locks */
+        Table *t = hvalue(s2v(ra));
+        if (l_unlikely(t->locked))
+          luaG_runerror(L, "attempt to modify locked table.");
+        
         if (ttisinteger(rb) /* fast track for integers? */
                 ? (cast_void(n = ivalue(rb)),
                    luaV_fastgeti(L, s2v(ra), n, slot))
@@ -198,10 +211,16 @@ returning: /* trap already set */
           Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
         vmbreak;
       }
-      VM_CASE(SETI) {
+      vmcase(OP_SETI) {
         const TValue *slot;
         int c = GETARG_B(i);
         TValue *rc = RKC(i);
+
+        /* verify locks */
+        Table *t = hvalue(s2v(ra));
+        if (l_unlikely(t->locked))
+          luaG_runerror(L, "attempt to modify locked table.");
+        
         if (luaV_fastgeti(L, s2v(ra), c, slot)) {
           luaV_finishfastset(L, s2v(ra), slot, rc);
         } else {
@@ -211,18 +230,20 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(SETFIELD) {
+      vmcase(OP_SETFIELD) {
         const TValue *slot;
         TValue *rb = KB(i);
         TValue *rc = RKC(i);
         TString *key = tsvalue(rb); /* key must be a string */
         if (luaV_fastget(L, s2v(ra), key, slot, luaH_getshortstr)) {
+          if (l_unlikely(hvalue(s2v(ra))->locked))
+            halfProtect(luaG_runerror(L, "attempt to modify locked table."));
           luaV_finishfastset(L, s2v(ra), slot, rc);
         } else
           Protect(luaV_finishset(L, s2v(ra), rb, rc, slot));
         vmbreak;
       }
-      VM_CASE(NEWTABLE) {
+      vmcase(OP_NEWTABLE) {
         int b = GETARG_B(i); /* log2(hash size) + 1 */
         int c = GETARG_C(i); /* array size */
         Table *t;
@@ -238,7 +259,7 @@ returning: /* trap already set */
         checkGC(L, ra + 1);
         vmbreak;
       }
-      VM_CASE(SELF) {
+      vmcase(OP_SELF) {
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = RKC(i);
@@ -250,51 +271,51 @@ returning: /* trap already set */
           Protect(luaV_finishget(L, rb, rc, ra, slot));
         vmbreak;
       }
-      VM_CASE(ADDI) {
+      vmcase(OP_ADDI) {
         op_arithI(L, l_addi, luai_numadd);
         vmbreak;
       }
-      VM_CASE(ADDK) {
+      vmcase(OP_ADDK) {
         op_arithK(L, l_addi, luai_numadd);
         vmbreak;
       }
-      VM_CASE(SUBK) {
+      vmcase(OP_SUBK) {
         op_arithK(L, l_subi, luai_numsub);
         vmbreak;
       }
-      VM_CASE(MULK) {
+      vmcase(OP_MULK) {
         op_arithK(L, l_muli, luai_nummul);
         vmbreak;
       }
-      VM_CASE(MODK) {
+      vmcase(OP_MODK) {
         op_arithK(L, luaV_mod, luaV_modf);
         vmbreak;
       }
-      VM_CASE(POWK) {
+      vmcase(OP_POWK) {
         op_arithfK(L, luai_numpow);
         vmbreak;
       }
-      VM_CASE(DIVK) {
+      vmcase(OP_DIVK) {
         op_arithfK(L, luai_numdiv);
         vmbreak;
       }
-      VM_CASE(IDIVK) {
+      vmcase(OP_IDIVK) {
         op_arithK(L, luaV_idiv, luai_numidiv);
         vmbreak;
       }
-      VM_CASE(BANDK) {
+      vmcase(OP_BANDK) {
         op_bitwiseK(L, l_band);
         vmbreak;
       }
-      VM_CASE(BORK) {
+      vmcase(OP_BORK) {
         op_bitwiseK(L, l_bor);
         vmbreak;
       }
-      VM_CASE(BXORK) {
+      vmcase(OP_BXORK) {
         op_bitwiseK(L, l_bxor);
         vmbreak;
       }
-      VM_CASE(SHRI) {
+      vmcase(OP_SHRI) {
         TValue *rb = vRB(i);
         int ic = GETARG_sC(i);
         lua_Integer ib;
@@ -304,7 +325,7 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(SHLI) {
+      vmcase(OP_SHLI) {
         TValue *rb = vRB(i);
         int ic = GETARG_sC(i);
         lua_Integer ib;
@@ -314,55 +335,55 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(ADD) {
+      vmcase(OP_ADD) {
         op_arith(L, l_addi, luai_numadd);
         vmbreak;
       }
-      VM_CASE(SUB) {
+      vmcase(OP_SUB) {
         op_arith(L, l_subi, luai_numsub);
         vmbreak;
       }
-      VM_CASE(MUL) {
+      vmcase(OP_MUL) {
         op_arith(L, l_muli, luai_nummul);
         vmbreak;
       }
-      VM_CASE(MOD) {
+      vmcase(OP_MOD) {
         op_arith(L, luaV_mod, luaV_modf);
         vmbreak;
       }
-      VM_CASE(POW) {
+      vmcase(OP_POW) {
         op_arithf(L, luai_numpow);
         vmbreak;
       }
-      VM_CASE(DIV) { /* float division (always with floats) */
+      vmcase(OP_DIV) { /* float division (always with floats) */
         op_arithf(L, luai_numdiv);
         vmbreak;
       }
-      VM_CASE(IDIV) { /* floor division */
+      vmcase(OP_IDIV) { /* floor division */
         op_arith(L, luaV_idiv, luai_numidiv);
         vmbreak;
       }
-      VM_CASE(BAND) {
+      vmcase(OP_BAND) {
         op_bitwise(L, l_band);
         vmbreak;
       }
-      VM_CASE(BOR) {
+      vmcase(OP_BOR) {
         op_bitwise(L, l_bor);
         vmbreak;
       }
-      VM_CASE(BXOR) {
+      vmcase(OP_BXOR) {
         op_bitwise(L, l_bxor);
         vmbreak;
       }
-      VM_CASE(SHR) {
+      vmcase(OP_SHR) {
         op_bitwise(L, luaV_shiftr);
         vmbreak;
       }
-      VM_CASE(SHL) {
+      vmcase(OP_SHL) {
         op_bitwise(L, luaV_shiftl);
         vmbreak;
       }
-      VM_CASE(MMBIN) {
+      vmcase(OP_MMBIN) {
         Instruction pi = *(pc - 2); /* original arith. expression */
         TValue *rb = vRB(i);
         TMS tm = (TMS)GETARG_C(i);
@@ -371,7 +392,7 @@ returning: /* trap already set */
         Protect(luaT_trybinTM(L, s2v(ra), rb, result, tm));
         vmbreak;
       }
-      VM_CASE(MMBINI) {
+      vmcase(OP_MMBINI) {
         Instruction pi = *(pc - 2); /* original arith. expression */
         int imm = GETARG_sB(i);
         TMS tm = (TMS)GETARG_C(i);
@@ -380,7 +401,7 @@ returning: /* trap already set */
         Protect(luaT_trybiniTM(L, s2v(ra), imm, flip, result, tm));
         vmbreak;
       }
-      VM_CASE(MMBINK) {
+      vmcase(OP_MMBINK) {
         Instruction pi = *(pc - 2); /* original arith. expression */
         TValue *imm = KB(i);
         TMS tm = (TMS)GETARG_C(i);
@@ -389,7 +410,7 @@ returning: /* trap already set */
         Protect(luaT_trybinassocTM(L, s2v(ra), imm, flip, result, tm));
         vmbreak;
       }
-      VM_CASE(UNM) {
+      vmcase(OP_UNM) {
         TValue *rb = vRB(i);
         lua_Number nb;
         if (ttisinteger(rb)) {
@@ -401,7 +422,7 @@ returning: /* trap already set */
           Protect(luaT_trybinTM(L, rb, rb, ra, TM_UNM));
         vmbreak;
       }
-      VM_CASE(BNOT) {
+      vmcase(OP_BNOT) {
         TValue *rb = vRB(i);
         lua_Integer ib;
         if (tointegerns(rb, &ib)) {
@@ -410,7 +431,7 @@ returning: /* trap already set */
           Protect(luaT_trybinTM(L, rb, rb, ra, TM_BNOT));
         vmbreak;
       }
-      VM_CASE(NOT) {
+      vmcase(OP_NOT) {
         TValue *rb = vRB(i);
         if (l_isfalse(rb))
           setbtvalue(s2v(ra));
@@ -418,53 +439,53 @@ returning: /* trap already set */
           setbfvalue(s2v(ra));
         vmbreak;
       }
-      VM_CASE(LEN) {
+      vmcase(OP_LEN) {
         Protect(luaV_objlen(L, ra, vRB(i)));
         vmbreak;
       }
-      VM_CASE(CONCAT) {
+      vmcase(OP_CONCAT) {
         int n = GETARG_B(i); /* number of elements to concatenate */
         L->top = ra + n;     /* mark the end of concat operands */
         ProtectNT(luaV_concat(L, n));
         checkGC(L, L->top); /* 'luaV_concat' ensures correct top */
         vmbreak;
       }
-      VM_CASE(CLOSE) {
+      vmcase(OP_CLOSE) {
         Protect(luaF_close(L, ra, LUA_OK, 1));
         vmbreak;
       }
-      VM_CASE(TBC) {
+      vmcase(OP_TBC) {
         /* create new to-be-closed upvalue */
         halfProtect(luaF_newtbcupval(L, ra));
         vmbreak;
       }
-      VM_CASE(JMP) {
+      vmcase(OP_JMP) {
         dojump(ci, i, 0);
         vmbreak;
       }
-      VM_CASE(EQ) {
+      vmcase(OP_EQ) {
         int cond;
         TValue *rb = vRB(i);
         Protect(cond = luaV_equalobj(L, s2v(ra), rb));
         docondjump();
         vmbreak;
       }
-      VM_CASE(LT) {
+      vmcase(OP_LT) {
         op_order(L, l_lti, LTnum, lessthanothers);
         vmbreak;
       }
-      VM_CASE(LE) {
+      vmcase(OP_LE) {
         op_order(L, l_lei, LEnum, lessequalothers);
         vmbreak;
       }
-      VM_CASE(EQK) {
+      vmcase(OP_EQK) {
         TValue *rb = KB(i);
         /* basic types do not use '__eq'; we can use raw equality */
         int cond = luaV_rawequalobj(s2v(ra), rb);
         docondjump();
         vmbreak;
       }
-      VM_CASE(EQI) {
+      vmcase(OP_EQI) {
         int cond;
         int im = GETARG_sB(i);
         if (ttisinteger(s2v(ra)))
@@ -476,28 +497,28 @@ returning: /* trap already set */
         docondjump();
         vmbreak;
       }
-      VM_CASE(LTI) {
+      vmcase(OP_LTI) {
         op_orderI(L, l_lti, luai_numlt, 0, TM_LT);
         vmbreak;
       }
-      VM_CASE(LEI) {
+      vmcase(OP_LEI) {
         op_orderI(L, l_lei, luai_numle, 0, TM_LE);
         vmbreak;
       }
-      VM_CASE(GTI) {
+      vmcase(OP_GTI) {
         op_orderI(L, l_gti, luai_numgt, 1, TM_LT);
         vmbreak;
       }
-      VM_CASE(GEI) {
+      vmcase(OP_GEI) {
         op_orderI(L, l_gei, luai_numge, 1, TM_LE);
         vmbreak;
       }
-      VM_CASE(TEST) {
+      vmcase(OP_TEST) {
         int cond = !l_isfalse(s2v(ra));
         docondjump();
         vmbreak;
       }
-      VM_CASE(TESTSET) {
+      vmcase(OP_TESTSET) {
         TValue *rb = vRB(i);
         if (l_isfalse(rb) == GETARG_k(i))
           pc++;
@@ -507,7 +528,7 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(CALL) {
+      vmcase(OP_CALL) {
         CallInfo *newci;
         int b = GETARG_B(i);
         int nresults = GETARG_C(i) - 1;
@@ -525,7 +546,7 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(TAILCALL) {
+      vmcase(OP_TAILCALL) {
         int b = GETARG_B(i); /* number of arguments + 1 (function) */
         int nparams1 = GETARG_C(i);
         /* delta is virtual 'func' - real 'func' (vararg functions) */
@@ -559,7 +580,7 @@ returning: /* trap already set */
 
         goto startfunc; /* execute the callee */
       }
-      VM_CASE(RETURN) {
+      vmcase(OP_RETURN) {
         int n = GETARG_B(i) - 1; /* number of results */
         int nparams1 = GETARG_C(i);
         if (n < 0)                   /* not fixed? */
@@ -578,7 +599,7 @@ returning: /* trap already set */
         updatetrap(ci); /* 'luaD_poscall' can change hooks */
         goto ret;
       }
-      VM_CASE(RETURN0) {
+      vmcase(OP_RETURN0) {
         if (l_unlikely(L->hookmask)) {
           L->top = ra;
           savepc(ci);
@@ -593,7 +614,7 @@ returning: /* trap already set */
         }
         goto ret;
       }
-      VM_CASE(RETURN1) {
+      vmcase(OP_RETURN1) {
         if (l_unlikely(L->hookmask)) {
           L->top = ra + 1;
           savepc(ci);
@@ -619,7 +640,7 @@ returning: /* trap already set */
           goto returning; /* continue running caller in this frame */
         }
       }
-      VM_CASE(FORLOOP) {
+      vmcase(OP_FORLOOP) {
         if (ttisinteger(s2v(ra + 2))) { /* integer loop? */
           lua_Unsigned count = l_castS2U(ivalue(s2v(ra + 1)));
           if (count > 0) { /* still more iterations? */
@@ -636,12 +657,12 @@ returning: /* trap already set */
         updatetrap(ci);              /* allows a signal to break the loop */
         vmbreak;
       }
-      VM_CASE(FORPREP) {
+      vmcase(OP_FORPREP) {
         savestate(L, ci);                           /* in case of errors */
         if (forprep(L, ra)) pc += GETARG_Bx(i) + 1; /* skip the loop */
         vmbreak;
       }
-      VM_CASE(TFORPREP) {
+      vmcase(OP_TFORPREP) {
         /* create to-be-closed upvalue (if needed) */
         halfProtect(luaF_newtbcupval(L, ra + 3));
         pc += GETARG_Bx(i);
@@ -649,7 +670,7 @@ returning: /* trap already set */
         lua_assert(GET_OPCODE(i) == OP_TFORCALL && ra == RA(i));
         goto l_tforcall;
       }
-      VM_CASE(TFORCALL) {
+      vmcase(OP_TFORCALL) {
       l_tforcall:
         /* 'ra' has the iterator function, 'ra + 1' has the state,
            'ra + 2' has the control variable, and 'ra + 3' has the
@@ -665,7 +686,7 @@ returning: /* trap already set */
         lua_assert(GET_OPCODE(i) == OP_TFORLOOP && ra == RA(i));
         goto l_tforloop;
       }
-      VM_CASE(TFORLOOP) {
+      vmcase(OP_TFORLOOP) {
       l_tforloop:
         if (!ttisnil(s2v(ra + 4))) {    /* continue loop? */
           setobjs2s(L, ra + 2, ra + 4); /* save control variable */
@@ -673,7 +694,7 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(SETLIST) {
+      vmcase(OP_SETLIST) {
         int n = GETARG_B(i);
         unsigned int last = GETARG_C(i);
         Table *h = hvalue(s2v(ra));
@@ -696,18 +717,18 @@ returning: /* trap already set */
         }
         vmbreak;
       }
-      VM_CASE(CLOSURE) {
+      vmcase(OP_CLOSURE) {
         Proto *p = cl->p->p[GETARG_Bx(i)];
         halfProtect(pushclosure(L, p, cl->upvals, base, ra));
         checkGC(L, ra + 1);
         vmbreak;
       }
-      VM_CASE(VARARG) {
+      vmcase(OP_VARARG) {
         int n = GETARG_C(i) - 1; /* required results */
         Protect(luaT_getvarargs(L, ci, ra, n));
         vmbreak;
       }
-      VM_CASE(VARARGPREP) {
+      vmcase(OP_VARARGPREP) {
         ProtectNT(luaT_adjustvarargs(L, GETARG_A(i), ci, cl->p));
         if (l_unlikely(trap)) { /* previous "Protect" updated trap */
           luaD_hookcall(L, ci);
@@ -716,7 +737,7 @@ returning: /* trap already set */
         updatebase(ci); /* function has new base after adjustment */
         vmbreak;
       }
-      VM_CASE(EXTRAARG) {
+      vmcase(OP_EXTRAARG) {
         lua_assert(0);
         vmbreak;
       }
@@ -779,7 +800,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
     vmfetch();
     #if 0
       /* low-level line tracing for debugging Lua */
-      printf("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
+      luaG_runerror("line: %d\n", luaG_getfuncline(cl->p, pcRel(pc, cl->p)));
     #endif
     lua_assert(base == ci->func + 1);
     lua_assert(base <= L->top && L->top < L->stack_last);
@@ -900,6 +921,12 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TValue *rb = KB(i);
         TValue *rc = RKC(i);
         TString *key = tsvalue(rb);  /* key must be a string */
+
+        /* verify locks */
+        Table *t = hvalue(upval);
+        if (l_unlikely(t->locked))
+          luaG_runerror(L, "attempt to modify locked table.");
+
         if (luaV_fastget(L, upval, key, slot, luaH_getshortstr)) {
           luaV_finishfastset(L, upval, slot, rc);
         }
@@ -912,6 +939,12 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TValue *rb = vRB(i);  /* key (table is in 'ra') */
         TValue *rc = RKC(i);  /* value */
         lua_Unsigned n;
+
+        /* verify locks */
+        Table *t = hvalue(s2v(ra));
+        if (l_unlikely(t->locked))
+          luaG_runerror(L, "attempt to modify locked table.");
+        
         if (ttisinteger(rb)  /* fast track for integers? */
             ? (cast_void(n = ivalue(rb)), luaV_fastgeti(L, s2v(ra), n, slot))
             : luaV_fastget(L, s2v(ra), rb, slot, luaH_get)) {
@@ -925,6 +958,12 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         const TValue *slot;
         int c = GETARG_B(i);
         TValue *rc = RKC(i);
+
+        /* verify locks */
+        Table *t = hvalue(s2v(ra));
+        if (l_unlikely(t->locked))
+          luaG_runerror(L, "attempt to modify locked table. 6");
+        
         if (luaV_fastgeti(L, s2v(ra), c, slot)) {
           luaV_finishfastset(L, s2v(ra), slot, rc);
         }
@@ -941,6 +980,8 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         TValue *rc = RKC(i);
         TString *key = tsvalue(rb);  /* key must be a string */
         if (luaV_fastget(L, s2v(ra), key, slot, luaH_getshortstr)) {
+          if (l_unlikely(hvalue(s2v(ra))->locked))
+            halfProtect(luaG_runerror(L, "attempt to modify locked table."));
           luaV_finishfastset(L, s2v(ra), slot, rc);
         }
         else

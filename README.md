@@ -11,6 +11,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
+- cleaner syntax errors and stack traces with colors
 - `_INCLUDES` global variable is a table of all libraries built with cobalt (ex: `if (!_INCLUDES["sdl"]) error("SDL is required")`)
 - allocation tracker (track bytes and pool allocator stats)
 - `uwait`, `swait`, `mwait` for system sleep
@@ -26,7 +27,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - 2x speed improved gc (optional) using libgc
 - improved vm
 - Python bridge `import("python")`
-- readonly tables or `rotables`
+- locked tables (like frozen tables in pluto) using `table.lock` and `table.islock`
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - LLVM JIT compiler
 - `debug.snap` to track current stack

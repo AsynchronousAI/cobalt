@@ -802,6 +802,10 @@ LUA_API void lua_seti(lua_State *L, int idx, lua_Integer n) {
   lua_lock(L);
   api_checknelems(L, 1);
   t = index2value(L, idx);
+  if (ttistable(t)) {
+    Table *tab = hvalue(t);
+    if (tab->locked) luaG_runerror(L, "attempt to modify locked table.");
+  }
   if (luaV_fastgeti(L, t, n, slot)) {
     luaV_finishfastset(L, t, slot, s2v(L->top - 1));
   } else {
@@ -902,6 +906,33 @@ LUA_API int lua_setiuservalue(lua_State *L, int idx, int n) {
   L->top--;
   lua_unlock(L);
   return res;
+}
+
+/*
+** table locking
+*/
+LUA_API void lua_locktable(lua_State* L, int idx) {
+  Table *t;
+  lua_lock(L);
+  t = gettable(L, idx);
+  if (t) {
+    t->locked = 1;
+  }
+  lua_unlock(L);
+}
+
+
+LUA_API int lua_istablelocked (lua_State *L, int idx) {
+  lua_lock(L);
+  Table *t = gettable(L, idx);
+  lua_unlock(L);
+  return t ? t->locked : 0;
+}
+
+LUA_API void lua_erriflocked (lua_State *L, int idx) {
+  lua_lock(L);
+  if (lua_istablelocked(L, idx)) luaG_runerror(L, "attempt to modify locked table.");
+  lua_unlock(L);
 }
 
 /*

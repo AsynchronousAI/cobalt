@@ -376,11 +376,30 @@ static int sort(lua_State *L) {
   return 0;
 }
 
+static int lock(lua_State* L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  if (lua_gettop(L) > 1) {
+    luaL_error(L, "more arguments than expected to table.freeze");
+  }
+  else {
+    lua_locktable(L, 1);
+  }
+  return 1;
+}
+
+
+static int islock (lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  lua_pushboolean(L, lua_istablelocked(L, 1));
+  return 1;
+}
+
 /* }====================================================== */
 
 static const luaL_Reg tab_funcs[] = {{"concat", tconcat}, {"insert", tinsert},
                                      {"pack", tpack},     {"unpack", tunpack},
                                      {"remove", tremove}, {"move", tmove},
+                                     {"lock", lock},      {"islock", islock},
                                      {"sort", sort},      {NULL, NULL}};
 
 LUAMOD_API int luaopen_table(lua_State *L) {

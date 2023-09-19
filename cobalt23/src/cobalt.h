@@ -153,6 +153,14 @@ LUA_API int(lua_checkstack)(lua_State *L, int n);
 LUA_API void(lua_xmove)(lua_State *from, lua_State *to, int n);
 
 /*
+** table locking
+*/
+
+LUA_API void  (lua_locktable) (lua_State *L, int idx);
+LUA_API int   (lua_istablelocked) (lua_State *L, int idx);
+LUA_API void  (lua_erriflocked) (lua_State *L, int idx);
+
+/*
 ** access functions (stack -> C)
 */
 

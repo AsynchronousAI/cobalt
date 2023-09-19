@@ -119,7 +119,7 @@ LUAI_FUNC TString *luaX_newstring(LexState *ls, const char *str, size_t l);
 LUAI_FUNC void luaX_next(LexState *ls);
 LUAI_FUNC int luaX_lookahead(LexState *ls);
 LUAI_FUNC l_noret luaX_syntaxerror(LexState *ls, const char *s);
-LUAI_FUNC l_noret luaX_notedsyntaxerror(LexState *ls, const char *s);
+LUAI_FUNC l_noret luaX_notedsyntaxerror(LexState *ls, const char *s, const char *msg);
 LUAI_FUNC void luaX_syntaxwarning(LexState *ls, const char *s);
 LUAI_FUNC const char *luaX_token2str(LexState *ls, int token);
 

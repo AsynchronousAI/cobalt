@@ -119,20 +119,22 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   /* get line contents */
   char *line_contents = ls->buff->buffer;
   int line_length = strlen(line_contents);
+  
 
-
-  /* get the errored character and generate arrows */
-  int faultyChar = ls->current;
-  char arrows[line_length + 1];
-  for (int i = 0; i < line_length; i++) {
-    if (i == faultyChar) {
+  /* arrows is a list of ^ populated as long as the line is */
+  char arrows = "^";
+  /*
+  for (int i = 0; i < line_length; i++){
+    if (i == ls->current - 1){
       arrows[i] = '^';
-    } else {
+    }else{
       arrows[i] = ' ';
     }
   }
   arrows[line_length] = '\0';
-  
+  */
+
+
   /* notes */
   char note[1000];
 
@@ -144,7 +146,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
     
   /* throw error */
   if (token)
-    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t%d| %s\n\t%s%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents, arrows, note);
+    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t%d| %s\n\t | ^\n\t | code until error\n\t%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents/*, arrows*/, note);
   luaD_throw(ls->L, LUA_ERRSYNTAX);
   #else
   msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);

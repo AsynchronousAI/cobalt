@@ -210,29 +210,6 @@ if (USB)
         "src/usb/utils.c"
     )
 endif()
-# SOCKET
-if (SOCKET)
-    list(APPEND LUA_LIB_SRCS
-        "src/curl/lcurlapi.c"
-        "src/curl/lcurl.c"
-        "src/curl/lcutils.c"
-        "src/curl/lcerror.c"
-        "src/curl/lcmime.c"
-        "src/curl/lchttppost.c"
-        "src/curl/lcmulti.c"
-        "src/curl/lceasy.c"
-        "src/curl/l52util.c"
-        "src/curl/lcshare.c"
-    )
-    if (CURL_PATH_OVERRIDE)
-        message("- Overriding CURL Path to: ${CURL_PATH_OVERRIDE}")
-        set(CURL_DIR "${CURL_PATH_OVERRIDE}")
-    endif()
-    find_package(CURL REQUIRED)
-    list(APPEND LINKED_LIBRARIES CURL::libcurl)
-    include_directories(${CURL_INCLUDE_DIRS})
-endif()
-
 # Python 
 if (PYTHON)
     list(APPEND LUA_LIB_SRCS

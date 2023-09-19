@@ -672,11 +672,6 @@ LUAMOD_API int luaopen_base(lua_State *L) {
   LENGTH++;
   lua_rawseti(L, -2, LENGTH);
   #endif
-  #ifdef COBALT_SOCKET
-  lua_pushstring(L, "cURL");
-  LENGTH++;
-  lua_rawseti(L, -2, LENGTH);
-  #endif
   #ifdef COBALT_USB
   lua_pushstring(L, "usb");
   LENGTH++;

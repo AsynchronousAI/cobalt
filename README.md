@@ -21,7 +21,6 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - `unix`, `win`, and `core` (core is cross plat) for lowlevel system calls
 - AOT compiler byte->C or byte->LLVMIR if you have LLVM capable version of cobalt
 - libclang bindings (compile C code from Cobalt)
-- cURL capabilites
 - light functions
 - regex support (not full regex only a small subset), use `unix.regex` for POSIX regex
 - 2x speed improved gc (optional) using libgc
@@ -126,9 +125,9 @@ missing features and the `unix`, `win` libraries should not be available.
 
 To build the following flags are reccomended:
 ```bash
--DCURL=off -DSDL=off -DM=2 -DCLANG=off -DLLVM=off -DCROSS=on -DPYTHON=off
+DSDL=off -DM=2 -DCLANG=off -DLLVM=off -DCROSS=on -DPYTHON=off
 ```
-* -DCURL, -DSDL, -DPYTHON, -DCLANG disable the bindings for those libraries (they are not supported and needed for microcontrollers)
+* -DSDL, -DPYTHON, -DCLANG disable the bindings for those libraries (they are not supported and needed for microcontrollers)
 * -DLLVM=off disables JIT and LLVM AOT which are just junk for microcontrollers.
 * -DM=2 maxes out memory optimizations in sacrifice of speed. `-DM=0` is the default and `-DM=1` is light memory optimizations.
 * -DCROSS=on disables CPU specific optimizations.
@@ -138,7 +137,6 @@ To build the following flags are reccomended:
 You can also use `#include` to include the cobalt stdlibs and run it there.
 ```c
 /* equivelent to flags: */
-#define COBALT_CURL 0
 #define COBALT_SDL 0
 #define COBALT_CLANG 0
 #define COBALT_PYTHON 0
@@ -151,7 +149,7 @@ You can also use `#include` to include the cobalt stdlibs and run it there.
 #include <lualib.h>
 #include <lautoc.h>
 
-/* This is a barebones start without the Clang, LLVM, cURL, and SDL libraries or standard libraries */
+/* This is a barebones start without the Clang, LLVM, and SDL libraries or standard libraries */
 ```
 Then you can use the C API to run cobalt code.
 ```c

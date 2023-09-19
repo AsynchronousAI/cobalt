@@ -99,7 +99,7 @@ static const char *txtToken(LexState *ls, int token) {
 /* teal arrows */
 #define ARROW "\033[32m^\033[0m"
 
-static l_noret lexerror(LexState *ls, const char *msg, int token) {
+static l_noret advlexerror(LexState *ls, const char *msg, int token, const char *innote) {
   #ifdef NEW_SYNTAX_ERR
   /* turn file name to a string */
   char buff[LUA_IDSIZE];
@@ -117,7 +117,7 @@ static l_noret lexerror(LexState *ls, const char *msg, int token) {
   */
   
   /* get line contents */
-  char line_contents[] = ls->buff->buffer;
+  char *line_contents = ls->buff->buffer;
   int line_length = strlen(line_contents);
 
 
@@ -132,10 +132,19 @@ static l_noret lexerror(LexState *ls, const char *msg, int token) {
     }
   }
   arrows[line_length] = '\0';
+  
+  /* notes */
+  char note[1000];
 
+  if (innote != ""){
+    sprintf(note, "\n\t\033[1;90mnote:\033[0m\t%s", innote);
+  }else{
+    note[0] = '\0';
+  }
+    
   /* throw error */
   if (token)
-    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t%d| %s\n\t%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents, arrows);
+    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t%d| %s\n\t%s%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents, arrows, note);
   luaD_throw(ls->L, LUA_ERRSYNTAX);
   #else
   msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);
@@ -144,9 +153,18 @@ static l_noret lexerror(LexState *ls, const char *msg, int token) {
   #endif
 }
 
+static l_noret lexerror(LexState *ls, const char *msg, int token) {
+  advlexerror(ls, msg, token, "");
+}
+
 l_noret luaX_syntaxerror(LexState *ls, const char *msg) {
   lexerror(ls, msg, ls->t.token);
 }
+
+l_noret luaX_notedsyntaxerror(LexState *ls, const char *msg, const char *note) {
+  advlexerror(ls, msg, ls->t.token, note);
+}
+
 
 static void lexwarning(LexState *ls, const char *msg, int token) {
 #if defined COBALT_WARNING
@@ -361,6 +379,7 @@ static void esccheck(LexState *ls, int c, const char *msg) {
   }
 }
 
+
 static int gethexa(LexState *ls) {
   save_and_next(ls);
   esccheck(ls, lisxdigit(ls->current), "hexadecimal digit expected");
@@ -545,7 +564,7 @@ static void read_format_string(LexState *ls, int del, SemInfo *seminfo) {
     }else{
       /* validate */
       if (track >= MAX_FORMAT)
-        lexerror(ls, "format string too long and ended", TK_STRING);
+        advlexerror(ls, "format string too long and ended", TK_STRING, "format strings have a maximum length of 10 characters");
       
       /* check if end or to be added */
       if (ls->current == '}') {

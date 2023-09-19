@@ -772,7 +772,7 @@ l_noret luaG_errormsg(lua_State *L) {
     setobjs2s(L, L->top - 1, errfunc);  /* push function */
     L->top++;                           /* assume EXTRA_STACK */
     luaD_callnoyield(L, L->top - 2, 1); /* call it */
-  }
+  } 
   luaD_throw(L, LUA_ERRRUN);
 }
 

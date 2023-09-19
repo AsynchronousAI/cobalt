@@ -68,5 +68,4 @@ install_manifest.txt
 !/cobalt23/lua-cobalt/Makefile
 
 # Libs
-/libglfw.dylib
 /test

@@ -187,64 +187,6 @@ else()
     set(SDL_LIBRARIES)
 endif()
 
-# VULKAN
-if (VULKAN)
-    list(APPEND LUA_LIB_SRCS
-        "src/vulkan/buffer_view.c"
-        "src/vulkan/buffer.c"
-        "src/vulkan/cmd.c"
-        "src/vulkan/command_buffer.c"
-        "src/vulkan/command_pool.c"
-        "src/vulkan/datahandling.c"
-        "src/vulkan/debug_report_callback.c"
-        "src/vulkan/debug_utils_messenger.c"
-        "src/vulkan/descriptor_pool.c"
-        "src/vulkan/descriptor_set.c"
-        "src/vulkan/descriptor_set_layout.c"
-        "src/vulkan/descriptor_update_template.c"
-        "src/vulkan/device_memory.c"
-        "src/vulkan/device.c"
-        "src/vulkan/display_mode.c"
-        "src/vulkan/display.c"
-        "src/vulkan/enums.c"
-        "src/vulkan/event.c"
-        "src/vulkan/fence.c"
-        "src/vulkan/framebuffer.c"
-        "src/vulkan/flags.c"
-        "src/vulkan/getproc.c"
-        "src/vulkan/image_view.c"
-        "src/vulkan/image.c"
-        "src/vulkan/instance.c"
-        "src/vulkan/layers.c"
-        "src/vulkan/main.c"
-        "src/vulkan/objects.c"
-        "src/vulkan/physical_device.c"
-        "src/vulkan/pipeline_cache.c"
-        "src/vulkan/pipeline_layout.c"
-        "src/vulkan/pipeline.c"
-        "src/vulkan/queue.c"
-        "src/vulkan/query_pool.c"
-        "src/vulkan/render_pass.c"
-        "src/vulkan/sampler.c"
-        "src/vulkan/sampler_ycbcr_conversion.c"
-        "src/vulkan/semaphore.c"
-        "src/vulkan/shader_module.c"
-        "src/vulkan/surface.c"
-        "src/vulkan/swapchain.c"
-        "src/vulkan/tracing.c"
-        "src/vulkan/udata.c"
-        "src/vulkan/utils.c"
-        "src/vulkan/validation_cache.c"
-        "src/vulkan/versions.c"
-        "src/vulkan/zcheck.c"
-
-        #"src/vulkan/vulkan/vk_format_utils.cpp"
-        #"src/vulkan/vulkan/vk_layer_config.cpp"
-        #"src/vulkan/vulkan/vk_layer_extension_utils.cpp"
-        #"src/vulkan/vulkan/vk_layer_utils.cpp"
-        #"src/vulkan/vulkan/vk_safe_struct.cpp"
-    )
-endif()
 # USB
 if (USB)
     list(APPEND LUA_LIB_SRCS
@@ -324,35 +266,6 @@ if (PYTHON)
     endif()
     target_link_libraries(lua_internal INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
     target_link_libraries(lua_include INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
-endif()
-
-# GLFW
-if (GLFW)
-    list(APPEND LUA_LIB_SRCS
-        "src/glfw/callbacks.c"
-        "src/glfw/context.c"
-        "src/glfw/cur.c"
-        "src/glfw/enums.c"
-        "src/glfw/getproc.c"
-        "src/glfw/hint.c"
-        "src/glfw/id.c"
-        "src/glfw/input.c"
-        "src/glfw/main.c"
-        "src/glfw/mon.c"
-        "src/glfw/monitor.c"
-        "src/glfw/native.c"
-        "src/glfw/utils.c"
-        "src/glfw/vulkan.c"
-        "src/glfw/win.c"
-        "src/glfw/window.c"
-    )
-    if (GLFW_PATH_OVERRIDE)
-        message("- Overriding GLFW Path to: ${GLFW_PATH_OVERRIDE}")
-        set(GLFW_DIR "${GLFW_PATH_OVERRIDE}")
-    endif()
-    #find_package(glfw3 REQUIRED)
-    #list(APPEND LINKED_LIBRARIES glfw)
-    #include_directories(${GLFW_INCLUDE_DIRS})
 endif()
 
 # LLVM

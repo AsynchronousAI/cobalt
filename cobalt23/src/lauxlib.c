@@ -116,8 +116,16 @@ static int lastlevel(lua_State *L) {
   }
   return le - 1;
 }
+/* for traceback */
+char* strcat_front(char *dest, const char *src) {
+  /* concats src to the start of dest and returns new string */
+  char *new_str = malloc(strlen(dest) + strlen(src) + 1);
+  strcpy(new_str, src);
+  strcat(new_str, dest);
+  return new_str;
+}
 
-LUALIB_API void luaL_traceback(lua_State *L, lua_State *L1, const char *msg,
+LUALIB_API void luaL_traceback(lua_State *L, lua_State *L1, char *msg,
                                int level) {
   luaL_Buffer b;
   lua_Debug ar;
@@ -125,26 +133,29 @@ LUALIB_API void luaL_traceback(lua_State *L, lua_State *L1, const char *msg,
   int limit2show = (last - level > LEVELS1 + LEVELS2) ? LEVELS1 : -1;
   luaL_buffinit(L, &b);
   if (msg) {
+    msg = strcat_front(msg, "\033[1;31mruntime error: \033[0m\033[1m");
+    strcat(msg, "\033[0m");
     luaL_addstring(&b, msg);
-    luaL_addchar(&b, '\n');
+    //luaL_addchar(&b, '\n');
   }
-  luaL_addstring(&b, "stack traceback:");
+  //luaL_addstring(&b, "traceback:");
   while (lua_getstack(L1, level++, &ar)) {
     if (limit2show-- == 0) {              /* too many levels? */
       int n = last - level - LEVELS2 + 1; /* number of levels to skip */
-      lua_pushfstring(L, "\n\t...\t(skipping %d levels)", n);
+      lua_pushfstring(L, "\n\t...\t(skipping %d)", n);
       luaL_addvalue(&b); /* add warning about skip */
       level += n;        /* and skip to last levels */
     } else {
       lua_getinfo(L1, "Slnt", &ar);
       if (ar.currentline <= 0)
-        lua_pushfstring(L, "\n\t%s: in ", ar.short_src);
+        lua_pushfstring(L, "\n\t\033[3m(%d)\033[0m \033[1m%s\033[0m in ", level, ar.short_src);
       else
-        lua_pushfstring(L, "\n\t%s:%d: in ", ar.short_src, ar.currentline);
+        lua_pushfstring(L, "\n\t\033[3m(%d)\033[0m \033[1m%s:%d\033[0m in ", level, ar.short_src, ar.currentline);
+      //lua_pushstring(L, "\033[0m");
       luaL_addvalue(&b);
       pushfuncname(L, &ar);
       luaL_addvalue(&b);
-      if (ar.istailcall) luaL_addstring(&b, "\n\t(...tail calls...)");
+      if (ar.istailcall) luaL_addstring(&b, "\n\t(...repeats...)");
     }
   }
   luaL_pushresult(&b);

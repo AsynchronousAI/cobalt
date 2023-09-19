@@ -112,14 +112,6 @@ LUAMOD_API int(luaopen_python)(lua_State *L);
 #define LUA_CLANGNAME "clang"
 LUAMOD_API int(luaopen_clang)(lua_State *L);
 #endif
-#if defined(COBALT_GLFW)
-#define LUA_GLFWNAME "glfw"
-LUAMOD_API int(luaopen_moonglfw)(lua_State *L);
-#endif
-#if defined(COBALT_VULKAN)
-#define LUA_VULKANNAME "vulkan"
-LUAMOD_API int(luaopen_moonvulkan)(lua_State *L);
-#endif
 #if defined(COBALT_USB)
 #define LUA_USBNAME "usb"
 LUAMOD_API int(luaopen_moonusb)(lua_State *L);

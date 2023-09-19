@@ -25,7 +25,6 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - regex support (not full regex only a small subset), use `unix.regex` for POSIX regex
 - 2x speed improved gc (optional) using libgc
 - improved vm
-- Vulkan bindings (optional) for high-performance 3D graphics
 - Python bridge `import("python")`
 - readonly tables or `rotables`
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
@@ -41,7 +40,7 @@ Cobalt is a Lowlevel fork of Lua 5.4 which includes:
 - CMake build system
 ## When to, and not use
 ### Graphics Programming
-Cobalt is a great choice for graphics programming as it has SDL, GLFW, Vulkan, and a Graphical Math library built in.
+Cobalt is a great choice for graphics programming as it has SDL, and a Graphical Math library built in.
 ### AI
 Cobalt doesn't include AI libraries/tools but is possible using the Python bridge or C FFI. Cobalt is a great choice for AI as it has a fast VM and JIT and access to Python and C's utilities.
 ### Web Development

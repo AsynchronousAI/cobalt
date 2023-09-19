@@ -25,7 +25,7 @@ execute_process(
 
 if (NOT PKG_CONFIGEXISTS)
 if (NOT IGNORE_PKG_CONFIG)
-    message(FATAL_ERROR "pkg-config is not installed on your device and is required for locating dependencies. \n\n\tUse -DIGNORE_PKG_CONFIG=ON to ignore this error (but you will not be able to access Vulkan, SDL, GLFW, Clang, and cURL)")
+    message(FATAL_ERROR "pkg-config is not installed on your device and is required for locating dependencies. \n\n\tUse -DIGNORE_PKG_CONFIG=ON to ignore this error (but you will not be able to access SDL, Clang, and cURL)")
 endif()
 endif()
 
@@ -221,10 +221,6 @@ if(SDL)
     endif()
     set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${SDL2_TTF_LIBS} ${SDL2_MIXER_LIBS}")
 endif() 
-if (GLFW)
-    message("-- Configuring GLFW Library")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_GLFW")
-endif()
 if (SOCKET)
     message("-- Configuring Socket/cURL Library")
     execute_process(
@@ -266,12 +262,6 @@ if (CLANG)
     message("-- ${CLANG_LIBS}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG ${CLANG_LIBS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_LIBS}")
-endif()
-
-if (VULKAN)
-    message("-- Configuring Vulkan Bindings")
-    # Vulkan is dynamic library dependent rather than header dependent like GLFW
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_VULKAN")
 endif()
 
 if (LLVM)

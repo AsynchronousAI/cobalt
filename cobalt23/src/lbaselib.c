@@ -656,18 +656,8 @@ LUAMOD_API int luaopen_base(lua_State *L) {
   LENGTH++;
   lua_rawseti(L, -2, LENGTH);
   #endif
-  #ifdef COBALT_GLFW
-  lua_pushstring(L, "glfw");
-  LENGTH++;
-  lua_rawseti(L, -2, LENGTH);
-  #endif
   #ifdef COBALT_SDL
   lua_pushstring(L, "sdl");
-  LENGTH++;
-  lua_rawseti(L, -2, LENGTH);
-  #endif
-  #ifdef COBALT_VULKAN
-  lua_pushstring(L, "vulkan");
   LENGTH++;
   lua_rawseti(L, -2, LENGTH);
   #endif

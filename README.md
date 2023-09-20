@@ -2,7 +2,7 @@
 > **NOTICE** Cobalt is heavily indevelopment, read the bottom of this file for a TODO.
 
 
-Cobalt is a Lowlevel fork of Lua 5.4 which includes:
+Cobalt is a fork of Lua 5.4 attempting to turn it into a language like C++. Cobalt includes:
 - SDL bindings (optional) for 2D graphics
 - interpreter, compiler, and JIT FFI
 - compile to LLVM IR if you have LLVM capable version of cobalt

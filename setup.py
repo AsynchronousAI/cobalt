@@ -67,7 +67,7 @@ setup(name="cobalt",
       url="http://github.com/cobalt-lang/cobalt",
       license="MIT",
       long_description="""Cobalt is a programming language that aims to be
-Lua turned into a lowlevel language, like C.""",
+Lua turned into a language like C++.""",
       ext_modules=[
         Extension("cobalt-python",
                   ["cobalt23/src/pyl.c", "cobalt23/src/lpy.c"],

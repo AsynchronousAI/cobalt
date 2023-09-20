@@ -38,8 +38,15 @@ static int luaUB_global(lua_State *L) {
   lua_getglobal(L, key);
   return 1;
 }
+static int luaUB_ipairsaux (lua_State *L) {
+  lua_Integer i = luaL_checkinteger(L, 2);
+  i = luaL_intop(+, i, 1);
+  lua_pushinteger(L, i);
+  return (lua_geti(L, 1, i) == LUA_TNIL) ? 1 : 2;
+}
 
 static const luaL_Reg base_funcs[] = {{"global", luaUB_global},
+                                      {"ipairsaux", luaUB_ipairsaux},
 
                                       /* placeholders */
                                       {"VERSION", NULL},

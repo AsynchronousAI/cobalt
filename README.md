@@ -11,6 +11,7 @@ Cobalt is a fork of Lua 5.4 attempting to turn it into a language like C++. Coba
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
+- Loop without `pairs`/`ipairs`/`next`
 - cleaner syntax errors and stack traces with colors
 - `_INCLUDES` global variable is a table of all libraries built with cobalt (ex: `if (!_INCLUDES["sdl"]) error("SDL is required")`)
 - allocation tracker (track bytes and pool allocator stats)

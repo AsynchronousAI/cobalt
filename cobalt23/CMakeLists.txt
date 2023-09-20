@@ -62,7 +62,6 @@ set(LUA_LIB_SRCS
     "src/math/quat.c"
     "src/math/rect.c"
     "src/math/enums.c"
-    "src/math/.DS_Store"
     "src/math/funcs.c"
     "src/math/transform.c"
     "src/math/complex.c"

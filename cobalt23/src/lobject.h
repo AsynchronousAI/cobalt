@@ -20,6 +20,13 @@
 #define LUA_TDEADKEY (LUA_NUMTYPES + 2) /* removed keys in tables */
 
 /*
+** Used in for-loops
+*/
+#define LUA_TITER  (LUA_NUMTYPES+3) /* Iterator marker */
+#define LUA_VITER  makevariant(LUA_TITER, 0)
+#define LUA_VITERI  makevariant(LUA_TITER, 1)
+
+/*
 ** number of all possible types (including LUA_TNONE but excluding DEADKEY)
 */
 #define LUA_TOTALTYPES (LUA_TPROTO + 2)
@@ -43,6 +50,7 @@ typedef union Value {
   lua_CFunction f;     /* light C functions */
   lua_Integer i;       /* integer numbers */
   lua_Number n;        /* float numbers */
+  unsigned int it; /* iterator index */
 } Value;
 
 /*

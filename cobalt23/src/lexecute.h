@@ -15,9 +15,27 @@ This is responsible for the following:
 - Using `minicobalt.c` for a miniture execution engine
 */
 
-#include <stdio.h>
-#include "llangstate.h"
+#include <stdio.h> /* debug */
+#include "llangstate.h" /* switch modes */
+#include "lauxlib.h" /* for internal func */
 
+/* for auto-iterators */
+static int next(lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+  lua_settop(L, 2); /* create a 2nd argument if there isn't one */
+  if (lua_next(L, 1))
+    return 2;
+  else {
+    lua_pushnil(L);
+    return 1;
+  }
+}
+static int ipairsaux (lua_State *L) {
+  lua_Integer i = luaL_checkinteger(L, 2);
+  i = luaL_intop(+, i, 1);
+  lua_pushinteger(L, i);
+  return (lua_geti(L, 1, i) == LUA_TNIL) ? 1 : 2;
+}
 
 #define vmcase(OP_name) \
   vmcase(##name)  // just a macro to make the code more readable
@@ -1408,9 +1426,32 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
       }
       vmcase(OP_TFORPREP) {
         /* create to-be-closed upvalue (if needed) */
-        halfProtect(luaF_newtbcupval(L, ra + 3));
-        pc += GETARG_Bx(i);
-        i = *(pc++);  /* go to next instruction */
+        const Instruction* callpc = pc + GETARG_Bx(i);
+        i = *callpc;
+        if ((!ttisfunction(s2v(ra)))) {
+          setobjs2s(L, ra + 1, ra);
+          setfvalue(s2v(ra), next);
+        }
+        if (ttypetag(s2v(ra)) == LUA_VLCF
+              && ttistable(s2v(ra+1))
+              && ttisnil(s2v(ra+3))
+              && !trap
+              && (GETARG_C(i) == 1 || GETARG_C(i) == 2)
+        ) {
+          if (fvalue(s2v(ra)) == next && ttisnil(s2v(ra + 2))) {
+            settt_(s2v(ra + 3), LUA_VITER);
+            val_(s2v(ra + 3)).it = 0;
+          } else if (fvalue(s2v(ra)) == ipairsaux && ttisinteger(s2v(ra + 2))) {
+            settt_(s2v(ra + 3), LUA_VITERI);
+          } else {
+            /* create to-be-closed upvalue (if needed) */
+            halfProtect(luaF_newtbcupval(L, ra + 3));
+          }
+        } else {
+          /* create to-be-closed upvalue (if needed) */
+          halfProtect(luaF_newtbcupval(L, ra + 3));
+        }
+        pc = callpc + 1;
         lua_assert(GET_OPCODE(i) == OP_TFORCALL && ra == RA(i));
         goto l_tforcall;
       }

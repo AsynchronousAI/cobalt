@@ -6,8 +6,6 @@ set(LUA_LIB_SRCS
     "src/lctype.c"
     "src/ldebug.c"
     "src/ljson.c"
-    "src/lfpconv.c"
-    "src/lstrbuf.c"
     "src/lulib.c"
     "src/ldo.c"
     "src/ldump.c"

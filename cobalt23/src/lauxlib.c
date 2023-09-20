@@ -836,7 +836,7 @@ LUALIB_API const char *luaL_tolstring(lua_State *L, int idx, size_t *len) {
         int tt = luaL_getmetafield(L, idx, "__name"); /* try name */
         const char *kind =
             (tt == LUA_TSTRING) ? lua_tostring(L, -1) : luaL_typename(L, idx);
-        lua_pushfstring(L, "%s: %p", kind, lua_topointer(L, idx));
+        lua_pushfstring(L, "<%s: *%p>", kind, lua_topointer(L, idx));
         if (tt != LUA_TNIL) lua_remove(L, -2); /* remove '__name' */
         break;
       }

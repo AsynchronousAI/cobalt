@@ -75,7 +75,7 @@ static const luaL_Reg preloadedlibs[] = {
     {LUA_COLORLIBNAME, luaopen_color},
     {LUA_ALLOCNAME, luaopen_alloc},
     {LUA_LPEGNAME, luaopen_lpeg},
-    {LUA_JSONAME, luaopen_cjson_safe},
+    {LUA_JSONAME, luaopen_json},
     {LUA_COLIBNAME, luaopen_coroutine},
     {LUA_ASYNCLIBNAME, luaopen_async},
     {LUA_UTF8LIBNAME, luaopen_utf8},

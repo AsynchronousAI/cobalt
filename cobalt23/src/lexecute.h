@@ -155,15 +155,17 @@ returning: /* trap already set */
         vmbreak;
       }
       vmcase(OP_GETTABLE) {
+        StkId ra = RA(i);
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = vRC(i);
         lua_Unsigned n;
-        if (ttisinteger(rc) /* fast track for integers? */
-                ? (cast_void(n = ivalue(rc)), luaV_fastgeti(L, rb, n, slot))
-                : luaV_fastget(L, rb, rc, slot, luaH_get)) {
+        if (ttisinteger(rc)  /* fast track for integers? */
+            ? (cast_void(n = ivalue(rc)), luaV_fastgeti(L, rb, n, slot))
+            : luaV_fastget(L, rb, rc, slot, luaH_get)) {
           setobj2s(L, ra, slot);
-        } else
+        }
+        else
           Protect(luaV_finishget(L, rb, rc, ra, slot));
         vmbreak;
       }
@@ -894,6 +896,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         vmbreak;
       }
       vmcase(OP_GETTABLE) {
+        StkId ra = RA(i);
         const TValue *slot;
         TValue *rb = vRB(i);
         TValue *rc = vRC(i);

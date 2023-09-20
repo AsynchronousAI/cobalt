@@ -278,31 +278,49 @@ static int floatforloop(StkId ra) {
 #ifndef AOT_IS_MODULE
 void luaV_finishget(lua_State *L, const TValue *t, TValue *key, StkId val,
                     const TValue *slot) {
-  int loop;         /* counter to avoid infinite loops */
-  const TValue *tm; /* metamethod */
+  int loop;  /* counter to avoid infinite loops */
+  const TValue *tm;  /* metamethod */
+  int isValueString = ttisstring(t) && ttisinteger(key);
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
-    if (slot == NULL) { /* 't' is not a table? */
+    if (slot == NULL) {  /* 't' is not a table? */
       lua_assert(!ttistable(t));
-      tm = luaT_gettmbyobj(L, t, TM_INDEX);
-      if (l_unlikely(notm(tm)))
-        luaG_typeerror(L, t, "index"); /* no metamethod */
-      /* else will try the metamethod */
-    } else { /* 't' is a table */
+      if (isValueString) { /* index for character of string */
+        lua_Integer index = ivalue(key);
+        if (index < 0) { /* negative index, index from end of string */
+          index += tsslen(tsvalue(t)) + 1;
+        }
+        if (((lua_Integer)tsslen(tsvalue(t)) < index) || (index < 1)) { /* invalid index */
+          setnilvalue(s2v(val));
+          return;
+        }
+        else { /* index is valid */
+          setsvalue(L, s2v(val), luaS_newlstr(L, &tsvalue(t)->contents[index - 1], 1));
+          return;
+        }
+      }
+      else {
+        tm = luaT_gettmbyobj(L, t, TM_INDEX);
+        if (l_unlikely(notm(tm)))
+          luaG_typeerror(L, t, "index");  /* no metamethod */
+        /* else will try the metamethod */
+      }
+    }
+    else {  /* 't' is a table */
       lua_assert(isempty(slot));
-      tm = fasttm(L, hvalue(t)->metatable, TM_INDEX); /* table's metamethod */
-      if (tm == NULL) {                               /* no metamethod? */
-        setnilvalue(s2v(val));                        /* result is nil */
+      tm = fasttm(L, hvalue(t)->metatable, TM_INDEX);  /* table's metamethod */
+      if (tm == NULL) {  /* no metamethod? */
+        setnilvalue(s2v(val));  /* result is nil */
         return;
       }
       /* else will try the metamethod */
     }
-    if (ttisfunction(tm)) {               /* is metamethod a function? */
-      luaT_callTMres(L, tm, t, key, val); /* call it */
+    if (ttisfunction(tm)) {  /* is metamethod a function? */
+      luaT_callTMres(L, tm, t, key, val);  /* call it */
       return;
     }
-    t = tm; /* else try to access 'tm[key]' */
-    if (luaV_fastget(L, t, key, slot, luaH_get)) { /* fast track? */
-      setobj2s(L, val, slot);                      /* done */
+    t = tm;  /* else try to access 'tm[key]' */
+    if (luaV_fastget(L, t, key, slot, luaH_get)) {  /* fast track? */
+      setobj2s(L, val, slot);  /* done */
       return;
     }
     /* else repeat (tail call 'luaV_finishget') */
@@ -319,38 +337,38 @@ void luaV_finishget(lua_State *L, const TValue *t, TValue *key, StkId val,
 ** 'luaV_fastget' would have done the job.)
 */
 #ifndef AOT_IS_MODULE
-void luaV_finishset(lua_State *L, const TValue *t, TValue *key, TValue *val,
-                    const TValue *slot) {
-  int loop; /* counter to avoid infinite loops */
+void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
+                     TValue *val, const TValue *slot) {
+  int loop;  /* counter to avoid infinite loops */
   for (loop = 0; loop < MAXTAGLOOP; loop++) {
-    const TValue *tm;                            /* '__newindex' metamethod */
-    if (slot != NULL) {                          /* is 't' a table? */
-      Table *h = hvalue(t);                      /* save 't' table */
-      lua_assert(isempty(slot));                 /* slot must be empty */
-      tm = fasttm(L, h->metatable, TM_NEWINDEX); /* get metamethod */
-      if (tm == NULL) {                          /* no metamethod? */
+    const TValue *tm;  /* '__newindex' metamethod */
+    if (slot != NULL) {  /* is 't' a table? */
+      Table *h = hvalue(t);  /* save 't' table */
+      lua_assert(isempty(slot));  /* slot must be empty */
+      tm = fasttm(L, h->metatable, TM_NEWINDEX);  /* get metamethod */
+      if (tm == NULL) {  /* no metamethod? */
         if (l_unlikely(h->locked)) luaG_runerror(L, "attempt to modify locked table.");
-
-        luaH_finishset(L, h, key, slot, val);    /* set new value */
+        luaH_finishset(L, h, key, slot, val);  /* set new value */
         invalidateTMcache(h);
         luaC_barrierback(L, obj2gco(h), val);
         return;
       }
       /* else will try the metamethod */
-    } else { /* not a table; check metamethod */
+    } else {  /* not a table; check metamethod */
       tm = luaT_gettmbyobj(L, t, TM_NEWINDEX);
-      if (l_unlikely(notm(tm))) luaG_typeerror(L, t, "index");
+      if (l_unlikely(notm(tm)))
+        luaG_typeerror(L, t, "index");
     }
     /* try the metamethod */
     if (ttisfunction(tm)) {
       luaT_callTM(L, tm, t, key, val);
       return;
     }
-    t = tm; /* else repeat assignment over 'tm' */
+    t = tm;  /* else repeat assignment over 'tm' */
     if (luaV_fastget(L, t, key, slot, luaH_get)) {
       if (l_unlikely(hvalue(t)->locked)) luaG_runerror(L, "attempt to modify locked table.");
       luaV_finishfastset(L, t, slot, val);
-      return; /* done */
+      return;  /* done */
     }
     /* else 'return luaV_finishset(L, t, key, val, slot)' (loop) */
   }

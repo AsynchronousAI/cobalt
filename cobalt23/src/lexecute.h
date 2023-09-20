@@ -980,7 +980,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         /* verify locks */
         Table *t = hvalue(s2v(ra));
         if (l_unlikely(t->locked))
-          luaG_runerror(L, "attempt to modify locked table. 6");
+          luaG_runerror(L, "attempt to modify locked table.");
         
         if (luaV_fastgeti(L, s2v(ra), c, slot)) {
           luaV_finishfastset(L, s2v(ra), slot, rc);

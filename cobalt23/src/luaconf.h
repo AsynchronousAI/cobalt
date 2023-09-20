@@ -735,7 +735,7 @@
 /*
 @@ New cobalt features and to enable or not.
 */
-#define NEW_SYNTAX_ERR 1 /* default: ON */
+#define NEW_SYNTAX_ERR 1 /* default: ON */ /* new syntax error messages */
 
 /*
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.

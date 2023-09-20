@@ -832,6 +832,30 @@ LUALIB_API const char *luaL_tolstring(lua_State *L, int idx, size_t *len) {
       case LUA_TNIL:
         lua_pushliteral(L, "null");
         break;
+      case LUA_TTABLE: {
+        int tt = luaL_getmetafield(L, idx, "__name"); /* try name */
+        double len = luaL_len(L, idx);
+        if (len == 0){ /* table */
+          lua_pushfstring(L, "<table *%p>", lua_topointer(L, idx));
+          if (tt != LUA_TNIL) lua_remove(L, -2); /* remove '__name' */
+        }else{ /* array */
+          luaL_Buffer b;
+          luaL_buffinit(L, &b);
+          luaL_addchar(&b, '[');
+          for (int i = 1; i <= len; i++) {
+            lua_pushinteger(L, i);
+            lua_gettable(L, idx);
+            luaL_addvalue(&b);
+            if (i != len){ 
+              luaL_addchar(&b, ','); 
+              luaL_addchar(&b, ' '); 
+            }
+          }
+          luaL_addchar(&b, ']');
+          luaL_pushresult(&b);
+        }
+        break;
+      }
       default: {
         int tt = luaL_getmetafield(L, idx, "__name"); /* try name */
         const char *kind =

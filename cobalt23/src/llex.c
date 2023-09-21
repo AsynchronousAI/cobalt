@@ -832,6 +832,7 @@ static int llex(LexState *ls, SemInfo *seminfo) {
       case ':': {
         next(ls);
         if (check_next1(ls, ':')) return TK_DBCOLON;
+        if (check_next1(ls, '=')) /*ls->appendLineBuff(":=");*/return TK_WALRUS;
         return ':';
       }
       case '+': {

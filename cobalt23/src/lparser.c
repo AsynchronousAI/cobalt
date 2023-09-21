@@ -510,13 +510,36 @@ static void singlevaraux(FuncState *fs, TString *n, expdesc *var, int base) {
     }
   }
 }
+/*
+** Adjust the number of results from an expression list 'e' with 'nexps'
+** expressions to 'nvars' values.
+*/
+static void adjust_assign (LexState *ls, int nvars, int nexps, expdesc *e) {
+  FuncState *fs = ls->fs;
+  int needed = nvars - nexps;  /* extra values needed */
+  if (hasmultret(e->k)) {  /* last expression has multiple returns? */
+    int extra = needed + 1;  /* discount last expression itself */
+    if (extra < 0)
+      extra = 0;
+    luaK_setreturns(fs, e, extra);  /* last exp. provides the difference */
+  }
+  else {
+    if (e->k != VVOID)  /* at least one expression? */
+      luaK_exp2nextreg(fs, e);  /* close last expression */
+    if (needed > 0)  /* missing values? */
+      luaK_nil(fs, fs->freereg, needed);  /* complete with nils */
+  }
+  if (needed > 0)
+    luaK_reserveregs(fs, needed);  /* registers for extra values */
+  else  /* adding 'needed' is actually a subtraction */
+    fs->freereg += needed;  /* remove extra values */
+}
 
 /*
 ** Find a variable with the given name 'n', handling global variables
 ** too.
 */
-static void singlevar(LexState *ls, expdesc *var) {
-  TString *varname = str_checkname(ls);
+static void singlevarinner(LexState *ls, expdesc *var, TString *varname) {
   FuncState *fs = ls->fs;
   singlevaraux(fs, varname, var, 1);
   if (var->k == VVOID) { /* global name? */
@@ -528,28 +551,19 @@ static void singlevar(LexState *ls, expdesc *var) {
   }
 }
 
-/*
-** Adjust the number of results from an expression list 'e' with 'nexps'
-** expressions to 'nvars' values.
-*/
-static void adjust_assign(LexState *ls, int nvars, int nexps, expdesc *e) {
-  FuncState *fs = ls->fs;
-  int needed = nvars - nexps; /* extra values needed */
-  if (hasmultret(e->k)) {     /* last expression has multiple returns? */
-    int extra = needed + 1;   /* discount last expression itself */
-    if (extra < 0) extra = 0;
-    luaK_setreturns(fs, e, extra); /* last exp. provides the difference */
-  } else {
-    if (e->k != VVOID)                   /* at least one expression? */
-      luaK_exp2nextreg(fs, e);           /* close last expression */
-    if (needed > 0)                      /* missing values? */
-      luaK_nil(fs, fs->freereg, needed); /* complete with nils */
+static void singlevar (LexState *ls, expdesc *var) {
+  TString *varname = str_checkname(ls);
+  if (ls->t.token == TK_WALRUS) {
+    luaX_next(ls);
+    new_localvar(ls, varname);
+    expr(ls, var);
+    adjust_assign(ls, 1, 1, var);
+    adjustlocalvars(ls, 1);
+    return;
   }
-  if (needed > 0)
-    luaK_reserveregs(fs, needed); /* registers for extra values */
-  else                     /* adding 'needed' is actually a subtraction */
-    fs->freereg += needed; /* remove extra values */
+  singlevarinner(ls, var, varname);
 }
+
 
 #define enterlevel(ls) luaE_incCstack(ls->L)
 
@@ -2149,7 +2163,7 @@ static void exprstat(LexState *ls) {
             ls,
             lua_pushfstring(
                 ls->L,
-                "'++', '--', +=', '-=', '*=', '/=', '%%=' or '=' expected"));
+                "'++', '--', +=', '-=', '*=', '/=', '%%=', ':=' or '=' expected"));
         break;
     }
   }
@@ -2250,7 +2264,7 @@ static void statement(LexState *ls) {
       /* add const */
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */
-        luaX_notedsyntaxerror(ls, "functions cannot be constant", "use `var` instead of `let`");
+        luaX_notedsyntaxerror(ls, "functions cannot be constant", "use 'var' instead of 'let'");
       else
         constlocalstat(ls);
       break;
@@ -2258,12 +2272,13 @@ static void statement(LexState *ls) {
       /* add const */
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */
-        luaX_notedsyntaxerror(ls, "functions cannot be auto/to-be-closed", "use `var` instead of `auto`");
+        luaX_notedsyntaxerror(ls, "functions cannot be auto/to-be-closed", "use 'var' instead of 'auto'");
       else
         autolocalstat(ls);
       break;
-    case TK_VAR:
-    case TK_LOCAL: {                 /* stat -> localstat */
+    case TK_LOCAL: 
+      printf("\033[1;33mwarning: \033[0m use 'var' instead of 'local'\n");
+    case TK_VAR: {                 /* stat -> localstat */
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */
         localfunc(ls);

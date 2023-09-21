@@ -10,6 +10,7 @@ Cobalt includes:
 - compile to LLVM IR if you have LLVM capable version of cobalt
 - more libraries/bindings
 - improved syntax
+- Walrus operator `:=`
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor

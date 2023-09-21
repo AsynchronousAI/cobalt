@@ -539,12 +539,26 @@ returning: /* trap already set */
         vmbreak;
       }
       vmcase(OP_TESTSET) {
+        StkId ra = RA(i);
         TValue *rb = vRB(i);
-        if (l_isfalse(rb) == GETARG_k(i))
-          pc++;
+        if (GETARG_C(i) == NULL_COALESCE) { /* R(C) is used as an identifier, as it was previously unused. */
+          if (ttisnil(rb)) {
+            pc++;
+          }
+          else {
+            setobj2s(L, ra, rb);
+            donextjump(ci);
+          }
+        }
         else {
-          setobj2s(L, ra, rb);
-          donextjump(ci);
+          if (l_isfalse(rb) == GETARG_k(i))
+          {
+            pc++;
+          }
+          else {
+            setobj2s(L, ra, rb);
+            donextjump(ci);
+          }
         }
         vmbreak;
       }
@@ -1289,12 +1303,26 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         vmbreak;
       }
       vmcase(OP_TESTSET) {
+        StkId ra = RA(i);
         TValue *rb = vRB(i);
-        if (l_isfalse(rb) == GETARG_k(i))
-          pc++;
+        if (GETARG_C(i) == NULL_COALESCE) { /* R(C) is used as an identifier, as it was previously unused. */
+          if (ttisnil(rb)) {
+            pc++;
+          }
+          else {
+            setobj2s(L, ra, rb);
+            donextjump(ci);
+          }
+        }
         else {
-          setobj2s(L, ra, rb);
-          donextjump(ci);
+          if (l_isfalse(rb) == GETARG_k(i))
+          {
+            pc++;
+          }
+          else {
+            setobj2s(L, ra, rb);
+            donextjump(ci);
+          }
         }
         vmbreak;
       }

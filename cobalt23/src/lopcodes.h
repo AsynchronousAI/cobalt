@@ -55,6 +55,11 @@ enum OpMode { iABC, iABx, iAsBx, iAx, isJ }; /* basic instruction formats */
 #define POS_sJ POS_A
 
 /*
+** Identifier used in R(C) for OP_TESTSET, to indicate whether 'false' should be falsy.
+*/
+#define NULL_COALESCE 2
+
+/*
 ** limits for opcode arguments.
 ** we use (signed) 'int' to manipulate most arguments,
 ** so they must fit in ints.

@@ -868,6 +868,25 @@ static int llex(LexState *ls, SemInfo *seminfo) {
         read_string(ls, ls->current, seminfo);
         return TK_STRING;
       }
+      case '?': {
+        next(ls);
+        if (check_next1(ls, '?')) {
+          if (check_next1(ls, '=')) {
+            //ls->appendLineBuff("?\?=");
+            seminfo->i = TK_COAL;
+            return '=';
+          } else {
+            //ls->appendLineBuff("??");
+            return TK_COAL;
+          }
+        }
+        else {
+          //ls->appendLineBuff('?');
+          return '?';
+        }
+      }
+      case '@':
+        return "import";
       case '.': { /* '.', '..', '...', or number */
         save_and_next(ls);
         if (check_next1(ls, '.')) {

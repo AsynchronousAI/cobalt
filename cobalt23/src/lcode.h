@@ -54,7 +54,8 @@ typedef enum BinOpr {
   OPR_CDIV,
   OPR_CMOD,
   OPR_CCONCAT,
-  OPR_NOBINOPR
+  OPR_NOBINOPR,
+  OPR_COAL,
 } BinOpr;
 
 /* true if operation is foldable (that is, it is arithmetic or bitwise) */

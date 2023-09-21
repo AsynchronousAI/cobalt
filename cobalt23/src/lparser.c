@@ -1160,12 +1160,7 @@ static void primaryexp(LexState *ls, expdesc *v) {
       check_match(ls, ')', '(', line);
       luaK_dischargevars(ls->fs, v);
       return;
-    } 
-    case '$':
-    case '&':
-    case '@': 
-      luaX_syntaxerror(ls, "unsupported quick-char");
-
+    }
     case TK_NAME: {
       singlevar(ls, v);
       return;
@@ -1356,6 +1351,8 @@ static BinOpr getbinopr(int op) {
       return OPR_CONCAT;
     case TK_NE:
       return OPR_NE;
+    case TK_COAL: 
+      return OPR_COAL;
     case TK_EQ:
       return OPR_EQ;
     case '<':
@@ -1392,7 +1389,7 @@ static const struct {
     {9, 8},                     /* '..' (right associative) */
     {3, 3},   {3, 3},   {3, 3}, /* ==, <, <= */
     {3, 3},   {3, 3},   {3, 3}, /* !=, >, >= */
-    {2, 2},   {1, 1}            /* and, or */
+    {2, 2},   {1, 1}, {1, 1}            /* and, or, ?? */
 };
 
 #define UNARY_PRIORITY 12 /* priority for unary operators */

@@ -26,6 +26,7 @@
 #include "lstring.h"
 #include "ltable.h"
 
+
 /* maximum number of local variables per function (must be smaller
    than 250, due to the bytecode format) */
 #define MAXVARS 250
@@ -1150,7 +1151,7 @@ static void primaryexp(LexState *ls, expdesc *v) {
     case '&':
     case '@': 
       luaX_syntaxerror(ls, "unsupported quick-char");
-      
+
     case TK_NAME: {
       singlevar(ls, v);
       return;
@@ -2013,6 +2014,88 @@ static void localstat(LexState *ls) {
   checktoclose(fs, toclose);
 }
 
+static void constlocalstat(LexState *ls) {
+  /* stat -> LOCAL NAME ATTRIB { ',' NAME ATTRIB } ['=' explist] */
+  FuncState *fs = ls->fs;
+  int toclose = -1; /* index of to-be-closed variable (if any) */
+  Vardesc *var;     /* last variable */
+  int vidx, kind;   /* index and kind of last variable */
+  int nvars = 0;
+  int nexps;
+  expdesc e;
+  do {
+    vidx = new_localvar(ls, str_checkname(ls));
+    kind = RDKCONST;
+    getlocalvardesc(fs, vidx)->vd.kind = kind;
+    if (kind == RDKTOCLOSE) { /* to-be-closed? */
+      if (toclose != -1)      /* one already present? */
+        luaK_semerror(ls, "multiple to-be-closed variables in local list");
+      toclose = fs->nactvar + nvars;
+    }
+    nvars++;
+    optParamType(ls);
+  } while (testnext(ls, ','));
+  if (testnext(ls, '='))
+    nexps = explist(ls, &e);
+  else {
+    e.k = VVOID;
+    nexps = 0;
+  }
+  var = getlocalvardesc(fs, vidx);       /* get last variable */
+  if (nvars == nexps &&                  /* no adjustments? */
+      var->vd.kind == RDKCONST &&        /* last variable is const? */
+      luaK_exp2const(fs, &e, &var->k)) { /* compile-time constant? */
+    var->vd.kind = RDKCTC;          /* variable is a compile-time constant */
+    adjustlocalvars(ls, nvars - 1); /* exclude last variable */
+    fs->nactvar++;                  /* but count it */
+  } else {
+    adjust_assign(ls, nvars, nexps, &e);
+    adjustlocalvars(ls, nvars);
+  }
+  checktoclose(fs, toclose);
+}
+
+static void autolocalstat(LexState *ls) {
+  /* stat -> LOCAL NAME ATTRIB { ',' NAME ATTRIB } ['=' explist] */
+  FuncState *fs = ls->fs;
+  int toclose = -1; /* index of to-be-closed variable (if any) */
+  Vardesc *var;     /* last variable */
+  int vidx, kind;   /* index and kind of last variable */
+  int nvars = 0;
+  int nexps;
+  expdesc e;
+  do {
+    vidx = new_localvar(ls, str_checkname(ls));
+    kind = RDKTOCLOSE;
+    getlocalvardesc(fs, vidx)->vd.kind = kind;
+    if (kind == RDKTOCLOSE) { /* to-be-closed? */
+      if (toclose != -1)      /* one already present? */
+        luaK_semerror(ls, "multiple to-be-closed variables in local list");
+      toclose = fs->nactvar + nvars;
+    }
+    nvars++;
+    optParamType(ls);
+  } while (testnext(ls, ','));
+  if (testnext(ls, '='))
+    nexps = explist(ls, &e);
+  else {
+    e.k = VVOID;
+    nexps = 0;
+  }
+  var = getlocalvardesc(fs, vidx);       /* get last variable */
+  if (nvars == nexps &&                  /* no adjustments? */
+      var->vd.kind == RDKCONST &&        /* last variable is const? */
+      luaK_exp2const(fs, &e, &var->k)) { /* compile-time constant? */
+    var->vd.kind = RDKCTC;          /* variable is a compile-time constant */
+    adjustlocalvars(ls, nvars - 1); /* exclude last variable */
+    fs->nactvar++;                  /* but count it */
+  } else {
+    adjust_assign(ls, nvars, nexps, &e);
+    adjustlocalvars(ls, nvars);
+  }
+  checktoclose(fs, toclose);
+}
+
 static int funcname(LexState *ls, expdesc *v) {
   /* funcname -> NAME {fieldsel} [':' NAME] */
   int ismethod = 0;
@@ -2163,9 +2246,23 @@ static void statement(LexState *ls) {
       funcstat(ls, line);
       break;
     }
+    case TK_LET: 
+      /* add const */
+      luaX_next(ls);                 /* skip LOCAL */
+      if (testnext(ls, TK_FUNCTION)) /* local function? */
+        luaX_notedsyntaxerror(ls, "functions cannot be constant", "use `var` instead of `let`");
+      else
+        constlocalstat(ls);
+      break;
     case TK_AUTO:
+      /* add const */
+      luaX_next(ls);                 /* skip LOCAL */
+      if (testnext(ls, TK_FUNCTION)) /* local function? */
+        luaX_notedsyntaxerror(ls, "functions cannot be auto/to-be-closed", "use `var` instead of `auto`");
+      else
+        autolocalstat(ls);
+      break;
     case TK_VAR:
-    case TK_LET:
     case TK_LOCAL: {                 /* stat -> localstat */
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */

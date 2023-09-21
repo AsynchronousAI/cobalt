@@ -1,8 +1,10 @@
 # Cobalt
 > **NOTICE** Cobalt is heavily indevelopment, read the bottom of this file for a TODO.
 
+Cobalt is a language based on Lua, LJS, and Pluto aiming to be a language that can fill many tasks, a
+low-level language like C++, a quick and easy language like python, and a lightweight language like Lua.
 
-Cobalt is a fork of Lua 5.4 attempting to turn it into a language like C++. Cobalt includes:
+Cobalt includes:
 - SDL bindings (optional) for 2D graphics
 - interpreter, compiler, and JIT FFI
 - compile to LLVM IR if you have LLVM capable version of cobalt
@@ -11,6 +13,11 @@ Cobalt is a fork of Lua 5.4 attempting to turn it into a language like C++. Coba
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
+- `let` to represent constants, `var`/`local` to represent normal variables, and `auto` for to-be-closed variables
+- `switch`, `case`, `default`
+- `export` to export variables anywhere instead of a `return` at the end of the file
+- Real OOP with `class`, `parent`, `extends`, `new`, and `instanceof`
+- `enum`'s
 - Loop without `pairs`/`ipairs`/`next`
 - cleaner syntax errors and stack traces with colors
 - `_INCLUDES` global variable is a table of all libraries built with cobalt (ex: `if (!_INCLUDES["sdl"]) error("SDL is required")`)

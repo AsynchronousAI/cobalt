@@ -39,7 +39,9 @@ static const char *const luaX_tokens[] = {
     "//",       "..",       "...",      "==",        ">=",     "<=",
     "!=",       "+=",       "-=",       "*=",        "/=",     "%=",
     "..=",      "++",       "--",       "<<",        ">>",     "->",
-    "::",       "<eof>",    "<number>", "<integer>", "<name>", "<string>",
+    "::",       "<eof>",    "<number>", "<integer>", "<name>", "<string>", 
+
+    /* added in cobalt */
     "case",     "default",  "as",       "begin",     "extends","instanceof",
     "switch",   "enum",     "new",      "class",     "parent", "export",   
     "??",       ":=",       "<formatted-string>",};
@@ -149,7 +151,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
     
   /* throw error */
   if (token)
-    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t%d| %s\n\t | ^\n\t | buffer stopped here\n\t%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents/*, arrows*/, note);
+    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t | buffer preview:\n\t | \n\t%d| %s\n\t%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents/*, arrows*/, note);
   luaD_throw(ls->L, LUA_ERRSYNTAX);
   #else
   msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);

@@ -1632,7 +1632,7 @@ static void check_conflict(LexState *ls, struct LHS_assign *lh, expdesc *v) {
 */
 static void restassign(LexState *ls, struct LHS_assign *lh, int nvars) {
   expdesc e;
-  check_condition(ls, vkisvar(lh->v.k), "syntax error");
+  check_condition(ls, vkisvar(lh->v.k), "");
   check_readonly(ls, &lh->v);
   if (testnext(ls, ',')) { /* restassign -> ',' suffixedexp restassign */
     struct LHS_assign nv;
@@ -2304,8 +2304,7 @@ static void inc_dec_op(LexState *ls, BinOpr op, expdesc *v, int isPost) {
   init_exp(&e2, VKINT, 0);
   e2.u.ival = (lua_Integer)1;
   if (isPost) {
-    check_condition(ls, vkisvar(v->k),
-                    "syntax error expression not assignable");
+    check_condition(ls, vkisvar(v->k), "expression not assignable");
     lv = e1 = *v;
     if (vkisindexed(v->k)) luaK_reserveregs(fs, 1);
     luaK_exp2nextreg(fs, v);
@@ -2316,7 +2315,7 @@ static void inc_dec_op(LexState *ls, BinOpr op, expdesc *v, int isPost) {
     return;
   }
   suffixedexp(ls, v);
-  check_condition(ls, vkisvar(v->k), "syntax error expression not assignable");
+  check_condition(ls, vkisvar(v->k), "expression not assignable");
   e1 = *v;
   if (vkisindexed(v->k)) luaK_reserveregs(fs, fs->freereg - indices);
   luaK_posfix(fs, op, &e1, &e2, ls->linenumber);

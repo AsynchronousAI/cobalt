@@ -77,7 +77,22 @@ enum RESERVED {
   TK_INT,
   TK_NAME,
   TK_STRING,
-  TK_FSTRING
+  /* added in cobalt: */
+  TK_CASE, 
+  TK_DEFAULT, 
+  TK_AS, 
+  TK_BEGIN, 
+  TK_EXTENDS, 
+  TK_INSTANCEOF,
+  TK_SWITCH, 
+  TK_ENUM, 
+  TK_NEW, 
+  TK_CLASS,
+  TK_PARENT, 
+  TK_EXPORT,
+  TK_COAL,
+  TK_WALRUS,
+  TK_FSTRING,
 };
 
 /* number of reserved words */

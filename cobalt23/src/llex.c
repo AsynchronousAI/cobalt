@@ -39,7 +39,10 @@ static const char *const luaX_tokens[] = {
     "//",       "..",       "...",      "==",        ">=",     "<=",
     "!=",       "+=",       "-=",       "*=",        "/=",     "%=",
     "..=",      "++",       "--",       "<<",        ">>",     "->",
-    "::",       "<eof>",    "<number>", "<integer>", "<name>", "<string>"};
+    "::",       "<eof>",    "<number>", "<integer>", "<name>", "<string>",
+    "case",     "default",  "as",       "begin",     "extends","instanceof",
+    "switch",   "enum",     "new",      "class",     "parent", "export",   
+    "??",       ":=",       "<formatted-string>",};
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
 

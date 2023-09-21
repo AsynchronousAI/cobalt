@@ -92,8 +92,6 @@ enum RESERVED {
   TK_EXPORT,
   TK_COAL,
   TK_WALRUS,
-  TK_FSTRING,
-  TK_FORMAT,
 };
 
 /* number of reserved words */

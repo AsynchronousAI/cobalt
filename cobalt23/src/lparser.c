@@ -912,8 +912,6 @@ static void recfield(LexState *ls, ConsControl *cc) {
     codename(ls, &key);
   } else if (ls->t.token == TK_STRING) {
     sindex(ls, &key);
-  } else if (ls->t.token == TK_FSTRING) {
-    luaX_syntaxerror(ls, "formatted strings cannot be used as a key");
   } else /* ls->t.token == '[' */
     yindex(ls, &key);
   cc->nh++;
@@ -962,7 +960,6 @@ static void field(LexState *ls, ConsControl *cc) {
   /* field -> listfield | recfield */
   switch (ls->t.token) {
     case TK_STRING:
-    case TK_FSTRING:
     case TK_NAME: { /* may be 'listfield' or 'recfield' */
       int ntk = luaX_lookahead(ls);
       if (!((ntk == '=') || (ntk == ':'))) /* expression? */
@@ -1095,6 +1092,15 @@ static void lambdabody (LexState *ls, expdesc *e, int line) {
   new_fs.f->lastlinedefined = ls->linenumber;
   codeclosure(ls, e);
   close_func(ls);
+}
+
+static void format(LexState *ls)
+{
+      printf("format\n");
+      /* print the contents of format also */
+      printf("%s\n", getstr(ls->t.seminfo.ts));
+      luaX_next(ls);
+      return;
 }
 
 static void body(LexState *ls, expdesc *e, int ismethod, int line) {
@@ -1258,15 +1264,10 @@ static void primaryexp(LexState *ls, expdesc *v) {
       inc_dec_op(ls, OPR_SUB, v, 0);
       return;
     }
-    case TK_FORMAT: {
-      printf("format\n");
-      /* print the contents of format also */
-      printf("%s\n", getstr(ls->t.seminfo.ts));
-      luaX_next(ls);
-      return;
-    }
     default: {
-      luaX_syntaxerror(ls, "unexpected symbol");
+      char error[100];
+      sprintf(error, "bad symbol: '%s'", luaX_token2str(ls, ls->t.token));
+      luaX_notedsyntaxerror(ls, "unexpected symbol", error);
     }
   }
 }
@@ -1339,7 +1340,6 @@ static void simpleexp(LexState *ls, expdesc *v) {
       v->u.ival = ls->t.seminfo.i;
       break;
     }
-    case TK_FSTRING:
     case TK_STRING: {
       codestring(v, ls->t.seminfo.ts);
       break;
@@ -1445,8 +1445,6 @@ static BinOpr getbinopr(int op) {
       return OPR_SHL;
     case TK_SHR:
       return OPR_SHR;
-    case TK_FSTRING:
-      return OPR_CONCAT;
     case TK_CONCAT:
       return OPR_CONCAT;
     case TK_NE:

@@ -44,7 +44,7 @@ static const char *const luaX_tokens[] = {
     /* added in cobalt */
     "case",     "default",  "as",       "begin",     "extends","instanceof",
     "switch",   "enum",     "new",      "class",     "parent", "export",   
-    "??",       ":=",       "<formatted-string>", "<format>"};
+    "??",       ":="};
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
 
@@ -92,7 +92,6 @@ static const char *txtToken(LexState *ls, int token) {
   switch (token) {
     case TK_NAME:
     case TK_STRING:
-    case TK_FSTRING:
     case TK_FLT:
     case TK_INT:
       save(ls, '\0');
@@ -472,8 +471,11 @@ static int readdecesc(LexState *ls) {
 #include <stdlib.h>
 #define MAX_FORMAT 10 /* maximum characters allowed in a format */
 
+int llex(LexState *ls, SemInfo *seminfo);
+
 static void read_format_string(LexState *ls, int del, SemInfo *seminfo) {
   save_and_next(ls); /* keep delimiter (for error messages) */
+  int need_concat = 0;
 
   while (ls->current != del) {
       switch (ls->current) {
@@ -566,21 +568,7 @@ static void read_format_string(LexState *ls, int del, SemInfo *seminfo) {
           break;
         }
         case '{': {
-          /* add a TK_FORMAT token with the contents of what is inside the brackets */
-          save_and_next(ls); /* keep '{' for error messages */
-          int i = 0;
-          char format[MAX_FORMAT];
-          while (ls->current != '}') {
-            if (i >= MAX_FORMAT) {
-              lexerror(ls, "format string too long", TK_FORMAT);
-            }
-            format[i++] = ls->current;
-            next(ls);
-          }
-          format[i] = '\0';
-          save_and_next(ls); /* skip '}' */
-          seminfo->ts = luaX_newstring(ls, format, strlen(format));
-          return;
+          
         }
 
         default:
@@ -691,7 +679,7 @@ static void read_string(LexState *ls, int del, SemInfo *seminfo) {
       luaX_newstring(ls, luaZ_buffer(ls->buff) + 1, luaZ_bufflen(ls->buff) - 2);
 }
 
-static int llex(LexState *ls, SemInfo *seminfo) {
+int llex(LexState *ls, SemInfo *seminfo) {
   luaZ_resetbuffer(ls->buff);
   for (;;) {
     switch (ls->current) {
@@ -855,8 +843,9 @@ static int llex(LexState *ls, SemInfo *seminfo) {
         return '%';
       }
       case '`': /* format literal strings */
+        lexerror(ls, "format literal strings not implemented", TK_STRING);
         read_format_string(ls, ls->current, seminfo);
-        return TK_FSTRING;
+        return TK_STRING;
       case '"':
       case '\'': { /* short literal strings */
         read_string(ls, ls->current, seminfo);

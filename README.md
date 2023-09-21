@@ -25,6 +25,7 @@ Cobalt includes:
 - allocation tracker (track bytes and pool allocator stats)
 - `uwait`, `swait`, `mwait` for system sleep
 - new std functions
+- Lambda like `|c| :> c+1`
 - coal operator `??` 
 - Manipulate dynamic libraries like `dyn.load`, `.get`, and `.close`. 
 - USB (libusb) bindings

@@ -44,7 +44,7 @@ static const char *const luaX_tokens[] = {
     /* added in cobalt */
     "case",     "default",  "as",       "begin",     "extends","instanceof",
     "switch",   "enum",     "new",      "class",     "parent", "export",   
-    "??",       ":=",       "<formatted-string>",};
+    "??",       ":=",       "<formatted-string>", "<format>"};
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
 
@@ -92,6 +92,7 @@ static const char *txtToken(LexState *ls, int token) {
   switch (token) {
     case TK_NAME:
     case TK_STRING:
+    case TK_FSTRING:
     case TK_FLT:
     case TK_INT:
       save(ls, '\0');
@@ -122,6 +123,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   */
   
   /* get line contents */
+  #ifdef BUFFER_PREVIEW
   char *line_contents = ls->buff->buffer;
   int line_length = strlen(line_contents);
   
@@ -138,6 +140,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   }
   arrows[line_length] = '\0';
   */
+  #endif
 
 
   /* notes */
@@ -151,7 +154,13 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
     
   /* throw error */
   if (token)
-    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (at %s)\033[0m\n\t | buffer preview:\n\t | \n\t%d| %s\n\t%s",  buff,         msg,   txtToken(ls, token), ls->linenumber,  line_contents/*, arrows*/, note);
+    #ifdef BUFFER_PREVIEW
+    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s, buff-char %d)\033[0m\n\t | buffer preview:\n\t | \n\t%d| %s\n\t%s",  buff,         msg,   txtToken(ls, token), ls->current, ls->linenumber,  line_contents/*, arrows*/, note);
+    #elif LINE_PREVIEW
+    #error line preview not implemented
+    #else
+    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s)\033[0m\n\t%s",  buff,         msg,   txtToken(ls, token), note);
+    #endif
   luaD_throw(ls->L, LUA_ERRSYNTAX);
   #else
   msg = luaG_addinfo(ls->L, msg, ls->source, ls->linenumber);
@@ -465,11 +474,8 @@ static int readdecesc(LexState *ls) {
 
 static void read_format_string(LexState *ls, int del, SemInfo *seminfo) {
   save_and_next(ls); /* keep delimiter (for error messages) */
-  int track = -1;
-  char format[MAX_FORMAT];
 
   while (ls->current != del) {
-    if (track == -1){
       switch (ls->current) {
         case EOZ:
           lexerror(ls, "unfinished string", TK_EOS);
@@ -560,39 +566,28 @@ static void read_format_string(LexState *ls, int del, SemInfo *seminfo) {
           break;
         }
         case '{': {
-          /* switch to tracking mode */
-          track = 0;
-          save_and_next(ls);
-          break;
+          /* add a TK_FORMAT token with the contents of what is inside the brackets */
+          save_and_next(ls); /* keep '{' for error messages */
+          int i = 0;
+          char format[MAX_FORMAT];
+          while (ls->current != '}') {
+            if (i >= MAX_FORMAT) {
+              lexerror(ls, "format string too long", TK_FORMAT);
+            }
+            format[i++] = ls->current;
+            next(ls);
+          }
+          format[i] = '\0';
+          save_and_next(ls); /* skip '}' */
+          seminfo->ts = luaX_newstring(ls, format, strlen(format));
+          return;
         }
+
         default:
           save_and_next(ls);
       }
-    }else{
-      /* validate */
-      if (track >= MAX_FORMAT)
-        advlexerror(ls, "format string too long and ended", TK_STRING, "format strings have a maximum length of 10 characters");
-      
-      /* check if end or to be added */
-      if (ls->current == '}') {
-        printf("current format string: %s\n", format);
-
-        for (int i = 0; i < MAX_FORMAT; i++) {
-          format[i] = '\0';
-        }
-
-        track = -1;
-
-        save_and_next(ls);
-      }else{
-        // add to format string
-        format[track] = ls->current;
-        track++;
-
-        save_and_next(ls);
-      }
-    }
   }
+
   save_and_next(ls); /* skip delimiter */
   seminfo->ts =
       luaX_newstring(ls, luaZ_buffer(ls->buff) + 1, luaZ_bufflen(ls->buff) - 2);
@@ -860,9 +855,8 @@ static int llex(LexState *ls, SemInfo *seminfo) {
         return '%';
       }
       case '`': /* format literal strings */
-        lexerror(ls, "format strings not supported", TK_STRING);
-        //read_format_string(ls, ls->current, seminfo);
-        //return TK_FSTRING;
+        read_format_string(ls, ls->current, seminfo);
+        return TK_FSTRING;
       case '"':
       case '\'': { /* short literal strings */
         read_string(ls, ls->current, seminfo);

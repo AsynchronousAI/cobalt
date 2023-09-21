@@ -1174,6 +1174,65 @@ static void funcargs(LexState *ls, expdesc *f, int line) {
 
 static void inc_dec_op(LexState *ls, BinOpr op, expdesc *v, int isPost);
 
+
+/*
+** Safe navigation is entirely accredited to SvenOlsen.
+** http://lua-users.org/wiki/SvenOlsen
+*/
+static void safe_navigation(LexState *ls, expdesc *v) {
+  FuncState *fs = ls->fs;
+  luaK_exp2nextreg(fs, v);
+  luaK_codeABC(fs, OP_TEST, v->u.info, NO_REG, 0 );
+  {
+    int old_free = fs->freereg;             
+    int vreg = v->u.info;
+    int j = luaK_jump(fs);
+    expdesc key;
+    switch(ls->t.token) {
+      case '[': {
+        luaX_next(ls);  /* skip the '[' */
+        if (ls->t.token == '-') {
+          expr(ls, &key);
+          switch (key.k) {
+            case VKINT: {
+              key.u.ival *= -1;
+              break;
+            }
+            case VKFLT: {
+              key.u.nval *= -1;
+              break;
+            }
+            default: {
+              luaX_notedsyntaxerror(ls, "unexpected symbol during navigation.", "unary '-' on non-numeral type.");
+            }
+          }
+        }
+        else expr(ls, &key);
+        checknext(ls, ']');
+        luaK_indexed(fs, v, &key);
+        break; 
+      }       
+      case '.': {
+        luaX_next(ls);
+        codename(ls, &key);
+        luaK_indexed(fs, v, &key);
+        break;
+      }
+      default: {
+        luaX_syntaxerror(ls, "unexpected symbol");
+      }
+    }
+    luaK_exp2nextreg(fs, v);
+    fs->freereg = old_free;
+    if (v->u.info != vreg) {
+      luaK_codeABC(fs, OP_MOVE, vreg, v->u.info, 0);
+      v->u.info = vreg;
+    }
+    luaK_patchtohere(fs, j);
+  }
+}
+
+
 static void primaryexp(LexState *ls, expdesc *v) {
   /* primaryexp -> NAME | '(' expr ')' */
   switch (ls->t.token) {
@@ -1199,6 +1258,13 @@ static void primaryexp(LexState *ls, expdesc *v) {
       inc_dec_op(ls, OPR_SUB, v, 0);
       return;
     }
+    case TK_FORMAT: {
+      printf("format\n");
+      /* print the contents of format also */
+      printf("%s\n", getstr(ls->t.seminfo.ts));
+      luaX_next(ls);
+      return;
+    }
     default: {
       luaX_syntaxerror(ls, "unexpected symbol");
     }
@@ -1213,6 +1279,12 @@ static void suffixedexp(LexState *ls, expdesc *v) {
   primaryexp(ls, v);
   for (;;) {
     switch (ls->t.token) {
+      case '?': {  /* safe navigation */
+        luaX_next(ls); /* skip '?' */
+        
+        safe_navigation(ls, v);
+        break;
+      }
       case '.': { /* fieldsel */
         fieldsel(ls, v);
         break;

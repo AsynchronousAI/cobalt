@@ -46,6 +46,7 @@ Cobalt includes:
 - 30% increase with pool allocator
 - lpeg-labels built in
 - more operators
+- Safe navigation `print(math?.sqrtt(4))` will print `null` instead of erroring if `math.sqrtt` is not defined
 - tenary operator
 - `` ` `` for python like format ``print(`Hello {name}`)`` directly implemented to the parser and bytecode compatable
 - CMake build system

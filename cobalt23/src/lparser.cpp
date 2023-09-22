@@ -2067,7 +2067,7 @@ static int getlocalattribute(LexState *ls) {
       luaK_semerror(
           ls, luaO_pushfstring(ls->L, "refrence values are not supported"));
     else if (strcmp(attr, "pre") == 0){
-      luaG_addinfo(ls->L, "\n\033[1;33mwarning: \033[0m preprocessed variables will not work directly in the interpreter, use the preprocessor to generate preprocessed code", ls->linenumber, 0);
+      luaX_notedsyntaxerror(ls, "pre-value not preprocessed", "use the preprocessor to fix this");
       return VDKREG;
     } else
       luaK_semerror(ls,

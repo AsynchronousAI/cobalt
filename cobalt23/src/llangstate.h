@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -58,3 +62,6 @@ int luaB_getstate(lua_State *L){
 }
 #endif // INTERNAL_AOT
 #endif // LLANGSTATE_H
+#ifdef __cplusplus
+}
+#endif

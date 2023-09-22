@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -27,4 +31,8 @@ static const char *const opnames[] = {
     "RETURN1",    "FORLOOP",  "FORPREP",  "TFORPREP",   "TFORCALL", "TFORLOOP",
     "SETLIST",    "CLOSURE",  "VARARG",   "VARARGPREP", "EXTRAARG", NULL};
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

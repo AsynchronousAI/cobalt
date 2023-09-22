@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -26,4 +30,7 @@ extern lua_State *LuaState;
 #endif
 PyMODINIT_FUNC PyInit_lua(void);
 
+#endif
+#ifdef __cplusplus
+}
 #endif

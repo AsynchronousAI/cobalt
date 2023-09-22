@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -134,4 +138,8 @@ LUALIB_API void(luaL_openlibs)(lua_State *L);
 #define lua_assert(x) ((void)0)
 #endif
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

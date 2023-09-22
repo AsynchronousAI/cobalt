@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -84,4 +88,8 @@ LUAI_FUNC void *luaM_shrinkvector_(lua_State *L, void *block, int *nelem,
                                    int final_n, int size_elem);
 LUAI_FUNC void *luaM_malloc_(lua_State *L, size_t size, int tag);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

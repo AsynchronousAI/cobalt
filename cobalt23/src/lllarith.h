@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -57,4 +61,8 @@ class Arith : public Opcode {
 
 }  // namespace lll
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -23,4 +27,7 @@ typedef struct
 py_object*    luaPy_to_pobject(lua_State *L, int n);
 #include "lualib.h"
 
+#endif
+#ifdef __cplusplus
+}
 #endif

@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -49,4 +53,8 @@ LUAI_FUNC int runtimecap(CapState *cs, Capture *close, const char *s, int *rem);
 LUAI_FUNC int getcaptures(lua_State *L, const char *s, const char *r, int ptop);
 LUAI_FUNC int finddyncap(Capture *cap, Capture *last);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -869,7 +869,7 @@ int llex(LexState *ls, SemInfo *seminfo) {
         }
       }
       case '@':
-        return "import";
+        lexerror(ls, "quick-chars not supported", TK_STRING);
       case '.': { /* '.', '..', '...', or number */
         save_and_next(ls);
         if (check_next1(ls, '.')) {

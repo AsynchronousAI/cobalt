@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 ** $Id: lobject.h $
 ** Type definitions for Lua objects
@@ -818,4 +822,8 @@ LUAI_FUNC const char *luaO_pushvfstring(lua_State *L, const char *fmt,
 LUAI_FUNC const char *luaO_pushfstring(lua_State *L, const char *fmt, ...);
 LUAI_FUNC void luaO_chunkid(char *out, const char *source, size_t srclen);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

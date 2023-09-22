@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -35,4 +39,8 @@ LUAI_FUNC int sizei(const Instruction *i);
 */
 #define nullable(t) checkaux(t, PEnullable)
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

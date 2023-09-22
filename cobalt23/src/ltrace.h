@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -555,3 +559,7 @@ int Lua_setcstacklimit(lua_State* L, unsigned int limit, const char* _FILE,
 
 #define lua_setcstacklimit(L, limit) \
   Lua_setcstacklimit(L, limit, __FILE__, __LINE__, __FUNCTION__)
+
+#ifdef __cplusplus
+}
+#endif

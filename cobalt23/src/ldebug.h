@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -52,4 +56,8 @@ LUAI_FUNC const char *luaG_addinfo(lua_State *L, const char *msg, TString *src,
 LUAI_FUNC l_noret luaG_errormsg(lua_State *L);
 LUAI_FUNC int luaG_traceexec(lua_State *L, const Instruction *pc);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -46,4 +50,8 @@
 #define codeNresults(n) (-(n)-3)
 #define decodeNresults(n) (-(n)-3)
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

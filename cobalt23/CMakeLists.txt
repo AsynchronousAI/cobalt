@@ -1,32 +1,32 @@
 cmake_minimum_required(VERSION 3.8)
 
 set(LUA_LIB_SRCS 
-    "src/lapi.c"
-    "src/lcode.c"
-    "src/lctype.c"
-    "src/ldebug.c"
-    "src/ljson.c"
-    "src/lulib.c"
-    "src/ldo.c"
-    "src/ldump.c"
+    "src/lapi.cpp"
+    "src/lcode.cpp"
+    "src/lctype.cpp"
+    "src/ldebug.cpp"
+    "src/ljson.cpp"
+    "src/lulib.cpp"
+    "src/ldo.cpp"
+    "src/ldump.cpp"
     "src/lautoc.c"
-    "src/lfunc.c"
-    "src/lgc.c"
-    "src/llex.c"
+    "src/lfunc.cpp"
+    "src/lgc.cpp"
+    "src/llex.cpp"
     "src/lcrypt.c"
-    "src/lmem.c"
-    "src/lobject.c"
-    "src/lopcodes.c"
-    "src/lparser.c"
-    "src/lstate.c"
-    "src/lstring.c"
-    "src/ltable.c"
-    "src/ltm.c"
-    "src/lundump.c"
-    "src/lvm.c"
-    "src/lzio.c"
-    "src/lauxlib.c"
-    "src/lbaselib.c"
+    "src/lmem.cpp"
+    "src/lobject.cpp"
+    "src/lopcodes.cpp"
+    "src/lparser.cpp"
+    "src/lstate.cpp"
+    "src/lstring.cpp"
+    "src/ltable.cpp"
+    "src/ltm.cpp"
+    "src/lundump.cpp"
+    "src/lvm.cpp"
+    "src/lzio.cpp"
+    "src/lauxlib.cpp"
+    "src/lbaselib.cpp"
     "src/lcorolib.c"
     "src/ldblib.c"
     "src/lcore.c" 
@@ -36,21 +36,21 @@ set(LUA_LIB_SRCS
     "src/lsignal.c" 
     "src/lchan.c"
     "src/ldyn.c"
-    "src/lcolorlib.c"
-    "src/lbitlib.c"
-    "src/liolib.c"
+    "src/lcolorlib.cpp"
+    "src/lbitlib.cpp"
+    "src/liolib.cpp"
     "src/lmathlib.c"
     "src/lbitop.c"
-    "src/loadlib.c"
-    "src/loslib.c"
+    "src/loadlib.cpp"
+    "src/loslib.cpp"
     "src/lstrlib.c"
-    "src/ltablib.c"
-    "src/lutf8lib.c"
-    "src/linit.c"
-    "src/lplcap.c"
+    "src/ltablib.cpp"
+    "src/lutf8lib.cpp"
+    "src/linit.cpp"
+    "src/lplcap.cpp"
     "src/lplcode.c"
-    "src/lpltree.c"
-    "src/lplvm.c"
+    "src/lpltree.cpp"
+    "src/lplvm.cpp"
 
 
     # AOT Cobalt compiled
@@ -82,9 +82,6 @@ set(TARGETS_TO_INSTALL lua_internal lua_include)
 
 set(LINKED_LIBRARIES)
 
-if(LUA_BUILD_AS_CXX)
-	set_source_files_properties(${LUA_LIB_SRCS} "src/cobalt.c" "src/cobaltc.c" "src/cobaltaot.c" "src/host/minicobalt.c" "pre/main.c" PROPERTIES LANGUAGE CXX )
-endif()
 
 add_library(lua_internal INTERFACE)
 
@@ -349,7 +346,7 @@ if(LUA_BUILD_BINARY)
 endif()
 
 if(LUA_BUILD_COMPILER)
-    add_executable(cobaltc "src/cobaltc.c")
+    add_executable(cobaltc "src/cobaltc.cpp")
     target_link_libraries(cobaltc PRIVATE cobalt_static)
     set_target_properties(cobaltc PROPERTIES 
         RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -369,7 +366,7 @@ if(LUA_BUILD_AOT)
 endif()
 
 if (LUA_BUILD_LLVM)
-    add_executable(cobaltllvm "src/cobaltllvm.c")
+    add_executable(cobaltllvm "src/cobaltllvm.cpp")
         
     # Can not use lua_shared because some symbols are not exported
     target_link_libraries(cobaltllvm PRIVATE cobalt_static)

@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -141,4 +145,8 @@ typedef struct Charset {
 #define INPRED 1
 /* labeled failure end */
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -4,8 +4,6 @@
 // ============================================================================== */
 
 
-#define LUA_BITOP_VERSION "1.0.2"
-
 #define LUA_LIB
 #include "cobalt.h"
 #include "lauxlib.h"

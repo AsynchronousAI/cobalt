@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -92,4 +96,8 @@ LUAI_DDEC(const lu_byte luai_ctype_[UCHAR_MAX + 2];)
 
 #endif /* } */
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

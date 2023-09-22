@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -399,4 +403,8 @@ LUAI_DDEC(const lu_byte luaP_opmodes[NUM_OPCODES];)
 /* number of list items to accumulate before a SETLIST instruction */
 #define LFIELDS_PER_FLUSH 50
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

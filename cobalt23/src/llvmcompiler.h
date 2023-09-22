@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <llvm-c/Core.h>
 
 int test() {
@@ -29,3 +33,6 @@ int test() {
 
     return 0;
 }
+#ifdef __cplusplus
+}
+#endif

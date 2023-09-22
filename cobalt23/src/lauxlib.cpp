@@ -117,12 +117,20 @@ static int lastlevel(lua_State *L) {
   return le - 1;
 }
 /* for traceback */
-char* strcat_front(char *dest, const char *src) {
-  /* concats src to the start of dest and returns new string */
-  char *new_str = malloc(strlen(dest) + strlen(src) + 1);
-  strcpy(new_str, src);
-  strcat(new_str, dest);
-  return new_str;
+#include <cstring>
+#include <cstdlib>
+
+char* strcat_front(const char* str1, const char* str2) {
+    size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
+    char* result = static_cast<char*>(malloc(len1 + len2 + 1));
+    if (result == nullptr) {
+        return nullptr;
+    }
+    memcpy(result, str2, len2);
+    memcpy(result + len2, str1, len1);
+    result[len1 + len2] = '\0';
+    return result;
 }
 
 LUALIB_API void luaL_traceback(lua_State *L, lua_State *L1, char *msg,

@@ -5,7 +5,6 @@ project(cobalt LANGUAGES CXX VERSION 11)
 
 
 option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" ON)
-option(LUA_BUILD_AS_CXX "Build cobalt as C++" OFF)
 option(LUA_ENABLE_SHARED "Build dynamic liblua" OFF)
 option(FFI "Install the C FFI library for Cobalt" ON)
 option(SDL "Install the Cobalt SDL2 bindings library" OFF)
@@ -29,10 +28,6 @@ if (NOT IGNORE_PKG_CONFIG)
 endif()
 endif()
 
-if (LUA_BUILD_AS_CXX)
-    message("-- C++ core not supported yet")
-    set(LUA_BUILD_AS_CXX OFF)
-endif()
 if (CROSS)
     message("-- Configuring Crossplatform CPU Build")
 else()

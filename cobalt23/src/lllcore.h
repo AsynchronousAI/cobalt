@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -42,4 +46,8 @@ void LLLDump(Proto *p);
 /* Writes the bytecode and the asm of $p to $path (debug) */
 void LLLWrite(Proto *p, const char *path);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

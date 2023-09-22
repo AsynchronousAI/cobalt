@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -76,4 +80,8 @@ LUAI_FUNC const byte numsiblings[];
 #define sib1(t) ((t) + 1)
 #define sib2(t) ((t) + (t)->u.ps)
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

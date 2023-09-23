@@ -98,14 +98,13 @@ local x = if a == 1 then "A is 1" else "A is not 1"
 
 return {
     x: x,
-    a: a,
-    b: b
+    a: a
 }
 ```
 ### Cobalt:
 ```ts
 export a = 1; /* export auto-generates a return statement at the end of the file */
-export b <const> = 2;
+let b = 2; /* let doesnt need the <const> and is a constant */
 var w <pre> = math.sqrt(1043); /* will calculate at preprocess time and replace w with the result instead of calculating on runtime */
 var c: number = a + b; /* optional typechecker/annotations */
 

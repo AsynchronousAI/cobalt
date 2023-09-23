@@ -135,6 +135,7 @@ typedef struct LexState {
   
   /** configurations */
   bool strict_type_config;
+  bool check_type;
 } LexState;
 
 LUAI_FUNC void luaX_init(lua_State *L);

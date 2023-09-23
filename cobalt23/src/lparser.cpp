@@ -259,7 +259,6 @@ static int new_localvar(LexState *ls, TString *name) {
 
   // var_check_unique_or_shadow0(fs, name, 1);
   var_check_unique_or_shadow(ls, fs, name, 0);
-#if 0
   int vidx, nactvar_n;
   vidx = fs->bl ? fs->bl->nactvar + fs->firstlocal : fs->firstlocal;
   //nactvar_n = dyd->actvar.n;
@@ -273,11 +272,10 @@ static int new_localvar(LexState *ls, TString *name) {
       const char *sname = getstr(name);
       //if(sname[0] == '(') break; //for loop variables
       if(tsslen(name) == 1 && sname[0] == '_') break;
-      luaX_syntaxerror(ls, luaO_pushfstring(ls->L,
-             "Name [%s] already declared", sname));
+      luaX_notedsyntaxerror(ls, luaO_pushfstring(ls->L,
+             "name '%s' already declared", sname), "try using a different name");
     }
   }
-#endif
   Vardesc *var;
   checklimit(fs, dyd->actvar.n + 1 - fs->firstlocal, MAXVARS,
              "local variables");
@@ -1053,15 +1051,46 @@ static void constructor_array(LexState *ls, expdesc *t) {
 
 /* }====================================================================== */
 
-static void optParamType(LexState *ls) {
+struct TypeCheck {
+  bool isTable;
+  TString *type;
+};
+
+static void typecheck(LexState *ls, TypeCheck *type, expdesc *v) {
+  /* check the type of v */
+  if (type->type != NULL) {
+    /* check type of v */
+    if (type->isTable) {
+      /* check if v is a table */
+      if (v->k != VRELOC || v->u.info != ls->fs->freereg - 1) {
+        luaX_syntaxerror(ls, "expect table type");
+      }
+    } else {
+      /* check if v is a string */
+      if (v->k != VRELOC || v->u.info != ls->fs->freereg - 1) {
+        luaX_syntaxerror(ls, "expect string type");
+      }
+    }
+  }
+}
+
+static TypeCheck optParamType(LexState *ls/*, expdesc *v*/) {  /* parses optional parameter type and returns it */
+  TypeCheck type = {false, NULL};
   if (testnext(ls, ':')) {   /*optional parameter type*/
     checknext(ls, TK_NAME);  /*for now do nothing, discard*/
+    type.type = ls->t.seminfo.ts;
     if (testnext(ls, '[')) { /*optional parameter type*/
+      type.isTable = true;
       checknext(ls, ']');    /*for now do nothing, discard*/
     }
   }else if (ls->strict_type_config == true){
     luaX_notedsyntaxerror(ls, "expect ':' after parameter name", "strict hints config is turned on a type\n\t\thint is required");
   }
+
+  if (ls->check_type == true && (type.type != NULL)) {
+    /*typecheck (ls, &type, v);*/
+  }
+  return type;
 }
 
 static void setvararg(FuncState *fs, int nparams) {
@@ -1093,6 +1122,8 @@ static void parlist(LexState *ls) {
       }
       if (testnext(ls, ':')) {  /*optional parameter type*/
         checknext(ls, TK_NAME); /*for now do nothing, discard*/
+      }else if (ls->strict_type_config == true){
+        luaX_notedsyntaxerror(ls, "expect ':' after argument name", "strict hints config is turned on a type\n\t\thint is required");
       }
       optParamType(ls);
     } while (!isvararg && testnext(ls, ','));
@@ -2562,10 +2593,14 @@ static void statement(LexState *ls) {
         value = 0; /* unreachable */
       }
 
-      if ((std::string)name->contents == "hints"){
+      if ((std::string)name->contents == "forcehints"){
         if (value == 1) ls->strict_type_config = true;
         else if (value == 0) ls->strict_type_config = false;
-        else luaX_syntaxerror(ls, "hints must be true, false, 0, or 1");
+        else luaX_syntaxerror(ls, "forcehints must be true, false, 0, or 1");
+      } else if ((std::string)name->contents == "typecheck"){
+        if (value == 1) ls->check_type = true;
+        else if (value == 0) ls->check_type = false;
+        else luaX_syntaxerror(ls, "typecheck must be true, false, 0, or 1");
       }else{
         luaX_syntaxerror(ls, "unknown config option");
       }

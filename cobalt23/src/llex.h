@@ -63,6 +63,7 @@ enum RESERVED {
   TK_CLASS,
   TK_PARENT, 
   TK_EXPORT,
+  TK_CONFIG,
   TK_WHILE,
 
   /* other terminal symbols */
@@ -131,6 +132,9 @@ typedef struct LexState {
 
   /* added in cobalt */
   std::vector<TString*> export_symbols;
+  
+  /** configurations */
+  bool strict_type_config;
 } LexState;
 
 LUAI_FUNC void luaX_init(lua_State *L);

@@ -38,12 +38,12 @@ static const char *const luaX_tokens[] = {
     "let",      "__LINE__", "local",    "null",      "return", "true",
     "var",      "case",     "default",  "as",        "begin",   "extends",
     "of",       "switch",   "enum",     "new",       "class",   "parent",
-    "export",   "while",    "&&",       "||",        "!",      "**",
-    "//",       "..",       "...",      "==",        ">=",     "<=",
-    "!=",       "+=",       "-=",       "*=",        "/=",     "%=",
-    "..=",      "++",       "--",       "<<",        ">>",     "->",
-    "::",       "<eof>",    "<number>", "<integer>", "<name>", "<string>", 
-    "??",       ":="
+    "export",   "config",   "while",    "&&",        "||",       "!",      
+    "**",       "//",       "..",       "...",      "==",        ">=",     
+    "<=",       "!=",       "+=",       "-=",       "*=",        "/=",     
+    "%=",       "..=",      "++",       "--",       "<<",        ">>",     
+    "->",       "::",       "<eof>",    "<number>", "<integer>", "<name>", 
+    "<string>", "??",       ":="
   };
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
@@ -146,7 +146,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   char note[1000];
 
   if (innote != ""){
-    sprintf(note, "\n\t\033[1;90mnote:\033[0m\t%s", innote);
+    sprintf(note, "\t\b\b\033[1;90mnote:\033[0m %s", innote);
   }else{
     note[0] = '\0';
   }

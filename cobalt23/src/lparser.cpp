@@ -1059,6 +1059,8 @@ static void optParamType(LexState *ls) {
     if (testnext(ls, '[')) { /*optional parameter type*/
       checknext(ls, ']');    /*for now do nothing, discard*/
     }
+  }else if (ls->strict_type_config == true){
+    luaX_notedsyntaxerror(ls, "expect ':' after parameter name", "strict hints config is turned on a type\n\t\thint is required");
   }
 }
 
@@ -2536,6 +2538,37 @@ static void statement(LexState *ls) {
     }
     case TK_FOR: { /* stat -> forstat */
       forstat(ls, line);
+      break;
+    }
+    case TK_CONFIG: {
+      /* check the next <name> */
+      luaX_next(ls);
+      TString *name = str_checkname(ls);
+      checknext(ls, '=');
+
+      /* get integer or bool */
+      int value;
+      if (ls->t.token == TK_INT) {
+        value = ls->t.seminfo.i;
+        luaX_next(ls);
+      } else if (ls->t.token == TK_TRUE) {
+        value = 1;
+        luaX_next(ls);
+      } else if (ls->t.token == TK_FALSE) {
+        value = 0;
+        luaX_next(ls);
+      } else {
+        luaX_syntaxerror(ls, "expected integer or boolean");
+        value = 0; /* unreachable */
+      }
+
+      if ((std::string)name->contents == "hints"){
+        if (value == 1) ls->strict_type_config = true;
+        else if (value == 0) ls->strict_type_config = false;
+        else luaX_syntaxerror(ls, "hints must be true, false, 0, or 1");
+      }else{
+        luaX_syntaxerror(ls, "unknown config option");
+      }
       break;
     }
     case TK_DO: { /* stat -> dowhilestat */

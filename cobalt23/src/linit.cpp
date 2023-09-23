@@ -101,9 +101,6 @@ static const luaL_Reg preloadedlibs[] = {
 #ifdef COBALT_PYTHON
     {LUA_PYTHONNAME, luaopen_python},
 #endif
-#ifdef COBALT_CLANG
-    {LUA_CLANGNAME, luaopen_clang},
-#endif
 #ifdef COBALT_USB
     {LUA_USBNAME, luaopen_moonusb},
 #endif

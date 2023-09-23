@@ -11,6 +11,7 @@ Cobalt includes:
 - more libraries/bindings
 - improved syntax
 - Walrus operator `:=`
+- Destructuring `var [a, b] = [1, 2]` or `var {a=log, b=exp} = math`
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
@@ -31,7 +32,6 @@ Cobalt includes:
 - USB (libusb) bindings
 - `unix`, `win`, and `core` (core is cross plat) for lowlevel system calls
 - AOT compiler byte->C or byte->LLVMIR if you have LLVM capable version of cobalt
-- libclang bindings (compile C code from Cobalt)
 - light functions
 - regex support (not full regex only a small subset), use `unix.regex` for POSIX regex
 - 2x speed improved gc (optional) using libgc
@@ -142,9 +142,9 @@ missing features and the `unix`, `win` libraries should not be available.
 
 To build the following flags are reccomended:
 ```bash
-DSDL=off -DM=2 -DCLANG=off -DLLVM=off -DCROSS=on -DPYTHON=off
+DSDL=off -DM=2 -DLLVM=off -DCROSS=on -DPYTHON=off -DUSB=off
 ```
-* -DSDL, -DPYTHON, -DCLANG disable the bindings for those libraries (they are not supported and needed for microcontrollers)
+* -DSDL, -DPYTHON -DUSB disable the bindings for those libraries (they are not supported and needed for microcontrollers)
 * -DLLVM=off disables JIT and LLVM AOT which are just junk for microcontrollers.
 * -DM=2 maxes out memory optimizations in sacrifice of speed. `-DM=0` is the default and `-DM=1` is light memory optimizations.
 * -DCROSS=on disables CPU specific optimizations.

@@ -27,7 +27,7 @@ execute_process(
 
 if (NOT PKG_CONFIGEXISTS)
 if (NOT IGNORE_PKG_CONFIG)
-    message(FATAL_ERROR "pkg-config is not installed on your device and is required for locating dependencies. \n\n\tUse -DIGNORE_PKG_CONFIG=ON to ignore this error (but you will not be able to access SDL, Clang, etc.)")
+    message(FATAL_ERROR "pkg-config is not installed on your device and is required for locating dependencies. \n\n\tUse -DIGNORE_PKG_CONFIG=ON to ignore this error (but you will not be able to access SDL, USB, etc.)")
 endif()
 endif()
 
@@ -188,36 +188,6 @@ if(SDL)
     endif()
     set(CMAKE_C_FLAGS "${SDL2_CFLAGS} ${SDL2_IMAGE_CFLAGS} ${SDL2_TTF_CFLAGS} ${SDL2_MIXER_CFLAGS} ${CMAKE_C_FLAGS} ${SDL2_LIBS} ${SDL2_IMAGE_LIBS} ${SDL2_TTF_LIBS} ${SDL2_MIXER_LIBS}")
 endif() 
-if (CLANG)
-    message("-- Configuring Clang Bindings")
-    if (LLVM_CONFIG)
-        set(LLVM_CONFIG_PATH "${LLVM_CONFIG}")
-    else()
-        set(LLVM_CONFIG_PATH "llvm-config")
-        execute_process(
-            COMMAND llvm-config
-            OUTPUT_VARIABLE LLVM_CONFIG_EXISTS
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        if (NOT LLVM_CONFIG_EXISTS)
-            message(FATAL_ERROR "llvm-config is not in your system path, please locate it and provide it to cmake like so:\n\t\t-DLLVM_CONFIG=/path/to/llvm-config")
-        endif()
-    endif()
-    execute_process(
-        COMMAND ${LLVM_CONFIG_PATH} --includedir --ldflags --libs --cflags
-        OUTPUT_VARIABLE CLANG_LIBS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if (NOT CLANG_LIBS)
-        message(FATAL_ERROR "Failed to find libclang, disable cobalt Clang support by doing:\n\t\t-DCLANG=OFF")
-    endif()
-    string(REPLACE "\n" " " CLANG_LIBS "${CLANG_LIBS}")
-    set(CLANG_LIBS "-I${CLANG_LIBS}")
-    message("-- ${CLANG_LIBS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_CLANG ${CLANG_LIBS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_LIBS}")
-endif()
-
 if (LLVM)
     message("-- Building with JIT and LLVM support")
     if (LLVM_PATH_OVERRIDE)

@@ -138,6 +138,7 @@ static void check_match(LexState *ls, int what, int who, int where) {
   }
 }
 
+/* flagless */
 static TString *str_checkname(LexState *ls) {
   TString *ts;
   check(ls, TK_NAME);
@@ -2119,8 +2120,97 @@ static void checktoclose(FuncState *fs, int level) {
   }
 }
 
+static void restdestructuring (LexState *ls, int line, std::vector<std::pair<TString*, expdesc>>& pairs) {
+  checknext(ls, '=');
+
+  /* begin scope of the locals we want to create */
+  for (const auto& p : pairs) {
+    new_localvar(ls, p.first);
+  }
+  expdesc e;
+  e.k = VVOID;
+  adjust_assign(ls, (int)pairs.size(), 0, &e);
+  adjustlocalvars(ls, (int)pairs.size());
+
+  /* get table */
+  expdesc t;
+  expr(ls, &t);
+
+  /* ensure table has a place to stay */
+  TString *temporary = nullptr;
+  if (t.k != VLOCAL) {
+    if (pairs.size() == 1) {
+      luaK_exp2anyreg(ls->fs, &t);
+    }
+    else {
+      temporary = luaS_newliteral(ls->L, "(temporary)");
+      new_localvar(ls, temporary);
+      adjust_assign(ls, 1, 1, &t);
+      adjustlocalvars(ls, 1);
+    }
+  }
+
+  /* assign locals */
+  for (auto& p : pairs) {
+    expdesc e, l;
+    if (temporary)
+      singlevar(ls, &e, temporary);
+    else
+      e = t;
+    luaK_indexed(ls->fs, &e, &p.second);
+    singlevar(ls, &l, p.first);
+    luaK_storevar(ls->fs, &l, &e);
+  }
+
+  /* release table */
+  if (temporary) {
+    removevars(ls->fs, ls->fs->nactvar - 1);
+  }
+}
+
+static void destructuring (LexState *ls) {
+  auto line = ls->linenumber;
+  std::vector<std::pair<TString*, expdesc>> pairs{};
+  luaX_next(ls); /* skip '{' */
+  do {
+    TString* var = str_checkname(ls);
+    TString* prop = var;
+    if (testnext(ls, '='))
+      prop = str_checkname(ls);
+    expdesc propexp;
+    codestring(&propexp, prop);
+    pairs.emplace_back(var, std::move(propexp));
+  } while (testnext(ls, ','));
+  check_match(ls, '}', '{', line);
+  restdestructuring(ls, line, pairs);
+}
+
+static void arraydestructuring (LexState *ls) {
+  auto line = ls->linenumber;
+  std::vector<std::pair<TString*, expdesc>> pairs{};
+  luaX_next(ls); /* skip '[' */
+  expdesc prop;
+  init_exp(&prop, VKINT, 0);
+  prop.u.ival = 1;
+  do {
+    pairs.emplace_back(str_checkname(ls), prop);
+    prop.u.ival++;
+  } while (testnext(ls, ','));
+  check_match(ls, ']', '[', line);
+  restdestructuring(ls, line, pairs);
+}
+
 static void localstat(LexState *ls) {
   /* stat -> LOCAL NAME ATTRIB { ',' NAME ATTRIB } ['=' explist] */
+  if (ls->t.token == '{') {
+    destructuring(ls);
+    return;
+  }
+  if (ls->t.token == '[') {
+    arraydestructuring(ls);
+    return;
+  }
+
   FuncState *fs = ls->fs;
   int toclose = -1; /* index of to-be-closed variable (if any) */
   Vardesc *var;     /* last variable */
@@ -2162,6 +2252,14 @@ static void localstat(LexState *ls) {
 
 static void exportstat(LexState *ls, TString *name) {
   /* stat -> LOCAL NAME ATTRIB { ',' NAME ATTRIB } ['=' explist] */
+  if (ls->t.token == '{') {
+    destructuring(ls);
+    return;
+  }
+  if (ls->t.token == '[') {
+    arraydestructuring(ls);
+    return;
+  }
   FuncState *fs = ls->fs;
   int toclose = -1; /* index of to-be-closed variable (if any) */
   Vardesc *var;     /* last variable */
@@ -2203,6 +2301,14 @@ static void exportstat(LexState *ls, TString *name) {
 
 static void constlocalstat(LexState *ls) {
   /* stat -> LOCAL NAME ATTRIB { ',' NAME ATTRIB } ['=' explist] */
+  if (ls->t.token == '{') {
+    destructuring(ls);
+    return;
+  }
+  if (ls->t.token == '[') {
+    arraydestructuring(ls);
+    return;
+  }
   FuncState *fs = ls->fs;
   int toclose = -1; /* index of to-be-closed variable (if any) */
   Vardesc *var;     /* last variable */
@@ -2244,6 +2350,14 @@ static void constlocalstat(LexState *ls) {
 
 static void autolocalstat(LexState *ls) {
   /* stat -> LOCAL NAME ATTRIB { ',' NAME ATTRIB } ['=' explist] */
+  if (ls->t.token == '{') {
+    destructuring(ls);
+    return;
+  }
+  if (ls->t.token == '[') {
+    arraydestructuring(ls);
+    return;
+  }
   FuncState *fs = ls->fs;
   int toclose = -1; /* index of to-be-closed variable (if any) */
   Vardesc *var;     /* last variable */

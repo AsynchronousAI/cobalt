@@ -667,11 +667,6 @@ LUAMOD_API int luaopen_base(lua_State *L) {
   LENGTH++;
   lua_rawseti(L, -2, LENGTH);
   #endif
-  #ifdef COBALT_CLANG
-  lua_pushstring(L, "clang");
-  LENGTH++;
-  lua_rawseti(L, -2, LENGTH);
-  #endif
   #ifdef COBALT_USB
   lua_pushstring(L, "usb");
   LENGTH++;

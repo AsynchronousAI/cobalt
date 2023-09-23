@@ -97,21 +97,6 @@ if (FFI)
     )
 endif()
 
-# CLANG
-if (CLANG)
-    list(APPEND LUA_LIB_SRCS
-        "src/lclang.cpp"
-    )
-
-    if (CLANG_PATH_OVERRIDE)
-        message("-- Overriding Clang Path to: ${CLANG_PATH_OVERRIDE}")
-        set(Clang_DIR "${CLANG_PATH_OVERRIDE}")
-    endif()
-    find_package(Clang REQUIRED)
-    list(APPEND LINKED_LIBRARIES Clang::Clang)
-    include_directories(${CLANG_INCLUDE_DIRS})
-endif()
-
 # SDL
 if (SDL)
     list(APPEND LUA_LIB_SRCS

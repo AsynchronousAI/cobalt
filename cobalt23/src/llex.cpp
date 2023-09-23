@@ -6,6 +6,7 @@
 
 #define llex_c
 #define LUA_CORE
+#include <vector>
 
 #include "llex.h"
 
@@ -35,16 +36,15 @@ static const char *const luaX_tokens[] = {
     "auto",     "break",    "continue", "do",        "else",   "false",
     "__FILE__", "for",      "function", "goto",      "if",     "in",
     "let",      "__LINE__", "local",    "null",      "return", "true",
-    "var",      "while",    "&&",       "||",        "!",      "**",
+    "var",      "case",     "default",  "as",        "begin",   "extends",
+    "of",       "switch",   "enum",     "new",       "class",   "parent",
+    "export",   "while",    "&&",       "||",        "!",      "**",
     "//",       "..",       "...",      "==",        ">=",     "<=",
     "!=",       "+=",       "-=",       "*=",        "/=",     "%=",
     "..=",      "++",       "--",       "<<",        ">>",     "->",
     "::",       "<eof>",    "<number>", "<integer>", "<name>", "<string>", 
-
-    /* added in cobalt */
-    "case",     "default",  "as",       "begin",     "extends","instanceof",
-    "switch",   "enum",     "new",      "class",     "parent", "export",   
-    "??",       ":="};
+    "??",       ":="
+  };
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
 
@@ -154,11 +154,11 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   /* throw error */
   if (token)
     #ifdef BUFFER_PREVIEW
-    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s, buff-char %d)\033[0m\n\t | buffer preview:\n\t | \n\t%d| %s\n\t%s",  buff,         msg,   txtToken(ls, token), ls->current, ls->linenumber,  line_contents/*, arrows*/, note);
+    luaO_pushfstring(ls->L, "\033[1m%s (line: %d):\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s, buff-char %d)\033[0m\n\t | buffer preview:\n\t | \n\t%d| %s\n\t%s",  buff,         msg,   txtToken(ls, token), ls->current, ls->linenumber,  line_contents/*, arrows*/, note);
     #elif LINE_PREVIEW
     #error line preview not implemented
     #else
-    luaO_pushfstring(ls->L, "\033[1m%s:\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s)\033[0m\n\t%s",  buff,         msg,   txtToken(ls, token), note);
+    luaO_pushfstring(ls->L, "\033[1m%s (line: %d):\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s)\033[0m\n\t%s",  buff, ls->linenumber,         msg,   txtToken(ls, token), note);
     #endif
   luaD_throw(ls->L, LUA_ERRSYNTAX);
   #else
@@ -804,7 +804,10 @@ int llex(LexState *ls, SemInfo *seminfo) {
       }
       case '&': {
         next(ls);
-        if (check_next1(ls, '&')) return TK_AND;
+        if (check_next1(ls, '&')) 
+          return TK_AND;
+        else
+          lexerror(ls, "direct pointers not supported", TK_STRING);
         return '&';
       }
       case '|': {
@@ -837,6 +840,14 @@ int llex(LexState *ls, SemInfo *seminfo) {
         if (check_next1(ls, '*')) return TK_POW;
         return '*';
       }
+      case '$': {
+        lexerror(ls, "direct pointers not supported", TK_STRING);
+      }/*
+      case '@': {
+        next(ls);
+        if (check_next1(ls, '@')) return TK_IMPORT;
+        return '@';
+      }*/
       case '%': {
         next(ls);
         if (check_next1(ls, '=')) return TK_CMOD;
@@ -855,21 +866,16 @@ int llex(LexState *ls, SemInfo *seminfo) {
         next(ls);
         if (check_next1(ls, '?')) {
           if (check_next1(ls, '=')) {
-            //ls->appendLineBuff("?\?=");
             seminfo->i = TK_COAL;
             return '=';
           } else {
-            //ls->appendLineBuff("??");
             return TK_COAL;
           }
         }
         else {
-          //ls->appendLineBuff('?');
           return '?';
         }
       }
-      case '@':
-        lexerror(ls, "quick-chars not supported", TK_STRING);
       case '.': { /* '.', '..', '...', or number */
         save_and_next(ls);
         if (check_next1(ls, '.')) {
@@ -930,6 +936,9 @@ void luaX_next(LexState *ls) {
     ls->lookahead.token = TK_EOS;      /* and discharge it */
   } else
     ls->t.token = llex(ls, &ls->t.seminfo); /* read next token */
+}
+
+void luaX_prev(LexState *ls) {
 }
 
 int luaX_lookahead(LexState *ls) {

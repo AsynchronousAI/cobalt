@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
+#include <vector>
 
 #include "cobalt.h"
 #include "lapi.h"

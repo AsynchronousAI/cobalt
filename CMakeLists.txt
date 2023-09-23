@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.1)
 project(cobalt LANGUAGES C VERSION 99)
 project(cobalt LANGUAGES CXX VERSION 11)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" ON)
 option(LUA_ENABLE_SHARED "Build dynamic liblua" OFF)

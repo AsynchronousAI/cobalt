@@ -7,6 +7,8 @@
 #define lstate_c
 #define LUA_CORE
 
+#include <vector>
+
 #include "lstate.h"
 
 #include <stddef.h>

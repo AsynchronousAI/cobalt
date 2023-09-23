@@ -7,6 +7,8 @@
 #define lcode_c
 #define LUA_CORE
 
+#include <vector>
+
 #include "lcode.h"
 
 #include <float.h>

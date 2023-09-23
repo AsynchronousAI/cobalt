@@ -51,7 +51,20 @@ enum RESERVED {
   TK_RETURN,
   TK_TRUE,
   TK_VAR,
+  TK_CASE, 
+  TK_DEFAULT, 
+  TK_AS, 
+  TK_BEGIN, 
+  TK_EXTENDS, 
+  TK_INSTANCEOF,
+  TK_SWITCH, 
+  TK_ENUM, 
+  TK_NEW, 
+  TK_CLASS,
+  TK_PARENT, 
+  TK_EXPORT,
   TK_WHILE,
+
   /* other terminal symbols */
   TK_AND,
   TK_NOT,
@@ -81,25 +94,12 @@ enum RESERVED {
   TK_INT,
   TK_NAME,
   TK_STRING,
-  /* added in cobalt: */
-  TK_CASE, 
-  TK_DEFAULT, 
-  TK_AS, 
-  TK_BEGIN, 
-  TK_EXTENDS, 
-  TK_INSTANCEOF,
-  TK_SWITCH, 
-  TK_ENUM, 
-  TK_NEW, 
-  TK_CLASS,
-  TK_PARENT, 
-  TK_EXPORT,
   TK_COAL,
   TK_WALRUS,
 };
 
 /* number of reserved words */
-#define NUM_RESERVED (cast_int(TK_WHILE - FIRST_RESERVED + 1))
+#define NUM_RESERVED (cast_int(TK_WHILE - FIRST_RESERVED))
 
 typedef union {
   lua_Number r;
@@ -128,6 +128,9 @@ typedef struct LexState {
   struct Dyndata *dyd; /* dynamic structures used by the parser */
   TString *source;     /* current source name */
   TString *envn;       /* environment variable name */
+
+  /* added in cobalt */
+  std::vector<TString*> export_symbols;
 } LexState;
 
 LUAI_FUNC void luaX_init(lua_State *L);
@@ -135,6 +138,7 @@ LUAI_FUNC void luaX_setinput(lua_State *L, LexState *ls, ZIO *z,
                              TString *source, int firstchar);
 LUAI_FUNC TString *luaX_newstring(LexState *ls, const char *str, size_t l);
 LUAI_FUNC void luaX_next(LexState *ls);
+LUAI_FUNC void luaX_prev(LexState *ls);
 LUAI_FUNC int luaX_lookahead(LexState *ls);
 LUAI_FUNC l_noret luaX_syntaxerror(LexState *ls, const char *s);
 LUAI_FUNC l_noret luaX_notedsyntaxerror(LexState *ls, const char *s, const char *msg);

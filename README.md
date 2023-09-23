@@ -95,11 +95,17 @@ while true do
 end
 
 local x = if a == 1 then "A is 1" else "A is not 1"
+
+return {
+    x: x,
+    a: a,
+    b: b
+}
 ```
 ### Cobalt:
 ```ts
-var a = 1;
-var b <const> = 2;
+export a = 1; /* export auto-generates a return statement at the end of the file */
+export b <const> = 2;
 var w <pre> = math.sqrt(1043); /* will calculate at preprocess time and replace w with the result instead of calculating on runtime */
 var c: number = a + b; /* optional typechecker/annotations */
 
@@ -122,7 +128,7 @@ while (true) {
     break; 
 }
 
-var x: string = a == 1 ? "A is 1" : "A is not 1";
+export x: string = a == 1 ? "A is 1" : "A is not 1";
 ```
 ## Portability
 Cobalt is made to be built and run on PC's running Windows, macOS, or Linux then

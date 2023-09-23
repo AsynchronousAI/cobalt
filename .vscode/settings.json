@@ -1,26 +1,3 @@
 {
-    "files.associations": {
-        "lauxlib.h": "c",
-        "cobalt.hh": "c",
-        "cstddef": "cpp",
-        "__locale": "c",
-        "lj_strscan.h": "c",
-        "lj_ctype.h": "c",
-        "cobalt.h": "c",
-        "lj_obj.h": "c",
-        "mman.h": "c",
-        "string.h": "c",
-        "typeinfo": "c",
-        "dasm_proto.h": "c",
-        "gen.C": "cpp",
-        "sdl_image.h": "c",
-        "lmem.h": "c",
-        "stdlib.h": "c",
-        "*.in": "cpp",
-        "jit-common.h": "c",
-        "lualib.h": "c",
-        "minicobalt.c": "cpp",
-        "locale": "cpp"
-    },
-    "terminal.integrated.scrollback": 1000000
+    
 }

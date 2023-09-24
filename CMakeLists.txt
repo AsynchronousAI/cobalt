@@ -187,7 +187,7 @@ if (MINGW)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMINGW")
 endif()
 # Set c++ flags to c flags
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wc++")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
 
 
 enable_language(CXX)

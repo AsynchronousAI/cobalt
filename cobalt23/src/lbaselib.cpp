@@ -44,58 +44,6 @@ enum {
   STYLE_CONCEALED = 8
 };
 
-const char *color(const char *text, int color, const char **styles,
-                  int num_styles) {
-  static char buf[1024];
-  char *p = buf;
-  const char *style;
-  int i;
-
-  p += sprintf(p, "\033[");
-  for (i = 0; i < num_styles; i++) {
-    style = styles[i];
-    if (style == "bold") {
-      p += sprintf(p, "1;");
-    } else if (style == "underline") {
-      p += sprintf(p, "4;");
-    } else if (style == "reverse") {
-      p += sprintf(p, "7;");
-    } else if (style == "concealed") {
-      p += sprintf(p, "8;");
-    }
-  }
-  p += sprintf(p, "%dm%s\033[0m", color, text);
-  return buf;
-}
-
-const char *red(const char *text, const char **styles, int num_styles) {
-  return color(text, COLOR_RED, styles, num_styles);
-}
-
-const char *green(const char *text, const char **styles, int num_styles) {
-  return color(text, COLOR_GREEN, styles, num_styles);
-}
-
-const char *yellow(const char *text, const char **styles, int num_styles) {
-  return color(text, COLOR_YELLOW, styles, num_styles);
-}
-
-const char *blue(const char *text, const char **styles, int num_styles) {
-  return color(text, COLOR_BLUE, styles, num_styles);
-}
-
-const char *magenta(const char *text, const char **styles, int num_styles) {
-  return color(text, COLOR_MAGENTA, styles, num_styles);
-}
-
-const char *cyan(const char *text, const char **styles, int num_styles) {
-  return color(text, COLOR_CYAN, styles, num_styles);
-}
-
-const char *white(const char *text, const char **styles, int num_styles) {
-  return color(text, COLOR_WHITE, styles, num_styles);
-}
-
 static int luaB_print(lua_State *L) {
   int n = lua_gettop(L); /* number of arguments */
   int i;
@@ -129,7 +77,7 @@ static int luaB_warn(lua_State *L) {
     lua_pushvalue(L, -2); /* function to be called */
     lua_pushvalue(L, i);  /* value to print */
     lua_call(L, 1, 1);
-    lua_pushstring(L, yellow("warning: ", (const char *[]){"bold"}, 1));
+    lua_pushstring(L, "\033[33;1mwarning: \033[0m"); /* yellow */
     lua_insert(L, -2);
     lua_concat(L, 2);
     s = lua_tolstring(L, -1, &l); /* get result */
@@ -151,7 +99,7 @@ static int luaB_info(lua_State *L) {
     lua_pushvalue(L, -2); /* function to be called */
     lua_pushvalue(L, i);  /* value to print */
     lua_call(L, 1, 1);
-    lua_pushstring(L, blue("info: ", (const char *[]){"bold"}, 1));
+    lua_pushstring(L, "\033[34;1minfo: \033[0m"); /* blue */
     lua_insert(L, -2);
     lua_concat(L, 2);
     s = lua_tolstring(L, -1, &l); /* get result */

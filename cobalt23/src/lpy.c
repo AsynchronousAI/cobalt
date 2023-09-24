@@ -173,6 +173,15 @@ static int py_object_call(lua_State *L)
     return ret;
 }
 
+static int py_object_len(lua_State *L)
+{
+    py_object *obj = (py_object*) luaL_checkudata(L, 1, POBJECT);
+    assert(obj);
+
+    lua_pushnumber(L, (lua_Number)PyObject_Size(obj->o));
+    return 1;
+}
+
 static int _p_object_newindex_set(lua_State *L, py_object *obj,
                   int keyn, int valuen)
 {
@@ -332,6 +341,31 @@ static int py_object_gc(lua_State *L)
     return 0;
 }
 
+static int py_object_ipairs(lua_State *L)
+{
+    PyObject *item;
+    PyObject *iter;
+    int ret = 0;
+
+    py_object *obj = (py_object*) luaL_checkudata(L, 1, POBJECT);
+    assert(obj);
+
+    iter = PyObject_GetIter(obj->o);
+    if (!iter) {
+        PyErr_Clear();
+        return 0;
+    }
+
+    while ((item = PyIter_Next(iter))) {
+        ret += py_convert(L, item);
+        Py_DECREF(item);
+    }
+
+    Py_DECREF(iter);
+
+    return ret;
+}
+
 static int py_object_tostring(lua_State *L)
 {
     py_object *obj = (py_object*) luaL_checkudata(L, 1, POBJECT);
@@ -387,6 +421,8 @@ make_pyoperator(_sub, "-");
 static const luaL_Reg py_object_mt[] =
 {
     {"__call",  py_object_call},
+    {"__len",   py_object_len},
+    {"__ipairs",py_object_ipairs},
     {"__index", py_object_index},
     {"__newindex",  py_object_newindex},
     {"__gc",    py_object_gc},
@@ -580,7 +616,7 @@ static const luaL_Reg py_lib[] =
     {"asfunc",  py_asfunc},
     {"locals",  py_locals},
     {"globals", py_globals},
-    {"builtins",    py_builtins},
+    {"builtins",py_builtins},
     {"import",  py_import},
     {NULL, NULL}
 };

@@ -405,7 +405,7 @@ static int lsyslog_close(lua_State *L) {
 // The following code is modified from lunix.
 #define luaL_checkint luaL_checkinteger
 #define luaL_optint luaL_optinteger
-#if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__)
+#if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__) && !defined(NO_UNIX)
 
 /*
  * P O R T A B L E  S Y S T E M  I N C L U D E S
@@ -11897,8 +11897,8 @@ LUALIB_API int luaopen_unix(lua_State *L) {
 #endif /* !defined _WIN32 */
 
 /* WINDOWS */
-#if defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || \
-    defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+#if (defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || \
+    defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW)  && !defined(NO_WIN)
 static int lwin_MessageBox(lua_State *L) {
   const char *text = luaL_checkstring(L, 1);
   const char *caption = luaL_optstring(L, 2, NULL);

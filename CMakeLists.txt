@@ -166,6 +166,12 @@ if(SDL)
 endif() 
 
 # Provide platform to language
+if (NO_PLAT_LIB)
+    message("-- Not using platform libraries")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_UNIX -DNO_WIN")
+else()
+    message("-- Adding platform libraries")
+endif()
 if (LINUX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLINUX")
 endif()

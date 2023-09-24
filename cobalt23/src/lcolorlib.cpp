@@ -204,7 +204,7 @@ static int color_fromhex(lua_State *L) {
   push_color(L, r, g, b);
 }
 
-static const luaL_Reg colorlib[] = {{"new", color_rgb},
+static const luaL_Reg colorlib[] = {{"create", color_rgb},
                                     {"hex", color_fromhex},
                                     {"hsl_to_rgb", color_hsl_to_rgb},
                                     {"rgb_to_hsl", color_rgb_to_hsl},

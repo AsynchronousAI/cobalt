@@ -3095,7 +3095,7 @@ static const luaL_Reg jit_mt[] = {{"__gc", &jit_gc}, {NULL, NULL}};
 
 static const luaL_Reg ffi_reg[] = {
     {"cdef", &ffi_cdef},       {"load", &ffi_load},
-    {"new", &ffi_new},         {"typeof", &ffi_typeof},
+    {"create", &ffi_new},      {"typeof", &ffi_typeof},
     {"cast", &ffi_cast},       {"metatype", &ffi_metatype},
     {"gc", &ffi_gc},           {"sizeof", &ffi_sizeof},
     {"alignof", &ffi_alignof}, {"offsetof", &ffi_offsetof},

@@ -1964,7 +1964,7 @@ static const obj_const obj_Lua_LLThread_constants[] = {{NULL, NULL, 0.0, 0}};
 
 static const reg_impl obj_Lua_LLThread_implements[] = {{NULL, NULL}};
 
-static const luaL_Reg llthreads_function[] = {{"new", llthreads__new__func},
+static const luaL_Reg llthreads_function[] = {{"create", llthreads__new__func},
                                               {NULL, NULL}};
 
 static const obj_const llthreads_constants[] = {{NULL, NULL, 0.0, 0}};

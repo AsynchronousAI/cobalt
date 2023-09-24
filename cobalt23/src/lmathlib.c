@@ -1175,8 +1175,6 @@ static double genrand(MT *o) {
   return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
 }
 
-#define AUTHOR "Mersenne Twister MT19937"
-/*************************************/
 #define RTYPE "random"
 
 #define SEED 2018UL
@@ -1248,7 +1246,7 @@ static int Lvalue(lua_State *L) /** value(c,[a,b]) */
 #define MYTOSTRING
 
 static const luaL_Reg Random[] = {MYTOSTRING{"clone", Lclone},
-                                  {"new", Lnew},
+                                  {"create", Lnew},
                                   {"seed", Lseed},
                                   {"value", Lvalue},
                                   {NULL, NULL}};

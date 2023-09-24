@@ -291,7 +291,7 @@ static int l_kill(lua_State *L) {
 
 #endif
 
-static const struct luaL_Reg lsignal_lib[] = {{"new", l_signal},
+static const struct luaL_Reg lsignal_lib[] = {{"create", l_signal},
                                               {"call", l_raise},
 #ifdef _POSIX_SOURCE
                                               {"kill", l_kill},

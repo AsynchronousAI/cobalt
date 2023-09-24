@@ -411,7 +411,7 @@ static const luaL_Reg msg_meta_fns[] = {
     {"send", msg_send}, {"recv", msg_recv}, {"__gc", msg_gc}, {NULL, NULL}};
 
 static const luaL_Reg msg_fns[] = {
-    {"new", msg_new}, {"get", msg_get}, {NULL, NULL}};
+    {"create", msg_new}, {"get", msg_get}, {NULL, NULL}};
 
 int luaopen_chan(lua_State* L) {
   luaL_newmetatable(L, METATABLE_NAME);

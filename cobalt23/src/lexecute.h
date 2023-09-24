@@ -476,7 +476,7 @@ returning: /* trap already set */
       }
       vmcase(OP_TBC) {
         /* create new to-be-closed upvalue */
-        halfProtect(luaF_newtbcupval(L, ra));
+        halfProtect(luaF_newtbcupval(L, ra, 0));
         vmbreak;
       }
       vmcase(OP_JMP) {
@@ -698,12 +698,16 @@ returning: /* trap already set */
       }
       vmcase(OP_TFORPREP) {
         /* create to-be-closed upvalue (if needed) */
-        halfProtect(luaF_newtbcupval(L, ra + 3));
+        halfProtect(luaF_newtbcupval(L, ra + 3, 0));
         pc += GETARG_Bx(i);
         i = *(pc++); /* go to next instruction */
         lua_assert(GET_OPCODE(i) == OP_TFORCALL && ra == RA(i));
         goto l_tforcall;
       }
+      vmcase(OP_DEFER) {
+        halfProtect(luaF_newtbcupval(L, ra, 1));
+        vmbreak;
+       }
       vmcase(OP_TFORCALL) {
       l_tforcall:
         /* 'ra' has the iterator function, 'ra + 1' has the state,
@@ -1240,7 +1244,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
       }
       vmcase(OP_TBC) {
         /* create new to-be-closed upvalue */
-        halfProtect(luaF_newtbcupval(L, ra));
+        halfProtect(luaF_newtbcupval(L, ra, 0));
         vmbreak;
       }
       vmcase(OP_JMP) {
@@ -1476,15 +1480,19 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
             settt_(s2v(ra + 3), LUA_VITERI);
           } else {
             /* create to-be-closed upvalue (if needed) */
-            halfProtect(luaF_newtbcupval(L, ra + 3));
+            halfProtect(luaF_newtbcupval(L, ra + 3, 0));
           }
         } else {
           /* create to-be-closed upvalue (if needed) */
-          halfProtect(luaF_newtbcupval(L, ra + 3));
+          halfProtect(luaF_newtbcupval(L, ra + 3, 0));
         }
         pc = callpc + 1;
         lua_assert(GET_OPCODE(i) == OP_TFORCALL && ra == RA(i));
         goto l_tforcall;
+      }
+      vmcase(OP_DEFER) {
+        halfProtect(luaF_newtbcupval(L, ra, 1));
+        vmbreak;
       }
       vmcase(OP_TFORCALL) {
        l_tforcall:

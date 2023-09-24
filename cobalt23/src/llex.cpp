@@ -38,12 +38,12 @@ static const char *const luaX_tokens[] = {
     "let",      "__LINE__", "local",    "null",      "return", "true",
     "var",      "case",     "default",  "as",        "begin",   "extends",
     "of",       "switch",   "enum",     "new",       "class",   "parent",
-    "export",   "config",   "while",    "&&",        "||",       "!",      
-    "**",       "//",       "..",       "...",      "==",        ">=",     
-    "<=",       "!=",       "+=",       "-=",       "*=",        "/=",     
-    "%=",       "..=",      "++",       "--",       "<<",        ">>",     
-    "->",       "::",       "<eof>",    "<number>", "<integer>", "<name>", 
-    "<string>", "??",       ":="
+    "defer",    "export",   "config",   "while",    "&&",        "||",       
+    "!",        "**",       "//",       "..",       "...",       "==",        
+    ">=",       "<=",       "!=",       "+=",       "-=",       "*=",       
+    "/=",       "%=",       "..=",      "++",       "--",       "<<",        
+    ">>",       "->",       "::",       "<eof>",    "<number>", "<integer>", 
+    "<name>",   "<string>", "??",       ":="
   };
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))

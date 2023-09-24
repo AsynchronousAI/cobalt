@@ -1192,7 +1192,7 @@ LUA_API void lua_toclose(lua_State *L, int idx) {
   o = index2stack(L, idx);
   nresults = L->ci->nresults;
   api_check(L, L->tbclist < o, "given index below or equal a marked one");
-  luaF_newtbcupval(L, o);         /* create new to-be-closed upvalue */
+  luaF_newtbcupval(L, o, 0);  /* create new to-be-closed upvalue */
   if (!hastocloseCfunc(nresults)) /* function not marked yet? */
     L->ci->nresults = codeNresults(nresults); /* mark it */
   lua_assert(hastocloseCfunc(L->ci->nresults));

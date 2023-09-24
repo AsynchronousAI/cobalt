@@ -740,7 +740,8 @@ extern "C" {
 @@ New cobalt features and to enable or not.
 */
 #define NEW_SYNTAX_ERR 1 /* default: ON */ /* new syntax error messages */
-#define QUICK_FILL 0 /* defualt: OFF */ /* faster buffer filling but interactive mode is broken */
+#undef QUICK_FILL /* defualt: OFF */ /* beta faster buffer filling (NOT RECOMMENDED) */
+
 /*
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
 */

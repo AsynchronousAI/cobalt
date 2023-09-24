@@ -11047,7 +11047,7 @@ CallInfo *magic_implementation_12(lua_State *L, CallInfo *ci)
   label_06: {
     aot_vmfetch(0x000281cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_12;
   }
 
@@ -16960,7 +16960,7 @@ CallInfo *magic_implementation_23(lua_State *L, CallInfo *ci)
   label_03: {
     aot_vmfetch(0x0007004b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_18;
   }
 
@@ -17414,7 +17414,7 @@ CallInfo *magic_implementation_24(lua_State *L, CallInfo *ci)
   label_03: {
     aot_vmfetch(0x0004004b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_12;
   }
 
@@ -18144,7 +18144,7 @@ CallInfo *magic_implementation_27(lua_State *L, CallInfo *ci)
   label_06: {
     aot_vmfetch(0x0012014b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_43;
   }
 
@@ -19215,7 +19215,7 @@ CallInfo *magic_implementation_28(lua_State *L, CallInfo *ci)
   label_07: {
     aot_vmfetch(0x003481cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_113;
   }
 
@@ -21808,7 +21808,7 @@ CallInfo *magic_implementation_30(lua_State *L, CallInfo *ci)
   label_22: {
     aot_vmfetch(0x001d01cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_81;
   }
 
@@ -23450,7 +23450,7 @@ CallInfo *magic_implementation_32(lua_State *L, CallInfo *ci)
   label_09: {
     aot_vmfetch(0x003b02cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_128;
   }
 
@@ -33471,7 +33471,7 @@ CallInfo *magic_implementation_39(lua_State *L, CallInfo *ci)
   label_06: {
     aot_vmfetch(0x0007834b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_22;
   }
 
@@ -36247,7 +36247,7 @@ CallInfo *magic_implementation_41(lua_State *L, CallInfo *ci)
   label_10: {
     aot_vmfetch(0x000b814b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_34;
   }
 
@@ -42800,7 +42800,7 @@ CallInfo *magic_implementation_44(lua_State *L, CallInfo *ci)
   label_15: {
     aot_vmfetch(0x0080824b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_273;
   }
 
@@ -45507,7 +45507,7 @@ CallInfo *magic_implementation_44(lua_State *L, CallInfo *ci)
   label_192: {
     aot_vmfetch(0x000505cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_203;
   }
 
@@ -47178,7 +47178,7 @@ CallInfo *magic_implementation_45(lua_State *L, CallInfo *ci)
   label_13: {
     aot_vmfetch(0x0006024b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_26;
   }
 
@@ -47887,7 +47887,7 @@ CallInfo *magic_implementation_46(lua_State *L, CallInfo *ci)
   label_12: {
     aot_vmfetch(0x000d824b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_40;
   }
 
@@ -49081,7 +49081,7 @@ CallInfo *magic_implementation_48(lua_State *L, CallInfo *ci)
   label_18: {
     aot_vmfetch(0x000503cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_29;
   }
 
@@ -51925,7 +51925,7 @@ CallInfo *magic_implementation_52(lua_State *L, CallInfo *ci)
   label_86: {
     aot_vmfetch(0x0002824b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_92;
   }
 
@@ -52114,7 +52114,7 @@ Protect(luaF_close(L, ra, LUA_OK, 1));
   label_98: {
     aot_vmfetch(0x0002824b);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_104;
   }
 
@@ -55004,7 +55004,7 @@ CallInfo *magic_implementation_61(lua_State *L, CallInfo *ci)
   label_09: {
     aot_vmfetch(0x000282cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_15;
   }
 
@@ -60929,7 +60929,7 @@ CallInfo *magic_implementation_71(lua_State *L, CallInfo *ci)
   label_21: {
     aot_vmfetch(0x002600cb);
     /* create to-be-closed upvalue (if needed) */
-    halfProtect(luaF_newtbcupval(L, ra + 3));
+    halfProtect(luaF_newtbcupval(L, ra + 3, 0));
     goto label_98;
   }
 

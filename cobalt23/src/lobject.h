@@ -158,6 +158,7 @@ typedef union StackValue {
   struct {
     TValuefields;
     unsigned short delta;
+    lu_byte is_deferred; /* 1 if deferred function, else 0 means regular TBC  */
   } tbclist;
 } StackValue;
 

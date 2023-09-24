@@ -90,6 +90,17 @@ UpVal *luaF_findupval(lua_State *L, StkId level) {
   return newupval(L, 0, level, pp);
 }
 
+
+static void calldefermethod (lua_State *L, TValue *func, TValue *err) {
+  if (!ttisfunction(func))
+    return;
+  StkId top = L->top;
+  setobj2s(L, top, func);  /* will call defer function */
+  setobj2s(L, top + 1, err);  /* and error msg. as 1st argument */
+  L->top = top + 2;  /* add function and arguments */
+  luaD_callnoyield(L, top, 0);
+}
+
 /*
 ** Call closing method for object 'obj' with error message 'err'. The
 ** boolean 'yy' controls whether the call is yieldable.
@@ -138,7 +149,10 @@ static void prepcallclosemth(lua_State *L, StkId level, int status, int yy) {
     errobj = s2v(level + 1);  /* error object goes after 'uv' */
     luaD_seterrorobj(L, status, level + 1); /* set error object */
   }
-  callclosemethod(L, uv, errobj, yy);
+  if (level->tbclist.is_deferred)
+    calldefermethod(L, uv, errobj);
+  else
+    callclosemethod(L, uv, errobj, yy);
 }
 
 /*
@@ -151,15 +165,20 @@ static void prepcallclosemth(lua_State *L, StkId level, int status, int yy) {
 /*
 ** Insert a variable in the list of to-be-closed variables.
 */
-void luaF_newtbcupval(lua_State *L, StkId level) {
+void luaF_newtbcupval (lua_State *L, StkId level, int deferred) {
   lua_assert(level > L->tbclist);
-  if (l_isfalse(s2v(level))) return; /* false doesn't need to be closed */
-  checkclosemth(L, level);           /* value must have a close method */
+  if (!deferred) {
+    if (l_isfalse(s2v(level)))
+      return;  /* false doesn't need to be closed */
+    checkclosemth(L, level);  /* value must have a close method */
+  }
   while (cast_uint(level - L->tbclist) > MAXDELTA) {
     L->tbclist += MAXDELTA; /* create a dummy node at maximum delta */
     L->tbclist->tbclist.delta = 0;
+    L->tbclist->tbclist.is_deferred = 0;
   }
   level->tbclist.delta = cast(unsigned short, level - L->tbclist);
+  level->tbclist.is_deferred = deferred ? 1 : 0;
   L->tbclist = level;
 }
 

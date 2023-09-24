@@ -507,7 +507,7 @@ static void create_function(Proto *f) {
       }
       case OP_TBC: {
         println("    /* create new to-be-closed upvalue */");
-        println("    halfProtect(luaF_newtbcupval(L, ra));");
+        println("    halfProtect(luaF_newtbcupval(L, ra, 0));");
         break;
       }
       case OP_JMP: {
@@ -745,7 +745,7 @@ static void create_function(Proto *f) {
       }
       case OP_TFORPREP: {
         println("    /* create to-be-closed upvalue (if needed) */");
-        println("    halfProtect(luaF_newtbcupval(L, ra + 3));");
+        println("    halfProtect(luaF_newtbcupval(L, ra + 3, 0));");
         println("    goto label_%02d;", ((pc + 1) + GETARG_Bx(instr)));  //(!)
         break;
       }

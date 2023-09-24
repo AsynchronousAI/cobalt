@@ -11,6 +11,7 @@ Cobalt includes:
 - more libraries/bindings
 - improved syntax
 - Walrus operator `:=`
+- `defer` statements
 - Destructuring `var [a, b] = [1, 2]` or `var {a=log, b=exp} = math`
 - Memory optimizations
 - type system (typechecker in preprocessor)

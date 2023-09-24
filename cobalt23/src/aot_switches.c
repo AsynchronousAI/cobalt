@@ -571,7 +571,7 @@ static void create_function_switches(Proto *f) {
       }
       case OP_TBC: {
         println("        /* create new to-be-closed upvalue */");
-        println("        halfProtect(luaF_newtbcupval(L, ra));");
+        println("        halfProtect(luaF_newtbcupval(L, ra, 0));");
         // FALLTHROUGH
         break;
       }
@@ -867,7 +867,7 @@ static void create_function_switches(Proto *f) {
       }
       case OP_TFORPREP: {
         println("        /* create to-be-closed upvalue (if needed) */");
-        println("        halfProtect(luaF_newtbcupval(L, ra + 3));");
+        println("        halfProtect(luaF_newtbcupval(L, ra + 3, 0));");
         println("        pc += %d;", GETARG_Bx(instr));
         println("        break;");
         // PC

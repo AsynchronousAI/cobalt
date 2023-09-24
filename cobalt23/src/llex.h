@@ -134,8 +134,8 @@ typedef struct LexState {
   std::vector<TString*> export_symbols;
   
   /** configurations */
-  bool strict_type_config;
-  bool check_type;
+  bool strict_type_config=false;
+  bool check_type=false;
 } LexState;
 
 LUAI_FUNC void luaX_init(lua_State *L);

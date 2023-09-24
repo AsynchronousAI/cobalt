@@ -1328,7 +1328,6 @@ static void safe_navigation(LexState *ls, expdesc *v) {
   }
 }
 
-
 static void primaryexp(LexState *ls, expdesc *v) {
   /* primaryexp -> NAME | '(' expr ')' */
   switch (ls->t.token) {
@@ -1877,29 +1876,31 @@ static void continuestat(LexState *ls) {
 
 #define ENUMBEGIN '{'
 #define ENUMEND '}'
-/*
-enum ENUMNAME do
-  ENUMERATOR1 = 1,
-  ENUMERATOR2 = 2,
-  ...
-  ENUMERATORn = n
-of 
-*/
+
 static void enumstat (LexState *ls) {
   /* enumstat -> ENUM [[CLASS] NAME] BEGIN NAME ['=' INT] { ',' NAME ['=' INT] } END */
 
   luaX_next(ls); /* skip 'enum' */
-
+  
   EnumDesc *ed = nullptr;
-  bool is_enum_class = false;
-  if (gett(ls) != TK_DO) { /* enum has name (and possibly modifier)? */
-    if (ls->t.token == TK_CLASS
+  //bool is_enum_class = false;
+  if (gett(ls) != ENUMBEGIN) { /* enum has name (and possibly modifier)? */
+    /*if (ls->t.token == TK_CLASS
       || (ls->t.token == TK_NAME && strcmp(ls->t.seminfo.ts->contents, "class") == 0)
       ) {
       is_enum_class = true;
       luaX_next(ls);
+    }*/
+    TString *name;
+    if (ls->t.token == TK_NAME) {
+      name = str_checkname(ls);
+    }else {
+      /* anyomous enum */
+      name = luaS_new(ls->L, "");
     }
-    auto vidx = new_localvar(ls, str_checkname(ls));
+    auto vidx = new_localvar(ls, name);
+    // Set vidx to "enum"
+    
     auto var = getlocalvardesc(ls->fs, vidx);
     var->vd.kind = RDKENUM;
     setivalue(&var->k, ls->enums.size());
@@ -1916,9 +1917,9 @@ static void enumstat (LexState *ls) {
   while (gett(ls) != ENUMEND) {
     TString *name = str_checkname(ls);
     int vidx;
-    if (!is_enum_class) {
-      vidx = new_localvar(ls, name);
-    }
+    //if (!is_enum_class) {
+    vidx = new_localvar(ls, name);
+    //}
     if (testnext(ls, '=')) {
       expdesc v;
       simpleexp_with_unary_support(ls, &v);
@@ -1929,28 +1930,27 @@ static void enumstat (LexState *ls) {
           v.u.ival = ivalue(k);
         }
       }
-      if (v.k != VKINT) { /* assert expdesc kind */
-        luaX_notedsyntaxerror(ls, "expected integer constant", "unexpected expression type");
+      if (v.k != VKINT)  { /* assert expdesc kind */
+        luaX_notedsyntaxerror(ls, "expected predefined integer constant", "unexpected expression type");
       }
       i = v.u.ival;
     }
     if (ed) {
       ed->enumerators.emplace_back(EnumDesc::Enumerator{ name, i });
     }
-    if (!is_enum_class) {
-      auto var = getlocalvardesc(ls->fs, vidx);
-      var->vd.kind = RDKCTC;
-      setivalue(&var->k, i);
-      i++;
-      ls->fs->nactvar++;
-    }
+    //if (!is_enum_class) {
+    auto var = getlocalvardesc(ls->fs, vidx);
+    var->vd.kind = RDKCTC;
+    setivalue(&var->k, i);
+    i++;
+    ls->fs->nactvar++;
+    //}
     if (gett(ls) != ',') break;
     luaX_next(ls);
   }
 
   check_match(ls, ENUMEND, ENUMBEGIN, line_begin);
 }
-
 
 /*
 ** Check whether there is already a label with the given 'name'.

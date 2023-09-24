@@ -10,7 +10,6 @@ between the different VMs dynamically.
 This is responsible for the following:
 - Primary executer/interpreter
 - Handling AOT execution (AOT_IS_MODULE)
-- Binding to the JIT (LLVM) 
 - Using `llangstate.h` to allow the user to switch between VMs at runtime
 - Using `minicobalt.c` for a miniture execution engine
 */

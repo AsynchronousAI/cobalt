@@ -7,7 +7,6 @@ low-level language like C++, a quick and easy language like python, and a lightw
 Cobalt includes:
 - SDL bindings (optional) for 2D graphics
 - FFI
-- compile to LLVM IR if you have LLVM capable version of cobalt
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
@@ -22,12 +21,10 @@ Cobalt includes:
 - Lambda like `|c| :> c+1`
 - Manipulate dynamic libraries like `dyn.load`, `.get`, and `.close`. 
 - `unix`, `win`, and `core` (core is cross plat) for lowlevel system calls
-- AOT compiler byte->C or byte->LLVMIR if you have LLVM capable version of cobalt
 - 2x speed improved gc (optional) using libgc
 - improved vm
 - locked tables (like frozen tables in pluto) using `table.lock` and `table.islock`
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
-- LLVM JIT compiler
 - `debug.snap` to track current stack
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - 30% increase with pool allocator

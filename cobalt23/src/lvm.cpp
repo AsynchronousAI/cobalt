@@ -1180,9 +1180,5 @@ void luaV_finishOp(lua_State *L) {
 #define vmcase(l) case l:
 #define vmbreak break
 
-#if defined(LLVM) && !defined(AOT_IS_MODULE)
-int LLVM = 0;
-#endif
-
 #include "lexecute.h"
 /* }================================================================== */

@@ -251,13 +251,7 @@ static char *get_module_name_from_filename(const char *filename) {
       sep = i;
     }
   }
-  if (0 == strcmp(filename + sep, ".ll")) {
-    #ifndef COBALT_LLVM
-    fatal_error("This cobalt version cannot compile to LLVM IR");
-    #else
-    fatal_error("incomplete")
-    #endif
-  } else if (!has_extension || 0 != strcmp(filename + sep, ".c")) {
+  if (!has_extension || 0 != strcmp(filename + sep, ".c")) {
     fatal_error("output file does not have a \".c\" extension");
   }
 

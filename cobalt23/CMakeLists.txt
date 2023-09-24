@@ -202,31 +202,6 @@ if (PYTHON)
     target_link_libraries(lua_include INTERFACE ${PYTHON_LDFLAGS} ${PYTHON_LIBFLAGS})
 endif()
 
-# LLVM
-if (LLVM)
-    list(APPEND LUA_LIB_SRCS
-        "src/lllarith.cpp"
-        "src/lllcompiler.cpp"
-        "src/lllcompilerstate.cpp"
-        "src/lllengine.cpp"
-        "src/llllib.c"
-        "src/llllogical.cpp"
-        "src/lllopcode.cpp"
-        "src/lllruntime.cpp"
-        "src/llltableset.cpp"
-        "src/lllvalue.cpp"
-        "src/lllvararg.cpp"
-        "src/lllcore.cpp"
-    )
-    if (LLVM_PATH_OVERRIDE)
-        message("- Overriding LLVM Path to: ${LLVM_PATH_OVERRIDE}")
-        set(LLVM_DIR "${LLVM_PATH_OVERRIDE}")
-    endif()
-    find_package(LLVM REQUIRED CONFIG)
-    list(APPEND LINKED_LIBRARIES LLVM::LLVM)
-    include_directories(${LLVM_INCLUDE_DIRS})
-endif()
-
 add_library(cobalt_static STATIC ${LUA_LIB_SRCS})
 target_link_libraries(cobalt_static PRIVATE lua_internal PUBLIC lua_include)
 set_target_properties(cobalt_static PROPERTIES
@@ -328,16 +303,6 @@ if(LUA_BUILD_AOT)
     list(APPEND TARGETS_TO_INSTALL cobaltaot)
 endif()
 
-if (LUA_BUILD_LLVM)
-    add_executable(cobaltllvm "src/cobaltllvm.cpp")
-        
-    # Can not use lua_shared because some symbols are not exported
-    target_link_libraries(cobaltllvm PRIVATE cobalt_static)
-    set_target_properties(cobaltllvm PROPERTIES 
-        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
-    )
-    list(APPEND TARGETS_TO_INSTALL cobaltllvm)
-endif()
 
 if(LUA_BUILD_PRE)
     add_executable(cobaltpre "pre/main.c")

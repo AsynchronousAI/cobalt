@@ -60,10 +60,10 @@ static const luaL_Reg loadedlibs[] = {
 */
 static const luaL_Reg preloadedlibs[] = {
     /* Platform specifics */
-#if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__
+#if (defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__) && !defined(NO_UNIX)
     {LUA_UNIXNAME, luaopen_unix},
-#elif defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || \
-    defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW
+#elif (defined _WIN32 || defined _WIN64 || defined __CYGWIN__ || \
+    defined __MINGW32__ || defined LUA_USE_WINDOWS || defined LUA_USE_MINGW) && !defined(NO_WIN)
     {LUA_WINNAME, luaopen_win},
 #endif
 

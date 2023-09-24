@@ -108,10 +108,6 @@ LUAMOD_API int(luaopen_moonsdl2)(lua_State *L);
 #define LUA_PYTHONNAME "python"
 LUAMOD_API int(luaopen_python)(lua_State *L);
 #endif
-#if defined(COBALT_USB)
-#define LUA_USBNAME "usb"
-LUAMOD_API int(luaopen_moonusb)(lua_State *L);
-#endif
 
 // Platform specific libraries
 #if defined __unix__ || defined LUA_USE_POSIX || defined __APPLE__

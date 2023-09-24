@@ -166,29 +166,6 @@ else()
     set(SDL_LIBRARIES)
 endif()
 
-# USB
-if (USB)
-    list(APPEND LUA_LIB_SRCS
-        "src/usb/context.c"
-        "src/usb/device.c"
-        "src/usb/datahandling.c"
-        "src/usb/datastructs.c"
-        "src/usb/devhandle.c"
-        "src/usb/enums.c"
-        "src/usb/device.c"
-        "src/usb/hostmem.c"
-        "src/usb/hotplug.c"
-        "src/usb/interface.c"
-        "src/usb/main.c"
-        "src/usb/objects.c"
-        "src/usb/polling.c"
-        "src/usb/synch.c"
-        "src/usb/tracing.c"
-        "src/usb/transfer.c"
-        "src/usb/udata.c"
-        "src/usb/utils.c"
-    )
-endif()
 # Python 
 if (PYTHON)
     list(APPEND LUA_LIB_SRCS

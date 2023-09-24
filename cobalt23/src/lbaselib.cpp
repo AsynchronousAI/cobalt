@@ -590,11 +590,9 @@ static int luaB_mwait(lua_State *L) {
   lua_pushcclosure(L, luaB_uwait, 1);
   return 1;
 }
-static int luaB_abort(lua_State *L) { abort(); }
 
 static const luaL_Reg base_funcs[] = {
     {"assert", *luaB_assert},
-    {"abort", *luaB_abort},
     {"collectgarbage", *luaB_collectgarbage},
     {"dofile", *luaB_dofile},
     {"error", *luaB_error},

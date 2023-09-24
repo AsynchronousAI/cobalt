@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <exception>
 
 #include "cobalt.h"
 #include "lauxlib.h"
@@ -384,9 +385,12 @@ static const luaL_Reg syslib[] = {
     {"clock", os_clock},         {"date", os_date},
     {"difftime", os_difftime},   {"execute", os_execute},
     {"exit", os_exit},           {"getenv", os_getenv},
-    {"remove", os_remove},       {"rename", os_rename},
-    {"setlocale", os_setlocale}, {"time", os_time},
-    {"tmpname", os_tmpname},     {NULL, NULL}};
+    {"abort", [](lua_State *L) -> int {              
+      abort();
+    }},                           {"remove", os_remove},       
+    {"rename", os_rename},       {"setlocale", os_setlocale}, 
+    {"time", os_time},           {"tmpname", os_tmpname},     
+{NULL, NULL}};
 
 /* }====================================================== */
 

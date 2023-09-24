@@ -9,10 +9,6 @@ Cobalt includes:
 - interpreter, compiler, and JIT FFI
 - compile to LLVM IR if you have LLVM capable version of cobalt
 - more libraries/bindings
-- improved syntax
-- Walrus operator `:=`
-- `defer` statements
-- Destructuring `var [a, b] = [1, 2]` or `var {a=log, b=exp} = math`
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
@@ -21,19 +17,15 @@ Cobalt includes:
 - `export` to export variables anywhere instead of a `return` at the end of the file
 - Real OOP with `class`, `parent`, `extends`, `new`, and `instanceof`
 - `enum`'s
-- Loop without `pairs`/`ipairs`/`next`
 - cleaner syntax errors and stack traces with colors
 - `_INCLUDES` global variable is a table of all libraries built with cobalt (ex: `if (!_INCLUDES["sdl"]) error("SDL is required")`)
 - allocation tracker (track bytes and pool allocator stats)
 - `uwait`, `swait`, `mwait` for system sleep
 - new std functions
 - Lambda like `|c| :> c+1`
-- coal operator `??` 
 - Manipulate dynamic libraries like `dyn.load`, `.get`, and `.close`. 
 - `unix`, `win`, and `core` (core is cross plat) for lowlevel system calls
 - AOT compiler byte->C or byte->LLVMIR if you have LLVM capable version of cobalt
-- light functions
-- regex support (not full regex only a small subset), use `unix.regex` for POSIX regex
 - 2x speed improved gc (optional) using libgc
 - improved vm
 - Python bridge `import("python")`
@@ -41,15 +33,10 @@ Cobalt includes:
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - LLVM JIT compiler
 - `debug.snap` to track current stack
-- bytecode optimizer
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - 30% increase with pool allocator
 - lpeg-labels built in
-- more operators
-- Safe navigation `print(math?.sqrtt(4))` will print `null` instead of erroring if `math.sqrtt` is not defined
 - tenary operator
-- `` ` `` for python like format ``print(`Hello {name}`)`` directly implemented to the parser and bytecode compatable
-- CMake build system
 ## When to, and not use
 ### Graphics Programming
 Cobalt is a great choice for graphics programming as it has SDL, and a Graphical Math library built in.

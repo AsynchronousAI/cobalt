@@ -380,12 +380,13 @@ static int os_exit(lua_State *L) {
   if (L) exit(status); /* 'if' to avoid warnings for unreachable 'return' */
   return 0;
 }
-
+extern int manual;
 static const luaL_Reg syslib[] = {
     {"clock", os_clock},         {"date", os_date},
     {"difftime", os_difftime},   {"execute", os_execute},
     {"exit", os_exit},           {"getenv", os_getenv},
-    {"abort", [](lua_State *L) -> int {              
+    {"abort", [](lua_State *L) -> int {    
+      manual = 1;          
       abort();
     }},                           {"remove", os_remove},       
     {"rename", os_rename},       {"setlocale", os_setlocale}, 

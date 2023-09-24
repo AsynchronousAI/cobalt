@@ -639,8 +639,12 @@ static int pmain(lua_State *L) {
   return 1;
 }
 
+#include "fatal.h" /* Handle fatal-errors */
+
 int main(int argc, char **argv) {
   int status, result;
+
+  handlefatal(-1, "Unknown");
 
   lua_State *L = luaL_newstate(); /* create state */
   if (L == NULL) {

@@ -50,6 +50,7 @@ set(LUA_LIB_SRCS
     "src/lplcap.cpp"
     "src/lplcode.c"
     "src/lpltree.cpp"
+    "src/fatal.cpp"
     "src/lplvm.cpp"
 
 

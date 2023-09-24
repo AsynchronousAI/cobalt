@@ -1,4 +1,3 @@
-
 /* ============================================================================== //
 // This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
 // License. Read `cobalt.h` for license information.                              //
@@ -594,10 +593,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lapi_h
@@ -649,10 +645,7 @@ extern "C" {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lautoc_h
@@ -918,10 +911,7 @@ void luaA_function_register_type(lua_State* L, void* src_func,
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lautocall_h
@@ -1820,10 +1810,7 @@ extern "C" {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lauxlib_h
@@ -2098,10 +2085,7 @@ typedef struct luaL_Stream {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 typedef struct {
@@ -2139,10 +2123,7 @@ typedef struct {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lcode_h
@@ -2268,10 +2249,7 @@ LUAI_FUNC l_noret luaK_semerror(LexState *ls, const char *msg);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lctype_h
@@ -2369,10 +2347,7 @@ LUAI_DDEC(const lu_byte luai_ctype_[UCHAR_MAX + 2];)
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef ldebug_h
@@ -2431,10 +2406,7 @@ LUAI_FUNC int luaG_traceexec(lua_State *L, const Instruction *pc);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef ldo_h
@@ -2507,10 +2479,7 @@ LUAI_FUNC int luaD_rawrunprotected(lua_State *L, Pfunc f, void *ud);
 #ifdef __cplusplus
 }
 #endif
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 /*
 lexecute.h is a huge script added to the Cobalt source code to switch
@@ -4077,10 +4046,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 /* Define 'chdir' for systems that do not implement it */
@@ -4119,10 +4085,7 @@ LFS_EXPORT int luaopen_lfs(lua_State* L);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lfunc_h
@@ -4179,10 +4142,7 @@ LUAI_FUNC const char *luaF_getlocalname(const Proto *func, int local_number,
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lgc_h
@@ -4371,10 +4331,7 @@ LUAI_FUNC void luaC_changemode(lua_State *L, int newmode);
 #ifdef __cplusplus
 }
 #endif
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #undef vmdispatch
@@ -4425,10 +4382,7 @@ static const void *const disptab[NUM_OPCODES] = {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 /* 
 Provides a simple interface to switch the interpreter state.
@@ -4492,10 +4446,7 @@ int luaB_getstate(lua_State *L){
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef llex_h
@@ -4647,10 +4598,7 @@ LUAI_FUNC const char *luaX_token2str(LexState *ls, int token);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef llimits_h
@@ -5005,10 +4953,7 @@ typedef l_uint32 Instruction;
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLARITH_H
@@ -5072,10 +5017,7 @@ class Arith : public Opcode {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLCOMPILER_H
@@ -5167,10 +5109,7 @@ class Compiler {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLCOMPILERSTATE_H
@@ -5297,10 +5236,7 @@ class CompilerState {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLCORE_H
@@ -5348,10 +5284,7 @@ void LLLWrite(Proto *p, const char *path);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLENGINE_H
@@ -5394,10 +5327,7 @@ class Engine {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLLOGICAL_H
@@ -5445,10 +5375,7 @@ class Logical : public Opcode {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLOPCODE_H
@@ -5501,10 +5428,7 @@ class Opcode {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLRUNTIME_H
@@ -5578,10 +5502,7 @@ class Runtime {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLTABLEGET_H
@@ -5643,10 +5564,7 @@ class TableGet : public Opcode {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLTABLESET_H
@@ -5709,10 +5627,7 @@ class TableSet : public Opcode {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLVALUE_H
@@ -5922,10 +5837,7 @@ class Stack {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef LLLVARARG_H
@@ -6013,10 +5925,7 @@ int test() {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lmem_h
@@ -6933,10 +6842,7 @@ LUAI_FUNC void luaO_chunkid(char *out, const char *source, size_t srclen);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lopcodes_h
@@ -7342,10 +7248,7 @@ LUAI_DDEC(const lu_byte luaP_opmodes[NUM_OPCODES];)
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #if !defined(lopnames_h)
@@ -7380,10 +7283,7 @@ static const char *const opnames[] = {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lparser_h
@@ -7544,10 +7444,7 @@ LUAI_FUNC LClosure *luaY_parser(lua_State *L, ZIO *z, Mbuffer *buff,
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #if !defined(lplcap_h)
@@ -7603,10 +7500,7 @@ LUAI_FUNC int finddyncap(Capture *cap, Capture *last);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #if !defined(lplcode_h)
@@ -7645,10 +7539,7 @@ LUAI_FUNC int sizei(const Instruction *i);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #if !defined(lpltree_h)
@@ -7731,10 +7622,7 @@ LUAI_FUNC const byte numsiblings[];
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #if !defined(lpltypes_h)
@@ -7882,10 +7770,7 @@ typedef struct Charset {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #if !defined(lplvm_h)
@@ -7953,10 +7838,7 @@ LUAI_FUNC const char *match(lua_State *L, const char *o, const char *s,
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 void* alloc_entry(void* ud, void* ptr, size_t osize, size_t nsize);
@@ -7970,10 +7852,7 @@ int luaopen_alloc(lua_State* L);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lprefix_h
@@ -8020,10 +7899,7 @@ extern "C" {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 #ifndef PYTHONINLUA_H
 #define PYTHONINLUA_H
@@ -8052,10 +7928,7 @@ py_object*    luaPy_to_pobject(lua_State *L, int n);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #include <signal.h>
@@ -8078,10 +7951,7 @@ struct lua_signal {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lstate_h
@@ -8459,10 +8329,7 @@ LUAI_FUNC int luaE_resetthread(lua_State *L, int status);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lstring_h
@@ -8515,10 +8382,7 @@ LUAI_FUNC TString *luaS_createlngstrobj(lua_State *L, size_t l);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #include <stdio.h>
@@ -8608,10 +8472,7 @@ static const char* getGPUName() {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef ltable_h
@@ -8673,10 +8534,7 @@ LUAI_FUNC int luaH_isdummy(const Table *t);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef ltm_h
@@ -8779,10 +8637,7 @@ LUAI_FUNC void luaT_getvarargs(lua_State *L, struct CallInfo *ci, StkId where,
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifdef __LCC__
@@ -9342,10 +9197,7 @@ int Lua_setcstacklimit(lua_State* L, unsigned int limit, const char* _FILE,
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef luaconf_h
@@ -10122,10 +9974,7 @@ extern "C" {
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lualib_h
@@ -10262,10 +10111,7 @@ LUALIB_API void(luaL_openlibs)(lua_State *L);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lundump_h
@@ -10303,10 +10149,7 @@ LUAI_FUNC int luaU_dump(lua_State* L, const Proto* f, lua_Writer w, void* data,
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lvm_h
@@ -10433,10 +10276,7 @@ LUAI_FUNC void luaV_objlen(lua_State *L, StkId ra, const TValue *rb);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 
 #ifndef lzio_h
@@ -10498,10 +10338,7 @@ LUAI_FUNC int luaZ_fill(ZIO *z);
 extern "C" {
 #endif
 
-/* ============================================================================== //
-// This file is apart of the Cobalt Programming Language. Cobalt is under the MIT //
-// License. Read `cobalt.h` for license information.                              //
-// ============================================================================== */
+
 
 #ifndef LUAINPYTHON_H
 #define LUAINPYTHON_H

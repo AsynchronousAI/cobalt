@@ -53,8 +53,7 @@ enum RESERVED {
   TK_VAR,
   TK_CASE, 
   TK_DEFAULT, 
-  TK_AS, 
-  TK_BEGIN, 
+  TK_AS,  
   TK_EXTENDS, 
   TK_INSTANCEOF,
   TK_SWITCH, 
@@ -114,6 +113,15 @@ typedef struct Token {
   SemInfo seminfo;
 } Token;
 
+typedef struct EnumDesc {
+  struct Enumerator {
+    TString* name;
+    lua_Integer value;
+  };
+  std::vector<Enumerator> enumerators;
+};
+
+
 /* state of the lexer plus state of the parser when shared by all
    functions */
 typedef struct LexState {
@@ -132,6 +140,7 @@ typedef struct LexState {
   TString *envn;       /* environment variable name */
 
   /* added in cobalt */
+  std::vector<EnumDesc> enums{};
   std::vector<TString*> export_symbols;
   
   /** configurations */

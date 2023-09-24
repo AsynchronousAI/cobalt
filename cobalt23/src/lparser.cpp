@@ -29,6 +29,7 @@
 #include "lstring.h"
 #include "ltable.h"
 
+#define gett(ls) (ls->t.token)
 
 /* maximum number of local variables per function (must be smaller
    than 250, due to the bytecode format) */
@@ -307,7 +308,7 @@ static Vardesc *getlocalvardesc(FuncState *fs, int vidx) {
 static int reglevel(FuncState *fs, int nvar) {
   while (nvar-- > 0) {
     Vardesc *vd = getlocalvardesc(fs, nvar); /* get previous variable */
-    if (vd->vd.kind != RDKCTC)               /* is in a register? */
+    if (vd->vd.kind != RDKCTC && vd->vd.kind != RDKENUM)  /* is in a register? */
       return vd->vd.ridx + 1;
   }
   return 0; /* no variables in registers */
@@ -324,7 +325,7 @@ int luaY_nvarstack(FuncState *fs) { return reglevel(fs, fs->nactvar); }
 */
 static LocVar *localdebuginfo(FuncState *fs, int vidx) {
   Vardesc *vd = getlocalvardesc(fs, vidx);
-  if (vd->vd.kind == RDKCTC)
+  if (vd->vd.kind == RDKCTC || vd->vd.kind == RDKENUM)
     return NULL; /* no debug info. for constants */
   else {
     int idx = vd->vd.pidx;
@@ -457,6 +458,10 @@ static int searchvar(FuncState *fs, TString *n, expdesc *var) {
     if (eqstr(n, vd->vd.name)) { /* found? */
       if (vd->vd.kind == RDKCTC) /* compile-time constant? */
         init_exp(var, VCONST, fs->firstlocal + i);
+      else if (vd->vd.kind == RDKENUM) {
+        init_exp(var, VENUM, 0);
+        var->u.ival = ivalue(&vd->k);
+      }
       else /* real variable */
         init_var(fs, var, i);
       return var->k;
@@ -1479,6 +1484,18 @@ static void simpleexp(LexState *ls, expdesc *v) {
   }
   luaX_next(ls);
 }
+static void simpleexp_with_unary_support (LexState *ls, expdesc *v) {
+  if (testnext(ls, '-')) { /* Negative constant? */
+    check(ls, TK_INT);
+    init_exp(v, VKINT, 0);
+    v->u.ival = (ls->t.seminfo.i * -1);
+    luaX_next(ls);
+  }
+  else {
+    testnext(ls, '+'); /* support pseudo-unary '+' */
+    simpleexp(ls, v);
+  }
+}
 
 static UnOpr getunopr(int op) {
   switch (op) {
@@ -1857,6 +1874,83 @@ static void continuestat(LexState *ls) {
   newgotoentry(ls, luaS_new(ls->L, LABEL_CONTINUE), line, luaK_jump(ls->fs));
   bl->isloop |= LOOP_HAS_CONTINUE;
 }
+
+#define ENUMBEGIN '{'
+#define ENUMEND '}'
+/*
+enum ENUMNAME do
+  ENUMERATOR1 = 1,
+  ENUMERATOR2 = 2,
+  ...
+  ENUMERATORn = n
+of 
+*/
+static void enumstat (LexState *ls) {
+  /* enumstat -> ENUM [[CLASS] NAME] BEGIN NAME ['=' INT] { ',' NAME ['=' INT] } END */
+
+  luaX_next(ls); /* skip 'enum' */
+
+  EnumDesc *ed = nullptr;
+  bool is_enum_class = false;
+  if (gett(ls) != TK_DO) { /* enum has name (and possibly modifier)? */
+    if (ls->t.token == TK_CLASS
+      || (ls->t.token == TK_NAME && strcmp(ls->t.seminfo.ts->contents, "class") == 0)
+      ) {
+      is_enum_class = true;
+      luaX_next(ls);
+    }
+    auto vidx = new_localvar(ls, str_checkname(ls));
+    auto var = getlocalvardesc(ls->fs, vidx);
+    var->vd.kind = RDKENUM;
+    setivalue(&var->k, ls->enums.size());
+    EnumDesc enumDesc;
+    ls->enums.emplace_back(enumDesc);
+    ed = &ls->enums.back();
+    ls->fs->nactvar++;
+  }
+
+  const auto line_begin = ls->linenumber;
+  checknext(ls, ENUMBEGIN); /* ensure we have 'begin' */
+
+  lua_Integer i = 1;
+  while (gett(ls) != ENUMEND) {
+    TString *name = str_checkname(ls);
+    int vidx;
+    if (!is_enum_class) {
+      vidx = new_localvar(ls, name);
+    }
+    if (testnext(ls, '=')) {
+      expdesc v;
+      simpleexp_with_unary_support(ls, &v);
+      if (v.k == VCONST) { /* compile-time constant? */
+        TValue *k = &ls->dyd->actvar.arr[v.u.info].k;
+        if (ttype(k) == LUA_TNUMBER && ttisinteger(k)) { /* integer value? */
+          init_exp(&v, VKINT, 0);
+          v.u.ival = ivalue(k);
+        }
+      }
+      if (v.k != VKINT) { /* assert expdesc kind */
+        luaX_notedsyntaxerror(ls, "expected integer constant", "unexpected expression type");
+      }
+      i = v.u.ival;
+    }
+    if (ed) {
+      ed->enumerators.emplace_back(EnumDesc::Enumerator{ name, i });
+    }
+    if (!is_enum_class) {
+      auto var = getlocalvardesc(ls->fs, vidx);
+      var->vd.kind = RDKCTC;
+      setivalue(&var->k, i);
+      i++;
+      ls->fs->nactvar++;
+    }
+    if (gett(ls) != ',') break;
+    luaX_next(ls);
+  }
+
+  check_match(ls, ENUMEND, ENUMBEGIN, line_begin);
+}
+
 
 /*
 ** Check whether there is already a label with the given 'name'.
@@ -2686,6 +2780,10 @@ static void statement(LexState *ls) {
         localfunc(ls);
       else
         localstat(ls);
+      break;
+    }
+    case TK_ENUM: {
+      enumstat(ls);
       break;
     }
     case TK_DEFER: {  /* stat -> deferstat */

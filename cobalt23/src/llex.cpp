@@ -33,17 +33,17 @@
 
 /* ORDER RESERVED */
 static const char *const luaX_tokens[] = {
-    "auto",     "break",    "continue", "do",        "else",   "false",
-    "__FILE__", "for",      "function", "goto",      "if",     "in",
-    "let",      "__LINE__", "local",    "null",      "return", "true",
-    "var",      "case",     "default",  "as",        "begin",   "extends",
-    "of",       "switch",   "enum",     "new",       "class",   "parent",
-    "defer",    "export",   "config",   "while",    "&&",        "||",       
-    "!",        "**",       "//",       "..",       "...",       "==",        
-    ">=",       "<=",       "!=",       "+=",       "-=",       "*=",       
-    "/=",       "%=",       "..=",      "++",       "--",       "<<",        
-    ">>",       "->",       "::",       "<eof>",    "<number>", "<integer>", 
-    "<name>",   "<string>", "??",       ":="
+    "auto",     "break",    "continue", "do",        "else",      "false",
+    "__FILE__", "for",      "function", "goto",      "if",        "in",
+    "let",      "__LINE__", "local",    "null",      "return",    "true",
+    "var",      "case",     "default",  "as",        "extends",   "of",       
+    "switch",   "enum",     "new",      "class",     "parent",    "defer",    
+    "export",   "config",   "while",    "&&",        "||",        "!",        
+    "**",       "//",       "..",       "...",       "==",        ">=",       
+    "<=",       "!=",       "+=",       "-=",        "*=",        "/=",       
+    "%=",       "..=",      "++",       "--",        "<<",        ">>",       
+    "->",       "::",       "<eof>",    "<number>",  "<integer>", "<name>",   
+    "<string>", "??",       ":="
   };
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))

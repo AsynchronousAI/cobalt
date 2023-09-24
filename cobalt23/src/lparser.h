@@ -60,7 +60,9 @@ typedef enum {
   VRELOC,    /* expression can put result in any register;
                 info = instruction pc */
   VCALL,     /* expression is a function call; info = instruction pc */
-  VVARARG    /* vararg expression; info = instruction pc */
+  VVARARG,    /* vararg expression; info = instruction pc */
+  
+  VENUM
 } expkind;
 
 #define vkisvar(k) (VLOCAL <= (k) && (k) <= VINDEXSTR)
@@ -91,6 +93,7 @@ typedef struct expdesc {
 #define RDKCONST 1   /* constant */
 #define RDKTOCLOSE 2 /* to-be-closed */
 #define RDKCTC 3     /* compile-time constant */
+#define RDKENUM		4   /* named enum */
 
 /* description of an active local variable */
 typedef union Vardesc {

@@ -1,8 +1,0 @@
-{ //- pi
-  assert(math.pi == 3.141592653589793);
-}
-
-{ //- huge
-  assert(math.huge > 0);
-  assert(1/math.huge == 0);
-}

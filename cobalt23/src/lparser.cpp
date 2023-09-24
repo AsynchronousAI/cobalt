@@ -1174,32 +1174,43 @@ static void format(LexState *ls)
       return;
 }
 
-static void body (LexState *ls, expdesc *e, int ismethod, int line, int deferred) {
+static void body (LexState *ls, expdesc *e, int ismethod, int line) {
+  /* body ->  '(' parlist ')' block END */
+  FuncState new_fs;
+  BlockCnt bl;
+  new_fs.f = addprototype(ls);
+  new_fs.f->linedefined = line;
+  open_func(ls, &new_fs, &bl);
+  checknext(ls, '(');
+  if (ismethod) {
+    new_localvarliteral(ls, "this");  /* create 'this' parameter */
+    adjustlocalvars(ls, 1);
+  }
+  parlist(ls);
+  checknext(ls, ')');
+  optParamType(ls);
+  checknext(ls, '{');
+  statlist(ls);
+  new_fs.f->lastlinedefined = ls->linenumber;
+  check_match(ls, '}', TK_FUNCTION, line);
+  codeclosure(ls, e, 0);
+  close_func(ls);
+}
+
+static void deferbody (LexState *ls, expdesc *e, int ismethod, int line) {
    /* body ->  '(' parlist ')' block END */
   FuncState new_fs;
   BlockCnt bl;
   new_fs.f = addprototype(ls);
   new_fs.f->linedefined = line;
   open_func(ls, &new_fs, &bl);
-  if (!deferred) {
-    checknext(ls, '(');
-    if (ismethod) {
-      new_localvarliteral(ls, "self"); /* create 'self' parameter */
-      adjustlocalvars(ls, 1);
-    }
-    parlist(ls);
-    checknext(ls, ')');
-  }else{
-    checknext(ls, '{');
-  }
-
+  checknext(ls, '{');
   statlist(ls);
   new_fs.f->lastlinedefined = ls->linenumber;
   check_match(ls, '}', TK_FUNCTION, line);
-  codeclosure(ls, e, deferred);
+  codeclosure(ls, e, 1);
   close_func(ls);
 }
- 
 
 static int explist(LexState *ls, expdesc *v) {
   /* explist -> expr { ',' expr } */
@@ -1446,7 +1457,7 @@ static void simpleexp(LexState *ls, expdesc *v) {
     }
     case TK_FUNCTION: {
       luaX_next(ls);
-      body(ls, v, 0, ls->linenumber, 0);
+      body(ls, v, 0, ls->linenumber);
       return;
     }
     case '|': {
@@ -2116,42 +2127,38 @@ static void ifstat(LexState *ls /*, int line*/) {
   luaK_patchtohere(fs, escapelist); /* patch escape list to 'if' end */
 }
 
-static void localfunc (LexState *ls, int defer) {
+static void localfunc (LexState *ls) {
+  expdesc b;
+  FuncState *fs = ls->fs;
+  int fvar = fs->nactvar;  /* function's variable index */
+  new_localvar(ls, str_checkname(ls));  /* new local variable */
+  adjustlocalvars(ls, 1);  /* enter its scope */
+  body(ls, &b, 0, ls->linenumber);  /* function created in next register */
+  /* debug information will only see the variable after this point! */
+  localdebuginfo(fs, fvar)->startpc = fs->pc;
+ }
+static void deferfunc (LexState *ls) {
    expdesc b;
    FuncState *fs = ls->fs;
    int fvar = fs->nactvar;  /* function's variable index */
-  if (defer) {
-    static const char funcname[] = "(deferred function)";
-    new_localvar(ls, luaX_newstring(ls, funcname, sizeof funcname-1));  /* new local variable */
-    markupval(fs, fs->nactvar);
-    fs->bl->insidetbc = 1;  /* in the scope of a defer closure variable */
-  }
-  else {
-    new_localvar(ls, str_checkname(ls)); /* new local variable */
-  }
+   static const char funcname[] = "(deferred function)";
+   new_localvar(ls, luaX_newstring(ls, funcname, sizeof funcname-1));  /* new local variable */
+   markupval(fs, fs->nactvar);
+   fs->bl->insidetbc = 1;  /* in the scope of a defer closure variable */
    adjustlocalvars(ls, 1);  /* enter its scope */
-  body(ls, &b, 0, ls->linenumber, defer);  /* function created in next register */
+   deferbody(ls, &b, 0, ls->linenumber);  /* function created in next register */
    /* debug information will only see the variable after this point! */
    localdebuginfo(fs, fvar)->startpc = fs->pc;
  }
-
-static void exportfunc(LexState *ls, TString *name, int defer) {
+static void exportfunc(LexState *ls, TString *name) {
   expdesc b;
-   FuncState *fs = ls->fs;
-   int fvar = fs->nactvar;  /* function's variable index */
-  if (defer) {
-    static const char funcname[] = "(deferred function)";
-    new_localvar(ls, luaX_newstring(ls, funcname, sizeof funcname-1));  /* new local variable */
-    markupval(fs, fs->nactvar);
-    fs->bl->insidetbc = 1;  /* in the scope of a defer closure variable */
-  }
-  else {
-    new_localvar(ls, str_checkname(ls)); /* new local variable */
-  }
-   adjustlocalvars(ls, 1);  /* enter its scope */
-  body(ls, &b, 0, ls->linenumber, defer);  /* function created in next register */
-   /* debug information will only see the variable after this point! */
-   localdebuginfo(fs, fvar)->startpc = fs->pc;
+  FuncState *fs = ls->fs;
+  int fvar = fs->nactvar;  /* function's variable index */
+  new_localvar(ls, name);  /* new local variable */
+  adjustlocalvars(ls, 1);  /* enter its scope */
+  body(ls, &b, 0, ls->linenumber);  /* function created in next register */
+  /* debug information will only see the variable after this point! */
+  localdebuginfo(fs, fvar)->startpc = fs->pc;
 }
 
 static int getlocalattribute(LexState *ls) {
@@ -2475,7 +2482,7 @@ static void funcstat(LexState *ls, int line) {
   expdesc v, b;
   luaX_next(ls); /* skip FUNCTION */
   ismethod = funcname(ls, &v);
-  body(ls, &b, ismethod, line, 0);
+  body(ls, &b, ismethod, line);
   check_readonly(ls, &v);
   luaK_storevar(ls->fs, &v, &b);
   luaK_fixline(ls->fs, line); /* definition "happens" in the first line */
@@ -2656,7 +2663,7 @@ static void statement(LexState *ls) {
       TString *name = str_checkname(ls);
       
       if (testnext(ls, TK_FUNCTION)) {
-        exportfunc(ls, name, 0);
+        exportfunc(ls, name);
         ls->export_symbols.emplace_back((name));
       } else {
         exportstat(ls, name);
@@ -2677,14 +2684,14 @@ static void statement(LexState *ls) {
     case TK_VAR: {                 /* stat -> localstat */
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */
-        localfunc(ls, 0);
+        localfunc(ls);
       else
         localstat(ls);
       break;
     }
     case TK_DEFER: {  /* stat -> deferstat */
       luaX_next(ls);  /* skip DEFER */
-      localfunc(ls, 1);
+      deferfunc(ls);
       break;
      }
     case TK_RETURN: { /* stat -> retstat */

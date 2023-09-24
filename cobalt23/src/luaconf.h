@@ -340,7 +340,7 @@ extern "C" {
 ** (These functions were already officially removed in 5.3;
 ** nevertheless they are still available here.)
 */
-#define LUA_COMPAT_MATHLIB
+#undef LUA_COMPAT_MATHLIB
 
 /*
 @@ LUA_COMPAT_APIINTCASTS controls the presence of macros for
@@ -349,13 +349,13 @@ extern "C" {
 ** (These macros were also officially removed in 5.3, but they are still
 ** available here.)
 */
-#define LUA_COMPAT_APIINTCASTS
+#undef LUA_COMPAT_APIINTCASTS
 
 /*
 @@ LUA_COMPAT_LT_LE controls the emulation of the '__le' metamethod
 ** using '__lt'.
 */
-#define LUA_COMPAT_LT_LE
+#undef LUA_COMPAT_LT_LE
 
 /*
 @@ The following macros supply trivial compatibility for some
@@ -740,7 +740,7 @@ extern "C" {
 @@ New cobalt features and to enable or not.
 */
 #define NEW_SYNTAX_ERR 1 /* default: ON */ /* new syntax error messages */
-
+#define QUICK_FILL 0 /* defualt: OFF */ /* faster buffer filling but interactive mode is broken */
 /*
 @@ LUAL_BUFFERSIZE is the buffer size used by the lauxlib buffer system.
 */

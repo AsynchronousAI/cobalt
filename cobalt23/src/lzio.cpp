@@ -21,12 +21,25 @@ int luaZ_fill(ZIO *z) {
   size_t size;
   lua_State *L = z->L;
   const char *buff;
+  #ifdef QUICK_FILL
+  if (z->eoz) return EOZ;
+  #endif
   lua_unlock(L);
   buff = z->reader(L, z->data, &size);
   lua_lock(L);
+  #ifndef QUICK_FILL
   if (buff == NULL || size == 0) return EOZ;
+  #else
+  if (buff == NULL || size == 0) {
+     z->eoz = 1;  /* avoid calling reader function next time */
+     return EOZ;
+  }
+  #endif
   z->n = size - 1; /* discount char being returned */
   z->p = buff;
+  #ifdef QUICK_FILL
+  z->eoz = 0;
+  #endif
   return cast_uchar(*(z->p++));
 }
 

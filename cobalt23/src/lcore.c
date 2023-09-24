@@ -458,8 +458,8 @@ static int lsyslog_close(lua_State *L) {
 #include <time.h> /* struct tm struct timespec gmtime_r(3) clock_gettime(3) tzset(3) */
 #include <unistd.h> /* _PC_NAME_MAX access(2) alarm(3) chdir(2) chroot(2) close(2) chdir(2) chown(2) chroot(2) dup2(2) execve(2) execl(2) execlp(2) execvp(2) faccessat(2) fork(2) fpathconf(3) getcwd(3) getegid(2) geteuid(2) getgid(2) getgroups(2) gethostname(3) getpgid(2) getpgrp(2) getpid(2) getppid(2) getuid(2) isatty(3) issetugid(2) lchown(2) lockf(3) link(2) pathconf(3) pread(2) pwrite(2) realpath(3) rename(2) rmdir(2) setegid(2) seteuid(2) setgid(2) setgroups(2) setpgid(2) setuid(2) setsid(2) symlink(2) sysconf(3) tcgetpgrp(3) tcsetpgrp(3) truncate(2) umask(2) unlink(2) unlinkat(2) */
 
-#define LUA_COMPAT_5_2 1
-#define LUA_COMPAT_5_3 1
+#undef LUA_COMPAT_5_2
+#undef LUA_COMPAT_5_3 1
 
 /*
  * F E A T U R E  D E T E C T I O N

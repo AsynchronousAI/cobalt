@@ -5,7 +5,7 @@
 
 #include "Python.h"
 
-#define LUA_COMPAT_ALL
+#undef LUA_COMPAT_ALL
 
 #include "cobalt.h"
 #include "luaconf.h"

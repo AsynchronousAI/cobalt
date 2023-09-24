@@ -9,7 +9,7 @@
 #endif
 
 /* need this to build with Lua 5.2: defines luaL_register() macro */
-#define LUA_COMPAT_MODULE
+#undef LUA_COMPAT_MODULE
 
 #include "cobalt.h"
 #include "lauxlib.h"

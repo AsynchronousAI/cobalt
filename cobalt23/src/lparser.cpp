@@ -2136,6 +2136,7 @@ static void forstat(LexState *ls, int line) {
   luaX_next(ls);                    /* skip 'for' */
   checknext(ls, '(');
   varname = str_checkname(ls); /* first variable name */
+  
   switch (ls->t.token) {
     case '=':
       fornum(ls, varname, line);
@@ -2147,8 +2148,9 @@ static void forstat(LexState *ls, int line) {
       break;
     }
     default:
-      luaX_syntaxerror(ls, "'=' or 'in' expected");
+      luaX_syntaxerror(ls, "'=', 'in' expected");
   }
+
   leaveblock(fs); /* loop scope ('break' jumps to this point) */
 }
 

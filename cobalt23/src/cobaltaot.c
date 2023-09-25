@@ -442,6 +442,10 @@ static void aot_PrintOpcodeComment(Proto *f, int pc) {
     case OP_MOVE:
       print("%d %d", a, b);
       break;
+    case OP_DEFER: {
+      printf("defers not supported when AOT compiling");
+      exit(1);
+    }
     case OP_LOADI:
       print("%d %d", a, sbx);
       break;

@@ -74,6 +74,10 @@ static void create_function_switches(Proto *f) {
         // FALLTHROUGH
         break;
       }
+      case OP_DEFER: {
+        printf("defers not supported when AOT compiling");
+        exit(1);
+      }
       case OP_LOADI: {
         println("        lua_Integer b = GETARG_sBx(i);");
         println("        setivalue(s2v(ra), b);");

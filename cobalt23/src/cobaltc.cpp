@@ -381,6 +381,9 @@ static void PrintCode(const Proto* f) {
       case OP_MOVE:
         printf("%d %d", a, b);
         break;
+      case OP_DEFER: {
+        printf("%d %d", a, b);
+      }
       case OP_LOADI:
         printf("%d %d", a, sbx);
         break;

@@ -1459,6 +1459,9 @@ static void suffixedexp(LexState *ls, expdesc *v) {
 
         /* check rules, do not apply isPublic rules when in scope */
         /* CHECK HERE */
+        if (!v->isPublic){
+          /* check if in the same parent table */
+        }
 
         if (!key.allowArrow) {
           luaX_notedsyntaxerror(fs->ls, "attempt to use '->' on static function", "use '.' instead of '->' when working with static functions");
@@ -1470,11 +1473,10 @@ static void suffixedexp(LexState *ls, expdesc *v) {
         break;
       }
       case '(': { /* funcargs */
-        /* check rules, do not apply isPublic rules when defining or in scope */
-        /* CHECK HERE */
         
         luaK_exp2nextreg(fs, v);
         funcargs(ls, v, line);
+        /* somehowe check publicity for normal calls */
         break;
       }
       case TK_PLUSPLUS: {

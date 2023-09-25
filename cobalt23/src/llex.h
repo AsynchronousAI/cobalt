@@ -67,6 +67,7 @@ enum RESERVED {
   TK_WHILE,
 
   /* other terminal symbols */
+  TK_WALRUS, /* highest priority */
   TK_AND,
   TK_NOT,
   TK_OR,
@@ -96,7 +97,6 @@ enum RESERVED {
   TK_NAME,
   TK_STRING,
   TK_COAL,
-  TK_WALRUS,
 };
 
 /* number of reserved words */

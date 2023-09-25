@@ -999,6 +999,7 @@ static void listfield(LexState *ls, ConsControl *cc) {
 static void body (LexState *ls, expdesc *e, int ismethod, int line, bool isPublic = 1);
 static void funcfield (LexState *ls, struct ConsControl *cc, int ismethod, bool isPublic = 1) {
   /* funcfield -> function NAME funcargs */
+
   FuncState *fs = ls->fs;
   int reg = ls->fs->freereg;
   expdesc tab, key, val;
@@ -1228,9 +1229,6 @@ static void lambdabody (LexState *ls, expdesc *e, int line) {
 
 static void format(LexState *ls)
 {
-      printf("format\n");
-      /* print the contents of format also */
-      printf("%s\n", getstr(ls->t.seminfo.ts));
       luaX_next(ls);
       return;
 }
@@ -1277,7 +1275,7 @@ static void deferbody (LexState *ls, expdesc *e, int ismethod, int line) {
   check_match(ls, '}', TK_FUNCTION, line);
 
   e->allowArrow = ismethod;
-  e->isPublic = 0;
+  e->isPublic = false;
 
   codeclosure(ls, e, 1);
   close_func(ls);
@@ -1457,14 +1455,8 @@ static void suffixedexp(LexState *ls, expdesc *v) {
         luaX_next(ls);
         codename(ls, &key);
 
-        /* check rules, do not apply isPublic rules when in scope */
-        /* CHECK HERE */
-        if (!v->isPublic){
-          /* check if in the same parent table */
-        }
-
         if (!key.allowArrow) {
-          luaX_notedsyntaxerror(fs->ls, "attempt to use '->' on static function", "use '.' instead of '->' when working with static functions");
+          luaX_notedsyntaxerror(fs->ls, "attempt to use '->' on static function", "did you mean to use '.'?");
         }
 
         /* call */
@@ -1473,7 +1465,6 @@ static void suffixedexp(LexState *ls, expdesc *v) {
         break;
       }
       case '(': { /* funcargs */
-        
         luaK_exp2nextreg(fs, v);
         funcargs(ls, v, line);
         /* somehowe check publicity for normal calls */

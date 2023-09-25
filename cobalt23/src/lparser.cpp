@@ -996,8 +996,8 @@ static void listfield(LexState *ls, ConsControl *cc) {
 }
 
 #include <stdio.h>
-static void body (LexState *ls, expdesc *e, int ismethod, int line, int isprivate = 0);
-static void funcfield (LexState *ls, struct ConsControl *cc, int ismethod, int isprivate = 0) {
+static void body (LexState *ls, expdesc *e, int ismethod, int line, bool isPublic = 1);
+static void funcfield (LexState *ls, struct ConsControl *cc, int ismethod, bool isPublic = 1) {
   /* funcfield -> function NAME funcargs */
   FuncState *fs = ls->fs;
   int reg = ls->fs->freereg;
@@ -1010,7 +1010,7 @@ static void funcfield (LexState *ls, struct ConsControl *cc, int ismethod, int i
 
   tab = *cc->t;
   luaK_indexed(fs, &tab, &key);
-  body(ls, &val, ismethod, ls->linenumber, isprivate);
+  body(ls, &val, ismethod, ls->linenumber, isPublic);
   luaK_storevar(fs, &tab, &val);
   fs->freereg = reg;  /* free registers */
 }
@@ -1019,12 +1019,13 @@ static void field(LexState *ls, ConsControl *cc) {
   /* field -> listfield | recfield */
   switch (ls->t.token) {
     case TK_STRING:
-    case TK_NAME: { /* may be 'listfield' or 'recfield' */
-      int isPrivate = (strcmp(ls->t.seminfo.ts->contents, "private") == 0);
-      int isStatic  = (strcmp(ls->t.seminfo.ts->contents, "static") == 0);
-      int isPublic  = (strcmp(ls->t.seminfo.ts->contents, "public") == 0);
+    case TK_NAME: { /* may be 'listfield' or 'recfield' or annotated function */
+      bool isPrivate = (strcmp(ls->t.seminfo.ts->contents, "private") == 0);
+      bool isStatic  = (strcmp(ls->t.seminfo.ts->contents, "static") == 0);
+      bool isPublic  = (strcmp(ls->t.seminfo.ts->contents, "public") == 0);
 
-      if (!isPrivate && !isStatic && !isPublic) {
+      if (!isPrivate && (!isStatic) && !isPublic) {
+        isPublic = true;
         int ntk = luaX_lookahead(ls);
         if (!((ntk == '=') || (ntk == ':'))) /* expression? */
           listfield(ls, cc);
@@ -1033,7 +1034,10 @@ static void field(LexState *ls, ConsControl *cc) {
       }else{
         luaX_next(ls);
         if (ls->t.token == TK_FUNCTION){
-          funcfield(ls, cc, isStatic, isPrivate);
+          /* rules */
+          if (!isPrivate) isPublic = true;
+
+          funcfield(ls, cc, isStatic, isPublic);
         }else{
           if (!isPrivate)
             isPrivate = (strcmp(ls->t.seminfo.ts->contents, "private") == 0);
@@ -1043,10 +1047,11 @@ static void field(LexState *ls, ConsControl *cc) {
             isPublic = (strcmp(ls->t.seminfo.ts->contents, "public") == 0);
 
           if (isPublic && isPrivate) luaX_notedsyntaxerror(ls, "functions cannot be both 'private' and 'public'", "choose either 'private' or 'public'");
+          if (!isPrivate) isPublic = true;
 
           luaX_next(ls);
 
-          funcfield(ls, cc, isStatic, isPrivate);
+          funcfield(ls, cc, isStatic, isPublic);
         }
       }
 
@@ -1230,7 +1235,7 @@ static void format(LexState *ls)
       return;
 }
 
-static void body (LexState *ls, expdesc *e, int ismethod, int line, int isprivate) {
+static void body (LexState *ls, expdesc *e, int ismethod, int line, bool isPublic) {
   /* body ->  '(' parlist ')' block END */
   FuncState new_fs;
   BlockCnt bl;
@@ -1238,7 +1243,7 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line, int isprivat
   new_fs.f->linedefined = line;
   
   e->allowArrow = ismethod;
-  e->isPrivate = isprivate;
+  e->isPublic = isPublic;
 
   open_func(ls, &new_fs, &bl);
 
@@ -1272,7 +1277,7 @@ static void deferbody (LexState *ls, expdesc *e, int ismethod, int line) {
   check_match(ls, '}', TK_FUNCTION, line);
 
   e->allowArrow = ismethod;
-  e->isPrivate = 0;
+  e->isPublic = 0;
 
   codeclosure(ls, e, 1);
   close_func(ls);
@@ -1447,17 +1452,27 @@ static void suffixedexp(LexState *ls, expdesc *v) {
         break;
       }
       case TK_ARROW: { /* '->' NAME funcargs */
+        /* prepare call */
         expdesc key;
         luaX_next(ls);
         codename(ls, &key);
+
+        /* check rules, do not apply isPublic rules when in scope */
+        /* CHECK HERE */
+
         if (!key.allowArrow) {
           luaX_notedsyntaxerror(fs->ls, "attempt to use '->' on static function", "use '.' instead of '->' when working with static functions");
         }
+
+        /* call */
         luaK_self(fs, v, &key);
         funcargs(ls, v, line);
         break;
       }
       case '(': { /* funcargs */
+        /* check rules, do not apply isPublic rules when defining or in scope */
+        /* CHECK HERE */
+        
         luaK_exp2nextreg(fs, v);
         funcargs(ls, v, line);
         break;

@@ -88,7 +88,7 @@ typedef struct expdesc {
   int f; /* patch list of 'exit when false' */
 
   bool allowArrow; /* allow '->' */
-  bool isPrivate; /* allow usage outside of scope */
+  bool isPublic; /* allow usage outside of scope */
 } expdesc;
 
 /* kinds of variables */

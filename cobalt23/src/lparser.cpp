@@ -1021,8 +1021,8 @@ static void field(LexState *ls, ConsControl *cc) {
     case TK_STRING:
     case TK_NAME: { /* may be 'listfield' or 'recfield' */
       int isPrivate = (strcmp(ls->t.seminfo.ts->contents, "private") == 0);
-      int isStatic = (strcmp(ls->t.seminfo.ts->contents, "static") == 0);
-      int isPublic = (strcmp(ls->t.seminfo.ts->contents, "public") == 0);
+      int isStatic  = (strcmp(ls->t.seminfo.ts->contents, "static") == 0);
+      int isPublic  = (strcmp(ls->t.seminfo.ts->contents, "public") == 0);
 
       if (!isPrivate && !isStatic && !isPublic) {
         int ntk = luaX_lookahead(ls);
@@ -1035,9 +1035,14 @@ static void field(LexState *ls, ConsControl *cc) {
         if (ls->t.token == TK_FUNCTION){
           funcfield(ls, cc, isStatic, isPrivate);
         }else{
-          isPrivate = (strcmp(ls->t.seminfo.ts->contents, "private") == 0) && !isPrivate;
-          isStatic = (strcmp(ls->t.seminfo.ts->contents, "static") == 0) && !isStatic;
-          isPublic = (strcmp(ls->t.seminfo.ts->contents, "public") == 0) && !isPublic;
+          if (!isPrivate)
+            isPrivate = (strcmp(ls->t.seminfo.ts->contents, "private") == 0);
+          if (!isStatic)
+            isStatic = (strcmp(ls->t.seminfo.ts->contents, "static") == 0);
+          if (!isPublic)
+            isPublic = (strcmp(ls->t.seminfo.ts->contents, "public") == 0);
+
+          if (isPublic && isPrivate) luaX_notedsyntaxerror(ls, "functions cannot be both 'private' and 'public'", "choose either 'private' or 'public'");
 
           luaX_next(ls);
 
@@ -1233,6 +1238,7 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line, int isprivat
   new_fs.f->linedefined = line;
   
   e->allowArrow = ismethod;
+  e->isPrivate = isprivate;
 
   open_func(ls, &new_fs, &bl);
 
@@ -1264,7 +1270,10 @@ static void deferbody (LexState *ls, expdesc *e, int ismethod, int line) {
   statlist(ls);
   new_fs.f->lastlinedefined = ls->linenumber;
   check_match(ls, '}', TK_FUNCTION, line);
+
   e->allowArrow = ismethod;
+  e->isPrivate = 0;
+
   codeclosure(ls, e, 1);
   close_func(ls);
 }

@@ -86,6 +86,11 @@ typedef struct expdesc {
   } u;
   int t; /* patch list of 'exit when true' */
   int f; /* patch list of 'exit when false' */
+
+  bool allowArrow; /* allow '->' */
+  /* 2: defualt */
+  /* 1: yes */
+  /* 0: no */
 } expdesc;
 
 /* kinds of variables */

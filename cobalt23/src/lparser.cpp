@@ -996,21 +996,65 @@ static void listfield(LexState *ls, ConsControl *cc) {
 }
 
 #include <stdio.h>
+static void body (LexState *ls, expdesc *e, int ismethod, int line);
+static void funcfield (LexState *ls, struct ConsControl *cc, int ismethod, int isprivate = 0) {
+  /* funcfield -> function NAME funcargs */
+  FuncState *fs = ls->fs;
+  int reg = ls->fs->freereg;
+  expdesc tab, key, val;
+  cc->nh++;
+  luaX_next(ls); /* skip TK_FUNCTION */
+  codename(ls, &key);
+  if (ismethod)
+    ismethod += (strcmp(key.u.strval->contents, "__construct") == 0);
+
+  if (isprivate) {
+    key.u.strval = luaS_new(ls->L, "private");
+  }
+  tab = *cc->t;
+  luaK_indexed(fs, &tab, &key);
+  body(ls, &val, ismethod, ls->linenumber);
+  luaK_storevar(fs, &tab, &val);
+  fs->freereg = reg;  /* free registers */
+}
 
 static void field(LexState *ls, ConsControl *cc) {
   /* field -> listfield | recfield */
   switch (ls->t.token) {
     case TK_STRING:
     case TK_NAME: { /* may be 'listfield' or 'recfield' */
-      int ntk = luaX_lookahead(ls);
-      if (!((ntk == '=') || (ntk == ':'))) /* expression? */
-        listfield(ls, cc);
-      else
-        recfield(ls, cc);
+      if ((strcmp(ls->t.seminfo.ts->contents, "static") != 0) && (strcmp(ls->t.seminfo.ts->contents, "private") != 0) && (strcmp(ls->t.seminfo.ts->contents, "public") != 0)) {
+        int ntk = luaX_lookahead(ls);
+        if (!((ntk == '=') || (ntk == ':'))) /* expression? */
+          listfield(ls, cc);
+        else
+          recfield(ls, cc);
+      } else if (strcmp(ls->t.seminfo.ts->contents, "static") == 0) {
+        luaX_next(ls);
+        check(ls, TK_FUNCTION);
+        funcfield(ls, cc, 0);
+      } else if (strcmp(ls->t.seminfo.ts->contents, "private") == 0) {
+        luaX_next(ls);
+        check(ls, TK_FUNCTION);
+        funcfield(ls, cc, 0, 1);
+      } else if (strcmp(ls->t.seminfo.ts->contents, "public") == 0) {
+        luaX_next(ls);
+        check(ls, TK_FUNCTION);
+        funcfield(ls, cc, 0, 0);
+      }
       break;
     }
     case '[': {
       recfield(ls, cc);
+      break;
+    }
+    case TK_FUNCTION: {
+      if (luaX_lookahead(ls) == '(') {
+        listfield(ls, cc);
+      }
+      else {
+        funcfield(ls, cc, 1);
+      }
       break;
     }
     default: {
@@ -1184,12 +1228,17 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   BlockCnt bl;
   new_fs.f = addprototype(ls);
   new_fs.f->linedefined = line;
+  
+  e->allowArrow = ismethod;
+
   open_func(ls, &new_fs, &bl);
+
   checknext(ls, '(');
   if (ismethod) {
     new_localvarliteral(ls, "this");  /* create 'this' parameter */
     adjustlocalvars(ls, 1);
   }
+
   parlist(ls);
   checknext(ls, ')');
   optParamType(ls);
@@ -1212,6 +1261,7 @@ static void deferbody (LexState *ls, expdesc *e, int ismethod, int line) {
   statlist(ls);
   new_fs.f->lastlinedefined = ls->linenumber;
   check_match(ls, '}', TK_FUNCTION, line);
+  e->allowArrow = ismethod;
   codeclosure(ls, e, 1);
   close_func(ls);
 }
@@ -1384,10 +1434,13 @@ static void suffixedexp(LexState *ls, expdesc *v) {
         luaK_indexed(fs, v, &key);
         break;
       }
-      case TK_ARROW: { /* ':' NAME funcargs */
+      case TK_ARROW: { /* '->' NAME funcargs */
         expdesc key;
         luaX_next(ls);
         codename(ls, &key);
+        if (!key.allowArrow) {
+          luaX_syntaxerror(fs->ls, "attempt to use '->' on static function");
+        }
         luaK_self(fs, v, &key);
         funcargs(ls, v, line);
         break;
@@ -2568,6 +2621,7 @@ static int funcname(LexState *ls, expdesc *v) {
     ismethod = 1;
     fieldsel(ls, v);
   }
+  v->allowArrow = ismethod;
   return ismethod;
 }
 

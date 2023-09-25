@@ -299,7 +299,7 @@
 		},
 		"keyword": {
 			"name": "keyword.control.cobalt",
-			"match": "\\b(break|else|elif|for|if|continue|open|config|define|undef|ifndef|ifdef|endif|error|warning|line|include|import|return|do|repeat|while|until|var|auto|let|local|case|default|switch|as|begin|extends|of|enum|new|class|parent|export|in|defer)\\b"
+			"match": "\\b(break|else|elif|for|if|continue|open|config|define|undef|ifndef|ifdef|endif|error|warning|line|include|import|return|do|repeat|while|until|var|auto|let|local|case|default|static|private|public|switch|as|begin|extends|of|enum|new|class|parent|export|in|defer)\\b"
 		},
 		"table-function": {
 			"name": "meta.function.cobalt",

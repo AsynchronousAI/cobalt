@@ -6,18 +6,13 @@ low-level language like C++, a quick and easy language like python, and a lightw
 
 Cobalt includes:
 - SDL bindings (optional) for 2D graphics
-- FFI
 - Memory optimizations
 - type system (typechecker in preprocessor)
 - preprocessor
 - `switch`, `case`, `default`
 - Real OOP with `class`, `parent`, `extends`, `new`, and `of`
 - `enum`'s
-- cleaner syntax errors and stack traces with colors
-- `_INCLUDES` global variable is a table of all libraries built with cobalt (ex: `if (!_INCLUDES["sdl"]) error("SDL is required")`)
 - allocation tracker (track bytes and pool allocator stats)
-- Manipulate dynamic libraries like `dyn.load`, `.get`, and `.close`. 
-- `unix`, `win`, and `core` (core is cross plat) for lowlevel system calls
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - lpeg-labels built in

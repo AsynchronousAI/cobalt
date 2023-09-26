@@ -1418,6 +1418,12 @@ static void primaryexp(LexState *ls, expdesc *v) {
       inc_dec_op(ls, OPR_SUB, v, 0);
       return;
     }
+    case '@': {
+      /* replace with `this` */
+      luaX_next(ls);
+      singlevar(ls, v, luaX_newliteral(ls, "this"));
+      return;
+    }
     default: {
       luaX_syntaxerror(ls, "unexpected symbol");
     }

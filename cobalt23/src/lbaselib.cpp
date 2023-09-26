@@ -8,14 +8,20 @@
 #define LUA_LIB
 
 #include <ctype.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <thread>
+#include <chrono>
 
 #include "cobalt.h"
 #include "lauxlib.h"
 #include "lprefix.h"
 #include "lualib.h"
+#include "lobject.h"
+#include "lstate.h"
+
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -629,5 +635,12 @@ LUAMOD_API int luaopen_base(lua_State *L) {
   lua_rawseti(L, -2, LENGTH);
   #endif
   lua_setfield(L, -2, "_INCLUDES");
+
+  const auto startup_code = "";
+  luaL_loadbuffer(L, startup_code, strlen(startup_code), "Standards");
+  G(L)->ready_for_table_mt = false;
+  lua_pcall(L, 0, 0, 0);
+  G(L)->ready_for_table_mt = true;
+
   return 1;
 }

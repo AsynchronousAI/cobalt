@@ -223,6 +223,7 @@ static void f_luaopen(lua_State *L, void *ud) {
   luaX_init(L);
   g->gcstp = 0;              /* allow gc */
   setnilvalue(&g->nilvalue); /* now state is complete */
+  g->ready_for_table_mt = true;
   setnilvalue(&g->table_mt);
   luai_userstateopen(L);
 }

@@ -4,7 +4,7 @@
 Cobalt is a language based on Lua, LJS, and Pluto aiming to be a language that can fill many tasks, a
 low-level language like C++, a quick and easy language like python, and a lightweight language like Lua.
 
-Cobalt includes:
+Add to docs:
 - SDL bindings (optional) for 2D graphics
 - Memory optimizations
 - type system (typechecker in preprocessor)
@@ -19,3 +19,10 @@ Cobalt includes:
 Tested on:
 - MacOS (multiple configurations)
 - Linux (multiple, and extreme configurations)
+
+Todo:
+- Default args
+- Named args
+- Switch statements
+- OOP
+- Typechecker

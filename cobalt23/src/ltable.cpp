@@ -666,6 +666,8 @@ void luaH_newkey(lua_State *L, Table *t, const TValue *key, TValue *value) {
 }
 
 void luaH_initmetatable (lua_State *L, Table *t) {
+  if (!G(L)->ready_for_table_mt)
+     return;
   lua_pushnil(L); /* space on the stack where the metatable will go */
   if (ttisnil(&G(L)->table_mt)) {
     /* create metatable */

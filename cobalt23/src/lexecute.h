@@ -273,6 +273,7 @@ returning: /* trap already set */
         pc++;                                   /* skip extra argument */
         L->top = ra + 1; /* correct top in case of emergency GC */
         t = luaH_new(L); /* memory allocation */
+        luaH_initmetatable(L, t);
         sethvalue2s(L, ra, t);
         if (b != 0 || c != 0) luaH_resize(L, t, c, b); /* idem */
         checkGC(L, ra + 1);
@@ -1038,6 +1039,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
         pc++;  /* skip extra argument */
         L->top = ra + 1;  /* correct top in case of emergency GC */
         t = luaH_new(L);  /* memory allocation */
+        luaH_initmetatable(L, t);
         sethvalue2s(L, ra, t);
         if (b != 0 || c != 0)
           luaH_resize(L, t, c, b);  /* idem */

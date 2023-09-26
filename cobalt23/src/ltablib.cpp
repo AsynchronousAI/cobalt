@@ -393,6 +393,35 @@ static int islock (lua_State *L) {
   lua_pushboolean(L, lua_istablelocked(L, 1));
   return 1;
 }
+static int tmap (lua_State *L) {
+   luaL_checktype(L, 1, LUA_TTABLE);
+   luaL_checktype(L, 2, LUA_TFUNCTION);
+
+   lua_newtable(L);
+   lua_Integer idx = 1;
+   lua_pushvalue(L, 1);
+   lua_pushnil(L);
+   /* stack now: out, in, key */
+   while (lua_next(L, -2)) {
+     /* stack now: out, in, key, value */
+     lua_pushvalue(L, 2);
+     lua_pushvalue(L, -2);
+     /* stack now: out, in, key, value, function, value */
+     lua_call(L, 1, 1);
+     /* stack now: out, in, key, value, mapped_value */
+     lua_pushinteger(L, idx++);
+     lua_pushvalue(L, -2);
+     /* stack now: out, in, key, value, mapped_value, idx, mapped_value */
+     lua_settable(L, -7);
+     /* stack now: out, in, key, value, mapped_value */
+     lua_pop(L, 2);
+     /* stack now: out, in, key */
+   }
+   /* stack now: out, in */
+   lua_pop(L, 1);
+   /* stack now: out */
+   return 1;
+ }
 
 /* }====================================================== */
 
@@ -400,7 +429,8 @@ static const luaL_Reg tab_funcs[] = {{"concat", tconcat}, {"insert", tinsert},
                                      {"pack", tpack},     {"unpack", tunpack},
                                      {"remove", tremove}, {"move", tmove},
                                      {"lock", lock},      {"islock", islock},
-                                     {"sort", sort},      {NULL, NULL}};
+                                     {"map", tmap},       {"sort", sort},      
+                                     {NULL, NULL}};
 
 LUAMOD_API int luaopen_table(lua_State *L) {
   luaL_newlib(L, tab_funcs);

@@ -665,6 +665,27 @@ void luaH_newkey(lua_State *L, Table *t, const TValue *key, TValue *value) {
   setobj2t(L, gval(mp), value);
 }
 
+void luaH_initmetatable (lua_State *L, Table *t) {
+  lua_pushnil(L); /* space on the stack where the metatable will go */
+  if (ttisnil(&G(L)->table_mt)) {
+    /* create metatable */
+    Table *table_mt = luaH_new(L);
+    sethvalue(L, &G(L)->table_mt, table_mt);
+    /* assign to stack value */
+    sethvalue(L, s2v(L->top - 1), table_mt);
+    /* set __index */
+    lua_pushstring(L, "__index");
+    lua_getglobal(L, "table");
+    lua_settable(L, -3);
+  }
+  else {
+    sethvalue(L, s2v(L->top - 1), hvalue(&G(L)->table_mt));
+  }
+  /* set stack value as metatable and pop */
+  t->metatable = hvalue(s2v(L->top - 1));
+  lua_pop(L, 1);
+}
+
 /*
 ** Search function for integers. If integer is inside 'alimit', get it
 ** directly from the array part. Otherwise, if 'alimit' is not equal to

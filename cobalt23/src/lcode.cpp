@@ -292,7 +292,7 @@ void luaK_patchlist(FuncState *fs, int list, int target) {
 }
 
 void luaK_patchtohere(FuncState *fs, int list) {
-  int hr = luaK_getlabel(fs); /* mark "here" as a jump target */
+  int hr = luaK_getlabel(fs);  /* mark "here" as a jump target */
   luaK_patchlist(fs, list, hr);
 }
 
@@ -1006,7 +1006,7 @@ void luaK_storevar(FuncState *fs, expdesc *var, expdesc *ex) {
   switch (var->k) {
     case VLOCAL: {
       freeexp(fs, ex);
-      exp2reg(fs, ex, var->u.var.ridx); /* compute 'ex' into proper place */
+      exp2reg(fs, ex, var->u.var.ridx);  /* compute 'ex' into proper place */
       return;
     }
     case VUPVAL: {
@@ -1030,8 +1030,7 @@ void luaK_storevar(FuncState *fs, expdesc *var, expdesc *ex) {
       codeABRK(fs, OP_SETTABLE, var->u.ind.t, var->u.ind.idx, ex);
       break;
     }
-    default:
-      lua_assert(0); /* invalid var kind to store */
+    default: lua_assert(0);  /* invalid var kind to store */
   }
   freeexp(fs, ex);
 }

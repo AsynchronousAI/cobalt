@@ -1,9 +1,9 @@
-# CMAKE 3.1, C99, C++11
+# CMAKE 3.1, C99, C++17
 cmake_minimum_required(VERSION 3.1)
 project(cobalt LANGUAGES C VERSION 99)
-project(cobalt LANGUAGES CXX VERSION 11)
+project(cobalt LANGUAGES CXX VERSION 17)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -15,7 +15,7 @@ option(SOCKET "Install the socket library for Cobalt" ON)
 option(LUA_ENABLE_TESTING "Enable testing for Cobalt" ON)
 option(INSTALL "Install Cobalt" ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DCOBALT_INTERFACE") # -DCOBALT_INTERFACE triggers the `main` symbol to be exported for minicobalt.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cobalt23/cmake/")
 # Based on the SDL and FFI variable provide them as Flags

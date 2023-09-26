@@ -11,8 +11,11 @@ Cobalt includes:
 - preprocessor
 - `switch`, `case`, `default`
 - Real OOP with `class`, `parent`, `extends`, `new`, and `of`
-- `enum`'s
 - allocation tracker (track bytes and pool allocator stats)
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - lpeg-labels built in
+
+Tested on:
+- MacOS (multiple configurations)
+- Linux (multiple, and extreme configurations)

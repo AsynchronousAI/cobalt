@@ -496,24 +496,25 @@ static void marktobeclosed(FuncState *fs) {
 ** this upvalue into all intermediate functions. If it is a global, set
 ** 'var' as 'void' as a flag.
 */
-static void singlevaraux(FuncState *fs, TString *n, expdesc *var, int base) {
-  if (fs == NULL)            /* no more levels? */
-    init_exp(var, VVOID, 0); /* default is global */
+static void singlevaraux (FuncState *fs, TString *n, expdesc *var, int base) {
+  if (fs == NULL)  /* no more levels? */
+    init_exp(var, VVOID, 0);  /* default is global */
   else {
-    int v = searchvar(fs, n, var); /* look up locals at current level */
-    if (v >= 0) {                  /* found? */
+    int v = searchvar(fs, n, var);  /* look up locals at current level */
+    if (v >= 0) {  /* found? */
       if (v == VLOCAL && !base)
-        markupval(fs, var->u.var.vidx); /* local will be used as an upval */
-    } else { /* not found as local at current level; try upvalues */
-      int idx = searchupvalue(fs, n);             /* try existing upvalues */
-      if (idx < 0) {                              /* not found? */
-        singlevaraux(fs->prev, n, var, 0);        /* try upper levels */
-        if (var->k == VLOCAL || var->k == VUPVAL) /* local or upvalue? */
-          idx = newupvalue(fs, n, var);           /* will be a new upvalue */
-        else      /* it is a global or a constant */
-          return; /* don't need to do anything at this level */
+        markupval(fs, var->u.var.vidx);  /* local will be used as an upval */
+    }
+    else {  /* not found as local at current level; try upvalues */
+      int idx = searchupvalue(fs, n);  /* try existing upvalues */
+      if (idx < 0) {  /* not found? */
+        singlevaraux(fs->prev, n, var, 0);  /* try upper levels */
+        if (var->k == VLOCAL || var->k == VUPVAL)  /* local or upvalue? */
+          idx  = newupvalue(fs, n, var);  /* will be a new upvalue */
+        else  /* it is a global or a constant */
+          return;  /* don't need to do anything at this level */
       }
-      init_exp(var, VUPVAL, idx); /* new or old upvalue */
+      init_exp(var, VUPVAL, idx);  /* new or old upvalue */
     }
   }
 }
@@ -1167,8 +1168,10 @@ static void setvararg(FuncState *fs, int nparams) {
   fs->f->is_vararg = 1;
   luaK_codeABC(fs, OP_VARARGPREP, nparams, 0, 0);
 }
+static void simpleexp(LexState *ls, expdesc *v);
 
-static void parlist(LexState *ls) {
+
+static void parlist (LexState *ls, std::vector<expdesc>* fallbacks = nullptr) {
   /* parlist -> [ {NAME ','} (NAME | '...') ] */
   FuncState *fs = ls->fs;
   Proto *f = fs->f;
@@ -1179,6 +1182,17 @@ static void parlist(LexState *ls) {
       switch (ls->t.token) {
         case TK_NAME: {
           new_localvar(ls, str_checkname(ls));
+          if (fallbacks) {
+            expdesc* parfallback = &fallbacks->emplace_back(expdesc{});
+            if (testnext(ls, '=')) {
+              luaX_syntaxerror(ls, "default arguments not supported");
+            
+              simpleexp(ls, parfallback);
+              if (!vkisconst(parfallback->k)) {
+                luaX_syntaxerror(ls, "parameter fallback value must be a compile-time constant");
+              }
+            }
+          }
           nparams++;
           break;
         }
@@ -1232,7 +1246,6 @@ static void format(LexState *ls)
       luaX_next(ls);
       return;
 }
-
 static void body (LexState *ls, expdesc *e, int ismethod, int line, bool isPublic) {
   /* body ->  '(' parlist ')' block END */
   FuncState new_fs;
@@ -1251,7 +1264,23 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line, bool isPubli
     adjustlocalvars(ls, 1);
   }
 
-  parlist(ls);
+  std::vector<expdesc> fallbacks{};
+  parlist(ls, &fallbacks);
+
+  int fallback_idx = 0;
+  for (auto& fallback : fallbacks) {
+    if (fallback.k != VVOID) {
+      Vardesc *vd = getlocalvardesc(ls->fs, fallback_idx);
+      expdesc lv;
+      singlevaraux(ls->fs, vd->vd.name, &lv, 1);
+      expdesc lcond = lv;
+      luaK_goifnil(ls->fs, &lcond);
+      luaK_storevar(ls->fs, &lv, &fallback);
+      luaK_patchtohere(ls->fs, lcond.t);
+    }
+    ++fallback_idx;
+  }
+
   checknext(ls, ')');
   optParamType(ls);
   checknext(ls, '{');

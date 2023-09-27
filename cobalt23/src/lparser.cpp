@@ -1188,11 +1188,11 @@ static void newexpr (LexState *ls, expdesc *v) {
   * Example:
   * new Human
   * is equal to
-  * Human.__construct
+  * Human->__construct
   */
   TString *obj = str_checkname(ls);
+  //funcargs(ls, v, line);
   singlevar(ls, v, obj);
-  luaK_exp2nextreg(fs, v);
 }
 
 static void instanceof (LexState *ls, expdesc *v) {

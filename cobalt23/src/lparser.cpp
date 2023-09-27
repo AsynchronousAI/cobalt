@@ -1199,7 +1199,7 @@ static void instanceof (LexState *ls, expdesc *v) {
   FuncState *fs = ls->fs;
   int line = ls->linenumber;
 
-  singlevaraux(fs, luaS_newliteral(ls->L, "op_instanceof"), v, 1);
+  singlevaraux(fs, luaS_newliteral(ls->L, "BUILTINOP_instanceof"), v, 1);
   lua_assert(v->k != VVOID);
   luaK_exp2nextreg(fs, v);
 
@@ -3198,7 +3198,6 @@ static void mainfunc(LexState *ls, FuncState *fs) {
   env->kind = VDKREG;
   env->name = ls->envn;
   luaC_objbarrier(ls->L, fs->f, env->name);
-  //builtinoperators(ls); /* import operators */
   luaX_next(ls); /* read first token */
 
   const bool ret = statlistget(ls);  /* parse main body */

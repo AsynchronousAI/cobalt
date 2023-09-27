@@ -26,9 +26,6 @@ static void builtinoperators (LexState *ls) {
   /* discover what operators are used */
   for (const auto& t : ls->tokens) {
     switch (t.token) {
-      case TK_NEW:
-        uses_new = true;
-        break;
       case TK_EXTENDS:
         uses_extends = true;
         break;
@@ -39,109 +36,12 @@ static void builtinoperators (LexState *ls) {
   }
 
   /* inject implementers */
-  if (uses_new || uses_extends || uses_instanceof) {
+  if (uses_extends || uses_instanceof) {
     /* capture state */
     std::vector<Token> tokens = std::move(ls->tokens);
 
     ls->tokens = {}; /* avoid use of moved warning */
 
-    if (uses_new) {
-      // local function BUILTINOP_new(mt, ...)
-      ls->tokens.emplace_back(Token(TK_VAR));
-      ls->tokens.emplace_back(Token(TK_FUNCTION));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "BUILTINOP_new")));
-      ls->tokens.emplace_back(Token('('));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "mt")));
-      ls->tokens.emplace_back(Token(','));
-      ls->tokens.emplace_back(Token(TK_DOTS));
-      ls->tokens.emplace_back(Token(')'));
-      ls->tokens.emplace_back(Token('{'));
-
-      //   if type(mt) ~= "table" then
-      ls->tokens.emplace_back(Token(TK_IF));
-      ls->tokens.emplace_back(Token('('));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "type")));
-      ls->tokens.emplace_back(Token('('));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "mt")));
-      ls->tokens.emplace_back(Token(')'));
-      ls->tokens.emplace_back(Token(TK_NE));
-      ls->tokens.emplace_back(Token(TK_STRING, luaX_newliteral(ls, "table")));
-      ls->tokens.emplace_back(Token(')'));
-      ls->tokens.emplace_back(Token(TK_THEN));
-
-      //     error "'new' used on non-table value"
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "error")));
-      ls->tokens.emplace_back(Token(TK_STRING, luaX_newliteral(ls, "'new' used on non-table value")));
-
-      //   end
-      ls->tokens.emplace_back(Token(TK_END));
-
-      //   local t = {}
-      ls->tokens.emplace_back(Token(TK_VAR));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "t")));
-      ls->tokens.emplace_back(Token('='));
-      ls->tokens.emplace_back(Token('{'));
-      ls->tokens.emplace_back(Token('}'));
-
-      //   setmetatable(t, mt)
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "setmetatable")));
-      ls->tokens.emplace_back(Token('('));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "t")));
-      ls->tokens.emplace_back(Token(','));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "mt")));
-      ls->tokens.emplace_back(Token(')'));
-
-      //   if not mt.__index or mt.__parent then
-      ls->tokens.emplace_back(Token(TK_IF));
-      ls->tokens.emplace_back(Token('('));
-      ls->tokens.emplace_back(Token(TK_NOT));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "mt")));
-      ls->tokens.emplace_back(Token('.'));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "__index")));
-      ls->tokens.emplace_back(Token(TK_OR));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "mt")));
-      ls->tokens.emplace_back(Token('.'));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "__parent")));
-      ls->tokens.emplace_back(Token(')'));
-      ls->tokens.emplace_back(Token(TK_THEN));
-
-      //     mt.__index = mt
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "mt")));
-      ls->tokens.emplace_back(Token('.'));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "__index")));
-      ls->tokens.emplace_back(Token('='));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "mt")));
-
-      //   end
-      ls->tokens.emplace_back(Token(TK_END));
-
-      //   if t.__construct then
-      ls->tokens.emplace_back(Token(TK_IF));
-      ls->tokens.emplace_back(Token('('));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "t")));
-      ls->tokens.emplace_back(Token('.'));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "__construct")));
-      ls->tokens.emplace_back(Token(')'));
-      ls->tokens.emplace_back(Token(TK_THEN));
-
-      //     t:__construct(...)
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "t")));
-      ls->tokens.emplace_back(Token(':'));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "__construct")));
-      ls->tokens.emplace_back(Token('('));
-      ls->tokens.emplace_back(Token(TK_DOTS));
-      ls->tokens.emplace_back(Token(')'));
-
-      //   end
-      ls->tokens.emplace_back(Token(TK_END));
-
-      //   return t
-      ls->tokens.emplace_back(Token(TK_RETURN));
-      ls->tokens.emplace_back(Token(TK_NAME, luaX_newliteral(ls, "t")));
-
-      // end
-      ls->tokens.emplace_back(Token(TK_END));
-    }
     if (uses_extends) {
       // local function BUILTINOP_extends(c, p)
       ls->tokens.emplace_back(Token(TK_VAR));

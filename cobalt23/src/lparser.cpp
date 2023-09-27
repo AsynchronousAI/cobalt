@@ -1184,22 +1184,22 @@ static void newexpr (LexState *ls, expdesc *v) {
 
   luaX_next(ls); /* skip new */
 
-  singlevaraux(fs, luaS_newliteral(ls->L, "BUILTINOP_new"), v, 1);
-  lua_assert(v->k != VVOID);
+  /*
+  * Example:
+  * new Human
+  * is equal to
+  * Human.__construct
+  */
+  TString *obj = str_checkname(ls);
+  singlevar(ls, v, obj);
   luaK_exp2nextreg(fs, v);
-
-  expdesc first_arg;
-  expr(ls, &first_arg);
-  luaK_exp2nextreg(fs, &first_arg);
-
-  funcargs(ls, v, line);
 }
 
 static void instanceof (LexState *ls, expdesc *v) {
   FuncState *fs = ls->fs;
   int line = ls->linenumber;
 
-  singlevaraux(fs, luaS_newliteral(ls->L, "Pluto_operator_instanceof"), v, 1);
+  singlevaraux(fs, luaS_newliteral(ls->L, "op_instanceof"), v, 1);
   lua_assert(v->k != VVOID);
   luaK_exp2nextreg(fs, v);
 

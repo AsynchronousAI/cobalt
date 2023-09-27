@@ -14,6 +14,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <stack>
 
 #include "cobalt.h"
 #include "lcode.h"
@@ -121,6 +122,7 @@ static void checknext(LexState *ls, int c) {
     if (!(c)) luaX_syntaxerror(ls, msg); \
   }
 
+
 /*
 ** Check that next token is 'what' and skip it. In case of error,
 ** raise an error that the expected 'what' should match a 'who'
@@ -147,6 +149,17 @@ static TString *str_checkname(LexState *ls) {
   luaX_next(ls);
   return ts;
 }
+
+static TString *checkextends (LexState *ls) {
+  TString *parent = nullptr;
+  if (ls->t.token == TK_EXTENDS) {
+    luaX_next(ls);
+    parent = str_checkname(ls);
+  }
+  ls->parent_classes.emplace(parent);
+  return parent;
+}
+
 
 static void init_exp(expdesc *e, expkind k, int i) {
   e->f = e->t = NO_JUMP;
@@ -1163,6 +1176,139 @@ static TypeCheck optParamType(LexState *ls/*, expdesc *v*/) {  /* parses optiona
   }
   return type;
 }
+static void funcargs(LexState *ls, expdesc *f, int line);
+
+static void newexpr (LexState *ls, expdesc *v) {
+  FuncState *fs = ls->fs;
+  int line = ls->linenumber;
+
+  luaX_next(ls); /* skip new */
+
+  singlevaraux(fs, luaS_newliteral(ls->L, "BUILTINOP_new"), v, 1);
+  lua_assert(v->k != VVOID);
+  luaK_exp2nextreg(fs, v);
+
+  expdesc first_arg;
+  expr(ls, &first_arg);
+  luaK_exp2nextreg(fs, &first_arg);
+
+  funcargs(ls, v, line);
+}
+
+static void instanceof (LexState *ls, expdesc *v) {
+  FuncState *fs = ls->fs;
+  int line = ls->linenumber;
+
+  singlevaraux(fs, luaS_newliteral(ls->L, "Pluto_operator_instanceof"), v, 1);
+  lua_assert(v->k != VVOID);
+  luaK_exp2nextreg(fs, v);
+
+  expdesc args;
+  singlevar(ls, &args);
+  luaK_exp2nextreg(fs, &args);
+  luaX_next(ls);
+  singlevar(ls, &args);
+
+  lua_assert(v->k == VNONRELOC);
+  int base = v->u.info;  /* base register for call */
+  luaK_exp2nextreg(fs, &args);  /* close last argument */
+  int nparams = fs->freereg - (base + 1);
+  init_exp(v, VCALL, luaK_codeABC(fs, OP_CALL, base, nparams + 1, 2));
+  luaK_fixline(fs, line);
+  fs->freereg = base + 1;
+}
+
+static void applyextends (LexState *ls, expdesc *v, TString *parent, int line) {
+  FuncState *fs = ls->fs;
+
+  expdesc f;
+  singlevaraux(fs, luaS_newliteral(ls->L, "BUILTINOP_extends"), &f, 1);
+  lua_assert(f.k != VVOID);
+  luaK_exp2nextreg(fs, &f);
+
+  expdesc args = *v;
+  luaK_exp2nextreg(fs, &args);
+  singlevar(ls, &args, parent);
+
+  lua_assert(f.k == VNONRELOC);
+  int base = f.u.info;  /* base register for call */
+  luaK_exp2nextreg(fs, &args);  /* close last argument */
+  int nparams = fs->freereg - (base + 1);
+  init_exp(&f, VCALL, luaK_codeABC(fs, OP_CALL, base, nparams + 1, 2));
+  luaK_fixline(fs, line);
+  fs->freereg = base + 1;
+}
+
+static void classexpr (LexState *ls, expdesc *t) {
+  FuncState *fs = ls->fs;
+  int line = ls->linenumber;
+  testnext(ls, '{');
+  int pc = luaK_codeABC(fs, OP_NEWTABLE, 0, 0, 0);
+  ConsControl cc;
+  luaK_code(fs, 0);  /* space for extra arg. */
+  cc.na = cc.nh = cc.tostore = 0;
+  cc.t = t;
+  init_exp(t, VNONRELOC, fs->freereg);  /* table will be at stack top */
+  luaK_reserveregs(fs, 1);
+  init_exp(&cc.v, VVOID, 0);  /* no value (yet) */
+  while (ls->t.token != '}') {
+    lua_assert(cc.v.k == VVOID || cc.tostore > 0);
+    closelistfield(fs, &cc);
+    field(ls, &cc);
+    (testnext(ls, ',') || testnext(ls, ';'));
+  }
+  check_match(ls, '}', TK_CLASS, line);
+  lastlistfield(fs, &cc);
+  luaK_settablesize(fs, pc, t->u.info, cc.na, cc.nh);
+}
+
+
+static void classstat (LexState *ls) {
+  auto line = ls->linenumber;
+  luaX_next(ls); /* skip 'class' */
+
+  expdesc v;
+  singlevar(ls, &v);
+
+  TString *parent = checkextends(ls);
+
+  expdesc t;
+  classexpr(ls, &t);
+  check_readonly(ls, &v);
+  luaK_storevar(ls->fs, &v, &t);
+  luaK_fixline(ls->fs, line);
+
+  lua_assert(ls->getParentClass() == parent);
+  ls->parent_classes.pop();
+
+  if (parent)
+    applyextends(ls, &v, parent, line);
+}
+
+
+static void localclass (LexState *ls) {
+  auto line = ls->linenumber;
+  TString *name = str_checkname(ls);
+  TString *parent = checkextends(ls);
+
+  new_localvar(ls, name);
+
+  expdesc t;
+  classexpr(ls, &t);
+
+  adjust_assign(ls, 1, 1, &t);
+  adjustlocalvars(ls, 1);
+
+  lua_assert(ls->getParentClass() == parent);
+  ls->parent_classes.pop();
+
+  if (parent) {
+    expdesc v;
+    singlevaraux(ls->fs, name, &v, 1);
+    lua_assert(v.k != VVOID);
+    applyextends(ls, &v, parent, line);
+  }
+}
 
 static void setvararg(FuncState *fs, int nparams) {
   fs->f->is_vararg = 1;
@@ -1422,6 +1568,35 @@ static void safe_navigation(LexState *ls, expdesc *v) {
   }
 }
 
+static void parentexp (LexState *ls, expdesc *v) {
+  if (testnext(ls, ':')) {
+    if (ls->getParentClass() == nullptr)
+      luaX_syntaxerror(ls, "attempt to use 'parent' outside of a class that inherits from another class");
+
+    auto line = ls->linenumber;
+
+    singlevar(ls, v, ls->getParentClass());
+    luaK_exp2nextreg(ls->fs, v);
+
+    expdesc key;
+    codename(ls, &key);
+    luaK_indexed(ls->fs, v, &key);
+    luaK_exp2nextreg(ls->fs, v);
+
+    expdesc first_arg;
+    singlevar(ls, &first_arg, luaS_newliteral(ls->L, "self"));
+    luaK_exp2nextreg(ls->fs, &first_arg);
+
+    funcargs(ls, v, line);
+  }
+  else {
+    singlevar(ls, v, luaS_newliteral(ls->L, "self"));
+    expdesc key;
+    codestring(&key, luaS_newliteral(ls->L, "__parent"));
+    luaK_indexed(ls->fs, v, &key);
+  }
+}
+
 static void primaryexp(LexState *ls, expdesc *v) {
   /* primaryexp -> NAME | '(' expr ')' */
   switch (ls->t.token) {
@@ -1573,6 +1748,20 @@ static void simpleexp(LexState *ls, expdesc *v) {
     }
     case '|': {
       lambdabody(ls, v, ls->linenumber);
+      return;
+    }
+    case TK_PARENT: {
+      luaX_next(ls);
+      parentexp(ls, v);
+      return;
+    }
+    case TK_NEW: {
+      newexpr(ls, v);
+      break;
+    }
+    case TK_CLASS: {
+      luaX_next(ls); /* skip 'class' */
+      classexpr(ls, v);
       return;
     }
     case TK___LINE__: {
@@ -2852,11 +3041,17 @@ static void statement(LexState *ls) {
       funcstat(ls, line);
       break;
     }
+    case TK_CLASS: {
+      classstat(ls);
+      break;
+    }
     case TK_LET: 
       /* add const */
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */
-        luaX_notedsyntaxerror(ls, "functions cannot be constant", "use 'var' instead of 'let'");
+        luaX_notedsyntaxerror(ls, "functions cannot be directly constant", "use 'var' instead of 'let'");
+      else if (testnext(ls, TK_CLASS))
+        luaX_notedsyntaxerror(ls, "classes cannot be directly constant", "use 'var' instead of 'let'");
       else
         constlocalstat(ls);
       break;
@@ -2869,6 +3064,9 @@ static void statement(LexState *ls) {
       if (testnext(ls, TK_FUNCTION)) {
         exportfunc(ls, name);
         ls->export_symbols.emplace_back((name));
+      } else if (testnext(ls, TK_CLASS)) {
+        localclass(ls);
+        ls->export_symbols.emplace_back((name));
       } else {
         exportstat(ls, name);
         ls->export_symbols.emplace_back((name));
@@ -2879,7 +3077,9 @@ static void statement(LexState *ls) {
       /* add const */
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */
-        luaX_notedsyntaxerror(ls, "functions cannot be auto/to-be-closed", "use 'var' instead of 'auto'");
+        luaX_notedsyntaxerror(ls, "functions cannot be directly auto/to-be-closed", "use 'var' instead of 'auto'");
+      else if (testnext(ls, TK_CLASS))
+        luaX_notedsyntaxerror(ls, "classes cannot be directly auto/to-be-closed", "use 'var' instead of 'auto'");
       else
         autolocalstat(ls);
       break;
@@ -2889,6 +3089,8 @@ static void statement(LexState *ls) {
       luaX_next(ls);                 /* skip LOCAL */
       if (testnext(ls, TK_FUNCTION)) /* local function? */
         localfunc(ls);
+      else if (testnext(ls, TK_CLASS))
+        localclass(ls);
       else
         localstat(ls);
       break;
@@ -2996,6 +3198,7 @@ static void mainfunc(LexState *ls, FuncState *fs) {
   env->kind = VDKREG;
   env->name = ls->envn;
   luaC_objbarrier(ls->L, fs->f, env->name);
+  //builtinoperators(ls); /* import operators */
   luaX_next(ls); /* read first token */
 
   const bool ret = statlistget(ls);  /* parse main body */

@@ -7,6 +7,7 @@
 #define llex_c
 #define LUA_CORE
 #include <vector>
+#include <stack>
 
 #include "llex.h"
 

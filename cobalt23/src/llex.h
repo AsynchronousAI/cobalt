@@ -12,7 +12,6 @@ extern "C" {
 #define llex_h
 
 #include <limits.h>
-
 #include "lobject.h"
 #include "lzio.h"
 
@@ -141,11 +140,19 @@ typedef struct LexState {
 
   /* added in cobalt */
   std::vector<EnumDesc> enums{};
+  std::stack<TString*> parent_classes{};
   std::vector<TString*> export_symbols;
   
   /** configurations */
   bool strict_type_config=false;
   bool check_type=false;
+
+  /** methods */
+  [[nodiscard]] TString* getParentClass() const noexcept {
+    if (parent_classes.empty())
+      return nullptr;
+    return parent_classes.top();
+  }
 } LexState;
 
 LUAI_FUNC void luaX_init(lua_State *L);

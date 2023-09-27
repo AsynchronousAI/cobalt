@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <vector>
+#include <stack>
 
 #include "cobalt.h"
 #include "lapi.h"

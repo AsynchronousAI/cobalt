@@ -24,5 +24,5 @@ Todo:
 - Default args
 - Named args
 - Switch statements
-- OOP
+- OOP (`extends`, `parent`, `new`, `of` all lexer prebuilding operators)
 - Typechecker

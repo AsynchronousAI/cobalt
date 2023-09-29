@@ -72,7 +72,7 @@ static void expr(LexState *ls, expdesc *v);
 
 static l_noret error_expected(LexState *ls, int token) {
   luaX_syntaxerror(
-      ls, luaO_pushfstring(ls->L, "%s expected", luaX_token2str(ls, token)));
+      ls, luaO_pushfstring(ls->L, "%s expected", luaX_token2str(ls, token)), "exp");
 }
 
 static l_noret errorlimit(FuncState *fs, int limit, const char *what) {
@@ -84,7 +84,9 @@ static l_noret errorlimit(FuncState *fs, int limit, const char *what) {
                           : luaO_pushfstring(L, "function at line %d", line);
   msg = luaO_pushfstring(L, "too many %s (limit is %d) in %s", what, limit,
                          where);
-  luaX_syntaxerror(fs->ls, msg);
+  printf("\033[1;31mfatal error: %s\033[0m\n\n\t\033[1;33mhelp: https://cobalt.github.io/maxerror\033[0m\n", msg);
+  //luaX_syntaxerror(fs->ls, msg, "fatal");
+  exit(1);
 }
 
 static void checklimit(FuncState *fs, int v, int l, const char *what) {
@@ -287,7 +289,7 @@ static int new_localvar(LexState *ls, TString *name) {
       //if(sname[0] == '(') break; //for loop variables
       if(tsslen(name) == 1 && sname[0] == '_') break;
       luaX_notedsyntaxerror(ls, luaO_pushfstring(ls->L,
-             "name '%s' already declared", sname), "try using a different name");
+             "name '%s' already declared", sname), "try using a different name", "mulvar");
     }
   }
   Vardesc *var;
@@ -385,7 +387,7 @@ static void check_readonly(LexState *ls, expdesc *e) {
   if (varname) {
     const char *msg = luaO_pushfstring(
         ls->L, "attempt to assign to const variable '%s'", getstr(varname));
-    luaK_semerror(ls, msg); /* error */
+    luaK_semerror(ls, msg, "const"); /* error */
   }
 }
 
@@ -610,7 +612,7 @@ static l_noret jumpscopeerror(LexState *ls, Labeldesc *gt) {
   const char *varname = getstr(getlocalvardesc(ls->fs, gt->nactvar)->vd.name);
   const char *msg = "<goto %s> at line %d jumps into the scope of local '%s'";
   msg = luaO_pushfstring(ls->L, msg, getstr(gt->name), gt->line, varname);
-  luaK_semerror(ls, msg); /* raise the error */
+  luaK_semerror(ls, msg, "jmp"); /* raise the error */
 }
 
 /*
@@ -760,7 +762,7 @@ static l_noret undefgoto(LexState *ls, Labeldesc *gt) {
     msg = "no visible label '%s' for <goto> at line %d";
     msg = luaO_pushfstring(ls->L, msg, getstr(gt->name), gt->line);
   }
-  luaK_semerror(ls, msg);
+  luaK_semerror(ls, msg, "undefjmp");
 }
 
 static void leaveblock(FuncState *fs) {
@@ -1061,7 +1063,7 @@ static void field(LexState *ls, ConsControl *cc) {
           if (!isPublic)
             isPublic = (strcmp(ls->t.seminfo.ts->contents, "public") == 0);
 
-          if (isPublic && isPrivate) luaX_notedsyntaxerror(ls, "functions cannot be both 'private' and 'public'", "choose either 'private' or 'public'");
+          if (isPublic && isPrivate) luaX_notedsyntaxerror(ls, "functions cannot be both 'private' and 'public'", "choose either 'private' or 'public'", "pubpriv");
           if (!isPrivate) isPublic = true;
 
           luaX_next(ls);
@@ -1168,7 +1170,7 @@ static TypeCheck optParamType(LexState *ls/*, expdesc *v*/) {  /* parses optiona
       checknext(ls, ']');    /*for now do nothing, discard*/
     }
   }else if (ls->strict_type_config == true){
-    luaX_notedsyntaxerror(ls, "expect ':' after parameter name", "strict hints config is turned on a type\n\t\thint is required");
+    luaX_notedsyntaxerror(ls, "expect ':' after parameter name", "strict hints config is turned on a type\n\t\thint is required", "nohint");
   }
 
   if (ls->check_type == true && (type.type != NULL)) {
@@ -1360,7 +1362,7 @@ static void parlist (LexState *ls, std::vector<expdesc>* fallbacks = nullptr) {
       if (testnext(ls, ':')) {  /*optional parameter type*/
         checknext(ls, TK_NAME); /*for now do nothing, discard*/
       }else if (ls->strict_type_config == true){
-        luaX_notedsyntaxerror(ls, "expect ':' after argument name", "strict hints config is turned on a type\n\t\thint is required");
+        luaX_notedsyntaxerror(ls, "expect ':' after argument name", "strict hints config is turned on a type\n\t\thint is required", "nohint");
       }
       optParamType(ls);
     } while (!isvararg && testnext(ls, ','));
@@ -1546,7 +1548,7 @@ static void safe_navigation(LexState *ls, expdesc *v) {
               break;
             }
             default: {
-              luaX_notedsyntaxerror(ls, "unexpected symbol during navigation.", "unary '-' on non-numeral type. Try and use a number instead.");
+              luaX_notedsyntaxerror(ls, "unexpected symbol during navigation.", "unary '-' on non-numeral type. Try and use a number instead.", "badsymbol");
             }
           }
         }
@@ -1562,7 +1564,7 @@ static void safe_navigation(LexState *ls, expdesc *v) {
         break;
       }
       default: {
-        luaX_syntaxerror(ls, "unexpected symbol");
+        luaX_syntaxerror(ls, "unexpected symbol", "badsymbol");
       }
     }
     luaK_exp2nextreg(fs, v);
@@ -1578,7 +1580,7 @@ static void safe_navigation(LexState *ls, expdesc *v) {
 static void parentexp (LexState *ls, expdesc *v) {
   if (testnext(ls, ':')) {
     if (ls->getParentClass() == nullptr)
-      luaX_syntaxerror(ls, "attempt to use 'parent' outside of a class that inherits from another class");
+      luaX_syntaxerror(ls, "attempt to use 'parent' outside of a class that inherits from another class", "outparent");
 
     auto line = ls->linenumber;
 
@@ -1664,7 +1666,7 @@ static void primaryexp(LexState *ls, expdesc *v) {
       } /* otherwise pass to `unexpected symbol`*/
     }
     default: {
-      luaX_syntaxerror(ls, "unexpected symbol");
+      luaX_syntaxerror(ls, "unexpected symbol", "badsymbol");
     }
   }
 }
@@ -1701,7 +1703,7 @@ static void suffixedexp(LexState *ls, expdesc *v) {
         codename(ls, &key);
 
         if (!key.allowArrow) {
-          luaX_notedsyntaxerror(fs->ls, "attempt to use '->' on static function", "did you mean to use '.'?");
+          luaX_notedsyntaxerror(fs->ls, "attempt to use '->' on static function", "did you mean to use '.'?", "staticarrow");
         }
 
         /* call */
@@ -2263,7 +2265,7 @@ static void enumstat (LexState *ls) {
         }
       }
       if (v.k != VKINT)  { /* assert expdesc kind */
-        luaX_notedsyntaxerror(ls, "expected predefined integer constant", "unexpected expression type");
+        luaX_notedsyntaxerror(ls, "expected predefined integer constant", "unexpected expression type", "preconst");
       }
       i = v.u.ival;
     }
@@ -2292,7 +2294,7 @@ static void checkrepeated(LexState *ls, TString *name) {
   if (l_unlikely(lb != NULL)) { /* already defined? */
     const char *msg = "label '%s' already defined on line %d";
     msg = luaO_pushfstring(ls->L, msg, getstr(name), lb->line);
-    luaK_semerror(ls, msg); /* error */
+    luaK_semerror(ls, msg, "dupejmp"); /* error */
   }
 }
 
@@ -2378,7 +2380,7 @@ static void fixforjump(FuncState *fs, int pc, int dest, int back) {
   int offset = dest - (pc + 1);
   if (back) offset = -offset;
   if (l_unlikely(offset > MAXARG_Bx))
-    luaX_syntaxerror(fs->ls, "control structure too long");
+    luaX_syntaxerror(fs->ls, "control structure too long", "longstuc");
   SETARG_Bx(*jmp, offset);
 }
 
@@ -2480,7 +2482,7 @@ static void forstat(LexState *ls, int line) {
       break;
     }
     default:
-      luaX_syntaxerror(ls, "'=', 'in' expected");
+      luaX_syntaxerror(ls, "'=', 'in' expected", "invfor");
   }
 
   leaveblock(fs); /* loop scope ('break' jumps to this point) */
@@ -2598,11 +2600,11 @@ static int getlocalattribute(LexState *ls) {
     else if (strcmp(attr, "close") == 0)
       return RDKTOCLOSE; /* to-be-closed variable */
     else if (strcmp(attr, "pre") == 0){
-      luaX_notedsyntaxerror(ls, "pre-value not preprocessed", "use the preprocessor to fix this");
+      luaX_notedsyntaxerror(ls, "pre-value not preprocessed", "use the preprocessor to fix this", "nrpre");
       return VDKREG;
     } else
       luaK_semerror(ls,
-                    luaO_pushfstring(ls->L, "unknown attribute '%s'", attr));
+                    luaO_pushfstring(ls->L, "unknown attribute '%s'", attr), "undefattr");
   }
   return VDKREG; /* regular variable */
 }
@@ -2718,7 +2720,7 @@ static void localstat(LexState *ls) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list");
+        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;
@@ -2767,7 +2769,7 @@ static void exportstat(LexState *ls, TString *name) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list");
+        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;
@@ -2816,7 +2818,7 @@ static void constlocalstat(LexState *ls) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list");
+        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;
@@ -2865,7 +2867,7 @@ static void autolocalstat(LexState *ls) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list");
+        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;
@@ -2945,7 +2947,7 @@ static void exprstat(LexState *ls) {
             ls,
             lua_pushfstring(
                 ls->L,
-                "'++', '--', +=', '-=', '*=', '/=', '%%=', ':=' or '=' expected"));
+                "'++', '--', +=', '-=', '*=', '/=', '%%=', ':=' or '=' expected"), "assign");
         break;
     }
   }
@@ -3051,20 +3053,20 @@ static void statement(LexState *ls) {
         value = 0;
         luaX_next(ls);
       } else {
-        luaX_syntaxerror(ls, "expected integer or boolean");
+        luaX_syntaxerror(ls, "expected integer or boolean", "config");
         value = 0; /* unreachable */
       }
 
       if ((std::string)name->contents == "forcehints"){
         if (value == 1) ls->strict_type_config = true;
         else if (value == 0) ls->strict_type_config = false;
-        else luaX_syntaxerror(ls, "forcehints must be true, false, 0, or 1");
+        else luaX_syntaxerror(ls, "forcehints must be true, false, 0, or 1", "config");
       } else if ((std::string)name->contents == "typecheck"){
         if (value == 1) ls->check_type = true;
         else if (value == 0) ls->check_type = false;
-        else luaX_syntaxerror(ls, "typecheck must be true, false, 0, or 1");
+        else luaX_syntaxerror(ls, "typecheck must be true, false, 0, or 1", "config");
       }else{
-        luaX_syntaxerror(ls, "unknown config option");
+        luaX_syntaxerror(ls, "unknown config option", "config");
       }
       break;
     }
@@ -3092,7 +3094,7 @@ static void statement(LexState *ls) {
       break;
     case TK_EXPORT: {
       if (ls->fs->bl->previous)
-        luaX_syntaxerror(ls, "Attempt to use 'export' outside of global scope");
+        luaX_syntaxerror(ls, "Attempt to use 'export' outside of global scope", "exportlocal");
       luaX_next(ls);  /* skip EXPORT */
       TString *name = str_checkname(ls);
       
@@ -3241,7 +3243,7 @@ static void mainfunc(LexState *ls, FuncState *fs) {
   if (!ls->export_symbols.empty()) {
     if (ret) {
       luaX_prev(ls);
-      luaX_syntaxerror(ls, "'export' used but main body already returns something");
+      luaX_syntaxerror(ls, "'export' used but main body already returns something", "exportret");
     }
     enterlevel(ls);
     /* generate return statement */

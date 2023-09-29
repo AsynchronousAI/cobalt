@@ -156,7 +156,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   char help[1000];
 
   if (errid != nullptr){
-    sprintf(help, "\n\t\b\b\033[1;33mhelp:\033[0m https://cobalt.github.io/%s", errid);  
+    sprintf(help, "\n\t\b\b\033[1;33mhelp:\033[0m https://cobalt-lang.github.io/%s", errid);  
   }else{
     help[0] = '\0';
   }

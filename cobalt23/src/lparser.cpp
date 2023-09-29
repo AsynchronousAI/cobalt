@@ -84,7 +84,7 @@ static l_noret errorlimit(FuncState *fs, int limit, const char *what) {
                           : luaO_pushfstring(L, "function at line %d", line);
   msg = luaO_pushfstring(L, "too many %s (limit is %d) in %s", what, limit,
                          where);
-  printf("\033[1;31mfatal error: %s\033[0m\n\n\t\033[1;33mhelp: https://cobalt.github.io/maxerror\033[0m\n", msg);
+  printf("\033[1;31mfatal error: %s\033[0m\n\n\t\033[1;33mhelp: https://cobalt-lang.github.io/maxerror\033[0m\n", msg);
   //luaX_syntaxerror(fs->ls, msg, "fatal");
   exit(1);
 }

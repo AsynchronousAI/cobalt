@@ -38,12 +38,6 @@
 
 static int codesJ(FuncState *fs, OpCode o, int sj, int k);
 
-/* semantic error */
-l_noret luaK_semerror(LexState *ls, const char *msg, const char *errcode) {
-  ls->t.token = 0; /* remove "near <token>" from final message */
-  luaX_syntaxerror(ls, msg, errcode);
-}
-
 /*
 ** If expression is a numeric constant, fills 'v' with its value
 ** and returns 1. Otherwise, returns 0.

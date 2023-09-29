@@ -387,7 +387,7 @@ static void check_readonly(LexState *ls, expdesc *e) {
   if (varname) {
     const char *msg = luaO_pushfstring(
         ls->L, "attempt to assign to const variable '%s'", getstr(varname));
-    luaK_semerror(ls, msg, "const"); /* error */
+    luaX_syntaxerror(ls, msg, "const"); /* error */
   }
 }
 
@@ -612,7 +612,7 @@ static l_noret jumpscopeerror(LexState *ls, Labeldesc *gt) {
   const char *varname = getstr(getlocalvardesc(ls->fs, gt->nactvar)->vd.name);
   const char *msg = "<goto %s> at line %d jumps into the scope of local '%s'";
   msg = luaO_pushfstring(ls->L, msg, getstr(gt->name), gt->line, varname);
-  luaK_semerror(ls, msg, "jmp"); /* raise the error */
+  luaX_syntaxerror(ls, msg, "jmp"); /* raise the error */
 }
 
 /*
@@ -762,7 +762,7 @@ static l_noret undefgoto(LexState *ls, Labeldesc *gt) {
     msg = "no visible label '%s' for <goto> at line %d";
     msg = luaO_pushfstring(ls->L, msg, getstr(gt->name), gt->line);
   }
-  luaK_semerror(ls, msg, "undefjmp");
+  luaX_syntaxerror(ls, msg, "undefjmp");
 }
 
 static void leaveblock(FuncState *fs) {
@@ -2294,7 +2294,7 @@ static void checkrepeated(LexState *ls, TString *name) {
   if (l_unlikely(lb != NULL)) { /* already defined? */
     const char *msg = "label '%s' already defined on line %d";
     msg = luaO_pushfstring(ls->L, msg, getstr(name), lb->line);
-    luaK_semerror(ls, msg, "dupejmp"); /* error */
+    luaX_syntaxerror(ls, msg, "dupejmp"); /* error */
   }
 }
 
@@ -2603,7 +2603,7 @@ static int getlocalattribute(LexState *ls) {
       luaX_notedsyntaxerror(ls, "pre-value not preprocessed", "use the preprocessor to fix this", "nrpre");
       return VDKREG;
     } else
-      luaK_semerror(ls,
+      luaX_syntaxerror(ls,
                     luaO_pushfstring(ls->L, "unknown attribute '%s'", attr), "undefattr");
   }
   return VDKREG; /* regular variable */
@@ -2720,7 +2720,7 @@ static void localstat(LexState *ls) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
+        luaX_syntaxerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;
@@ -2769,7 +2769,7 @@ static void exportstat(LexState *ls, TString *name) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
+        luaX_syntaxerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;
@@ -2818,7 +2818,7 @@ static void constlocalstat(LexState *ls) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
+        luaX_syntaxerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;
@@ -2867,7 +2867,7 @@ static void autolocalstat(LexState *ls) {
     getlocalvardesc(fs, vidx)->vd.kind = kind;
     if (kind == RDKTOCLOSE) { /* to-be-closed? */
       if (toclose != -1)      /* one already present? */
-        luaK_semerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
+        luaX_syntaxerror(ls, "multiple to-be-closed variables in local list", "maxtoclose");
       toclose = fs->nactvar + nvars;
     }
     nvars++;

@@ -147,7 +147,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   char note[1000];
 
   if (innote != ""){
-    sprintf(note, "\t\b\b\033[1;90mnote:\033[0m %s", innote);
+    sprintf(note, "\t\033[1;90mnote:\033[0m %s\n", innote);
   }else{
     note[0] = '\0';
   }
@@ -156,7 +156,7 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   char help[1000];
 
   if (errid != nullptr){
-    sprintf(help, "\n\t\b\b\033[1;33mhelp:\033[0m https://cobalt-lang.github.io/%s", errid);  
+    sprintf(help, "\n\t\033[1;33mhelp:\033[0m https://cobalt-lang.github.io/%s\n", errid);  
   }else{
     help[0] = '\0';
   }
@@ -164,11 +164,11 @@ static l_noret advlexerror(LexState *ls, const char *msg, int token, const char 
   /* throw error */
   if (token)
     #ifdef BUFFER_PREVIEW
-    luaO_pushfstring(ls->L, "\033[1m%s (line: %d):\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s, buff-char %d)\033[0m\n\t | buffer preview:\n\t | \n\t%d| %s\n\t%s%s",  buff,         msg,   txtToken(ls, token), ls->current, ls->linenumber,  line_contents/*, arrows*/, note, help);
+    luaO_pushfstring(ls->L, "\033[1m%s (line: %d):\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s, buff-char %d)\033[0m\n\t | buffer preview:\n\t | \n\t%d| %s\n%s%s",  buff,         msg,   txtToken(ls, token), ls->current, ls->linenumber,  line_contents/*, arrows*/, note, help);
     #elif LINE_PREVIEW
     #error line preview not implemented
     #else
-    luaO_pushfstring(ls->L, "\033[1m%s (line: %d):\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s)\033[0m\n\t%s%s",  buff, ls->linenumber,         msg,   txtToken(ls, token), note, help);
+    luaO_pushfstring(ls->L, "\033[1m%s (line: %d):\033[0m \033[1;31msyntax error:\033[0m\033[1m %s (near %s)\033[0m\n%s%s",  buff, ls->linenumber,         msg,   txtToken(ls, token), note, help);
     #endif
   luaD_throw(ls->L, LUA_ERRSYNTAX);
   #else

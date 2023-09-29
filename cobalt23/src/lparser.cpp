@@ -1655,10 +1655,10 @@ static void primaryexp(LexState *ls, expdesc *v) {
         luaX_next(ls);
         codename(ls, &key);
         /* set to bool */
-        if (key.allowArrow) /* true */
-          init_exp(v, VFALSE, 0);
-        else /* false */
+        if (!key.allowArrow) /* true */
           init_exp(v, VTRUE, 0);
+        else /* false */
+          init_exp(v, VFALSE, 0);
         
         return;
       } /* otherwise pass to `unexpected symbol`*/

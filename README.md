@@ -16,6 +16,7 @@ Add to docs:
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - lpeg-labels built in
 - `$ismethod` & `$isstatic`
+- Errors
 
 Tested on:
 - MacOS (multiple configurations)

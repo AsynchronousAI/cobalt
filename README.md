@@ -15,6 +15,7 @@ Add to docs:
 - Easy interface to get device information `device`, `device.specs().CPU`, etc
 - C API extended to allow C datastructures to be posted to Cobalt without needing to be wrapped
 - lpeg-labels built in
+- `$ismethod` & `$isstatic`
 
 Tested on:
 - MacOS (multiple configurations)
@@ -26,3 +27,5 @@ Todo:
 - Switch statements
 - OOP (`extends`, `parent`, `new`, `of` all lexer prebuilding operators)
 - Typechecker
+- LS
+- try & catch

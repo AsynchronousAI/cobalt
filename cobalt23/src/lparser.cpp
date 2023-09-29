@@ -1635,6 +1635,34 @@ static void primaryexp(LexState *ls, expdesc *v) {
       singlevar(ls, v, luaX_newliteral(ls, "this"));
       return;
     }
+    case '$': {
+      /* lexer api */
+      luaX_next(ls);
+      TString *looking_for = str_checkname(ls);
+      if (strcmp(getstr(looking_for), "isstatic") == 0) {
+        expdesc key;
+        luaX_next(ls);
+        codename(ls, &key);
+        /* set to bool */
+        if (key.allowArrow) /* true */
+          init_exp(v, VTRUE, 0);
+        else /* false */
+          init_exp(v, VFALSE, 0);
+        
+        return;
+      }else if (strcmp(getstr(looking_for), "ismethod") == 0) {
+        expdesc key;
+        luaX_next(ls);
+        codename(ls, &key);
+        /* set to bool */
+        if (key.allowArrow) /* true */
+          init_exp(v, VFALSE, 0);
+        else /* false */
+          init_exp(v, VTRUE, 0);
+        
+        return;
+      } /* otherwise pass to `unexpected symbol`*/
+    }
     default: {
       luaX_syntaxerror(ls, "unexpected symbol");
     }

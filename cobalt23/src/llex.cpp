@@ -841,9 +841,6 @@ int llex(LexState *ls, SemInfo *seminfo) {
         if (check_next1(ls, '*')) return TK_POW;
         return '*';
       }
-      case '$': {
-        lexerror(ls, "direct pointers not supported", TK_STRING);
-      }
       case '%': {
         next(ls);
         if (check_next1(ls, '=')) return TK_CMOD;

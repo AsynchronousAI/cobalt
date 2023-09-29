@@ -1327,7 +1327,13 @@ static void parlist (LexState *ls, std::vector<expdesc>* fallbacks = nullptr) {
     do {
       switch (ls->t.token) {
         case TK_NAME: {
-          new_localvar(ls, str_checkname(ls));
+          TString *str = str_checkname(ls);
+          /*if (strcmp(getstr(str), "public")){
+            printf("%s\t", getstr(str));
+            str = str_checkname(ls);
+            printf("%s\n", getstr(str));
+          }*/
+          new_localvar(ls, str);
           if (fallbacks) {
             expdesc* parfallback = &fallbacks->emplace_back(expdesc{});
             if (testnext(ls, '=')) {
@@ -1339,6 +1345,7 @@ static void parlist (LexState *ls, std::vector<expdesc>* fallbacks = nullptr) {
               }
             }
           }
+          
           nparams++;
           break;
         }

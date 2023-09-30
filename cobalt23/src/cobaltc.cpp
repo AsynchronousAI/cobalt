@@ -203,6 +203,8 @@ static int pmain(lua_State* L) {
         printf("%s", path);
       }
       pclose(fp);
+    }else{
+      process = filename;
     }
 
     if (luaL_loadfile(L, process) != LUA_OK) fatal(lua_tostring(L, -1));

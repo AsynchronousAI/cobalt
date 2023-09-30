@@ -1,0 +1,1 @@
+/* go through all the characters */

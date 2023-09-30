@@ -44,7 +44,7 @@ static const char *const luaX_tokens[] = {
     ">=",       "<=",       "!=",       "+=",       "-=",        "*=",        
     "/=",       "%=",       "..=",      "++",       "--",        "<<",        
     ">>",       "->",       "::",       "<eof>",    "<number>",  "<integer>", 
-    "<name>",   "<string>", "??"
+    "<name>",   "<string>", "<Component>", "??"
   };
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
@@ -578,7 +578,7 @@ static void read_format_string(LexState *ls, int del, SemInfo *seminfo) {
           break;
         }
         case '{': {
-          
+          lexerror(ls, "formats not supported", TK_STRING);
         }
 
         default:
@@ -691,6 +691,7 @@ static void read_string(LexState *ls, int del, SemInfo *seminfo) {
 
 int llex(LexState *ls, SemInfo *seminfo) {
   luaZ_resetbuffer(ls->buff);
+  bool disable = false;
   for (;;) {
     switch (ls->current) {
       case '\n':
@@ -856,7 +857,6 @@ int llex(LexState *ls, SemInfo *seminfo) {
         return '%';
       }
       case '`': /* format literal strings */
-        lexerror(ls, "format literal strings not implemented", TK_STRING, "unsupported");
         read_format_string(ls, ls->current, seminfo);
         return TK_STRING;
       case '"':

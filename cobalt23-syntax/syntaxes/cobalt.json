@@ -31,6 +31,9 @@
 					"include": "#single-quote-string"
 				},
 				{
+					"include": "#backtick-quote-string"
+				},
+				{
 					"include": "#double-quote-string"
 				},
 				{
@@ -95,6 +98,9 @@
 				},
 				{
 					"include": "#variable"
+				},
+				{
+					"include": "#tags"
 				}
 			]
 		},
@@ -121,7 +127,7 @@
 				"name": "punctuation.definition.comment.cobalt"
 			  }
 			}
-		  },
+		},
 		"constant": {
 			"name": "constant.language.cobalt",
 			"match": "\\b(null|true|false|_G|_VERSION|\\.\\.\\.)\\b"
@@ -167,10 +173,9 @@
 			},
 			"patterns": [
 				{
-					"match": "\\\\(\\d{1,3}|.)",
+					"match": "\\\\([{}])",
 					"name": "constant.character.escape.cobalt"
 				}
-
 			]
 		},
 		"double-quote-string": {
@@ -559,6 +564,65 @@
 		"variable": {
 			"name": "variable.other.cobalt",
 			"match": "\\b[_[:alpha:]][_[:alnum:]]*\\b"
+		},
+		"tags": {
+			"name": "meta.tag.jsx",
+			"begin": "<",
+			"end": ">",
+			"patterns": [
+			  {
+				"name": "entity.name.tag.jsx",
+				"match": "\\w+"
+			  },
+			  {
+				"name": "meta.tag-content.jsx",
+				"begin": "(?<=>)",
+				"end": "(?=<)",
+				"patterns": [
+				  {
+					"name": "string.quoted.double.jsx",
+					"match": "\".*?\""
+				  },
+				  {
+					"name": "string.quoted.single.jsx",
+					"match": "'.*?'"
+				  },
+				  {
+					"name": "constant.numeric.jsx",
+					"match": "\\d+"
+				  },
+				  {
+					"name": "variable.other.jsx",
+					"match": "\\$\\w+"
+				  },
+				  {
+					"name": "support.class.jsx",
+					"match": "\\w+"
+				  },
+				  {
+					"name": "entity.other.attribute-name.jsx",
+					"match": "\\w+"
+				  },
+				  {
+					"name": "keyword.operator.jsx",
+					"match": "="
+				  },
+				  {
+					"name": "punctuation.separator.jsx",
+					"match": ","
+				  },
+				  {
+					"name": "punctuation.definition.tag.jsx",
+					"match": "/",
+					"captures": {
+					  "0": {
+						"name": "keyword.operator.jsx"
+					  }
+					}
+				  }
+				]
+			  }
+			]
 		}
 	}
 }

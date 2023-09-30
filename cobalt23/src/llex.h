@@ -95,6 +95,7 @@ enum RESERVED {
   TK_INT,
   TK_NAME,
   TK_STRING,
+  TK_COMPONENT,
   TK_COAL,
 };
 

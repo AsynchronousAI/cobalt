@@ -20,7 +20,7 @@ int handlefatal(int line, const char file[30]) {
   std::signal(SIGABRT, fault_handler);
   std::signal(SIGFPE, fault_handler);
   std::signal(SIGILL, fault_handler);
-  std::signal(SIGINT, fault_handler);
+  //std::signal(SIGINT, fault_handler); -- Raised on Ctrl+C 
   std::signal(SIGSEGV, fault_handler);
   std::signal(SIGTERM, fault_handler);
   

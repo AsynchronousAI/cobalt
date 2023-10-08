@@ -1,0 +1,10 @@
+# Count .pluto files as Lua
+*.pluto linguist-language=Lua
+
+# Line Endings
+*.pluto text eof=lf
+*.cpp text eof=lf
+*.h text eof=lf
+
+# Exclude vendored code from language stats
+src/vendor/** linguist-vendored

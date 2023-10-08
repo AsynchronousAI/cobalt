@@ -1,72 +1,21 @@
-/.DS_Store
-/.argon.project.json
-*.o
-*.a
-/__pycache__/
-*.pyc
-/luaffifb
-*.a
-*.so
-/node_modules
-/cobalt
-/cobaltc
-/cobaltaot
-/test.cobalt
-/Pluto
-/cobaltpre
-/test.ll
-/libjit
-/cobalt23/lemon
-/cobaltmini
-/cobaltc.byte
-/cobaltc.cii
-/test.cobalt.cii
-/test.c
-/test.so
-/cobalt23-tests/music.mp3
-/jit
+/doc
+/src/*.o
+/src/*.exe
+/src/pluto
+/src/*.dll
+/src/*.a
+/src/*.lib
+/src/*.exp
+/src/vendor/Soup/*.lib
+/tbytecode.script
+/luac.out
+/tests/quick.lua
 
-# CMake Ignore
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-cmake_install.cmake
-Makefile
-.DS_Store
+# VS Code
+/.vscode/
 
-# Personal
-/cobalt23/5.1
-
-# Argon be annoying sometimes
-/src 
-
-# CMake Ignore (Very large) 
-/build
-install_manifest.txt
-/cobalt23/pre/cobaltpre
-/gc
-/lll
-/cobalt23/raptor/src/host/buildvm_arch.h
-/cobalt23/CMakeLists.txt.user
-/cobalt23/CMakeCache.txt
-/cobalt23/CMakeFiles
-/cobalt23/cmake_install.cmake
-/cobalt23/Makefile
-/cobalt23/src/CMakeLists.txt.user
-/cobalt23/src/CMakeCache.txt
-/cobalt23/src/CMakeFiles
-/cobalt23/src/cmake_install.cmake
-/cobalt23/src/Makefile
-*cmake_install.cmake
-*.dylib
-/Testing
-*Config.cmake
-*CTestTestfile.cmake
-
-# Allow 
-!/cobalt23/lua-cobalt/Makefile
-
-# Libs
-/test
-/test.py
-/testcii.cobalt
+# Visual Studio
+.vs/
+int/
+out/
+Pluto.vcxproj.user

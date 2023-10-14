@@ -51,7 +51,7 @@
 static const char *const luaX_tokens [] = {
     "and", "break", "do", "else", "elseif",
     "end", "false", "for", "function", "goto", "if",
-    "in", "local", "nil", "not", "or", "repeat",
+    "in", "local",  "nil", "null", "not", "or", "repeat",
     "case", "default", "as", "begin", "extends", "instanceof",
     "pluto_use",
     "pluto_switch", "pluto_continue", "pluto_enum", "pluto_new", "pluto_class", "pluto_parent", "pluto_export",

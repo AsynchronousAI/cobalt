@@ -12,3 +12,4 @@ Pluto + LJS + Ravi + AOT + Python + Lua = Cobalt
 - C-style comments & Lua style comments supported
 - Floor division like `x /% 3` or `/%=` for compound
 - Compound operaters 
+- Null = nil

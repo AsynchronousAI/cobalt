@@ -1211,7 +1211,7 @@ LUAI_FUNC int luaB_ipairsaux (lua_State *L);
   switch (ttype(t))
   {
     case LUA_TNIL:
-      str << "nil";
+      str << "null";
       break;
     case LUA_TBOOLEAN: 
       str << "boolean";

@@ -313,7 +313,7 @@ static void PrintConstant(const Proto* f, int i)
  switch (ttypetag(o))
  {
   case LUA_VNIL:
-    printf("nil");
+    printf("null");
     break;
   case LUA_VFALSE:
     printf("false");

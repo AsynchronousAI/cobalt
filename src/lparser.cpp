@@ -2689,6 +2689,7 @@ static void simpleexp (LexState *ls, expdesc *v, int flags, TypeHint *prop) {
         break;
       return;
     }
+    case TK_NULL:
     case TK_NIL: {
       if (prop) prop->emplaceTypeDesc(VT_NIL);
       init_exp(v, VNIL, 0);

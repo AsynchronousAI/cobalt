@@ -37,7 +37,7 @@ enum RESERVED {
   /* terminal symbols denoted by reserved words */
   TK_AND = FIRST_RESERVED, TK_BREAK,
   TK_DO, TK_ELSE, TK_ELSEIF, TK_END, TK_FALSE, TK_FOR, TK_FUNCTION,
-  TK_GOTO, TK_IF, TK_IN, TK_LOCAL, TK_NIL, TK_NOT, TK_OR, TK_REPEAT,
+  TK_GOTO, TK_IF, TK_IN, TK_LOCAL, TK_NIL, TK_NULL, TK_NOT, TK_OR, TK_REPEAT,
   TK_CASE, TK_DEFAULT, TK_AS, TK_BEGIN, TK_EXTENDS, TK_INSTANCEOF, // New narrow keywords.
   TK_PUSE, // New compatibility keywords.
   TK_PSWITCH, TK_PCONTINUE, TK_PENUM, TK_PNEW, TK_PCLASS, TK_PPARENT, TK_PEXPORT,
@@ -125,7 +125,7 @@ struct Token {
 
   [[nodiscard]] bool IsReservedNonValue() const noexcept
   {
-    return IsReserved() && token != TK_TRUE && token != TK_FALSE && token != TK_NIL
+    return IsReserved() && token != TK_TRUE && token != TK_FALSE && token != TK_NIL && token != TK_NULL
       && token != TK_PPARENT
       && token != TK_PARENT
       ;

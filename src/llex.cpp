@@ -51,12 +51,10 @@
 static const char *const luaX_tokens [] = {
     "and", "break", "do", "else", "elseif",
     "end", "false", "for", "function", "goto", "if",
-    "in", "local",  "nil", "null", "not", "or", "repeat",
+    "in", "local",  "nil", "null", "!", "not", "or", "repeat",
     "case", "default", "as", "begin", "extends", "instanceof",
-    "pluto_use",
-    "pluto_switch", "pluto_continue", "pluto_enum", "pluto_new", "pluto_class", "pluto_parent", "pluto_export",
-          "switch",       "continue",       "enum",       "new",       "class",       "parent",       "export",
-    "let",
+    "switch",       "continue",       "enum",       "new",       "class",       "parent",       "export",
+    "let", "use",
     "pluto_suggest_0", "pluto_suggest_1",
     "return", "then", "true", "until", "while",
     "//", "..", "...", "==", ">=", "<=", "~=",
@@ -932,7 +930,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       case '!': {
         next(ls);
         if (check_next1(ls, '=')) return TK_NE;  /* '!=' */
-        else return '!';
+        else return TK_NOT;
       }
       case '?': {
         next(ls);
@@ -985,6 +983,12 @@ static int llex (LexState *ls, SemInfo *seminfo) {
           ls->appendLineBuff(c);
           ls->appendLineBuff('=');
           return '=';
+        /*} else if (ls->current == '&' && c == '&'){
+          ls->appendLineBuff('&');
+          return TK_AND;
+        } else if (ls->current == '|' && c == '|'){
+          ls->appendLineBuff('|');
+          return TK_OR;*/
         } else {
           ls->appendLineBuff(c);
           return c;

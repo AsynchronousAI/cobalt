@@ -87,7 +87,7 @@ enum ValType : lu_byte {
   switch (vt) {
     case VT_DUNNO: return "dunno";
     case VT_VOID: return "void";
-    case VT_NIL: return "null";
+    case VT_NIL: return "nil";
     case VT_NUMBER: return "number";
     case VT_INT: return "int";
     case VT_FLT: return "float";
@@ -269,7 +269,7 @@ struct TypeHint {
 
   [[nodiscard]] std::string toString() const {
     if (empty()) {
-      return "null";
+      return "nil";
     }
     std::string str{};
     if (isNullable())

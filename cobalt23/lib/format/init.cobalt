@@ -1,0 +1,93 @@
+/*
+    Formatter for cobalt code
+*/
+
+
+/* init */
+configurations = {}
+
+/* code cleaning */
+function removeStringsAndComments(line){
+    /* Clears all comments and strings so parser doesnt have to deal with them */
+    return line->gsub("//.*", "")->gsub("/%*.-%*/", "")->gsub("'[^']*'", "")->gsub('"[^"]*"', "")
+}
+function configurator(line){
+    /* Looks for //format:x:y and will lib.config(x, y)*/
+    for (i, match in line->gmatch("//format:(%w+):(%w+)")){
+        configurations[i] = loadstring("return "..match)()
+    }
+    return line
+}
+function deindent(line){
+    /* Removes all whitespace before first not whitespace character */
+    return line->gsub("^%s+", "")
+}
+function all(line){
+    return deindent(configurator(line))
+}
+
+/* main */
+lib = {
+    "comma": function(code){
+        /*
+        If a comma is found, the character before shouldnt be whitespace and the character after should be a space
+        */
+        error("not implemented");
+
+    },
+    "operator": function(code){
+        /*
+        Spaces operators by configurations["operator"]
+        */
+        error("not implemented");
+        lines = code->split("\n")
+        operator = configurations["operator"] || 1
+    
+        for (_, line in pairs(lines)){
+            line = all(line)
+            operator = configurations["operator"] || 1
+            oline = line
+            space = []
+            line = removeStringsAndComments(line)
+            print(line)
+            for (i = 1, #line){
+                char = line->sub(i, i)
+
+                if ((char == "*" && line->sub(i+1, i+1) != "*") || (char == "<" && line->sub(i+1, i+1) == "<") || (char == ">" && line->sub(i+1, i+1) == ">") || char == "/" || char == "+" || char == "-" || char == "%" || char == "^" || (char == "&" && line->sub(i+1, i+1) == "&") || (char == "|" && line->sub(i+1, i+1) == "|") || char == "/" ){
+                    space[#space+1] = i
+                }
+            }
+            line = oline
+        }
+        return table.concat(lines, "\n")
+    },
+    "indent": function(code){
+        /*
+        Indents code by looking for { and } and adding indent spaces based on config.indent
+        */
+        lines = code->split("\n")
+        indent = configurations["indent"] || 4
+        cindent = 0
+    
+        for (_, line in pairs(lines)){
+            tl = 0;
+            line = all(line)
+            indent = configurations["indent"] || 4
+            oline = line
+            line = removeStringsAndComments(line)
+            for (i = 1, #line){
+                char = line->sub(i, i)
+
+                if (char == "{") {cindent++; tl=_;}
+                else if (char == "}") {cindent--; tl=0;}
+            }
+            line = oline
+            if (tl != _) lines[_] = (" ")->rep(cindent * indent) .. line
+        }
+        return table.concat(lines, "\n")
+    }
+}
+
+
+/* exports */
+return lib

@@ -209,7 +209,7 @@ static void throw_warn(LexState* ls, const char* err, WarningType warningType) {
       throwerr(ls,
         "expected an identifier.", "this needs a name.");
     }
-    case TK_CONTINUE: {
+    case TK_PCONTINUE: {
       throwerr(ls,
         "expected 'continue' inside a loop.", "this is not within a loop.");
     }
@@ -1226,7 +1226,9 @@ static void caselist (LexState *ls) {
       && gett(ls) != TK_DEFAULT
       && gett(ls) != TK_END
     ) {
-    if (gett(ls) == TK_CONTINUE) {
+    if (gett(ls) == TK_PCONTINUE
+        || gett(ls) == TK_CONTINUE
+        ) {
       continuestat(ls, 1);
     }
     else {
@@ -2478,7 +2480,8 @@ static void primaryexp (LexState *ls, expdesc *v) {
       const_expr(ls, v);
       return;
     }
-    case TK_PARENT: {
+    case TK_PARENT:
+    case TK_PPARENT: {
       luaX_next(ls);
       parentexp(ls, v);
       return;
@@ -2734,12 +2737,14 @@ static void simpleexp (LexState *ls, expdesc *v, int flags, TypeHint *prop) {
       lambdabody(ls, v, ls->getLineNumber());
       return;
     }
-    case TK_NEW: {
+    case TK_NEW:
+    case TK_PNEW: {
       if (prop) prop->emplaceTypeDesc(VT_TABLE);
       newexpr(ls, v);
       break;
     }
-    case TK_CLASS: {
+    case TK_CLASS:
+    case TK_PCLASS: {
       if (prop) prop->emplaceTypeDesc(VT_TABLE);
       luaX_next(ls); /* skip 'class' */
       classexpr(ls, v);
@@ -2771,7 +2776,6 @@ static void inexpr (LexState *ls, expdesc *v) {
 static UnOpr getunopr (int op) {
   switch (op) {
     case TK_NOT: return OPR_NOT;
-    case TK_NNOT: return OPR_NOT;
     case '-': return OPR_MINUS;
     case '~': return OPR_BNOT;
     case '#': return OPR_LEN;
@@ -4210,7 +4214,8 @@ static void statement (LexState *ls, TypeHint *prop) {
       funcstat(ls, line);
       break;
     }
-    case TK_CLASS: {
+    case TK_CLASS:
+    case TK_PCLASS: {
       classstat(ls);
       break;
     }
@@ -4225,13 +4230,14 @@ static void statement (LexState *ls, TypeHint *prop) {
       }
       if (testnext(ls, TK_FUNCTION))  /* local function? */
         localfunc(ls);
-      else if (testnext(ls, TK_CLASS))
+      else if (testnext2(ls, TK_CLASS, TK_PCLASS))
         localclass(ls);
       else
         localstat(ls);
       break;
     }
-    case TK_EXPORT: {
+    case TK_EXPORT:
+    case TK_PEXPORT: {
       if (ls->fs->bl->previous)
         luaX_syntaxerror(ls, "Attempt to use 'export' outside of global scope");
       luaX_next(ls);  /* skip EXPORT */
@@ -4247,7 +4253,7 @@ static void statement (LexState *ls, TypeHint *prop) {
         luaX_prev(ls);
         localfunc(ls);
       }
-      else if (testnext(ls, TK_CLASS)) {
+      else if (testnext2(ls, TK_CLASS, TK_PCLASS)) {
         ls->export_symbols.emplace_back(str_checkname(ls, 0));
         luaX_prev(ls);
         localclass(ls);
@@ -4273,7 +4279,8 @@ static void statement (LexState *ls, TypeHint *prop) {
       breakstat(ls);
       break;
     }
-    case TK_CONTINUE: {
+    case TK_CONTINUE:
+    case TK_PCONTINUE: {
       continuestat(ls);
       break;
     }
@@ -4282,11 +4289,13 @@ static void statement (LexState *ls, TypeHint *prop) {
       gotostat(ls);
       break;
     }
-    case TK_SWITCH: {
+    case TK_SWITCH:
+    case TK_PSWITCH: {
       switchstat(ls, line);
       break;
     }
-    case TK_ENUM: {
+    case TK_ENUM:
+    case TK_PENUM: {
       enumstat(ls);
       break;
     }
@@ -4301,7 +4310,8 @@ static void statement (LexState *ls, TypeHint *prop) {
       prefixplusplus(ls, &v, true);
       break;
     }
-    case TK_NEW: {
+    case TK_NEW:
+    case TK_PNEW: {
       if (prop) prop->emplaceTypeDesc(VT_TABLE);
       expdesc v;
       newexpr(ls, &v);
@@ -4331,6 +4341,7 @@ static void builtinoperators (LexState *ls) {
   for (const auto& t : ls->tokens) {
     switch (t.token) {
       case TK_NEW:
+      case TK_PNEW:
         uses_new = true;
         break;
       case TK_EXTENDS:

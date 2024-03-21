@@ -3932,71 +3932,6 @@ static void localstat (LexState *ls) {
   checktoclose(fs, toclose);
 }
 
-static void letstat (LexState *ls) {
-  if (ls->t.token == '{') {
-    destructuring(ls);
-    return;
-  }
-  if (ls->t.token == '[') {
-    arraydestructuring(ls);
-    return;
-  }
-  /* stat -> LOCAL NAME ATTRIB { ',' NAME ATTRIB } ['=' explist] */
-  FuncState *fs = ls->fs;
-  int toclose = -1;  /* index of to-be-closed variable (if any) */
-  Vardesc *var;  /* last variable */
-  int vidx, kind;  /* index and kind of last variable */
-  TypeHint hint{};
-  int nvars = 0;
-  int nexps;
-  expdesc e;
-  auto line = ls->getLineNumber(); /* in case we need to emit a warning */
-  size_t starting_tidx = ls->tidx; /* code snippets on tuple assignments can have inaccurate line readings because the parser skips lines until it can close the statement */
-  do {
-    vidx = new_localvar(ls, str_checkname(ls, N_OVERRIDABLE), line);
-    hint = gettypehint(ls);
-    kind = RDKCONST;
-    var = getlocalvardesc(fs, vidx);
-    var->vd.kind = kind;
-    *var->vd.hint = hint;
-    nvars++;
-  } while (testnext(ls, ','));
-  std::vector<TypeHint> ts;
-  if (testnext(ls, '=')) {
-    ParserContext ctx = ((nvars == 1) ? PARCTX_CREATE_VAR : PARCTX_CREATE_VARS);
-    ls->pushContext(ctx);
-    nexps = explist(ls, &e, ts);
-    ls->popContext(ctx);
-  }
-  else {
-    e.k = VVOID;
-    nexps = 0;
-    process_assign(ls, var, TypeHint{ VT_NIL }, line);
-  }
-  if (nvars == nexps) { /* no adjustments? */
-    if (var->vd.kind == RDKCONST &&  /* last variable is const? */
-        luaK_exp2const(fs, &e, &var->k)) {  /* compile-time constant? */
-      var->vd.kind = RDKCTC;  /* variable is a compile-time constant */
-      adjustlocalvars(ls, nvars - 1);  /* exclude last variable */
-      fs->nactvar++;  /* but count it */
-    }
-    else {
-      vidx = vidx - nvars + 1;
-      for (TypeHint& t : ts) {
-        exp_propagate(ls, e, t);
-        process_assign(ls, getlocalvardesc(fs, vidx), t, line);
-        ++vidx;
-      }
-      adjust_assign(ls, nvars, nexps, &e);
-      adjustlocalvars(ls, nvars);
-    }
-  }
-  else {
-    adjust_assign(ls, nvars, nexps, &e);
-    adjustlocalvars(ls, nvars);
-  }
-  checktoclose(fs, toclose);
-}
 
 static int funcname (LexState *ls, expdesc *v) {
   /* funcname -> NAME {fieldsel} [':' NAME] */
@@ -4283,17 +4218,7 @@ static void statement (LexState *ls, TypeHint *prop) {
       classstat(ls);
       break;
     }
-    case TK_LET: {
-      luaX_next(ls);  /* skip LOCAL */
-      if (testnext(ls, TK_FUNCTION))  /* local function? */
-        luaX_syntaxerror(ls, "Attempt to use 'let' on a function");
-      else if (testnext2(ls, TK_CLASS, TK_PCLASS))
-        luaX_syntaxerror(ls, "Attempt to use 'let' on a class");
-      else
-        letstat(ls);
-      break;
-    }
-    case TK_LOCAL: {  /* stat -> localstat */
+    case TK_LOCAL: case TK_LET: {  /* stat -> localstat */
       luaX_next(ls);  /* skip LOCAL */
       if (ls->shouldSuggest()) {
         SuggestionsState ss(ls);

@@ -1,8 +1,7 @@
 /doc
 /src/*.o
 /src/*.exe
-/src/obsid
-/src/obsidc
+/src/pluto
 /src/*.dll
 /src/*.a
 /src/*.lib
@@ -19,4 +18,4 @@
 .vs/
 int/
 out/
-obsid.vcxproj.user
+Pluto.vcxproj.user
